@@ -55,7 +55,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
           flexShrink: 0,
         }}
       >
-        <Logo />
+        {/* <Logo /> */}
 
         <NavAccount />
       </Stack>
@@ -64,7 +64,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <NavDocs />
+      {/* <NavDocs /> */}
     </Scrollbar>
   );
 
