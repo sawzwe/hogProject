@@ -19,7 +19,7 @@ import ScrollToTop from './components/scroll-to-top';
 // Check our docs
 // https://docs.minimals.cc/authentication/js-version
 
-import { AuthProvider } from './auth/JwtContext';
+import { AuthProvider } from './auth/FirebaseContext';
 
 //
 import App from './App';

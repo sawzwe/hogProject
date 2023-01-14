@@ -8,7 +8,7 @@ import DashboardEPLayout from '../layouts/dashboardEP';
 // config
 import { PATH_AFTER_LOGIN } from '../config';
 //
-import { Page404, PageOne, PageTwo, PageSix, PageFour, PageFive, LoginPage, PageThree } from './elements';
+import { Page404, PageOne, PageTwo, PageSix, PageFour, PageFive, LoginPage, PageThree, RegisterPage } from './elements';
 
 // ----------------------------------------------------------------------
 
@@ -26,6 +26,11 @@ export default function Router() {
             </GuestGuard>
           ),
         },
+        { 
+          path: 'register', 
+          element: 
+          <GuestGuard><RegisterPage /> </GuestGuard>
+        }
       ],
     },
     {
@@ -56,5 +61,6 @@ export default function Router() {
       children: [{ path: '404', element: <Page404 /> }],
     },
     { path: '*', element: <Navigate to="/404" replace /> },
+    // { path: 'register', element: <RegisterPage /> },
   ]);
 }
