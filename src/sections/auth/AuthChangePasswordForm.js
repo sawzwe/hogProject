@@ -39,7 +39,7 @@ export default function AuthResetPasswordForm() {
         try {
             await changePassword(data.newPassword);
             logout();
-            navigate('/');
+            navigate('/login');
         } catch (error) {
             console.error(error.message);
 

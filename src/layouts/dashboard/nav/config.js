@@ -82,9 +82,9 @@ const EAnavConfig = [
   {
     subheader: 'schedule management',
     items: [
-      { title: 'Search', path: PATH_DASHBOARD.epone, icon: ICONS.user },
-      { title: 'Request', path: PATH_DASHBOARD.eptwo, icon: ICONS.group },
-      { title: 'Calendar', path: PATH_DASHBOARD.eptwo, icon: ICONS.group }
+      { title: 'Search', path: PATH_DASHBOARD.newStudent, icon: ICONS.user },
+      { title: 'Request', path: PATH_DASHBOARD.newStudent, icon: ICONS.group },
+      { title: 'Calendar', path: PATH_DASHBOARD.newStudent, icon: ICONS.group }
     ],
   },
 
@@ -93,7 +93,7 @@ const EAnavConfig = [
   {
     subheader: 'course registration',
     items: [
-      {title: 'Registration Request', path: PATH_DASHBOARD.root, icon: ICONS.mail }
+      {title: 'Registration Request', path: PATH_DASHBOARD.newStudent, icon: ICONS.mail }
     ],
   },
 
@@ -102,8 +102,8 @@ const EAnavConfig = [
   {
     subheader: 'Settings',
     items: [
-      {title: 'Reset Password', path: PATH_DASHBOARD.root, icon: ICONS.changePassword },
-      {title: 'Logout', path: PATH_DASHBOARD.root, icon: ICONS.logout }
+      {title: 'Reset Password', path: PATH_DASHBOARD.newStudent, icon: ICONS.changePassword },
+      {title: 'Logout', path: PATH_DASHBOARD.newStudent, icon: ICONS.logout }
     ],
   }
 ];

@@ -7,6 +7,7 @@ import { Tooltip, Link, ListItemText } from '@mui/material';
 import { useLocales } from '../../../locales';
 // auth
 import RoleBasedGuard from '../../../auth/RoleBasedGuard';
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
 import Iconify from '../../iconify';
 import { StyledItem, StyledIcon } from './styles';
@@ -15,10 +16,19 @@ import { StyledItem, StyledIcon } from './styles';
 
 const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...other }, ref) => {
   const { translate } = useLocales();
+  const { logout } = useAuthContext();
 
   const { title, path, icon, children, disabled, caption, roles } = item;
 
   const subItem = depth !== 1;
+
+  const handleLogout = async () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const renderContent = (
     <StyledItem ref={ref} open={open} depth={depth} active={active} disabled={disabled} {...other}>
@@ -81,6 +91,15 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
           {renderContent}
         </Link>
       );
+
+    // Logout
+    if (title === "Logout") {
+      return (
+        <Link component={RouterLink} underline="none" onClick={handleLogout} >
+          {renderContent}
+        </Link>
+      );
+    }
 
     // Default
     return (

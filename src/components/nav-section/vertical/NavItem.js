@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { Box, Tooltip, Link, ListItemText } from '@mui/material';
 // locales
@@ -7,8 +7,6 @@ import { useLocales } from '../../../locales';
 // auth
 import RoleBasedGuard from '../../../auth/RoleBasedGuard';
 
-// routes
-import { PATH_AUTH } from '../../../routes/paths';
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
 //
@@ -28,17 +26,11 @@ NavItem.propTypes = {
 
 export default function NavItem({ item, depth, open, active, isExternalLink, ...other }) {
   const { translate } = useLocales();
-  const { navigate } = useNavigate();
-
-  const { user, logout } = useAuthContext();
+  const { logout } = useAuthContext();
 
   const { title, path, icon, info, children, disabled, caption, roles } = item;
 
   const subItem = depth !== 1;
-
-  // const handleClickItem = () => {
-  //   console.log('hi')
-  // }
 
   const handleLogout = async () => {
     try {
@@ -113,7 +105,7 @@ export default function NavItem({ item, depth, open, active, isExternalLink, ...
     // Logout
     if (title === "Logout") {
       return (
-        <Link component={RouterLink} to="/" underline="none" onClick={handleLogout} >
+        <Link component={RouterLink} underline="none" onClick={handleLogout} >
           {renderContent}
         </Link>
       );

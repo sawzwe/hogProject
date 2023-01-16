@@ -1,28 +1,53 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // auth
+import RoleBasedGuard from '../auth/RoleBasedGuard';
 import AuthGuard from '../auth/AuthGuard';
 import GuestGuard from '../auth/GuestGuard';
 import { useAuthContext } from '../auth/useAuthContext';
 // layouts
 import CompactLayout from '../layouts/compact';
-import DashboardEPLayout from '../layouts/dashboardEP';
+import DashboardLayout from '../layouts/dashboard';
 // 
-import { PATH_DASHBOARD } from './paths';
+import { PATH_DASHBOARD, PATH_AUTH } from './paths';
 //
-import { Page404, PageNewStdent, PageTwo, PageSix, PageFour, PageFive, LoginPage, PageThree, RegisterPage, PageAllStdents, PageCreateRequest, PageRequestStatus, PageCourseTransferRequest, PageChangePassword } from './elements';
+import {
+  Page404,
+  PageNewStdent,
+  PageTwo,
+  PageSix,
+  PageFour,
+  PageFive,
+  LoginPage,
+  PageThree,
+  RegisterPage,
+  PageAllStdents,
+  PageCreateRequest,
+  PageRequestStatus,
+  PageCourseTransferRequest,
+  PageChangePassword
+}
+  from './elements';
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
   const { user } = useAuthContext();
-  
-  // If user.role === 'Education Planner' then firstPage = PATH.DASHBOARD.newStudent;
-  // Set condition at <Navigate  to={firstPage}> according to user's role
+
+  function firstPage() {
+    if (user.role === 'Education Planner') {
+      return 'newStudent'
+    } 
+    if (user.role === 'Education Admin'){
+      return 'allStudents'
+    }
+    return null;
+  };
+
   return useRoutes([
     {
       path: '/',
       children: [
-        { element: <Navigate to={PATH_DASHBOARD.newStudent} replace />, index: true },
+        { element: <Navigate to="/login" replace />, index: true },
         {
           path: 'login',
           element: (
@@ -31,12 +56,13 @@ export default function Router() {
             </GuestGuard>
           ),
         },
-        { 
-          path: 'register', 
-          element: 
-          <GuestGuard>
-          <RegisterPage /> 
-          </GuestGuard>
+        {
+          path: 'register',
+          element: (
+            <GuestGuard>
+              <RegisterPage />
+            </GuestGuard>
+          )
         }
       ],
     },
@@ -44,17 +70,50 @@ export default function Router() {
       path: '/dashboard',
       element: (
         <AuthGuard>
-          <DashboardEPLayout />
+          <DashboardLayout />
         </AuthGuard>
       ),
       children: [
-        { element: <Navigate to={PATH_DASHBOARD.root} replace />, index: true },
-        { path: 'newStudent', element: <PageNewStdent /> },
-        { path: 'allStudents', element: <PageAllStdents /> },
-        { path: 'createRequest', element: <PageCreateRequest /> },
-        { path: 'requestStatus', element: <PageRequestStatus /> },
-        { path: 'courseTransferRequest', element: <PageCourseTransferRequest /> },
-        { path: 'resetPassword', element: <PageChangePassword />}
+        { element: <Navigate to={user?.role && firstPage() } replace />, index: true },
+        {
+          path: 'newStudent',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageNewStdent />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'allStudents',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageAllStdents />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'createRequest',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageCreateRequest />
+            </RoleBasedGuard>)
+        },
+        {
+          path: 'requestStatus',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageRequestStatus />
+            </RoleBasedGuard>)
+        },
+        {
+          path: 'courseTransferRequest',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageCourseTransferRequest />
+            </RoleBasedGuard>
+          )
+        },
+        { path: 'resetPassword', element: <PageChangePassword /> }
       ],
     },
     {
