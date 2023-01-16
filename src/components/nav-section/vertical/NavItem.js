@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { Box, Tooltip, Link, ListItemText } from '@mui/material';
 // locales
 import { useLocales } from '../../../locales';
 // auth
 import RoleBasedGuard from '../../../auth/RoleBasedGuard';
+
+// routes
+import { PATH_AUTH } from '../../../routes/paths';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
 import Iconify from '../../iconify';
 //
@@ -23,10 +28,25 @@ NavItem.propTypes = {
 
 export default function NavItem({ item, depth, open, active, isExternalLink, ...other }) {
   const { translate } = useLocales();
+  const { navigate } = useNavigate();
+
+  const { user, logout } = useAuthContext();
 
   const { title, path, icon, info, children, disabled, caption, roles } = item;
 
   const subItem = depth !== 1;
+
+  // const handleClickItem = () => {
+  //   console.log('hi')
+  // }
+
+  const handleLogout = async () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const renderContent = (
     <StyledItem depth={depth} active={active} disabled={disabled} caption={!!caption} {...other}>
@@ -74,7 +94,9 @@ export default function NavItem({ item, depth, open, active, isExternalLink, ...
     </StyledItem>
   );
 
+
   const renderItem = () => {
+
     // ExternalLink
     if (isExternalLink)
       return (
@@ -88,9 +110,18 @@ export default function NavItem({ item, depth, open, active, isExternalLink, ...
       return renderContent;
     }
 
+    // Logout
+    if (title === "Logout") {
+      return (
+        <Link component={RouterLink} to="/" underline="none" onClick={handleLogout} >
+          {renderContent}
+        </Link>
+      );
+    }
+
     // Default
     return (
-      <Link component={RouterLink} to={path} underline="none">
+      <Link component={RouterLink} to={path} underline="none" >
         {renderContent}
       </Link>
     );

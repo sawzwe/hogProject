@@ -7,12 +7,34 @@ import { hideScrollbarX } from '../../../utils/cssStyles';
 // components
 import Logo from '../../../components/logo';
 import { NavSectionMini } from '../../../components/nav-section';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import navConfig from './config';
+import {EPnavConfig, EAnavConfig, OAnavConfig} from './config';
 
 // ----------------------------------------------------------------------
 
 export default function NavMini() {
+  const { user } = useAuthContext();
+
+  function getNavConfig(err) {
+    if (user.role === "Education Planner") {
+      return EPnavConfig
+    }
+
+    if (user.role === "Education Admin") {
+      return EAnavConfig
+    } 
+    
+    if (user.role === "Office Admin") {
+      return OAnavConfig
+    }
+
+    return err;
+  }
+
+  const navConfig = getNavConfig();
+  
   return (
     <Box
       component="nav"

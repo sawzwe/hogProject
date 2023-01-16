@@ -9,13 +9,34 @@ import { HEADER } from '../../../config';
 import { bgBlur } from '../../../utils/cssStyles';
 // components
 import { NavSectionHorizontal } from '../../../components/nav-section';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import navConfig from './config';
+import {EPnavConfig, EAnavConfig, OAnavConfig} from './config';
 
 // ----------------------------------------------------------------------
 
 function NavHorizontal() {
   const theme = useTheme();
+  const { user } = useAuthContext();
+
+  function getNavConfig(err) {
+    if (user.role === "Education Planner") {
+      return EPnavConfig
+    }
+
+    if (user.role === "Education Admin") {
+      return EAnavConfig
+    } 
+    
+    if (user.role === "Office Admin") {
+      return OAnavConfig
+    }
+
+    return err;
+  }
+
+  const navConfig = getNavConfig();
 
   return (
     <AppBar

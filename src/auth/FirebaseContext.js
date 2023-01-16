@@ -8,6 +8,7 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    updatePassword
 } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 // config
@@ -48,7 +49,6 @@ export const AuthContext = createContext(null);
 const firebaseApp = initializeApp(FIREBASE_API);
 
 const AUTH = getAuth(firebaseApp);
-
 const DB = getFirestore(firebaseApp);
 
 AuthProvider.propTypes = {
@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
                             user: {
                                 ...user,
                                 ...profile,
-                                role: 'admin',
+                                // role: 'admin',
                             },
                         },
                     });
@@ -99,11 +99,14 @@ export function AuthProvider({ children }) {
         initialize();
     }, [initialize]);
 
+    // UPDATE PASSWORD
+    const changePassword = (newPassword) => updatePassword(AUTH.currentUser, newPassword);
+
     // LOGIN
     const login = (email, password) => signInWithEmailAndPassword(AUTH, email, password);
 
     // REGISTER
-    const register = (email, password, firstName, lastName) =>
+    const register = (email, password, firstName, lastName, role) =>
         createUserWithEmailAndPassword(AUTH, email, password).then(async (res) => {
             const userRef = doc(collection(DB, 'users'), res.user?.uid);
 
@@ -111,7 +114,7 @@ export function AuthProvider({ children }) {
                 uid: res.user?.uid,
                 email,
                 displayName: `${firstName} ${lastName}`,
-                role: 'student'
+                role
             });
         });
 
@@ -126,6 +129,7 @@ export function AuthProvider({ children }) {
                 login,
                 register,
                 logout,
+                changePassword,
             }}
         >
             {children}

@@ -28,6 +28,7 @@ export default function NavSectionVertical({ data, sx, ...other }) {
 
             {group.items.map((list) => (
               <NavList key={list.title + list.path} data={list} depth={1} hasChild={!!list.children} />
+              
             ))}
           </List>
         );

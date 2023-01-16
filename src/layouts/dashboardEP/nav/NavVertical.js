@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { Box, Stack, Drawer } from '@mui/material';
@@ -11,8 +11,10 @@ import { NAV } from '../../../config';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import { NavSectionVertical } from '../../../components/nav-section';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import navConfig from './config';
+import {EPnavConfig, EAnavConfig, OAnavConfig} from './config';
 import NavDocs from './NavDocs';
 import NavAccount from './NavAccount';
 
@@ -25,6 +27,7 @@ NavVertical.propTypes = {
 
 export default function NavVertical({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const { user } = useAuthContext();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -34,6 +37,24 @@ export default function NavVertical({ openNav, onCloseNav }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  function getNavConfig(err) {
+    if (user.role === "Education Planner") {
+      return EPnavConfig
+    }
+
+    if (user.role === "Education Admin") {
+      return EAnavConfig
+    } 
+    
+    if (user.role === "Office Admin") {
+      return OAnavConfig
+    }
+
+    return err;
+  }
+
+  const navConfig = getNavConfig();
 
   const renderContent = (
     <Scrollbar

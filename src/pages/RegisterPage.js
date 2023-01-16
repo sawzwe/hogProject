@@ -5,7 +5,7 @@ import Register from '../sections/auth/Register';
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
     return (
         <>
             <Helmet>
