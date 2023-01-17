@@ -17,7 +17,7 @@ export default function AllStudentsPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Saw Edit All Students
+                    Hong Edit All Students
                 </Typography>
 
             </Container>
