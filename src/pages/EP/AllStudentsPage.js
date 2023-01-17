@@ -12,12 +12,12 @@ export default function AllStudentsPage() {
     return (
         <>
             <Helmet>
-                <title> EP | All Students </title>
+                <title> EP STUDENTS </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Saw Edit All Students
+                    Added Table Saw
                 </Typography>
 
             </Container>
