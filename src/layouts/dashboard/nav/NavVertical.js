@@ -38,7 +38,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  function getNavConfig(err) {
+  function getNavConfig() {
     if (user.role === "Education Planner") {
       return EPnavConfig
     }
@@ -51,7 +51,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
       return OAnavConfig
     }
 
-    return err;
+    return EPnavConfig;
   }
 
   const navConfig = getNavConfig();

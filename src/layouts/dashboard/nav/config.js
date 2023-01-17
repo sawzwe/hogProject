@@ -67,7 +67,7 @@ const EPnavConfig = [
   {
     subheader: 'Settings',
     items: [
-      {title: 'Reset Password', path: PATH_DASHBOARD.resetPassword, icon: ICONS.changePassword },
+      {title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
       {title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
@@ -102,7 +102,7 @@ const EAnavConfig = [
   {
     subheader: 'Settings',
     items: [
-      {title: 'Reset Password', path: PATH_DASHBOARD.newStudent, icon: ICONS.changePassword },
+      {title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
       {title: 'Logout', path: PATH_DASHBOARD.newStudent, icon: ICONS.logout }
     ],
   }
@@ -137,7 +137,7 @@ const OAnavConfig = [
   {
     subheader: 'Settings',
     items: [
-      {title: 'Reset Password', path: PATH_DASHBOARD.root, icon: ICONS.changePassword },
+      {title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
       {title: 'Logout', path: PATH_DASHBOARD.root, icon: ICONS.logout }
     ],
   }

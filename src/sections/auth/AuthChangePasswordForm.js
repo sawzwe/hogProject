@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 // form
@@ -8,9 +9,8 @@ import { Link, Stack, Alert, IconButton, InputAdornment } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
-// routes
-import { PATH_AUTH } from '../../routes/paths';
 // components
+import Iconify from '../../components/iconify';
 import FormProvider, { RHFTextField } from '../../components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -19,8 +19,14 @@ export default function AuthResetPasswordForm() {
     const navigate = useNavigate();
     const { changePassword, logout } = useAuthContext();
 
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmedNewPassword] = useState(false);
+
     const ResetPasswordSchema = Yup.object().shape({
-        newPassword: Yup.string().required('New Password is required')
+        newPassword: Yup.string().required('New Password is required'),
+        confirmNewPassword: Yup.string()
+        .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+        .required('Confirm New Password is required')
     });
 
     const methods = useForm({
@@ -54,8 +60,35 @@ export default function AuthResetPasswordForm() {
 
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3}>
-                <RHFTextField name="newPassword" label="New password" />
+            <Stack spacing={2}>
+                <RHFTextField
+                    name="newPassword"
+                    label="New Password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end">
+                                    <Iconify icon={showNewPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+                <RHFTextField
+                    name="confirmNewPassword"
+                    label="Confirm new password"
+                    type={showConfirmNewPassword ? 'text' : 'password'}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowConfirmedNewPassword(!showConfirmNewPassword)} edge="end">
+                                    <Iconify icon={showConfirmNewPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
             </Stack>
 
             <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isSubmitting} sx={{ mt: 3 }}>

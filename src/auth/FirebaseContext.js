@@ -114,7 +114,7 @@ export function AuthProvider({ children }) {
                 uid: res.user?.uid,
                 email,
                 displayName: `${firstName} ${lastName}`,
-                role
+                role: "Education Planner"
             });
         });
 

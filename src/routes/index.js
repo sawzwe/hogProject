@@ -13,11 +13,9 @@ import { PATH_DASHBOARD, PATH_AUTH } from './paths';
 import {
   Page404,
   PageNewStdent,
-  PageTwo,
-  PageSix,
-  PageFour,
-  PageFive,
   LoginPage,
+  PageOne,
+  PageTwo,
   PageThree,
   RegisterPage,
   PageAllStdents,
@@ -113,7 +111,7 @@ export default function Router() {
             </RoleBasedGuard>
           )
         },
-        { path: 'resetPassword', element: <PageChangePassword /> }
+        { path: 'changePassword', element: <PageChangePassword /> }
       ],
     },
     {

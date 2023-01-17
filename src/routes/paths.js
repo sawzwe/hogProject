@@ -22,7 +22,7 @@ export const PATH_DASHBOARD = {
   createRequest: path(ROOTS_DASHBOARD, '/createRequest'),
   requestStatus: path(ROOTS_DASHBOARD, '/requestStatus'),
   courseTransferRequest: path(ROOTS_DASHBOARD, '/courseTransferRequest'),
-  resetPassword: path(ROOTS_DASHBOARD, '/resetPassword'),
+  changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
 };
 
 export const PATH_EP_DASHBOARD = {

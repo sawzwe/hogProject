@@ -17,7 +17,7 @@ export default function NewStudentPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    New Student
+                    Hello
                 </Typography>
 
                 <Typography gutterBottom>
