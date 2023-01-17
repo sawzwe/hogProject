@@ -5,8 +5,10 @@ import { Box, Typography } from '@mui/material';
 import { useAuthContext } from '../../../auth/useAuthContext';
 // components
 import { CustomAvatar } from '../../../components/custom-avatar';
+import Logo from '../../../components/logo/Logo';
 // logo
-import { hog-logo } from '../../../public/logo/logo.png';
+// import hog from '../../../assets/logo/hog.svg';
+
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +27,8 @@ export default function NavAccount() {
 
   return (
     <StyledRoot>
-      <CustomAvatar src={user?.photoURL} alt={user?.displayName} name={user?.displayName} />
+      {/* <CustomAvatar src={hog} alt={user?.displayName} name={user?.displayName} /> */}
+      <Logo />
 
       <Box sx={{ ml: 2, minWidth: 0 }}>
         <Typography variant="subtitle2" noWrap>
