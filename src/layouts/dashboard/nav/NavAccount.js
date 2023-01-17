@@ -5,6 +5,8 @@ import { Box, Typography } from '@mui/material';
 import { useAuthContext } from '../../../auth/useAuthContext';
 // components
 import { CustomAvatar } from '../../../components/custom-avatar';
+// logo
+import { hog-logo } from '../../../public/logo/logo.png';
 
 // ----------------------------------------------------------------------
 
