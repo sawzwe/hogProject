@@ -1,8 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
+// routes
+import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import { useSettingsContext } from '../../components/settings';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+// sections
+import UserNewEditForm from '../../sections/dashboard/UserNewEditForm';
 
 // ----------------------------------------------------------------------
 
@@ -12,23 +17,25 @@ export default function NewStudentPage() {
     return (
         <>
             <Helmet>
-                <title> EP | New Student </title>
+                <title> EP | New student </title>
             </Helmet>
 
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <Typography variant="h3" component="h1" paragraph>
-                    Hello
-                </Typography>
-
-                <Typography gutterBottom>
-                    Saw, you need to learn MUI Components and Template's Components. If you found compoenents on MUI, check if it's 
-                    in template's components in components folder or not, and try to use template's components first. If it didn't work,
-                    then you may use components from MUI.
-                </Typography>
-
-                <Typography>
-                    Just a text
-                </Typography>
+            <Container maxWidth={themeStretch ? false : 'lg'}>
+                <CustomBreadcrumbs
+                    heading="Create a new student"
+                    links={[
+                        {
+                            name: 'Dashboard',
+                            href: PATH_DASHBOARD.firstPage,
+                        },
+                        {
+                            name: 'Student management',
+                            href: PATH_DASHBOARD.firstPage,
+                        },
+                        { name: 'New student' },
+                    ]}
+                />
+                <UserNewEditForm />
             </Container>
         </>
     );
