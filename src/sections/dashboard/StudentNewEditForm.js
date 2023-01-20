@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // form
 import { useForm, Controller } from 'react-hook-form';
@@ -22,18 +22,39 @@ import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHF
 
 // ----------------------------------------------------------------------
 
-UserNewEditForm.propTypes = {
+const TITLE_OPTIONS = [
+    { id: 1, name: 'Mr.' },
+    { id: 2, name: 'Ms.' },
+    { id: 3, name: 'Mrs.' },
+];
+
+const STUDY_PROGRAM_OPTIONS = [
+    { label: 'International Program', value: 'International Program' },
+    { label: 'Bilingual/EP Program', value: 'Bilingual/EP Program' },
+    { label: 'Thai Program', value: 'Thai Program' },
+    { label: 'Gifted Program', value: 'Gifted Program' },
+    { label: 'Homeschool', value: 'Homeschool' },
+    { label: 'Other', value: 'Other' }
+]
+
+const MAX_FILE_SIZE = 2 * 1000 * 1000; // 2 Mb
+
+const FILE_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
+
+// ----------------------------------------------------------------------
+
+StudentNewEditForm.propTypes = {
     isEdit: PropTypes.bool,
-    currentUser: PropTypes.object,
+    currentStudent: PropTypes.object,
 };
 
-export default function UserNewEditForm({ isEdit = false, currentUser }) {
+export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
     const navigate = useNavigate();
 
     const { enqueueSnackbar } = useSnackbar();
 
     const NewStudentSchema = Yup.object().shape({
-        studentTitle: Yup.string().required('Title is required'),
+        studentTitle: Yup.string().nullable().required('Title is required'),
         studentFirstName: Yup.string().required('Firstname is required'),
         studentLastName: Yup.string().required('Lastname is required'),
         studentNickname: Yup.string().required('Nickname is required'),
@@ -42,11 +63,15 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
         studentLineId: Yup.string().required('Line ID is required'),
         studentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         schoolName: Yup.string().required('School name is required'),
-        schoolCountry: Yup.string().required('Country is required'),
+        schoolCountry: Yup.string().nullable().required('Country is required'),
         levelOfStudy: Yup.string().required('Level of study is required'),
         targetUniversity: Yup.string(),
         targetScore: Yup.string(),
         studyProgram: Yup.string().required('Study program is required'),
+        otherStudyProgram: Yup.string().when("showOtherStudyProgram", {
+            is: true,
+            then: Yup.string().required('Other study program is required')
+        }),
         address: Yup.string().required('Address is required'),
         subDistrict: Yup.string().required('Sub-District is required'),
         district: Yup.string().required('District is required'),
@@ -61,12 +86,52 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
         parentLine: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
         studentSource: Yup.string(),
-        studentImageUrl: Yup.mixed().test('required', 'Profile image is required', (value) => value !== ''),
+        studentImageURL: Yup.mixed().required('Student photo is required')
+            .test('fileSize', 'The file is too large', (file) => file && file.size <= MAX_FILE_SIZE)
+            .test('fileFormat', 'Unsupported Format', (file) => file && FILE_FORMATS.includes(file.type)),
     });
+
+    const defaultValues = useMemo(
+        () => ({
+            studentTitle: currentStudent?.studentTitle || 'Mr.',
+            studentFirstName: currentStudent?.studentFirstName || 'Piyaphon',
+            studentLastName: currentStudent?.studentLastName || 'Wu',
+            studentNickname: currentStudent?.studentNickname || 'Hong',
+            studentDateOfBirth: currentStudent?.studentDateOfBirth || '02/05/2002',
+            studentPhoneNo: currentStudent?.studentPhoneNo || '098-xxx-xxxx',
+            studentLineId: currentStudent?.studentLineId || 'pnw029',
+            studentEmail: currentStudent?.studentEmail || 'hong@gmail.com',
+            schoolName: currentStudent?.schoolName || 'Assumption College Rayong',
+            schoolCountry: currentStudent?.schoolCountry || countries[216].label,
+            levelOfStudy: currentStudent?.levelOfStudy || 'Matthayom 6',
+            targetUniversity: currentStudent?.targetUniversity || 'Assumption University',
+            targetScore: currentStudent?.targetScore || 'IELTS 9.0',
+            studyProgram: currentStudent?.studyProgram || STUDY_PROGRAM_OPTIONS[2].value,
+            otherStudyProgram: currentStudent?.otherStudyProgram || '',
+            address: currentStudent?.address || '2/18 Moo 2 Rd.Sukhumwit',
+            subDistrict: currentStudent?.subDistrict || 'Nernpra',
+            district: currentStudent?.district || 'Mueng Rayong',
+            province: currentStudent?.province || 'Rayong',
+            zipCode: currentStudent?.zipCode || '21000',
+            parentTitle: currentStudent?.parentTitle || 'Mrs.',
+            parentFirstName: currentStudent?.parentFirstName || 'dadFirstname',
+            parentLastName: currentStudent?.parentLastName || 'dadLastname',
+            parentRelationships: currentStudent?.parentRelationships || 'Father',
+            parentPhoneNo: currentStudent?.parentPhoneNo || '097-xxx-xxxx',
+            parentEmail: currentStudent?.parentEmail || 'dad@gmail.com',
+            parentLine: currentStudent?.parentLine || 'dad@line',
+            studentHealthInfo: currentStudent?.studentHealthInfo || 'Seafood allergy',
+            studentSource: currentStudent?.studentSource || 'Know from friends',
+            studentImageUrl: currentStudent?.studentImageUrl || '',
+            studentAdditionalFiles: currentStudent?.studentAdditionalFiles || [],
+        }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [currentStudent]
+    );
 
     const methods = useForm({
         resolver: yupResolver(NewStudentSchema),
-        // defaultValues,
+        defaultValues,
     });
 
     const {
@@ -80,19 +145,41 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
 
     const values = watch();
 
-    const onSubmit = async () => {
+    useEffect(() => {
+        if (isEdit && currentStudent) {
+            reset(defaultValues);
+        }
+        if (!isEdit) {
+            reset(defaultValues);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isEdit, currentStudent]);
+
+    const onSubmit = async (data) => {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            reset();
+            // await new Promise((resolve) => setTimeout(resolve, 500));
+            // reset();
             enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
-            navigate(PATH_DASHBOARD.allStudents);
+            console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
             console.error(error);
         }
     };
 
+    // Other Study Program
+    const [showOtherStudyProgram, setShowOtherStudyProgram] = useState(false);
+
+    const handleClickOther = (data) => {
+        if (data.target.value === "Other") {
+            setShowOtherStudyProgram(true)
+        } else {
+            setValue("otherStudyProgram", "");
+            setShowOtherStudyProgram(false)
+        };
+    };
+
     // Student Image ()
-    const handleDropImage = useCallback(
+    const handleDropStudentImage = useCallback(
         (acceptedFiles) => {
             const file = acceptedFiles[0];
 
@@ -101,17 +188,17 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
             });
 
             if (file) {
-                setValue('avatarUrl', newFile);
+                setValue('studentImageURL', newFile);
             }
         },
         [setValue]
     );
 
-
     // Additional Files (Handle add & remove)
+
     const handleDropFiles = useCallback(
         (acceptedFiles) => {
-            const files = values.images || [];
+            const files = values.studentAdditionalFiles || [];
 
             const newFiles = acceptedFiles.map((file) =>
                 Object.assign(file, {
@@ -119,18 +206,18 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                 })
             );
 
-            setValue('images', [...files, ...newFiles]);
+            setValue('studentAdditionalFiles', [...files, ...newFiles]);
         },
-        [setValue, values.images]
+        [setValue, values.studentAdditionalFiles]
     );
 
     const handleRemoveFile = (inputFile) => {
-        const filtered = values.images && values.images?.filter((file) => file !== inputFile);
-        setValue('images', filtered);
+        const filtered = values.studentAdditionalFiles && values.studentAdditionalFiles?.filter((file) => file !== inputFile);
+        setValue('studentAdditionalFiles', filtered);
     };
 
     const handleRemoveAllFiles = () => {
-        setValue('images', []);
+        setValue('studentAdditionalFiles', []);
     };
 
     return (
@@ -151,9 +238,9 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                     color: 'text.primary',
                                 }}> Student Image </Typography>
                             <RHFUploadAvatar
-                                name="studentImageUrl"
+                                name="studentImageURL"
                                 maxSize={3145728}
-                                onDrop={handleDropImage}
+                                onDrop={handleDropStudentImage}
                                 helperText={
                                     <Typography
                                         variant="caption"
@@ -203,10 +290,10 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                     name="studentTitle"
                                     label="Title"
                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
-                                    {nameTitle.map((option) => (
+                                    {TITLE_OPTIONS.map((option) => (
                                         <MenuItem
-                                            key={option.value}
-                                            value={option.label}
+                                            key={option.id}
+                                            value={option.name}
                                             sx={{
                                                 mx: 1,
                                                 my: 0.5,
@@ -217,7 +304,7 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {option.label}
+                                            {option.name}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
@@ -235,7 +322,6 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                 <Controller
                                     name="studentDateOfBirth"
                                     control={control}
-                                    defaultValue={''}
                                     render={({ field, fieldState: { error } }) => (
                                         <DatePicker
                                             label="Date of Birth"
@@ -249,7 +335,7 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                         />
                                     )}
                                 />
-                                
+
                             </Box>
                             <Box gridArea={"studentPhoneNumber"}>
                                 <RHFTextField name="studentPhoneNo" label="Phone Number" />
@@ -282,17 +368,19 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                             }}
                         >
                             <RHFTextField name="schoolName" label="School Name" />
+
                             <RHFAutocomplete
                                 name="schoolCountry"
-                                onChange={(event, newValue) => setValue('tags', newValue)}
-                                options={countries.map((option) => option)}
+                                onChange={(event, newValue) => setValue('schoolCountry', newValue)}
+                                options={countries.map((option) => option.label)}
                                 renderTags={(value, getTagProps) =>
                                     value.map((option, index) => (
-                                        <Chip {...getTagProps({ index })} key={option.code} value={option.label} size="small" label={option.label} />
+                                        <Chip {...getTagProps({ index })} key={option} size="small" label={option} />
                                     ))
                                 }
-                                renderInput={(params) => <RHFTextField name="schoolCountry" label="School Country" {...params} />}
+                                renderInput={(params) => <TextField label="School Country" {...params} />}
                             />
+
                             <RHFSelect
                                 name="levelOfStudy"
                                 label="Level of Study"
@@ -317,7 +405,8 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                             </RHFSelect>
                             <RHFTextField name="targetUniversity" label="Target University" />
                             <RHFTextField name="targetScore" label="Target Score" />
-                            <RHFRadioGroup name="studyProgram" options={studyProgram} label="Study Program" />
+                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther} />
+                            {showOtherStudyProgram ? <RHFTextField name="otherStudyProgram" label="Other" /> : null}
                         </Box>
                     </Card>
                 </Grid>
@@ -471,6 +560,7 @@ export default function UserNewEditForm({ isEdit = false, currentUser }) {
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
+
                             <RHFUpload
                                 multiple
                                 thumbnail

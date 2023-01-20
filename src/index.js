@@ -19,9 +19,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { SettingsProvider } from './components/settings';
 import ScrollToTop from './components/scroll-to-top';
 
-// Check our docs
-// https://docs.minimals.cc/authentication/js-version
-
 import { AuthProvider } from './auth/FirebaseContext';
 
 //
