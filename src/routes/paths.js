@@ -6,8 +6,6 @@ function path(root, sublink) {
 
 const ROOTS_DASHBOARD = '/dashboard';
 
-const ROOTS_EP_DASHBOARD = '/epdashboard';
-
 // ----------------------------------------------------------------------
 
 export const PATH_AUTH = {
@@ -23,11 +21,4 @@ export const PATH_DASHBOARD = {
   requestStatus: path(ROOTS_DASHBOARD, '/requestStatus'),
   courseTransferRequest: path(ROOTS_DASHBOARD, '/courseTransferRequest'),
   changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
-};
-
-export const PATH_EP_DASHBOARD = {
-  root: ROOTS_EP_DASHBOARD,
-  epone: path(ROOTS_EP_DASHBOARD, '/epone'),
-  eptwo: path(ROOTS_EP_DASHBOARD, '/eptwo'),
-  epthree: path(ROOTS_EP_DASHBOARD, '/epthree'),
 };

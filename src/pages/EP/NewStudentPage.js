@@ -7,7 +7,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
-import UserNewEditForm from '../../sections/dashboard/UserNewEditForm';
+import StudentNewEditForm from '../../sections/dashboard/StudentNewEditForm';
 
 // ----------------------------------------------------------------------
 
@@ -25,17 +25,12 @@ export default function NewStudentPage() {
                     heading="Create a new student"
                     links={[
                         {
-                            name: 'Dashboard',
-                            href: PATH_DASHBOARD.firstPage,
-                        },
-                        {
                             name: 'Student management',
-                            href: PATH_DASHBOARD.firstPage,
                         },
                         { name: 'New student' },
                     ]}
                 />
-                <UserNewEditForm />
+                <StudentNewEditForm />
             </Container>
         </>
     );

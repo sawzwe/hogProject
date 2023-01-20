@@ -12,8 +12,8 @@ import AvatarPreview from './preview/AvatarPreview';
 // ----------------------------------------------------------------------
 
 const StyledDropZone = styled('div')(({ theme }) => ({
-  width: 144,
-  height: 144,
+  width: 170,
+  height: 170,
   margin: 'auto',
   display: 'flex',
   cursor: 'pointer',
