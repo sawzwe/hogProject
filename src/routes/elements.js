@@ -18,6 +18,7 @@ export const RegisterPage = Loadable(lazy(() => import('../pages/RegisterPage'))
 
 export const PageNewStdent = Loadable(lazy(() => import('../pages/EP/NewStudentPage')));
 export const PageAllStdents = Loadable(lazy(() => import('../pages/EP/AllStudentsPage')));
+export const PageEditStudent = Loadable(lazy(() => import('../pages/EP/EditStudentPage')));
 export const PageCreateRequest = Loadable(lazy(() => import('../pages/EP/CreateRequestPage')));
 export const PageRequestStatus = Loadable(lazy(() => import('../pages/EP/RequestStatusPage')));
 export const PageCourseTransferRequest = Loadable(lazy(() => import('../pages/EP/CourseTransferRequestPage')));

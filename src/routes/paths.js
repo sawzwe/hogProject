@@ -17,6 +17,7 @@ export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   newStudent: path(ROOTS_DASHBOARD, '/newStudent'),
   allStudents: path(ROOTS_DASHBOARD, '/allStudents'),
+  edit: (id) => path(ROOTS_DASHBOARD, `/student/${id}/edit`),
   createRequest: path(ROOTS_DASHBOARD, '/createRequest'),
   requestStatus: path(ROOTS_DASHBOARD, '/requestStatus'),
   courseTransferRequest: path(ROOTS_DASHBOARD, '/courseTransferRequest'),

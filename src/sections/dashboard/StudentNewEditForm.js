@@ -13,8 +13,11 @@ import { Box, Card, Chip, Grid, Stack, Switch, Typography, FormControlLabel, But
 import { fData } from '../../utils/formatNumber';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
+// sections
+import { StudentCurrentCourse } from './StudentCurrentCourse';
+import { StudentNewEditExam } from './StudentNewEditExam';
 // assets
-import { countries, levelOfStudy, nameTitle, studyProgram } from '../../assets/data';
+import { countries } from '../../assets/data';
 // components
 import Label from '../../components/label';
 import { useSnackbar } from '../../components/snackbar';
@@ -35,6 +38,33 @@ const STUDY_PROGRAM_OPTIONS = [
     { label: 'Gifted Program', value: 'Gifted Program' },
     { label: 'Homeschool', value: 'Homeschool' },
     { label: 'Other', value: 'Other' }
+]
+
+const STUDY_LEVEL_OPTIONS = [
+    { value: 'Prathom 5' },
+    { value: 'Prathom 6' },
+    { value: 'Matthayom 1' },
+    { value: 'Matthayom 2' },
+    { value: 'Matthayom 3' },
+    { value: 'Matthayom 4' },
+    { value: 'Matthayom 5' },
+    { value: 'Matthayom 6' },
+    { value: 'Grade 5' },
+    { value: 'Grade 6' },
+    { value: 'Grade 7' },
+    { value: 'Grade 8' },
+    { value: 'Grade 9' },
+    { value: 'Grade 10' },
+    { value: 'Grade 11' },
+    { value: 'Grade 12' },
+    { value: 'Year 7' },
+    { value: 'Year 8' },
+    { value: 'Year 9' },
+    { value: 'Year 10' },
+    { value: 'Year 11' },
+    { value: 'Year 12' },
+    { value: 'Year 13' },
+    { value: 'Others' }
 ]
 
 const MAX_FILE_SIZE = 2 * 1000 * 1000; // 2 Mb
@@ -157,6 +187,9 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
 
     const onSubmit = async (data) => {
         try {
+            // ADD STUDENT ACCOUNT TO FIREBASE AUTH
+            // ADD STUDENT INFORMATION TO THE DATABASE (waiting for API)
+
             // await new Promise((resolve) => setTimeout(resolve, 500));
             // reset();
             enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
@@ -178,7 +211,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         };
     };
 
-    // Student Image ()
+    // Student Image
     const handleDropStudentImage = useCallback(
         (acceptedFiles) => {
             const file = acceptedFiles[0];
@@ -194,18 +227,15 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         [setValue]
     );
 
-    // Additional Files (Handle add & remove)
-
+    // Additional Files
     const handleDropFiles = useCallback(
         (acceptedFiles) => {
             const files = values.studentAdditionalFiles || [];
-
             const newFiles = acceptedFiles.map((file) =>
                 Object.assign(file, {
                     preview: URL.createObjectURL(file),
                 })
             );
-
             setValue('studentAdditionalFiles', [...files, ...newFiles]);
         },
         [setValue, values.studentAdditionalFiles]
@@ -385,10 +415,10 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 name="levelOfStudy"
                                 label="Level of Study"
                                 SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
-                                {levelOfStudy.map((option) => (
+                                {STUDY_LEVEL_OPTIONS.map((option) => (
                                     <MenuItem
                                         key={option.value}
-                                        value={option.label}
+                                        value={option.value}
                                         sx={{
                                             mx: 1,
                                             my: 0.5,
@@ -399,7 +429,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                             '&:last-of-type': { mb: 0 },
                                         }}
                                     >
-                                        {option.label}
+                                        {option.value}
                                     </MenuItem>
                                 ))}
                             </RHFSelect>
@@ -479,10 +509,10 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                     name="parentTitle"
                                     label="Title"
                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
-                                    {nameTitle.map((option) => (
+                                    {TITLE_OPTIONS.map((option) => (
                                         <MenuItem
-                                            key={option.value}
-                                            value={option.label}
+                                            key={option.id}
+                                            value={option.name}
                                             sx={{
                                                 mx: 1,
                                                 my: 0.5,
@@ -493,7 +523,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {option.label}
+                                            {option.name}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
@@ -560,7 +590,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
-
                             <RHFUpload
                                 multiple
                                 thumbnail
@@ -571,11 +600,11 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 onRemoveAll={handleRemoveAllFiles}
                                 onUpload={() => console.log('ON UPLOAD')}
                             />
-
                         </Box>
-
                     </Card>
                 </Grid>
+
+                {/* {isEdit ? <> <StudentCurrentCourse /> <StudentNewEditExam /> </>: null} */}
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" justifyContent="flex-end" alignItems="center">
@@ -584,8 +613,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                         </LoadingButton>
                     </Stack>
                 </Grid>
-
             </Grid>
+
         </FormProvider>
     );
 }

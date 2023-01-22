@@ -19,6 +19,7 @@ import {
   PageThree,
   RegisterPage,
   PageAllStdents,
+  PageEditStudent,
   PageCreateRequest,
   PageRequestStatus,
   PageCourseTransferRequest,
@@ -34,8 +35,8 @@ export default function Router() {
   function firstPage() {
     if (user.role === 'Education Planner') {
       return 'newStudent'
-    } 
-    if (user.role === 'Education Admin'){
+    }
+    if (user.role === 'Education Admin') {
       return 'allStudents'
     }
     return null;
@@ -72,7 +73,7 @@ export default function Router() {
         </AuthGuard>
       ),
       children: [
-        { element: <Navigate to={user?.role && firstPage() } replace />, index: true },
+        { element: <Navigate to={user?.role && firstPage()} replace />, index: true },
         {
           path: 'newStudent',
           element: (
@@ -83,12 +84,23 @@ export default function Router() {
         },
         {
           path: 'allStudents',
-          element: (
-            <RoleBasedGuard roles={['Education Planner']} hasContent>
-              <PageAllStdents />
-            </RoleBasedGuard>
-          )
+          children: [
+            {
+              element: <RoleBasedGuard roles={['Education Planner', 'Education Admin', 'Office Admin']} hasContent>
+                <PageAllStdents />
+              </RoleBasedGuard>, index: true
+            },
+            { path: 'student/:id/edit', element: <PageEditStudent /> },
+          ]
         },
+        // {
+        //   path: 'student/:id/edit',
+        //   element: (
+        //     <RoleBasedGuard roles={['Education Planner', 'Education Admin', 'Office Admin']} hasContent>
+        //       <PageEditStudent />
+        //     </RoleBasedGuard>
+        //   )
+        // },
         {
           path: 'createRequest',
           element: (
