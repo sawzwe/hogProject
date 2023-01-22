@@ -24,10 +24,4 @@ export const PageRequestStatus = Loadable(lazy(() => import('../pages/EP/Request
 export const PageCourseTransferRequest = Loadable(lazy(() => import('../pages/EP/CourseTransferRequestPage')));
 export const PageChangePassword = Loadable(lazy(() => import('../pages/ChangePasswordPage')));
 
-
-
-export const PageOne = Loadable(lazy(() => import('../pages/PageOne')));
-export const PageTwo = Loadable(lazy(() => import('../pages/PageTwo')));
-export const PageThree = Loadable(lazy(() => import('../pages/PageThree')));
-
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));

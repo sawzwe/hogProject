@@ -25,8 +25,6 @@ export default function NewStudentPage() {
                     heading="Create a new student"
                     links={[
                         {
-                        },
-                        {
                             name: 'New student',
                         },
                     ]}

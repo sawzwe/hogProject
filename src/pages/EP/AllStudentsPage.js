@@ -5,6 +5,7 @@ import { Container, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 // components
 import { useSettingsContext } from '../../components/settings';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 
 // ----------------------------------------------------------------------
 
@@ -18,9 +19,14 @@ export default function AllStudentsPage() {
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
-                <Typography variant="h3" component="h1" paragraph>
-                    All Students
-                </Typography>
+                <CustomBreadcrumbs
+                    heading="All students"
+                    links={[
+                        {
+                            name: 'All students',
+                        },
+                    ]}
+                />
 
                 <Typography variant="p" component="p" paragraph>
                     <Link to="student/1/edit">Dummy Student</Link>

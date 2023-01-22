@@ -14,9 +14,6 @@ import {
   Page404,
   PageNewStdent,
   LoginPage,
-  PageOne,
-  PageTwo,
-  PageThree,
   RegisterPage,
   PageAllStdents,
   PageEditStudent,
@@ -90,7 +87,7 @@ export default function Router() {
                 <PageAllStdents />
               </RoleBasedGuard>, index: true
             },
-            { path: 'student/:id/edit', element: <PageEditStudent /> },
+            { path: 'student/:studentId/edit', element: <PageEditStudent /> },
           ]
         },
         // {

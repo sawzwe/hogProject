@@ -25,6 +25,13 @@ import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHF
 
 // ----------------------------------------------------------------------
 
+// Get student data from table Student
+// Get registered course from table StudyCourse joined with Student
+// Get exam date from table Exam joined with Student
+
+// Once created, store the data to Student table, Firebase Auth and Firestore
+// Once saved, overwrite the data to Student and Exam tables
+
 const TITLE_OPTIONS = [
     { id: 1, name: 'Mr.' },
     { id: 2, name: 'Ms.' },
@@ -113,7 +120,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         parentRelationships: Yup.string().required('Relationships is required'),
         parentPhoneNo: Yup.string().required('Phone number is required'),
         parentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
-        parentLine: Yup.string().required('Line ID is required'),
+        parentLineId: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
         studentSource: Yup.string(),
         studentImageURL: Yup.mixed().required('Student photo is required')
@@ -143,13 +150,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
             district: currentStudent?.district || 'Mueng Rayong',
             province: currentStudent?.province || 'Rayong',
             zipCode: currentStudent?.zipCode || '21000',
-            parentTitle: currentStudent?.parentTitle || 'Mrs.',
+            parentTitle: currentStudent?.parentTitle || 'Mr.',
             parentFirstName: currentStudent?.parentFirstName || 'dadFirstname',
             parentLastName: currentStudent?.parentLastName || 'dadLastname',
             parentRelationships: currentStudent?.parentRelationships || 'Father',
             parentPhoneNo: currentStudent?.parentPhoneNo || '097-xxx-xxxx',
             parentEmail: currentStudent?.parentEmail || 'dad@gmail.com',
-            parentLine: currentStudent?.parentLine || 'dad@line',
+            parentLineId: currentStudent?.parentLineId || 'dad@line',
             studentHealthInfo: currentStudent?.studentHealthInfo || 'Seafood allergy',
             studentSource: currentStudent?.studentSource || 'Know from friends',
             studentImageUrl: currentStudent?.studentImageUrl || '',
@@ -185,14 +192,28 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEdit, currentStudent]);
 
+    // Create student to Firebase Auth, Firestore, and Azure Database
+    const createStudent = () => {
+        // Add Logic here
+
+        enqueueSnackbar('Create success!')
+    }
+
+    // Update student data to the database
+    const updateStudent = () => {
+        // Add Logic here
+
+        enqueueSnackbar('Update success!')
+    }
+
     const onSubmit = async (data) => {
         try {
-            // ADD STUDENT ACCOUNT TO FIREBASE AUTH
-            // ADD STUDENT INFORMATION TO THE DATABASE (waiting for API)
-
-            // await new Promise((resolve) => setTimeout(resolve, 500));
-            // reset();
-            enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
+            // updateStudent(data);
+            if (isEdit) {
+                await updateStudent(data);
+            } else {
+                await createStudent(data);
+            }
             console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
             console.error(error);
@@ -498,9 +519,9 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 sm: 'repeat(6, 1fr)',
                             }}
                             gridTemplateAreas={{
-                                xs: `"parentTitle" "parentFirstName" "parentLastName" "parentRelationships" "parentPhone" "parentEmail" "parentLine"`,
+                                xs: `"parentTitle" "parentFirstName" "parentLastName" "parentRelationships" "parentPhone" "parentEmail" "parentLineId"`,
                                 md: `"parentTitle parentFirstName parentFirstName parentLastName parentLastName parentRelationships" 
-                                "parentPhone parentPhone parentEmail parentEmail parentLine parentLine"`
+                                "parentPhone parentPhone parentEmail parentEmail parentLineId parentLineId"`
                             }}
                         >
                             <Box gridArea={"parentTitle"}>
@@ -543,8 +564,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             <Box gridArea={"parentEmail"}>
                                 <RHFTextField name="parentEmail" label="Email Address" />
                             </Box>
-                            <Box gridArea={"parentLine"}>
-                                <RHFTextField name="parentLine" label="Line ID" />
+                            <Box gridArea={"parentLineId"}>
+                                <RHFTextField name="parentLineId" label="Line ID" />
                             </Box>
                         </Box>
                     </Card>
@@ -604,12 +625,36 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                     </Card>
                 </Grid>
 
-                {/* {isEdit ? <> <StudentCurrentCourse /> <StudentNewEditExam /> </>: null} */}
+                {/* Registered Courses */}
+                {isEdit && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}>{`Registered Course(s)`}</Typography>
+                        </Card>
+                    </Grid>
+                )}
+
+                {/* Exam Dates */}
+                {isEdit && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}>{`Exam Date(s)`}</Typography>
+                        </Card>
+                    </Grid>
+                )}
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" justifyContent="flex-end" alignItems="center">
                         <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
-                            Create Student
+                            {!isEdit ? 'Create Student' : 'Save Changes'}
                         </LoadingButton>
                     </Stack>
                 </Grid>

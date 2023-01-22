@@ -6,7 +6,7 @@ import { Container } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // _mock_
-import { _userList } from '../../_mock/arrays';
+import { _studentList } from '../../_mock/arrays';
 // components
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
@@ -18,9 +18,10 @@ import StudentNewEditForm from '../../sections/dashboard/StudentNewEditForm';
 export default function UserEditPage() {
     const { themeStretch } = useSettingsContext();
 
-    const { id } = useParams();
+    const { studentId } = useParams();
 
-    // const currentUser = _userList.find((user) => paramCase(user.name) === name);
+    // Find user in database with user's ID
+    const currentStudent = _studentList.find((student) => student.id === studentId);
 
     return (
         <>
@@ -29,19 +30,18 @@ export default function UserEditPage() {
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                <h1>ID: {id}</h1>
-                {/* <CustomBreadcrumbs
-                    heading="Edit user"
+                <CustomBreadcrumbs
+                    heading="Edit student"
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.root,
+                            href: PATH_DASHBOARD.allStudents,
                         },
-                        { name: currentUser?.name },
+                        { name: currentStudent?.studentFirstName.concat(' ', currentStudent?.studentLastName) },
                     ]}
                 />
 
-                <StudentNewEditForm isEdit currentUser={currentUser} /> */}
+                <StudentNewEditForm isEdit currentStudent={currentStudent} />
             </Container>
         </>
     );
