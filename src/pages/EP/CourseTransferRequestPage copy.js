@@ -1,41 +1,38 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { Typography,Box, Card, Container, CardHeader, Stack } from '@mui/material';
+import { Container, Typography,Stack,Card } from '@mui/material';
 // components
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';    
 // Table
-import SortingSelecting from './TableAllStudents';
+// import {UserTableRow, UserTableToolbar} from './TableEA';
+import UserListPage from './TableEA/UserListPage';
 
 // ----------------------------------------------------------------------
 
-export default function AllStudentsPage() {
+export default function CourseTransferRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
         <Helmet>
-            <title> All Student Table</title>
+            <title>Course Transfer Request</title>
         </Helmet>
         <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="All Student Table"
+                    heading="EA Table"
                     links={[
                         {
                             name: 'Student management',
                             href: PATH_DASHBOARD.firstPage,
                         },
-                        { name: 'All Student TableList' },
+                        { name: 'Course Transfer' },
                     ]}
-                />
-                <Stack spacing={3}>
-                    <Card>
-                        <SortingSelecting />
-                    </Card>
-                </Stack>
+                />  
+                <UserListPage/>
             </Container>
-
+        </>
     );
 }
