@@ -9,7 +9,7 @@ export default function ResetPasswordPage() {
     return (
         <>
             <Helmet>
-                <title> Register | Minimal UI</title>
+                <title> Register | HOG </title>
             </Helmet>
 
             <Register />

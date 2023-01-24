@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
     return (
         <>
             <Helmet>
-                <title> Change Password | Minimal UI</title>
+                <title> Change Password </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>

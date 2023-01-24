@@ -12,12 +12,12 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+// @mui
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 // components
 import { SettingsProvider } from './components/settings';
 import ScrollToTop from './components/scroll-to-top';
-
-// Check our docs
-// https://docs.minimals.cc/authentication/js-version
 
 import { AuthProvider } from './auth/FirebaseContext';
 
@@ -33,12 +33,14 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AuthProvider>
     <HelmetProvider>
-      <SettingsProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <App />
-        </BrowserRouter>
-      </SettingsProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <SettingsProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <App />
+          </BrowserRouter>
+        </SettingsProvider>
+      </LocalizationProvider>
     </HelmetProvider>
   </AuthProvider>
 );

@@ -9,6 +9,8 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // Table
 import SortingSelecting from './TableAllStudents';
 
+// ----------------------------------------------------------------------
+
 export default function AllStudentsPage() {
     const { themeStretch } = useSettingsContext();
 
@@ -35,8 +37,5 @@ export default function AllStudentsPage() {
                 </Stack>
             </Container>
 
-
-
-      </>
     );
 }

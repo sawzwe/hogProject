@@ -6,8 +6,6 @@ function path(root, sublink) {
 
 const ROOTS_DASHBOARD = '/dashboard';
 
-const ROOTS_EP_DASHBOARD = '/epdashboard';
-
 // ----------------------------------------------------------------------
 
 export const PATH_AUTH = {
@@ -17,17 +15,12 @@ export const PATH_AUTH = {
 
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
-  newStudent: path(ROOTS_DASHBOARD, '/newStudent'),
-  allStudents: path(ROOTS_DASHBOARD, '/allStudents'),
-  createRequest: path(ROOTS_DASHBOARD, '/createRequest'),
-  requestStatus: path(ROOTS_DASHBOARD, '/requestStatus'),
-  courseTransferRequest: path(ROOTS_DASHBOARD, '/courseTransferRequest'),
+  newStudent: path(ROOTS_DASHBOARD, '/new-student'),
+  search: path(ROOTS_DASHBOARD, '/search'),
+  edit: (id) => path(ROOTS_DASHBOARD, `/student/${id}/edit`),
+  createRegistrationRequest: path(ROOTS_DASHBOARD, '/create-registration-request'),
+  registrationRequestStatus: path(ROOTS_DASHBOARD, '/registration-request-status'),
+  createCourseTransferRequest: path(ROOTS_DASHBOARD, '/create-course-transfer-request'),
+  courseTransferRequestStatus: path(ROOTS_DASHBOARD, '/course-transfer-request-status'),
   changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
-};
-
-export const PATH_EP_DASHBOARD = {
-  root: ROOTS_EP_DASHBOARD,
-  epone: path(ROOTS_EP_DASHBOARD, '/epone'),
-  eptwo: path(ROOTS_EP_DASHBOARD, '/eptwo'),
-  epthree: path(ROOTS_EP_DASHBOARD, '/epthree'),
 };

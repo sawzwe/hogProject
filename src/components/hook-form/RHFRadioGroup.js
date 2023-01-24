@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
-import { Radio, RadioGroup, FormHelperText, FormControlLabel } from '@mui/material';
+import { Radio, RadioGroup, FormHelperText, FormControlLabel, FormLabel, FormControl, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ RHFRadioGroup.propTypes = {
   options: PropTypes.array,
 };
 
-export default function RHFRadioGroup({ name, options, ...other }) {
+export default function RHFRadioGroup({ name, options, label, ...other }) {
   const { control } = useFormContext();
 
   return (
@@ -20,17 +20,18 @@ export default function RHFRadioGroup({ name, options, ...other }) {
       control={control}
       render={({ field, fieldState: { error } }) => (
         <div>
-          <RadioGroup {...field} row {...other}>
-            {options.map((option) => (
-              <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
-            ))}
-          </RadioGroup>
+            <Typography variant="subtitle1">{label}</Typography>
+            <RadioGroup {...field} row {...other}>
+              {options.map((option) => (
+                <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+              ))}
+            </RadioGroup>
 
-          {!!error && (
-            <FormHelperText error sx={{ px: 2 }}>
-              {error.message}
-            </FormHelperText>
-          )}
+            {!!error && (
+              <FormHelperText error sx={{ px: 2 }}>
+                {error.message}
+              </FormHelperText>
+            )}
         </div>
       )}
     />

@@ -40,6 +40,9 @@ import {
    import   UserTableRow  from './TableEA/UserTableRow'; 
    import  UserTableToolbar from './TableEA/UserTableToolbar';
 // import { UserTableRow, UserTableToolbar} from './TableEA';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+// sections
+import TransferNewEditForm from '../../sections/dashboard/course-transfer';
 
 // ----------------------------------------------------------------------
 
@@ -299,7 +302,6 @@ export default function CourseTransferRequestPage() {
                   onChangeDense={onChangeDense}
                 />
               </Card>
-                
             </Container>
         </>
     );
