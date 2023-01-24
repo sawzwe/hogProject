@@ -1,17 +1,45 @@
-import {InputAdornment,TextField, Tooltip, Typography, 
-  IconButton, Stack,Button,Drawer,Box,Divider,
-  List,ListItem,ListItemButton,ListItemText,MenuItem,Checkbox } from '@mui/material';
-import { useState,React } from 'react'
+import PropTypes from 'prop-types';
+import {
+  InputAdornment, TextField, Tooltip, Typography,
+  IconButton, Stack, Button, Drawer, Box, Divider,
+  List, ListItem, ListItemButton, ListItemText, MenuItem, Checkbox,Badge
+} from '@mui/material';
+import { useState, React } from 'react'
+import { Controller, useFormContext } from 'react-hook-form';
+import { alpha } from '@mui/material/styles';
 // components
 import Iconify from '../../../components/iconify';
-// Icon
+import Scrollbar from '../../../components/scrollbar';
+import { RHFMultiCheckbox, RHFTextField} from '../../../components/hook-form';
+
+
 // ----------------------------------------------------------------------
 
-export default function SortingSelectingToolbar() {
+export const FILTER_GENDER_OPTIONS = [
+  { label: 'Men', value: 'Men' },
+  { label: 'Women', value: 'Women' },
+  { label: 'Kids', value: 'Kids' },
+];
 
-// Open and CLose Drawer
-const [openDrawer,setOpenDrawer] = useState(false)
-// Checkbox
+// ----------------------------------------------------------------------
+// const onSelected = (selected, item) =>
+//   selected.includes(item) ? selected.filter((value) => value !== item) : [...selected, item];
+
+SortingSelectingToolbar.propTypes = {
+  open: PropTypes.bool,
+  onOpen: PropTypes.func,
+  onClose: PropTypes.func,
+  isDefault: PropTypes.bool,
+  onResetFilter: PropTypes.func,
+};
+
+
+
+// Filter
+
+
+export default function SortingSelectingToolbar({ open, onOpen, onClose, isDefault, onResetFilter }) {
+  // const { control } = useFormContext();
 const [groupchecked, setGroupChecked] = useState(false);
 const [privatechecked, setPrivateChecked] = useState(false);
 const [semiprivatechecked, setSemiprivateChecked] = useState(false);
@@ -25,179 +53,76 @@ const handlePrivateChange = (event) => {
 const handleSemiChange = (event) => {
   setSemiprivateChecked(event.target.checked);
 };
+  return (
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
+        <TextField id="search-student" label="Search" variant="outlined" sx={{ width: 980 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Iconify icon="ic:search" />
+              </InputAdornment>
+            ),
+          }} />
+        <Tooltip title="Filter list">
+          <Button sx={{ p: 2, m: 2 }} variant='outlined' onClick={onOpen} endIcon={<Iconify icon="ic:round-filter-list" />}>
+            <Typography>Filter</Typography>
+          </Button>
+        </Tooltip>
+      </Stack>
+      
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        BackdropProps={{
+          invisible: true,
+        }}
+      >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pl: 2, pr: 1, py: 2 }}>
+          <Typography variant="subtitle1">Filters</Typography>
 
-// List Of Selections
-const course = [
-{
-value: 'SAT',
-label: 'SAT',
-},
-{
-value: 'GED',
-label: 'GED',
-},
-{
-value: 'IGCSE',
-label: 'IGCSE',
-},
-{
-value: 'IELTS',
-label: 'IELTS',
-},
-];
-const subject = [
-{
-value: 'VER',
-label: 'VERBAL',
-},
-{
-value: 'WRI',
-label: 'WRITTEN',
-},
-];
-const level = [
-{
-value: 'INT',
-label: 'INTENSIVE',
-},
-{
-value: 'NOR',
-label: 'NORMAL',
-},
-];
-// Set Period
-//  const [value, setValue] = useState(dayjs('2014-08-18T21:11:54'));
+          <IconButton onClick={onClose}>
+            <Iconify icon="eva:close-fill" />
+          </IconButton>
+        </Stack>
 
-// const handlePeriodChange = (newValue) => {
-//   setValue(newValue);
-// };
+        <Divider />
 
-return (
-<>
-<Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
-<TextField id="search-student" label="Search" variant="outlined" sx={{width: 980}} 
-InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <Iconify icon="ic:search" />
-      </InputAdornment>
-    ),
-  }}/>
-<Tooltip title="Filter list">
-  <Button sx={{ p:2 , m:2}} variant='outlined' onClick={()=>setOpenDrawer(true)} endIcon={<Iconify icon="ic:round-filter-list" />}>
-    <Typography>Filter</Typography>
-  </Button> 
-</Tooltip>
-</Stack>
+        <Scrollbar>
+          <Stack spacing={3} sx={{ p: 2.5 }}>
+            <Stack spacing={1}>
+              <Typography variant="subtitle1"> Gender </Typography>
+              {/* s<RHFMultiCheckbox name="gender" options={FILTER_GENDER_OPTIONS} sx={{ width: 1 }} /> */}
+            </Stack>
+          </Stack>
+        </Scrollbar>
 
-<Drawer anchor='right' open={openDrawer} onClose={()=> setOpenDrawer(false)}>
-  <Box p={2} width='250px' textAlign='left' role='presentation'>
-    <Typography variant='h6' >Filter </Typography> <Iconify icon="ic:close" position="end" onClick={()=> setOpenDrawer(false)} />
-    <Divider/>
-    <Typography variant='h6' >Course Type </Typography>
-    <List>
-      <ListItem><Checkbox
-      checked={groupchecked}
-      onChange={handleGroupChange}
-      inputProps={{ 'aria-label': 'controlled' }}
-    />Group
-    </ListItem>
-    <ListItem>
-      <Checkbox
-      checked={privatechecked}
-      onChange={handlePrivateChange}
-      inputProps={{ 'aria-label': 'controlled' }}
-    />Private 
-    </ListItem>
-    <ListItem><Checkbox
-      checked={semiprivatechecked}
-      onChange={handleSemiChange}
-      inputProps={{ 'aria-label': 'controlled' }}
-    />Semi-Private
-    </ListItem>
+        <Box sx={{ p: 2.5 }}>
+          <Badge
+            color="error"
+            variant="dot"
+            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            invisible={isDefault}
+            sx={{ width: 1 }}
+          >
+            <Button
+              fullWidth
+              size="large"
+              type="submit"
+              color="inherit"
+              variant="outlined"
+              onClick={onResetFilter}
+              startIcon={<Iconify icon="eva:trash-2-outline" />}
+            >
+              Clear
+            </Button>
+          </Badge>
+        </Box>
+      </Drawer>
 
 
-  {/* {['Group', 'Private', 'Semi-Private'].map((text, index) => (
-    <ListItem key={text} disablePadding>
-      <ListItemButton>
-      <Checkbox
-      checked={checked}
-      onChange={handleChange}
-      inputProps={{ 'aria-label': 'controlled' }}
-    /><ListItemText primary={text} />
-      </ListItemButton>
-    </ListItem>
-  ))} */}
-</List>
-<Divider/>
-<Typography variant='h6'>Course</Typography>
-<Box p={2}>
-  <div>
-  <TextField
-    id="outlined-select-course"
-    select
-    label="Course"
-    defaultValue="SAT"
-    helperText="               "
-    sx={{width: 180}}
-    
-  >
-    {course.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </TextField>
-  </div>
-  <div>
-  <TextField
-    id="outlined-select-subject"
-    select
-    label="Subject"
-    defaultValue="VER"
-    helperText="               "
-    sx={{width: 180}}
-  >
-    {subject.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </TextField>
-  </div>
-  <div>
-  <TextField
-    id="outlined-select-level"
-    select
-    label="Level"
-    defaultValue="INT"
-    helperText="               "
-    sx={{width: 180}}
-  >
-    {level.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </TextField>
-  </div>
+    </>
 
-</Box>
-
-<Divider/>
-<Typography variant='h6' >Period</Typography>
-{/* <DesktopDatePicker
-          label="Date desktop"
-          inputFormat="MM/DD/YYYY"
-          value={value}
-          onChange={handlePeriodChange}
-          renderInput={(params) => <TextField {...params} />}
-        /> */}
-  </Box>
-</Drawer>
-
-
-</>
-
-);
+  );
 }

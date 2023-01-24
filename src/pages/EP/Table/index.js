@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 // @mui
 import { Table, Tooltip, Checkbox, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -86,9 +87,50 @@ export default function SortingSelecting() {
 
   const denseHeight = dense ? 34 : 54;
 
+  // Filter
+
+  const [openFilter, setOpenFilter] = useState(false);
+
+const defaultValues = {
+  gender: [],
+};
+
+const methods = useForm({
+  defaultValues,
+});
+
+const {
+  reset,
+  watch,
+  formState: { dirtyFields },
+} = methods;
+
+const isDefault =
+  (!dirtyFields.gender ) ||
+  false;
+
+const values = watch();
+
+const handleResetFilter = () => {
+  reset();
+};
+
+const handleOpenFilter = () => {
+  setOpenFilter(true);
+};
+
+const handleCloseFilter = () => {
+  setOpenFilter(false);
+};
+  
+
   return (
     <div>
-      <SortingSelectingToolbar />
+      <SortingSelectingToolbar isDefault={isDefault}
+                open={openFilter}
+                onOpen={handleOpenFilter}
+                onClose={handleCloseFilter}
+                onResetFilter={handleResetFilter}/>
 
       <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
         
@@ -153,7 +195,7 @@ export default function SortingSelecting() {
                 </TableRow>
               ))}
 
-              <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
+              {/* <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} /> */}
             </TableBody>
           </Table>
         </Scrollbar>
