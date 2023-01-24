@@ -7,7 +7,7 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';    
 // Table
-import SortingSelecting from './TableAllStudents';
+import SortingSelecting from '../../sections/dashboard/ep-all-students-list';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +36,6 @@ export default function AllStudentsPage() {
                     </Card>
                 </Stack>
             </Container>
-
+        </> 
     );
 }

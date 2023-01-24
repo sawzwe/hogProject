@@ -8,9 +8,13 @@ import Iconify from '../../../components/iconify';
 
 UserTableToolbar.propTypes = {
   isFiltered: PropTypes.bool,
+  filterValue: PropTypes.string,
   filterName: PropTypes.string,
+  filterId: PropTypes.string,
   filterRole: PropTypes.string,
   onFilterName: PropTypes.func,
+  onFilterId: PropTypes.func,
+  onFilterValue: PropTypes.func,
   onFilterRole: PropTypes.func,
   onResetFilter: PropTypes.func,
   optionsRole: PropTypes.arrayOf(PropTypes.string),
@@ -18,11 +22,13 @@ UserTableToolbar.propTypes = {
 
 export default function UserTableToolbar({
   isFiltered,
+  filterValue,
+  onFilterValue,
   filterName,
-  filterRole,
+  filterId,
   optionsRole,
   onFilterName,
-  onFilterRole,
+  onFilterId,
   onResetFilter,
 }) {
   return (
@@ -35,7 +41,7 @@ export default function UserTableToolbar({
       }}
       sx={{ px: 2.5, py: 3 }}
     >
-      <TextField
+      {/* <TextField
         fullWidth
         select
         label="Role"
@@ -72,13 +78,15 @@ export default function UserTableToolbar({
             {option}
           </MenuItem>
         ))}
-      </TextField>
+      </TextField> */}
 
       <TextField
         fullWidth
-        value={filterName}
-        onChange={onFilterName}
-        placeholder="Search..."
+        value={filterValue}
+        onChange={onFilterValue} 
+        // value={filterId}
+        // onChange={onFilterId}
+        placeholder="Search Name"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -87,7 +95,6 @@ export default function UserTableToolbar({
           ),
         }}
       />
-
       {isFiltered && (
         <Button
           color="error"
