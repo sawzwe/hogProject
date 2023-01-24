@@ -6,18 +6,18 @@ import { useSettingsContext } from '../../components/settings';
 
 // ----------------------------------------------------------------------
 
-export default function RequestStatusPage() {
+export default function DailyCalendarPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> EP | Request Status </title>
+                <title> EA | Daily Calendar </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Request Status
+                    Daily Calendar
                 </Typography>
 
                 <Typography gutterBottom>

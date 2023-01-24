@@ -15,12 +15,19 @@ import {
   PageNewStdent,
   LoginPage,
   RegisterPage,
-  PageAllStudents,
+  PageSearchStudent,
   PageEditStudent,
-  PageCreateRequest,
-  PageRequestStatus,
-  PageCourseTransferRequest,
-  PageChangePassword
+  PageCreateRegistrationRequest,
+  PageRegistrationRequestStatus,
+  PageCourseTransferRequestStatus,
+  PageCreateCourseTransferRequest,
+  PageChangePassword,
+  PageSearchCourseStudent,
+  PageSearchTeacher,
+  PageDailyCalendar,
+  PageRegistrationRequestEA,
+  PageTransferringRequestEA,
+  PageSearchCourseTeacher
 }
   from './elements';
 
@@ -34,7 +41,7 @@ export default function Router() {
       return 'new-student'
     }
     if (user.role === 'Education Admin') {
-      return 'search'
+      return 'daily-calendar'
     }
     return null;
   };
@@ -79,47 +86,119 @@ export default function Router() {
             </RoleBasedGuard>
           )
         },
+
+        // Student search
         {
-          path: 'search',
+          path: 'student-management',
           children: [
+            { element: <Navigate to={'/dashboard/student-management/search-student'} replace />, index: true },
             {
-              element: <RoleBasedGuard roles={['Education Planner', 'Education Admin', 'Office Admin']} hasContent>
-                <PageAllStudents />
-              </RoleBasedGuard>, index: true
+              path: 'search-student', element: (
+                <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
+                  <PageSearchStudent />
+                </RoleBasedGuard>
+              )
             },
-            { path: 'student/:studentId/edit', element: <PageEditStudent /> },
+            {
+              path: 'search-student/:id/edit', element: (
+                <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
+                  <PageEditStudent />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'search-course', element: (
+                <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
+                  <PageSearchCourseStudent />
+                </RoleBasedGuard>
+              )
+            },
+          ]
+        },
+
+        // Teacher search
+        {
+          path: 'teacher-management',
+          children: [
+            { element: <Navigate to={'/dashboard/teacher-management/search-teacher'} replace />, index: true },
+            {
+              path: 'search-teacher', element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <PageSearchTeacher />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'search-course', element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <PageSearchCourseTeacher />
+                </RoleBasedGuard>
+              )
+            },
+            // {
+            //   path: 'search-student/:id/edit', element: (
+            //     <RoleBasedGuard roles={['Education Admin']} hasContent>
+            //       <PageEditStudent />
+            //     </RoleBasedGuard>
+            //   )
+            // },
+            // {
+            //   path: 'search-course', element: (
+            //     <RoleBasedGuard roles={['Education Admin']} hasContent>
+            //       <PageSearchStudentsCourses />
+            //     </RoleBasedGuard>
+            //   )
+            // },
+          ]
+        },
+
+        {
+          path: 'course-registration',
+          children: [
+            { element: <Navigate to="/dashboard/course-registration/create-request" replace />, index: true },
+            {
+              path: 'create-request',
+              element: (
+                <RoleBasedGuard roles={['Education Planner']} hasContent>
+                  <PageCreateRegistrationRequest />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'request-status',
+              element: (
+                <RoleBasedGuard roles={['Education Planner']} hasContent>
+                  <PageRegistrationRequestStatus />
+                </RoleBasedGuard>
+              )
+            }
           ]
         },
         {
-          path: 'create-registration-request',
-          element: (
-            <RoleBasedGuard roles={['Education Planner']} hasContent>
-              <PageCreateRequest />
-            </RoleBasedGuard>)
+          path: 'course-transfer',
+          children: [
+            { element: <Navigate to="/dashboard/course-transferring/request-status" replace />, index: true },
+            {
+              path: 'create-request',
+              element: (
+                <RoleBasedGuard roles={['Education Planner']} hasContent>
+                  <PageCreateCourseTransferRequest />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'request-status',
+              element: (
+                <RoleBasedGuard roles={['Education Planner']} hasContent>
+                  <PageCourseTransferRequestStatus />
+                </RoleBasedGuard>
+              )
+            }
+          ]
         },
-        {
-          path: 'registration-request-status',
-          element: (
-            <RoleBasedGuard roles={['Education Planner']} hasContent>
-              <PageRequestStatus />
-            </RoleBasedGuard>)
-        },
-        {
-          path: 'course-transfer-request-status',
-          element: (
-            <RoleBasedGuard roles={['Education Planner']} hasContent>
-              <PageCourseTransferRequest />
-            </RoleBasedGuard>
-          )
-        },
-        {
-          path: 'create-course-transfer-request',
-          element: (
-            <RoleBasedGuard roles={['Education Planner']} hasContent>
-              <PageCourseTransferRequest />
-            </RoleBasedGuard>
-          )
-        },
+        { path: 'daily-calendar', element: <PageDailyCalendar />},
+        { path: 'registration-request', element: <PageRegistrationRequestEA />},
+        { path: 'transferring-request', element: <PageTransferringRequestEA />},
         { path: 'changePassword', element: <PageChangePassword /> }
       ],
     },

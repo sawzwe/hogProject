@@ -15,12 +15,30 @@ export const PATH_AUTH = {
 
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
+  studentManagement: {
+    root: path(ROOTS_DASHBOARD, '/student-management'),
+    searchStudent: path(ROOTS_DASHBOARD, '/student-management/search-student'),
+    edit: (id) => path(ROOTS_DASHBOARD, `/student-management/search-student/${id}/edit`),
+    searchCourseStudent: path(ROOTS_DASHBOARD, '/student-management/search-course'),
+  },
+  teacherManagement: {
+    root: path(ROOTS_DASHBOARD, '/teacher-management'),
+    searchTeacher: path(ROOTS_DASHBOARD, '/teacher-management/search-teacher'),
+    searchCourseTeacher: path(ROOTS_DASHBOARD, '/teacher-management/search-course'),
+  },
   newStudent: path(ROOTS_DASHBOARD, '/new-student'),
-  search: path(ROOTS_DASHBOARD, '/search'),
-  edit: (id) => path(ROOTS_DASHBOARD, `/student/${id}/edit`),
-  createRegistrationRequest: path(ROOTS_DASHBOARD, '/create-registration-request'),
-  registrationRequestStatus: path(ROOTS_DASHBOARD, '/registration-request-status'),
-  createCourseTransferRequest: path(ROOTS_DASHBOARD, '/create-course-transfer-request'),
-  courseTransferRequestStatus: path(ROOTS_DASHBOARD, '/course-transfer-request-status'),
+  courseRegistration: {
+    root: path(ROOTS_DASHBOARD, '/course-registration'),
+    createRequest: path(ROOTS_DASHBOARD, '/course-registration/create-request'),
+    requestStatus: path(ROOTS_DASHBOARD, '/course-registration/request-status'),
+  },
+  courseTransferring: {
+    root: path(ROOTS_DASHBOARD, '/course-transfer'),
+    createRequest: path(ROOTS_DASHBOARD, '/course-transfer/create-request'),
+    requestStatus: path(ROOTS_DASHBOARD, '/course-transfer/request-status'),
+  },
+  dailyCalendar: path(ROOTS_DASHBOARD, '/daily-calendar'),
+  registrationRequest: path(ROOTS_DASHBOARD, '/registration-request'),
+  transferringRequest: path(ROOTS_DASHBOARD, '/transferring-request'),
   changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
 };

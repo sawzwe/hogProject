@@ -6,18 +6,18 @@ import { useSettingsContext } from '../../components/settings';
 
 // ----------------------------------------------------------------------
 
-export default function CreateRequestPage() {
+export default function RegistrationRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> EP | Create Request </title>
+                <title> EA | Daily Calendar </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Create Request
+                    Registration Request
                 </Typography>
 
                 <Typography gutterBottom>
