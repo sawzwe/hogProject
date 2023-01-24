@@ -32,14 +32,58 @@ const ICONS = {
 // ----------------------------------------------------------------------
 // Education Planner navConfig
 
+// const EPnavConfig = [
+//   {
+//     subheader: 'management',
+//     items: [
+//       // STUDENT
+//       {
+//         title: 'student management',
+//         path: PATH_DASHBOARD.allStudents,
+//         icon: icon.user,
+//         children: [
+//           {title: 'student list', path: PATH_DASHBOARD.allStudents},
+//           {title: 'create student', path: PATH_DASHBOARD.newStudent},
+//         ],
+//       },
+
+//       {
+//         title: 'course registration',
+//         path: PATH_DASHBOARD.createRequest,
+//         icon: icon.user,
+//         children: [
+//           {title: 'create request', path: PATH_DASHBOARD.createRequest},
+//           {title: 'request status', path: PATH_DASHBOARD.requestStatus},
+//         ]
+//       },      {
+//         title: 'course transferring',
+//         path: PATH_DASHBOARD.courseTransferRequest,
+//         icon: icon.user,
+//         children: [
+//           {title: 'create request', path: PATH_DASHBOARD.courseTransferRequest},
+//           {title: 'request status', path: PATH_DASHBOARD.courseTransferRequest},
+//         ]
+//       }
+//     ]
+//   },
+//   {
+//     subheader: 'Settings',
+//     items: [
+//       {title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+//       {title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
+//     ],
+//   }
+// ]
+
 const EPnavConfig = [
   // Student Management
   // ----------------------------------------------------------------------
   {
     subheader: 'student management',
     items: [
+      // Student Management
+      { title: 'Search', path: PATH_DASHBOARD.search, icon: ICONS.group },
       { title: 'New Student', path: PATH_DASHBOARD.newStudent, icon: ICONS.user },
-      { title: 'All Students', path: PATH_DASHBOARD.allStudents, icon: ICONS.group },
     ],
   },
 
@@ -48,22 +92,23 @@ const EPnavConfig = [
   {
     subheader: 'course registration',
     items: [
-      {title: 'Create Request', path: PATH_DASHBOARD.createRequest, icon: ICONS.mail },
-      {title: 'Request Status', path: PATH_DASHBOARD.requestStatus, icon: ICONS.menuItem }
+      {title: 'Registration Status', path: PATH_DASHBOARD.registrationRequestStatus, icon: ICONS.menuItem },
+      {title: 'Create Request', path: PATH_DASHBOARD.createRegistrationRequest, icon: ICONS.mail },
     ],
   },
 
   // Schedule Management
   // ----------------------------------------------------------------------
   {
-    subheader: 'schedule management',
+    subheader: 'course transferring',
     items: [
-      {title: 'Course Transfer Request', path: PATH_DASHBOARD.courseTransferRequest, icon: ICONS.file }
+      {title: 'Transferring Status', path: PATH_DASHBOARD.courseTransferRequestStatus, icon: ICONS.file },
+      {title: 'Create Request', path: PATH_DASHBOARD.createCourseTransferRequest, icon: ICONS.file },
     ],
   },
 
-  // Settings
-  // ----------------------------------------------------------------------
+  // // Settings
+  // // ----------------------------------------------------------------------
   {
     subheader: 'Settings',
     items: [

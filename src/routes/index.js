@@ -15,7 +15,7 @@ import {
   PageNewStdent,
   LoginPage,
   RegisterPage,
-  PageAllStdents,
+  PageAllStudents,
   PageEditStudent,
   PageCreateRequest,
   PageRequestStatus,
@@ -31,10 +31,10 @@ export default function Router() {
 
   function firstPage() {
     if (user.role === 'Education Planner') {
-      return 'newStudent'
+      return 'new-student'
     }
     if (user.role === 'Education Admin') {
-      return 'allStudents'
+      return 'search'
     }
     return null;
   };
@@ -72,7 +72,7 @@ export default function Router() {
       children: [
         { element: <Navigate to={user?.role && firstPage()} replace />, index: true },
         {
-          path: 'newStudent',
+          path: 'new-student',
           element: (
             <RoleBasedGuard roles={['Education Planner']} hasContent>
               <PageNewStdent />
@@ -80,40 +80,40 @@ export default function Router() {
           )
         },
         {
-          path: 'allStudents',
+          path: 'search',
           children: [
             {
               element: <RoleBasedGuard roles={['Education Planner', 'Education Admin', 'Office Admin']} hasContent>
-                <PageAllStdents />
+                <PageAllStudents />
               </RoleBasedGuard>, index: true
             },
             { path: 'student/:studentId/edit', element: <PageEditStudent /> },
           ]
         },
-        // {
-        //   path: 'student/:id/edit',
-        //   element: (
-        //     <RoleBasedGuard roles={['Education Planner', 'Education Admin', 'Office Admin']} hasContent>
-        //       <PageEditStudent />
-        //     </RoleBasedGuard>
-        //   )
-        // },
         {
-          path: 'createRequest',
+          path: 'create-registration-request',
           element: (
             <RoleBasedGuard roles={['Education Planner']} hasContent>
               <PageCreateRequest />
             </RoleBasedGuard>)
         },
         {
-          path: 'requestStatus',
+          path: 'registration-request-status',
           element: (
             <RoleBasedGuard roles={['Education Planner']} hasContent>
               <PageRequestStatus />
             </RoleBasedGuard>)
         },
         {
-          path: 'courseTransferRequest',
+          path: 'course-transfer-request-status',
+          element: (
+            <RoleBasedGuard roles={['Education Planner']} hasContent>
+              <PageCourseTransferRequest />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'create-course-transfer-request',
           element: (
             <RoleBasedGuard roles={['Education Planner']} hasContent>
               <PageCourseTransferRequest />
