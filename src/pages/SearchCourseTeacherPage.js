@@ -7,7 +7,7 @@ import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // Table
-import SortingSelecting from './EP/TableAllStudents';
+import SortingSelecting from '../sections/dashboard/ep-all-students-list';
 
 // ----------------------------------------------------------------------
 
@@ -21,13 +21,13 @@ export default function SearchTeacherCoursePage() {
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="Teacher Course Search"
+                    heading="All Teachers Courses"
                     links={[
                         {
-                            name: 'Teacher Management',
-                            href: PATH_DASHBOARD.firstPage,
+                            name: 'Teacher management',
+                            href: PATH_DASHBOARD.studentManagement.root,
                         },
-                        { name: 'All Teacher TableList' },
+                        { name: 'Search teacher course' },
                     ]}
                 />
                 <Stack spacing={3}>

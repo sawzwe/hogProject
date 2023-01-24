@@ -15,7 +15,7 @@ import StudentNewEditForm from '../../sections/dashboard/StudentNewEditForm';
 
 // ----------------------------------------------------------------------
 
-export default function UserEditPage() {
+export default function EditStudentPage() {
     const { themeStretch } = useSettingsContext();
 
     const { studentId } = useParams();

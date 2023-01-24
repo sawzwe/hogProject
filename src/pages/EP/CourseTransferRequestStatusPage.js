@@ -15,6 +15,8 @@ import {
     Container,
     IconButton,
     TableContainer,
+    TableRow,
+    TableCell,
 } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
@@ -36,9 +38,11 @@ import {
     TableSelectedAction,
     TablePaginationCustom,
 } from '../../components/table';
+import Label from '../../components/label'
 // sections
-import UserTableRow from './TableEA/UserTableRow';
-import UserTableToolbar from './TableEA/UserTableToolbar';
+// import SortingSelecting from '../../sections/dashboard/ep-all-students-list';
+import UserTableRow from '../../sections/dashboard/ep-course-transfer-list/UserTableRow';
+import UserTableToolbar from '../../sections/dashboard/ep-course-transfer-list/UserTableToolbar';
 // import { UserTableRow, UserTableToolbar} from './TableEA';
 // sections
 import TransferNewEditForm from '../../sections/dashboard/course-transfer';
@@ -46,7 +50,7 @@ import TransferNewEditForm from '../../sections/dashboard/course-transfer';
 // ----------------------------------------------------------------------
 
 // const STATUS_OPTIONS = ['all', 'active', 'banned'];
-const STATUS_OPTIONS = ['all', 'students', 'teachers'];
+const STATUS_OPTIONS = ['all', 'pending', 'completed'];
 
 const ROLE_OPTIONS = [
     'all',
@@ -60,19 +64,31 @@ const ROLE_OPTIONS = [
     'front end developer',
     'full stack developer',
     'full stack developer',
-    'full time',
-    'part time',
 ];
 
 const TABLE_HEAD = [
-    { id: 'name', label: 'Name', align: 'left' },
-    { id: 'company', label: 'Company', align: 'left' },
-    { id: 'role', label: 'Role', align: 'left' },
-    { id: 'isVerified', label: 'Verified', align: 'center' },
+    { id: 'id', label: 'Request ID', align: 'left' },
+    { id: 'date', label: 'Request Date', align: 'left' },
+    { id: 'fullname', label: 'Student Name', align: 'left' },
+    { id: 'nickname', label: 'Nickname', align: 'left' },
+    // { id: 'isVerified', label: 'Request Type', align: 'left' },
     { id: 'status', label: 'Status', align: 'left' },
     { id: '' },
 ];
 
+// Demo Data
+function createData(id, requestdate, fullname, nickname, status) {
+    return { id, requestdate, fullname, nickname, status };
+}
+
+const TABLE_DATA = [
+    createData('S012', '22-01-2022', 'Saw Zwe Wai Yan', 'Saw', 'pending'),
+    createData('S014', '21-01-2022', 'Siwach Toprasert', 'Pan', 'pending'),
+    createData('S002', '18-01-2022', 'Piyaphon Wu', 'Hong', 'completed'),
+    createData('S251', '25-01-2022', 'Thanatuch Lertritsirikul', 'Tar', 'pending'),
+    createData('S272', '25-01-2022', 'Zain Ijaz Janpatiew', 'Zain', 'completed'),
+
+];
 export default function CourseTransferRequestPage() {
     const {
         dense,
@@ -97,21 +113,25 @@ export default function CourseTransferRequestPage() {
 
     const navigate = useNavigate();
 
-    const [tableData, setTableData] = useState(_userList);
+    // const [tableData, setTableData] = useState(_userList);
+    const [tableData, setTableData] = useState(TABLE_DATA);
 
     const [openConfirm, setOpenConfirm] = useState(false);
 
     const [filterName, setFilterName] = useState('');
 
-    const [filterRole, setFilterRole] = useState('all');
+    const [filterValue, setFilterValue] = useState('');
+
+    const [filterId, setFilterId] = useState('');
 
     const [filterStatus, setFilterStatus] = useState('all');
 
     const dataFiltered = applyFilter({
         inputData: tableData,
         comparator: getComparator(order, orderBy),
+        filterValue,
         filterName,
-        filterRole,
+        filterId,
         filterStatus,
     });
 
@@ -119,11 +139,11 @@ export default function CourseTransferRequestPage() {
 
     const denseHeight = dense ? 52 : 72;
 
-    const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+    const isFiltered = filterName !== '' || filterId !== '' || filterStatus !== 'all';
 
     const isNotFound =
         (!dataFiltered.length && !!filterName) ||
-        (!dataFiltered.length && !!filterRole) ||
+        (!dataFiltered.length && !!filterId) ||
         (!dataFiltered.length && !!filterStatus);
 
     const handleOpenConfirm = () => {
@@ -144,10 +164,20 @@ export default function CourseTransferRequestPage() {
         setFilterName(event.target.value);
     };
 
-    const handleFilterRole = (event) => {
+    const handleFilterId = (event) => {
         setPage(0);
-        setFilterRole(event.target.value);
+        setFilterId(event.target.value);
     };
+
+    const handleFilterValue = (event) => {
+        setPage(0);
+        setFilterValue(event.target.value);
+    };
+
+    // const handleFilterRole = (event) => {
+    //   setPage(0);
+    //   setFilterRole(event.target.value);
+    // };
 
     const handleDeleteRow = (id) => {
         const deleteRow = tableData.filter((row) => row.id !== id);
@@ -184,7 +214,8 @@ export default function CourseTransferRequestPage() {
 
     const handleResetFilter = () => {
         setFilterName('');
-        setFilterRole('all');
+        setFilterId('');
+        // setFilterRole('all');
         setFilterStatus('all');
     };
 
@@ -195,13 +226,13 @@ export default function CourseTransferRequestPage() {
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="EA Table"
+                    heading="Course Transferring Request Status"
                     links={[
                         {
-                            name: 'Student management',
-                            href: PATH_DASHBOARD.firstPage,
+                            name: 'Course transferring',
+                            href: PATH_DASHBOARD.courseTransferring.root,
                         },
-                        { name: 'Course Transfer' },
+                        { name: 'Request status' },
                     ]}
                 />
                 <Card>
@@ -222,11 +253,15 @@ export default function CourseTransferRequestPage() {
 
                     <UserTableToolbar
                         isFiltered={isFiltered}
-                        filterName={filterName}
-                        filterRole={filterRole}
-                        optionsRole={ROLE_OPTIONS}
-                        onFilterName={handleFilterName}
-                        onFilterRole={handleFilterRole}
+                        filterValue={filterValue}
+                        onFilterValue={handleFilterValue}
+                        // filterName={filterName}
+                        // filterId={filterId}
+                        // filterRole={filterRole}
+                        // optionsRole={ROLE_OPTIONS}
+                        // onFilterName={handleFilterName}
+                        // onFilterId={handleFilterId}
+                        // onFilterRole={handleFilterRole}
                         onResetFilter={handleResetFilter}
                     />
 
@@ -271,15 +306,34 @@ export default function CourseTransferRequestPage() {
                                 />
 
                                 <TableBody>
+
                                     {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                                        <UserTableRow
-                                            key={row.id}
-                                            row={row}
-                                            selected={selected.includes(row.id)}
-                                            onSelectRow={() => onSelectRow(row.id)}
-                                            onDeleteRow={() => handleDeleteRow(row.id)}
-                                            onEditRow={() => handleEditRow(row.name)}
-                                        />
+                                        <TableRow hover>
+                                            {/* <UserTableRow
+                            key={row.id}
+                            row={row}
+                            // selected={selected.includes(row.id)}
+                            // onSelectRow={() => onSelectRow(row.id)}
+                            // onDeleteRow={() => handleDeleteRow(row.id)}
+                            // onEditRow={() => handleEditRow(row.name)}
+                          /> */}
+
+                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}> {row.id} </TableCell>
+                                            <TableCell align="left">{row.requestdate}</TableCell>
+                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.fullname}</TableCell>
+                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.nickname}</TableCell>
+                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+                                                {row.status}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title="More Info">
+                                                    <IconButton>
+                                                        <Iconify icon="ic:chevron-right" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+
+                                        </TableRow>
                                     ))}
 
                                     <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
@@ -312,7 +366,7 @@ export default function CourseTransferRequestPage() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
+function applyFilter({ inputData, comparator, filterName, filterStatus, filterId, filterValue }) {
     const stabilizedThis = inputData.map((el, index) => [el, index]);
 
     stabilizedThis.sort((a, b) => {
@@ -323,17 +377,29 @@ function applyFilter({ inputData, comparator, filterName, filterStatus, filterRo
 
     inputData = stabilizedThis.map((el) => el[0]);
 
-    if (filterName) {
-        inputData = inputData.filter((user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    if (filterValue) {
+        inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
     }
+
+    // if (filterName) {
+    //   inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    // }
+
+    // if (filterId) {
+    //   inputData = inputData.filter((user) => user.id.toLowerCase().indexOf(filterId.toLowerCase()) !== -1);
+    // }
+
+    // if (filterId || filterName) {
+    //   inputData = inputData.filter((user) => (user.id.toLowerCase().indexOf(filterId.toLowerCase()) || user.id.toLowerCase().indexOf(filterId.toLowerCase())) !== -1);
+    // }
 
     if (filterStatus !== 'all') {
         inputData = inputData.filter((user) => user.status === filterStatus);
     }
 
-    if (filterRole !== 'all') {
-        inputData = inputData.filter((user) => user.role === filterRole);
-    }
+    // if (filterRole !== 'all') {
+    //   inputData = inputData.filter((user) => user.role === filterRole);
+    // }
 
     return inputData;
 }

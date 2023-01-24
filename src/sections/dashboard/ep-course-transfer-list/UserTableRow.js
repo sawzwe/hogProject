@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 // @mui
-import { Stack, Avatar, Button, Checkbox, TableRow, MenuItem, TableCell, IconButton, Typography } from '@mui/material';
+import { Stack, Avatar, Button, Checkbox, TableRow, MenuItem, TableCell, IconButton, Typography,Tooltip } from '@mui/material';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -19,8 +19,8 @@ UserTableRow.propTypes = {
 };
 
 export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
-  const { name, avatarUrl, company, role, isVerified, status } = row;
-
+  // const { name, avatarUrl, company, role, isVerified, status } = row;
+  const { id, date, fullname, nickname, status } = row;
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [openPopover, setOpenPopover] = useState(null);
@@ -48,20 +48,22 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell> */}
 
-        <TableCell>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            {/* <Avatar alt={name} src={avatarUrl} /> */}
+        {/* <TableCell>
+           <Stack direction="row" alignItems="center" spacing={2}>
 
             <Typography variant="subtitle2" noWrap>
-              {name}
+              {id}
             </Typography>
-          </Stack>
+          </Stack> 
+        </TableCell> */}
+        
+        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+          {id}
         </TableCell>
-
-        <TableCell align="left">{company}</TableCell>
+        <TableCell align="left">{date}</TableCell>
 
         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-          {role}
+          {fullname}
         </TableCell>
 
         <TableCell align="center">
@@ -74,6 +76,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
               ...(!isVerified && { color: 'warning.main' }),
             }}
           /> */}
+          {nickname}
         </TableCell>
 
         <TableCell align="left">
@@ -88,11 +91,12 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
 
         <TableCell align="right">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
-            <Iconify icon="eva:more-vertical-fill" />
+            {/* <Iconify icon="eva:more-vertical-fill" /> */}
+            <Iconify icon="ic:chevron-right" />
           </IconButton>
         </TableCell>
       </TableRow>
-
+      
       <MenuPopover open={openPopover} onClose={handleClosePopover} arrow="right-top" sx={{ width: 140 }}>
         <MenuItem
           onClick={() => {

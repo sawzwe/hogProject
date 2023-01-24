@@ -25,8 +25,8 @@ export const PageCreateCourseTransferRequest = Loadable(lazy(() => import('../pa
 export const PageChangePassword = Loadable(lazy(() => import('../pages/ChangePasswordPage')));
 
 // Search student
-export const PageSearchStudent = Loadable(lazy(() => import('../pages/EP/SearchStudentPage')));
-export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/EP/SeachCourseStudentPage')));
+export const PageSearchStudent = Loadable(lazy(() => import('../pages/SearchStudentPage')));
+export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/SearchCourseStudentPage')));
 
 // Search teacher
 export const PageSearchTeacher = Loadable(lazy(() => import('../pages/SearchTeacherPage')));

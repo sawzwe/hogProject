@@ -177,7 +177,7 @@ export default function Router() {
         {
           path: 'course-transfer',
           children: [
-            { element: <Navigate to="/dashboard/course-transferring/request-status" replace />, index: true },
+            { element: <Navigate to="/dashboard/course-transfer/request-status" replace />, index: true },
             {
               path: 'create-request',
               element: (

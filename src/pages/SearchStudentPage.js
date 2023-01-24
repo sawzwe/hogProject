@@ -2,16 +2,16 @@ import { Helmet } from 'react-helmet-async';
 // @mui
 import { Typography, Box, Card, Container, CardHeader, Stack } from '@mui/material';
 // components
-import { useSettingsContext } from '../../components/settings';
-import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import { useSettingsContext } from '../components/settings';
+import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_DASHBOARD } from '../routes/paths';
 // Table
-import SortingSelecting from './TableAllStudents';
+import SortingSelecting from '../sections/dashboard/ep-all-students-list';
 
 // ----------------------------------------------------------------------
 
-export default function AllStudentsPage() {
+export default function SearchStudentPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
@@ -21,13 +21,13 @@ export default function AllStudentsPage() {
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="All Student Table"
+                    heading="All Students"
                     links={[
                         {
                             name: 'Student management',
-                            href: PATH_DASHBOARD.firstPage,
+                            href: PATH_DASHBOARD.studentManagement.root,
                         },
-                        { name: 'All Student TableList' },
+                        { name: 'Search student' },
                     ]}
                 />
                 <Stack spacing={3}>
