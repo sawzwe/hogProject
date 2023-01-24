@@ -20,36 +20,36 @@ import SortingSelectingToolbar from './SortingSelectingToolbar';
 // ----------------------------------------------------------------------
 
 function createData(id, fullname, nickname) {
-  return { id, fullname, nickname};
+  return { id, fullname, nickname };
 }
 
 const TABLE_DATA = [
-  createData('S012', 'Saw Zwe Wai Yan','Saw'),
-  createData('S015', 'Siwach Toprasert','Pan'),
-  createData('S879', 'Piyaphon Wu','Hong'),
-  createData('S122', 'Jeffrey Zhi Chi Chong','Jeff'),
-  createData('S002', 'Thanatuch Lertritsirikul','Tar'),
-  createData('S272', 'Zain Ijaz Janpatiew','Zain'),
-  createData('S662', 'Saw Zwe Wai Yan','Saw'),
-  createData('S085', 'Siwach Toprasert','Pan'),
-  createData('S052', 'Piyaphon Wu','Hong'),
-  createData('S162', 'Jeffrey Zhi Chi Chong','Jeff'),
-  createData('S422', 'Thanatuch Lertritsirikul','Tar'),
-  createData('S984', 'Zain Ijaz Janpatiew','Zain'),
-  createData('S155', 'Saw Zwe Wai Yan','Saw'),
-  createData('S468', 'Siwach Toprasert','Pan'),
-  createData('S777', 'Piyaphon Wu','Hong'),
-  createData('S666', 'Jeffrey Zhi Chi Chong','Jeff'),
-  createData('S333', 'Thanatuch Lertritsirikul','Tar'),
-  createData('S222', 'Zain Ijaz Janpatiew','Zain'),
+  createData('S012', 'Saw Zwe Wai Yan', 'Saw'),
+  createData('S015', 'Siwach Toprasert', 'Pan'),
+  createData('S879', 'Piyaphon Wu', 'Hong'),
+  createData('S122', 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData('S002', 'Thanatuch Lertritsirikul', 'Tar'),
+  createData('S272', 'Zain Ijaz Janpatiew', 'Zain'),
+  createData('S662', 'Saw Zwe Wai Yan', 'Saw'),
+  createData('S085', 'Siwach Toprasert', 'Pan'),
+  createData('S052', 'Piyaphon Wu', 'Hong'),
+  createData('S162', 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData('S422', 'Thanatuch Lertritsirikul', 'Tar'),
+  createData('S984', 'Zain Ijaz Janpatiew', 'Zain'),
+  createData('S155', 'Saw Zwe Wai Yan', 'Saw'),
+  createData('S468', 'Siwach Toprasert', 'Pan'),
+  createData('S777', 'Piyaphon Wu', 'Hong'),
+  createData('S666', 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData('S333', 'Thanatuch Lertritsirikul', 'Tar'),
+  createData('S222', 'Zain Ijaz Janpatiew', 'Zain'),
 
 ];
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Student ID', align: 'left'},
+  { id: 'id', label: 'Student ID', align: 'left' },
   { id: 'fullname', label: 'Fullname  ', align: 'left' },
   { id: 'nickname', label: 'Nickname  ', align: 'left' },
-  { id: 'details', label: ' ',align: 'left' },
+  { id: 'details', label: ' ', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -80,61 +80,78 @@ export default function SortingSelecting() {
     setTableData(TABLE_DATA);
   }, []);
 
+  // Search
+  const [filterValue, setFilterValue] = useState('');
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
+    filterValue,
   });
 
   const denseHeight = dense ? 34 : 54;
 
   // Filter
-
   const [openFilter, setOpenFilter] = useState(false);
 
-const defaultValues = {
-  gender: [],
+  const isFiltered = filterValue !== '' ;
+  const isNotFound =
+        (!dataFiltered.length && !!filterValue);
+
+
+  const defaultValues = {
+    gender: [],
+  };
+
+  const methods = useForm({
+    defaultValues,
+  });
+
+  const {
+    reset,
+    watch,
+    formState: { dirtyFields },
+  } = methods;
+
+  const isDefault =
+    (!dirtyFields.gender) ||
+    false;
+
+  const values = watch();
+
+  const handleResetFilter = () => {
+    reset();
+  };
+
+  const handleOpenFilter = () => {
+    setOpenFilter(true);
+  };
+
+  const handleCloseFilter = () => {
+    setOpenFilter(false);
+  };
+
+  const handleFilterValue = (event) => {
+    // setPage(0);
+    setFilterValue(event.target.value);
 };
 
-const methods = useForm({
-  defaultValues,
-});
-
-const {
-  reset,
-  watch,
-  formState: { dirtyFields },
-} = methods;
-
-const isDefault =
-  (!dirtyFields.gender ) ||
-  false;
-
-const values = watch();
-
-const handleResetFilter = () => {
-  reset();
-};
-
-const handleOpenFilter = () => {
-  setOpenFilter(true);
-};
-
-const handleCloseFilter = () => {
-  setOpenFilter(false);
-};
-  
 
   return (
     <div>
-      <SortingSelectingToolbar isDefault={isDefault}
-                open={openFilter}
-                onOpen={handleOpenFilter}
-                onClose={handleCloseFilter}
-                onResetFilter={handleResetFilter}/>
+      <SortingSelectingToolbar 
+        isFiltered={isFiltered}
+        filterValue={filterValue}
+        onFilterValue={handleFilterValue} 
+        isDefault={isDefault}
+        open={openFilter}
+        onOpen={handleOpenFilter}
+        onClose={handleCloseFilter}
+        onResetFilter={handleResetFilter} />
 
       <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-        
-         {/* <TableSelectedAction
+
+        {/* <TableSelectedAction
           dense={dense}
           numSelected={selected.length}
           rowCount={tableData.length}
@@ -176,10 +193,10 @@ const handleCloseFilter = () => {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                  //  hover
-                  //  key={row.id}
-                  //  onClick={() => onSelectRow(row.id)}
-                  // selected={selected.includes(row.id)}
+                //  hover
+                //  key={row.id}
+                //  onClick={() => onSelectRow(row.id)}
+                // selected={selected.includes(row.id)}
                 >
                   {/* <TableCell padding="checkbox">
                      <Checkbox checked={selected.includes(row.id)} /> 
@@ -188,9 +205,9 @@ const handleCloseFilter = () => {
                   <TableCell align="left">{row.fullname}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <Tooltip title="More Info">
-                  <IconButton>
-                  <Iconify icon="ic:chevron-right" />
-                  </IconButton>
+                    <IconButton>
+                      <Iconify icon="ic:chevron-right" />
+                    </IconButton>
                   </Tooltip>
                 </TableRow>
               ))}
@@ -217,7 +234,7 @@ const handleCloseFilter = () => {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator }) {
+function applyFilter({ inputData, comparator,filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -229,6 +246,10 @@ function applyFilter({ inputData, comparator }) {
   });
 
   inputData = stabilizedThis.map((el) => el[0]);
+
+  if (filterValue) {
+    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+}
 
   return inputData;
 }
