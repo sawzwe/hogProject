@@ -5,7 +5,7 @@ import { Container, Typography } from '@mui/material';
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
-import TransferNewEditForm from '../../sections/dashboard/course-transfer';
+import TransferNewEditForm from '../../sections/dashboard/ep-course-transfer-list';
 
 // ----------------------------------------------------------------------
 

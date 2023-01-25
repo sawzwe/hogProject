@@ -22,8 +22,6 @@ export default function TransferCourseListDialog({ open, selected, onClose, onSe
 
     const dataFiltered = applyFilter(courseOptions, searchCourse);
 
-    // const isNotFound = !dataFiltered.length && !!searchCourse;
-
     const handleSearchAddress = (event) => {
         setSearchCourse(event.target.value);
     };
@@ -58,50 +56,6 @@ export default function TransferCourseListDialog({ open, selected, onClose, onSe
                     }}
                 />
             </Stack>
-
-            {/* {isNotFound ? (
-                <SearchNotFound query={searchCourse} sx={{ px: 3, pt: 5, pb: 10 }} />
-            ) : (
-                <Scrollbar sx={{ p: 1.5, pt: 0, maxHeight: 80 * 8 }}>
-                    {dataFiltered.map((address) => (
-                        <ListItemButton
-                            key={address.id}
-                            selected={selected(address.id)}
-                            onClick={() => handleSelectAddress(address)}
-                            sx={{
-                                p: 1.5,
-                                borderRadius: 1,
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                                '&.Mui-selected': {
-                                    bgcolor: 'action.selected',
-                                    '&:hover': {
-                                        bgcolor: 'action.selected',
-                                    },
-                                },
-                            }}
-                        >
-                            <Typography variant="subtitle2">{address.name}</Typography>
-
-                            <Typography
-                                variant="caption"
-                                component="div"
-                                sx={{
-                                    my: 0.5,
-                                    color: 'info.main',
-                                    fontWeight: 'fontWeightMedium',
-                                }}
-                            >
-                                {address.company}
-                            </Typography>
-
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                {address.address}
-                            </Typography>
-                        </ListItemButton>
-                    ))}
-                </Scrollbar>
-            )} */}
         </Dialog>
     );
 }

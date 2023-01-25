@@ -132,7 +132,6 @@ export default function SortingSelecting() {
   };
 
   const handleFilterValue = (event) => {
-    // setPage(0);
     setFilterValue(event.target.value);
 };
 
@@ -151,41 +150,9 @@ export default function SortingSelecting() {
 
       <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
 
-        {/* <TableSelectedAction
-          dense={dense}
-          numSelected={selected.length}
-          rowCount={tableData.length}
-          onSelectAllRows={(checked) =>
-            onSelectAllRows(
-              checked,
-              tableData.map((row) => row.id)
-            )
-          }
-          action={
-            <Tooltip title="Delete">
-              <IconButton color="primary">
-                <Iconify icon="eva:trash-2-outline" />
-              </IconButton>
-            </Tooltip>
-          }
-        /> */}
 
         <Scrollbar>
           <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-            {/* <TableHeadCustom
-              order={order}
-              orderBy={orderBy}
-              headLabel={TABLE_HEAD}
-              rowCount={tableData.length}
-              numSelected={selected.length}
-              onSort={onSort}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                   checked,
-                   tableData.map((row) => row.id)
-                 )
-              }
-            /> */}
             <TableHeadCustom
               headLabel={TABLE_HEAD}
             />
@@ -193,26 +160,23 @@ export default function SortingSelecting() {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                //  hover
-                //  key={row.id}
-                //  onClick={() => onSelectRow(row.id)}
-                // selected={selected.includes(row.id)}
+                 hover
+                key={row.id}
                 >
-                  {/* <TableCell padding="checkbox">
-                     <Checkbox checked={selected.includes(row.id)} /> 
-                  </TableCell>  */}
                   <TableCell align="left" > {row.id} </TableCell>
                   <TableCell align="left">{row.fullname}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
-                  <Tooltip title="More Info">
-                    <IconButton>
-                      <Iconify icon="ic:chevron-right" />
-                    </IconButton>
-                  </Tooltip>
+                  <TableCell>
+                    <Tooltip title="More Info">
+                      <IconButton>
+                        <Iconify icon="ic:chevron-right" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+
                 </TableRow>
               ))}
 
-              {/* <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} /> */}
             </TableBody>
           </Table>
         </Scrollbar>
