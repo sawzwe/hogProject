@@ -162,7 +162,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
             studentImageUrl: currentStudent?.studentImageUrl || '',
             studentAdditionalFiles: currentStudent?.studentAdditionalFiles || [],
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [currentStudent]
     );
 
@@ -189,7 +188,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         if (!isEdit) {
             reset(defaultValues);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEdit, currentStudent]);
 
     // Create student to Firebase Auth, Firestore, and Azure Database

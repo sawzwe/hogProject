@@ -5,10 +5,11 @@ import * as Yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Container, Typography, MenuItem, Grid } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Container, Typography, MenuItem, Grid, Stack, Card, Box } from '@mui/material';
 // components
 import { useSettingsContext } from '../../components/settings';
-import FormProvider, { RHFSelect } from '../../components/hook-form';
+import FormProvider, { RHFSelect, RHFUpload } from '../../components/hook-form';
 import { FormPrivate, FormGroup, FormSemiPrivate } from '../../sections/dashboard/ep-registration-request-form';
 
 // ----------------------------------------------------------------------
@@ -16,7 +17,7 @@ import { FormPrivate, FormGroup, FormSemiPrivate } from '../../sections/dashboar
 const COURSE_TYPE_OPTIONS = [
     { id: 1, name: 'Group' },
     { id: 2, name: 'Private' },
-    { id: 3, name: 'Semi Private'}
+    { id: 3, name: 'Semi Private' }
 ]
 
 // ----------------------------------------------------------------------
@@ -24,21 +25,21 @@ const COURSE_TYPE_OPTIONS = [
 export default function CreateRegistrationRequestPage() {
     const { themeStretch } = useSettingsContext();
 
-    const { courseType, setCourseType } = useState('');
-
-    const RegRequestSchema = Yup.object().shape({
+    const RegisterRequestSchema = Yup.object().shape({
         selectedCourseType: Yup.string().required('Course type is required'),
     });
 
     const defaultValues = useMemo(
         () => ({
-            selectedCourseType: '',
+            selectedCourseType: 'Group',
+            assignedStudents: [],
+            PaymentAttachmentFiles: [],
         }),
         []
     );
 
     const methods = useForm({
-        resolver: yupResolver(RegRequestSchema),
+        resolver: yupResolver(RegisterRequestSchema),
         defaultValues,
     });
 
@@ -60,6 +61,46 @@ export default function CreateRegistrationRequestPage() {
             console.error(error);
         }
     };
+
+    // Student Add/Remove
+    const handleAddStudent = useCallback(
+        (student) => {
+            setValue('assignedStudents', [...values.assignedStudents, student]);
+        }
+    )
+
+    const handleRemoveStudent = (studentId) => {
+        const filtered = values.assignedStudents?.filter((student) => student.id !== studentId);
+        setValue('assignedStudents', filtered);
+    }
+
+    // Payment Attachment for group
+    const handleDropFiles = useCallback(
+        (acceptedFiles) => {
+            const files = values.PaymentAttachmentFiles || [];
+            const newFiles = acceptedFiles.map((file) =>
+                Object.assign(file, {
+                    preview: URL.createObjectURL(file),
+                })
+            );
+            setValue('PaymentAttachmentFiles', [...files, ...newFiles]);
+        },
+        [setValue, values.PaymentAttachmentFiles]
+    );
+
+    const handleRemoveFile = (inputFile) => {
+        const filtered = values.PaymentAttachmentFiles && values.PaymentAttachmentFiles?.filter((file) => file !== inputFile);
+        setValue('PaymentAttachmentFiles', filtered);
+    };
+
+    const handleRemoveAllFiles = () => {
+        setValue('PaymentAttachmentFiles', []);
+    };
+
+    useEffect(() => {
+        reset(defaultValues);
+        setValue('selectedCourseType', values.selectedCourseType);
+    }, [values.selectedCourseType])
 
     return (
         <>
@@ -99,9 +140,101 @@ export default function CreateRegistrationRequestPage() {
                             </RHFSelect>
                         </Grid>
 
-                    { values.selectedCourseType === 'Group' && <Grid item xs={12} md={12}><FormGroup /> </Grid> }
-                    { values.selectedCourseType === 'Private' && <Grid item xs={12} md={12}> <FormPrivate /> </Grid> }
-                    { values.selectedCourseType === 'Semi Private' && <Grid item xs={12} md={12}> <FormSemiPrivate /> </Grid> }
+                        {/* Select Group */}
+                        {values.selectedCourseType === 'Group' &&
+                            <>
+
+                                {/* Add Student and Course */}
+                                <Grid item xs={12} md={12}>
+                                    <FormGroup
+                                        onAddStudent={handleAddStudent}
+                                        onRemoveStudent={handleRemoveStudent}
+                                    />
+                                </Grid>
+                                {/* Payment Attachment */}
+                                <Grid item xs={12} md={12}>
+                                    <Card sx={{ p: 3 }}>
+                                        <Typography variant="h5"
+                                            sx={{
+                                                mb: 2,
+                                                display: 'block',
+                                            }}>Additional Files</Typography>
+                                        <Box
+                                            rowGap={3}
+                                            columnGap={2}
+                                            display="grid"
+                                            gridTemplateColumns={{
+                                                xs: 'repeat(1, 1fr)',
+                                                sm: 'repeat(1, 1fr)',
+                                            }}
+                                        >
+                                            <RHFUpload
+                                                multiple
+                                                thumbnail
+                                                name="PaymentAttachmentFiles"
+                                                maxSize={3145728}
+                                                onDrop={handleDropFiles}
+                                                onRemove={handleRemoveFile}
+                                                onRemoveAll={handleRemoveAllFiles}
+                                                onUpload={() => console.log('ON UPLOAD')}
+                                            />
+                                        </Box>
+                                    </Card>
+                                </Grid>
+
+                                {/* Submit Button */}
+                                <Grid item xs={12} md={12}>
+                                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                                        <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
+                                            Send request
+                                        </LoadingButton>
+                                    </Stack>
+                                </Grid>
+                            </>
+                        }
+
+                        {/* Select Private */}
+                        {values.selectedCourseType === 'Private' &&
+                            <>
+                                <Grid item xs={12} md={12}>
+                                    <FormPrivate 
+                                        onAddStudent={handleAddStudent}
+                                        onRemoveStudent={handleRemoveStudent}
+                                    />
+                                </Grid>
+
+                                {/* Submit Button */}
+                                <Grid item xs={12} md={12}>
+                                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                                        <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
+                                            Send request
+                                        </LoadingButton>
+                                    </Stack>
+                                </Grid>
+                            </>
+                        }
+
+                        {/* Select Semi Private */}
+                        {values.selectedCourseType === 'Semi Private' &&
+                            <>
+                                <Grid item xs={12} md={12}>
+                                    <FormSemiPrivate 
+                                        onAddStudent={handleAddStudent}
+                                        onRemoveStudent={handleRemoveStudent}
+                                    />
+                                </Grid>
+
+                                {/* Submit Button */}
+                                <Grid item xs={12} md={12}>
+                                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                                        <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
+                                            Send request
+                                        </LoadingButton>
+                                    </Stack>
+                                </Grid>
+                            </>
+                        }
+
                     </Grid>
                 </FormProvider>
 
