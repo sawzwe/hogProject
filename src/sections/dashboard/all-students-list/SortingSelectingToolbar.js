@@ -21,6 +21,8 @@ export const FILTER_GENDER_OPTIONS = [
   { label: 'Kids', value: 'Kids' },
 ];
 
+
+
 // ----------------------------------------------------------------------
 // const onSelected = (selected, item) =>
 //   selected.includes(item) ? selected.filter((value) => value !== item) : [...selected, item];
@@ -31,6 +33,8 @@ SortingSelectingToolbar.propTypes = {
   onClose: PropTypes.func,
   isDefault: PropTypes.bool,
   onResetFilter: PropTypes.func,
+  filterValue: PropTypes.string,
+  onFilterValue: PropTypes.func,
 };
 
 
@@ -38,7 +42,7 @@ SortingSelectingToolbar.propTypes = {
 // Filter
 
 
-export default function SortingSelectingToolbar({ open, onOpen, onClose, isDefault, onResetFilter }) {
+export default function SortingSelectingToolbar({ filterValue, onFilterValue, open, onOpen, onClose, isDefault, onResetFilter }) {
   // const { control } = useFormContext();
 const [groupchecked, setGroupChecked] = useState(false);
 const [privatechecked, setPrivateChecked] = useState(false);
@@ -56,7 +60,8 @@ const handleSemiChange = (event) => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
-        <TextField id="search-student" label="Search" variant="outlined" sx={{ width: 980 }}
+        <TextField value={filterValue}
+        onChange={onFilterValue} id="search-student" label="Search" variant="outlined" sx={{ width: 980 }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

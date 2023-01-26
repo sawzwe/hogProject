@@ -9,26 +9,14 @@ import Iconify from '../../../components/iconify';
 UserTableToolbar.propTypes = {
   isFiltered: PropTypes.bool,
   filterValue: PropTypes.string,
-  filterName: PropTypes.string,
-  filterId: PropTypes.string,
-  filterRole: PropTypes.string,
-  onFilterName: PropTypes.func,
-  onFilterId: PropTypes.func,
   onFilterValue: PropTypes.func,
-  onFilterRole: PropTypes.func,
   onResetFilter: PropTypes.func,
-  optionsRole: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default function UserTableToolbar({
   isFiltered,
   filterValue,
   onFilterValue,
-  filterName,
-  filterId,
-  optionsRole,
-  onFilterName,
-  onFilterId,
   onResetFilter,
 }) {
   return (
@@ -41,51 +29,11 @@ export default function UserTableToolbar({
       }}
       sx={{ px: 2.5, py: 3 }}
     >
-      {/* <TextField
-        fullWidth
-        select
-        label="Role"
-        value={filterRole}
-        onChange={onFilterRole}
-        SelectProps={{
-          MenuProps: {
-            PaperProps: {
-              sx: {
-                maxHeight: 260,
-              },
-            },
-          },
-        }}
-        sx={{
-          maxWidth: { sm: 240 },
-          textTransform: 'capitalize',
-        }}
-      >
-        {optionsRole.map((option) => (
-          <MenuItem
-            key={option}
-            value={option}
-            sx={{
-              mx: 1,
-              my: 0.5,
-              borderRadius: 0.75,
-              typography: 'body2',
-              textTransform: 'capitalize',
-              '&:first-of-type': { mt: 0 },
-              '&:last-of-type': { mb: 0 },
-            }}
-          >
-            {option}
-          </MenuItem>
-        ))}
-      </TextField> */}
 
       <TextField
         fullWidth
         value={filterValue}
         onChange={onFilterValue} 
-        // value={filterId}
-        // onChange={onFilterId}
         placeholder="Search Name"
         InputProps={{
           startAdornment: (
