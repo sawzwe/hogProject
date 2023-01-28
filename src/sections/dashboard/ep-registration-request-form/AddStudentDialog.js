@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 // @mui
-import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box } from '@mui/material';
+import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import Iconify from '../../../components/iconify';
@@ -34,16 +35,16 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
 
     const handleSearchStudent = (event) => {
         setSearchStudent(event.target.value);
-    }
+    };
 
     const handleExceedStudent = () => {
         enqueueSnackbar('Number of student is at limit!', {
             variant: 'error'
         })
-    }
+    };
 
     const handleSelectStudent = (student) => {
-        if (type === 'group') {
+        if (type === 'Group') {
             if (selected?.length < limit) {
                 onSelect(student);
                 setSearchStudent('');
@@ -52,7 +53,7 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
             }
         }
 
-        if (type === 'private') {
+        if (type === 'Private') {
             if (selected?.length < limit) {
                 onSelect(student);
                 setSearchStudent('');
@@ -62,7 +63,7 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
             }
         }
 
-        if (type === 'semiPrivate') {
+        if (type === 'Semi Private') {
             if (selected?.length < limit) {
                 onSelect(student);
                 setSearchStudent('');
@@ -73,16 +74,15 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
     };
 
     return (
-        <Dialog fullWidth maxWidth="xs" open={open} onClose={onClose}>
+        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
                 <Typography variant="h6"> Select student </Typography>
-                <Button component={Link} to="/dashboard/new-student" size="small" startIcon={<Iconify icon="eva:plus-fill" />} sx={{ alignSelf: 'flex-end' }}>
-                    New Student
-                </Button>
+                <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
             </Stack>
 
-            <Stack sx={{ p: 2.5 }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ p: 2.5 }}>
                 <TextField
+                    fullWidth
                     value={searchStudent}
                     onChange={handleSearchStudent}
                     placeholder="Search..."
@@ -99,7 +99,7 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
             {isNotFound ? (
                 <SearchNotFound query={searchStudent} sx={{ px: 3, pt: 5, pb: 10 }} />
             ) : (
-                <Scrollbar sx={{ p: 1.5, pt: 0, pb: 4, maxHeight: 80 * 8 }}>
+                <Scrollbar sx={{ p: 3, pt: 0, pb: 4, maxHeight: 80 * 8 }}>
                     {dataFiltered.map((student) => (
                         !selected?.some((s) => s.id === student.id) &&
                         <Box key={student.id}>

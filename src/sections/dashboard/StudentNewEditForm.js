@@ -134,7 +134,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
             studentFirstName: currentStudent?.studentFirstName || 'Piyaphon',
             studentLastName: currentStudent?.studentLastName || 'Wu',
             studentNickname: currentStudent?.studentNickname || 'Hong',
-            studentDateOfBirth: currentStudent?.studentDateOfBirth || '02/05/2002',
+            studentDateOfBirth: currentStudent?.studentDateOfBirth || '1-May-2002',
             studentPhoneNo: currentStudent?.studentPhoneNo || '098-xxx-xxxx',
             studentLineId: currentStudent?.studentLineId || 'pnw029',
             studentEmail: currentStudent?.studentEmail || 'hong@gmail.com',
@@ -381,6 +381,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                             renderInput={(params) => (
                                                 <TextField {...params} fullWidth error={!!error} helperText={error?.message} />
                                             )}
+                                            disableMaskedInput
+                                            inputFormat="dd-MMM-yyyy"
                                         />
                                     )}
                                 />

@@ -8,17 +8,19 @@ import AddIcon from '@mui/icons-material/Add';
 import StudentInfo from './StudentInfo';
 // hook
 import useResponsive from '../../../hooks/useResponsive';
-// 
+// dialog
 import AddStudentDialog from './AddStudentDialog';
 // mockup data
-import { studentList } from './studentList';
+import { studentList } from './_mockupData';
 
-FormGroup.propTypes ={
+AddStudentForm.propTypes = {
+    courseType: PropTypes.string,
+    studentLimit: PropTypes.number,
     onAddStudent: PropTypes.func,
     onRemoveStudent: PropTypes.func,
-}
+};
 
-export default function FormGroup({ onAddStudent, onRemoveStudent }) {
+export default function AddStudentForm({ courseType, studentLimit, onAddStudent, onRemoveStudent }) {
     const {
         watch,
         setValue,
@@ -29,7 +31,7 @@ export default function FormGroup({ onAddStudent, onRemoveStudent }) {
 
     const values = watch();
 
-    const { assignedStudents } = values
+    const { assignedStudents } = values;
 
     const [openAddStudentDialog, setOpenAddStudentDialog] = useState(false);
 
@@ -39,16 +41,16 @@ export default function FormGroup({ onAddStudent, onRemoveStudent }) {
 
     const handleCloseAddStudentDialog = () => {
         setOpenAddStudentDialog(false);
-    }
+    };
 
     const handleDeleteStudent = (studentId) => {
         onRemoveStudent(studentId)
-    }
+    };
 
     return (
         <Card sx={{ p: 3 }}>
             <Box rowGap={1}
-                columnGap={1}
+                columnGap={2}
                 display="grid"
                 gridTemplateColumns={{
                     xs: 'repeat(1, 1fr)',
@@ -59,7 +61,7 @@ export default function FormGroup({ onAddStudent, onRemoveStudent }) {
                     md: `"studentText studentText addStudentButton addStudentButton"`
                 }}>
                 <Box gridArea={"studentText"} sx={{ pt: 1.2 }}>
-                    <Typography variant="h6">{`Student(s)`} {assignedStudents?.length} / 15</Typography>
+                    <Typography variant="h6">{`Student(s) ${assignedStudents?.length} / ${studentLimit.toString()}`}</Typography>
                 </Box>
                 <Box gridArea={"addStudentButton"} display="flex" justifyContent="right" alignItems="right">
                     <Button variant="outlined" size='large' onClick={handleOpenAddStudentDialog}>
@@ -68,10 +70,10 @@ export default function FormGroup({ onAddStudent, onRemoveStudent }) {
                 </Box>
 
                 <AddStudentDialog
-                    type={"group"}
+                    type={courseType}
                     open={openAddStudentDialog}
                     onClose={handleCloseAddStudentDialog}
-                    limit={15}
+                    limit={studentLimit}
                     selected={assignedStudents}
                     onSelect={(student) => onAddStudent(student)}
                     studentOptions={studentList}
@@ -85,3 +87,5 @@ export default function FormGroup({ onAddStudent, onRemoveStudent }) {
         </Card>
     )
 }
+
+//
