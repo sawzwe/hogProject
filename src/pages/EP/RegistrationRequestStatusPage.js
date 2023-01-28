@@ -5,7 +5,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
-import InvoiceListPage from '../../sections/dashboard/ep-course-registration-request-list/InvoiceListPage'
+import RegistrationRequestStatusList from '../../sections/dashboard/ep-course-registration-request-list/RegistrationRequestStatusList'
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ export default function RegistrationRequestStatusPage() {
                 ]}
             />
             <Container maxWidth={themeStretch ? false : 'xl'}>
-                <InvoiceListPage />
+                <RegistrationRequestStatusList />
             </Container>
         </>
     );

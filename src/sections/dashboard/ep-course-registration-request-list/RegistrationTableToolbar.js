@@ -1,31 +1,22 @@
 import PropTypes from 'prop-types';
-import { Stack, InputAdornment, TextField, MenuItem, Button } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
+import { Stack, InputAdornment, TextField, Button } from '@mui/material';
 // components
-import Iconify from '../../../../components/iconify';
+import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
-const INPUT_WIDTH = 160;
-
-InvoiceTableToolbar.propTypes = {
+RegistrationTableToolbar.propTypes = {
   isFiltered: PropTypes.bool,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   onResetFilter: PropTypes.func,
-  filterService: PropTypes.string,
-  onFilterService: PropTypes.func,
-  optionsService: PropTypes.arrayOf(PropTypes.string),
 };
 
-export default function InvoiceTableToolbar({
+export default function RegistrationTableToolbar({
   isFiltered,
   filterName,
   onFilterName,
-  filterService,
   onResetFilter,
-  optionsService,
-  onFilterService,
 }) {
   return (
     <Stack
