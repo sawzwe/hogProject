@@ -1,42 +1,31 @@
-import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // mui
 import {
     Tab,
     Tabs,
     Card,
     Table,
-    Button,
     Tooltip,
     Divider,
     TableBody,
-    Container,
     IconButton,
     TableContainer,
     TableRow,
     TableCell,
 } from '@mui/material';
-// routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
 // components
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
-import ConfirmDialog from '../../../components/confirm-dialog';
-import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
-import { useSettingsContext } from '../../../components/settings';
 import {
     useTable,
     getComparator,
     emptyRows,
-    TableNoData,
+    TableNoData,    
     TableEmptyRows,
     TableHeadCustom,
     TableSelectedAction,
     TablePaginationCustom,
 } from '../../../components/table';
-import Label from '../../../components/label'
 // sections
 import UserTableToolbar from './UserTableToolbar';
 
@@ -78,22 +67,14 @@ export default function CourseTransferRequestList() {
         //
         selected,
         setSelected,
-        onSelectRow,
         onSelectAllRows,
         //
-        onSort,
         onChangeDense,
         onChangePage,
         onChangeRowsPerPage,
     } = useTable();
 
-    const { themeStretch } = useSettingsContext();
-
-    const navigate = useNavigate();
-
     const [tableData, setTableData] = useState(TABLE_DATA);
-
-    const [openConfirm, setOpenConfirm] = useState(false);
 
     const [filterValue, setFilterValue] = useState('');
 
@@ -116,13 +97,6 @@ export default function CourseTransferRequestList() {
         (!dataFiltered.length && !!filterValue) ||
         (!dataFiltered.length && !!filterStatus);
 
-    const handleOpenConfirm = () => {
-        setOpenConfirm(true);
-    };
-
-    const handleCloseConfirm = () => {
-        setOpenConfirm(false);
-    };
 
     const handleFilterStatus = (event, newValue) => {
         setPage(0);
@@ -152,101 +126,101 @@ export default function CourseTransferRequestList() {
         setFilterValue('');
         setFilterStatus('all');
     };
-  return (
-    <>
-                    <Card>
-                    <Tabs
-                        value={filterStatus}
-                        onChange={handleFilterStatus}
-                        sx={{
-                            px: 2,
-                            bgcolor: 'background.neutral',
-                        }}
-                    >
-                        {STATUS_OPTIONS.map((tab) => (
-                            <Tab key={tab} label={tab} value={tab} />
-                        ))}
-                    </Tabs>
+    return (
+        <>
+            <Card>
+                <Tabs
+                    value={filterStatus}
+                    onChange={handleFilterStatus}
+                    sx={{
+                        px: 2,
+                        bgcolor: 'background.neutral',
+                    }}
+                >
+                    {STATUS_OPTIONS.map((tab) => (
+                        <Tab key={tab} label={tab} value={tab} />
+                    ))}
+                </Tabs>
 
-                    <Divider />
+                <Divider />
 
-                    <UserTableToolbar
-                        isFiltered={isFiltered}
-                        filterValue={filterValue} 
-                        onFilterValue={handleFilterValue}
-                        onResetFilter={handleResetFilter}
-                    />
+                <UserTableToolbar
+                    isFiltered={isFiltered}
+                    filterValue={filterValue}
+                    onFilterValue={handleFilterValue}
+                    onResetFilter={handleResetFilter}
+                />
 
-                    <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-                        <TableSelectedAction
-                            dense={dense}
-                            numSelected={selected.length}
-                            rowCount={tableData.length}
-                            onSelectAllRows={(checked) =>
-                                onSelectAllRows(
-                                    checked,
-                                    tableData.map((row) => row.id)
-                                )
-                            }
-                            action={
-                                <Tooltip title="Delete">
-                                    <IconButton color="primary" onClick={handleOpenConfirm}>
-                                        <Iconify icon="eva:trash-2-outline" />
-                                    </IconButton>
-                                </Tooltip>
-                            }
-                        />
-
-                        <Scrollbar>
-                            <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                                
-                                <TableHeadCustom
-                                    headLabel={TABLE_HEAD}
-                                />
-
-                                <TableBody>
-
-                                    {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                                        <TableRow key={row.id} hover>
-                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}> {row.id} </TableCell>
-                                            <TableCell align="left">{row.requestdate}</TableCell>
-                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.fullname}</TableCell>
-                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.nickname}</TableCell>
-                                            <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-                                                {row.status}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Tooltip title="More Info">
-                                                    <IconButton>
-                                                        <Iconify icon="ic:chevron-right" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </TableCell>
-
-                                        </TableRow>
-                                    ))}
-
-                                    <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
-
-                                    <TableNoData isNotFound={isNotFound} />
-                                </TableBody>
-                            </Table>
-                        </Scrollbar>
-                    </TableContainer>
-
-                    <TablePaginationCustom
-                        count={dataFiltered.length}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        onPageChange={onChangePage}
-                        onRowsPerPageChange={onChangeRowsPerPage}
-                        //
+                <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+                    <TableSelectedAction
                         dense={dense}
-                        onChangeDense={onChangeDense}
+                        numSelected={selected.length}
+                        rowCount={tableData.length}
+                        onSelectAllRows={(checked) =>
+                            onSelectAllRows(
+                                checked,
+                                tableData.map((row) => row.id)
+                            )
+                        }
+                        action={
+                            <Tooltip title="Delete">
+                                <IconButton color="primary">
+                                    <Iconify icon="eva:trash-2-outline" />
+                                </IconButton>
+                            </Tooltip>
+                        }
                     />
-                </Card>
-    </>
-  )
+
+                    <Scrollbar>
+                        <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+
+                            <TableHeadCustom
+                                headLabel={TABLE_HEAD}
+                            />
+
+                            <TableBody>
+
+                                {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                                    <TableRow key={row.id} hover>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}> {row.id} </TableCell>
+                                        <TableCell align="left">{row.requestdate}</TableCell>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.fullname}</TableCell>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.nickname}</TableCell>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+                                            {row.status}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Tooltip title="More Info">
+                                                <IconButton>
+                                                    <Iconify icon="ic:chevron-right" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+
+                                    </TableRow>
+                                ))}
+
+                                <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
+
+                                <TableNoData isNotFound={isNotFound} />
+                            </TableBody>
+                        </Table>
+                    </Scrollbar>
+                </TableContainer>
+
+                <TablePaginationCustom
+                    count={dataFiltered.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={onChangePage}
+                    onRowsPerPageChange={onChangeRowsPerPage}
+                    //
+                    dense={dense}
+                    onChangeDense={onChangeDense}
+                />
+            </Card>
+        </>
+    )
 }
 
 // Filtering The Search
