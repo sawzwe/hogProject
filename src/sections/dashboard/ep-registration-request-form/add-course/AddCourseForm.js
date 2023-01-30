@@ -5,13 +5,13 @@ import { useFormContext } from 'react-hook-form';
 // components
 import { Card, Grid, Box, Typography, Button } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
-import CourseInfo from './StudentInfo';
+import GroupCourseCard from './GroupCourseCard';
 // hook
-import useResponsive from '../../../hooks/useResponsive';
+import useResponsive from '../../../../hooks/useResponsive';
 // dialog
 import AddCourseDialog from './AddCourseDialog';
 // mockup data
-import { groupCourseList } from './_mockupData';
+import { groupCourseList } from '../_mockupData';
 
 AddCourseForm.propTypes = {
     courseType: PropTypes.string,
@@ -40,6 +40,10 @@ export default function AddCourseForm({ courseType, onAddCourse, onRemoveCourse 
 
     const handleCloseAddCourseDialog = () => {
         setOpenAddCourseDialog(false);
+    };
+
+    const handleDeleteCourse = (courseId) => {
+        onRemoveCourse(courseId);
     };
 
     return (
@@ -72,6 +76,10 @@ export default function AddCourseForm({ courseType, onAddCourse, onRemoveCourse 
                     courseOptions={groupCourseList}
                 />
             </Box>
+
+            {assignedCourses?.map((course) => {
+                return <GroupCourseCard key={course.id} course={course} onDelete={handleDeleteCourse} />
+            })}
         </Card>
     )
 }

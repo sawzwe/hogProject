@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 // components
-import { useSnackbar } from '../../../components/snackbar';
-import Iconify from '../../../components/iconify';
-import { Upload } from '../../../components/upload';
-import SearchNotFound from '../../../components/search-not-found/SearchNotFound';
-import Scrollbar from '../../../components/scrollbar/Scrollbar';
+import { useSnackbar } from '../../../../components/snackbar';
+import Iconify from '../../../../components/iconify';
+import { Upload } from '../../../../components/upload';
+import SearchNotFound from '../../../../components/search-not-found/SearchNotFound';
+import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 
 // ----------------------------------------------------------------------
 
@@ -44,16 +44,8 @@ export default function AddStudentDialog({ type, open, limit, onClose, selected,
     };
 
     const handleSelectStudent = (student) => {
-        if (type === 'Group') {
-            if (selected?.length < limit) {
-                onSelect(student);
-                setSearchStudent('');
-            } else {
-                handleExceedStudent();
-            }
-        }
 
-        if (type === 'Private') {
+        if (type === 'Group' || type === 'Private') {
             if (selected?.length < limit) {
                 onSelect(student);
                 setSearchStudent('');

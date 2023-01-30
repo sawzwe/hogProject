@@ -5,13 +5,13 @@ import { useFormContext } from 'react-hook-form';
 // components
 import { Card, Grid, Box, Typography, Button } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
-import StudentInfo from './StudentInfo';
+import StudentCard from './StudentCard';
 // hook
-import useResponsive from '../../../hooks/useResponsive';
+import useResponsive from '../../../../hooks/useResponsive';
 // dialog
 import AddStudentDialog from './AddStudentDialog';
 // mockup data
-import { studentList } from './_mockupData';
+import { studentList } from '../_mockupData';
 
 AddStudentForm.propTypes = {
     courseType: PropTypes.string,
@@ -49,25 +49,19 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
 
     return (
         <Card sx={{ p: 3 }}>
-            <Box rowGap={1}
-                columnGap={2}
-                display="grid"
-                gridTemplateColumns={{
-                    xs: 'repeat(1, 1fr)',
-                    md: 'repeat(4, 1fr)',
-                }}
-                gridTemplateAreas={{
-                    xs: `"studentText addStudentButton" `,
-                    md: `"studentText studentText addStudentButton addStudentButton"`
-                }}>
-                <Box gridArea={"studentText"} sx={{ pt: 1.2 }}>
+            <Grid
+                container
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center">
+                <Grid item xs={12} md={6}>
                     <Typography variant="h6">{`Student(s) ${assignedStudents?.length} / ${studentLimit.toString()}`}</Typography>
-                </Box>
-                <Box gridArea={"addStudentButton"} display="flex" justifyContent="right" alignItems="right">
+                </Grid>
+                <Grid container item xs={12} md={6} justifyContent="flex-end">
                     <Button variant="outlined" size='large' onClick={handleOpenAddStudentDialog}>
                         {<AddIcon />} Add Student
                     </Button>
-                </Box>
+                </Grid>
 
                 <AddStudentDialog
                     type={courseType}
@@ -78,10 +72,10 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
                     onSelect={(student) => onAddStudent(student)}
                     studentOptions={studentList}
                 />
-            </Box>
+            </Grid>
 
             {assignedStudents?.map((student) => {
-                return <StudentInfo key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
+                return <StudentCard key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
             })
             }
         </Card>
