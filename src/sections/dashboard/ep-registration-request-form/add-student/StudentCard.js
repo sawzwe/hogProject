@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 
-StudentInfo.propTypes = {
+StudentCard.propTypes = {
     id: PropTypes.string,
     fName: PropTypes.string,
     lName: PropTypes.string,
@@ -13,7 +13,7 @@ StudentInfo.propTypes = {
     onDelete: PropTypes.func
 };
 
-export default function StudentInfo({ id, fName, lName, nickname, onDelete }) {
+export default function StudentCard({ id, fName, lName, nickname, onDelete }) {
     return (
         <Stack flexDirection="row" alignItems="center" mt={2} >
             <TextField
