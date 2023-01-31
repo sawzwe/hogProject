@@ -33,7 +33,7 @@ export default function RegistrationTableToolbar({
         fullWidth
         value={filterName}
         onChange={onFilterName}
-        placeholder="Search client or invoice number..."
+        placeholder="Search RID or Course Type or Section"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
