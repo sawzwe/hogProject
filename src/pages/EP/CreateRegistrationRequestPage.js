@@ -34,10 +34,12 @@ export default function CreateRegistrationRequestPage() {
             selectedCourseType: 'Group',
             assignedStudents: [],
             assignedCourses: [],
+            selectedCourseSubjects: [],
             courseStartDate: new Date(),
             courseEndDate: null,
             paymentAttachmentFiles: [],
             additionalComment: '',
+            
         }),
         []
     );
@@ -82,13 +84,14 @@ export default function CreateRegistrationRequestPage() {
     // Course Add/Remove
     const handleAddCourse = useCallback(
         (course) => {
+            console.log(course)
             setValue('assignedCourses', [...values.assignedCourses, course]);
         },
         [setValue, values.assignedCourses]
     );
 
     const handleRemoveCourse = (courseId) => {
-        const filtered = values.assignedCourses?.filter((course) => course.id!== courseId);
+        const filtered = values.assignedCourses?.filter((course) => course.id !== courseId);
         setValue('assignedCourses', filtered);
     }
 

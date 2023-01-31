@@ -41,7 +41,7 @@ export function RHFMultiCheckbox({ name, options, ...other }) {
           field.value.includes(option) ? field.value.filter((value) => value !== option) : [...field.value, option];
 
         return (
-          <FormGroup>
+          <FormGroup sx={{display:'inline-block'}}>
             {options.map((option) => (
               <FormControlLabel
                 key={option.value}

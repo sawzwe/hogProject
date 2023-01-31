@@ -18,7 +18,7 @@ export default function CourseTransferRequestPage() {
     return (
         <>
             <Helmet>
-                <title>Course Transfer Request</title>
+                <title>Course Transfe Request</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
