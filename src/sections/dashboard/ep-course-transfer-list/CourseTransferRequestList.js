@@ -30,7 +30,7 @@ import {
 import UserTableToolbar from './UserTableToolbar';
 
 //-------------------------------------------------------------------------
-const STATUS_OPTIONS = ['all', 'pending', 'completed'];
+const STATUS_OPTIONS = ['pending', 'completed'];
 
 
 const TABLE_HEAD = [
@@ -78,7 +78,7 @@ export default function CourseTransferRequestList() {
 
     const [filterValue, setFilterValue] = useState('');
 
-    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterStatus, setFilterStatus] = useState('pending');
 
     const dataFiltered = applyFilter({
         inputData: tableData,
@@ -91,7 +91,7 @@ export default function CourseTransferRequestList() {
 
     const denseHeight = dense ? 52 : 72;
 
-    const isFiltered = filterValue !== '' || filterStatus !== 'all';
+    const isFiltered = filterValue !== '' || filterStatus !== 'pending';
 
     const isNotFound =
         (!dataFiltered.length && !!filterValue) ||
@@ -124,7 +124,7 @@ export default function CourseTransferRequestList() {
 
     const handleResetFilter = () => {
         setFilterValue('');
-        setFilterStatus('all');
+        setFilterStatus('pending');
     };
     return (
         <>
@@ -239,7 +239,7 @@ function applyFilter({ inputData, comparator, filterStatus, filterValue }) {
         inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
     }
 
-    if (filterStatus !== 'all') {
+    if (filterStatus !== '') {
         inputData = inputData.filter((user) => user.status === filterStatus);
     }
 
