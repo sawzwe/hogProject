@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
 // components
-import { CustomAvatar } from '../../../components/custom-avatar';
+// import { CustomAvatar } from '../../../components/custom-avatar';
 import Logo from '../../../components/logo/Logo';
 // logo
 // import hog from '../../../assets/logo/hog.svg';

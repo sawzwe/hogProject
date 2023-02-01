@@ -7,8 +7,6 @@ import { useAuthContext } from '../auth/useAuthContext';
 // layouts
 import CompactLayout from '../layouts/compact';
 import DashboardLayout from '../layouts/dashboard';
-// 
-import { PATH_DASHBOARD, PATH_AUTH } from './paths';
 //
 import {
   Page404,

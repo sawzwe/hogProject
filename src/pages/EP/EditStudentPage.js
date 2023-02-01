@@ -1,17 +1,15 @@
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
 import { useParams } from 'react-router-dom';
 // @mui
 import { Container } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { _studentList } from '../../_mock/arrays';
 // components
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
 import StudentNewEditForm from '../../sections/dashboard/StudentNewEditForm';
+import { studentList } from '../../sections/dashboard/ep-registration-request-form/_mockupData';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +19,7 @@ export default function EditStudentPage() {
     const { studentId } = useParams();
 
     // Find user in database with user's ID
-    const currentStudent = _studentList.find((student) => student.id === studentId);
+    const currentStudent = studentList.find((student) => student.id === studentId);
 
     return (
         <>

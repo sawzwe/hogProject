@@ -15,13 +15,11 @@ export default function App() {
   return (
     <MotionLazyContainer>
       <ThemeProvider>
-        {/* <ThemeSettings> */}
           <ThemeLocalization>
             <SnackbarProvider>
               <Router />
             </SnackbarProvider>
           </ThemeLocalization>
-        {/* </ThemeSettings> */}
       </ThemeProvider>
     </MotionLazyContainer>
   );

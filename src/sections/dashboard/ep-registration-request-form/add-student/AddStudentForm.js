@@ -31,7 +31,7 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
 
     const values = watch();
 
-    const { assignedStudents } = values;
+    const { students } = values;
 
     const [openAddStudentDialog, setOpenAddStudentDialog] = useState(false);
 
@@ -55,7 +55,7 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
                 justifyContent="space-between"
                 alignItems="center">
                 <Grid item xs={12} md={6}>
-                    <Typography variant="h6">{`Student(s) ${assignedStudents?.length} / ${studentLimit.toString()}`}</Typography>
+                    <Typography variant="h6">{`Student(s) ${students?.length} / ${studentLimit.toString()}`}</Typography>
                 </Grid>
                 <Grid container item xs={12} md={6} justifyContent="flex-end">
                     <Button variant="outlined" size='large' onClick={handleOpenAddStudentDialog}>
@@ -64,17 +64,15 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
                 </Grid>
 
                 <AddStudentDialog
-                    type={courseType}
                     open={openAddStudentDialog}
                     onClose={handleCloseAddStudentDialog}
                     limit={studentLimit}
-                    selected={assignedStudents}
                     onSelect={(student) => onAddStudent(student)}
                     studentOptions={studentList}
                 />
             </Grid>
 
-            {assignedStudents?.map((student) => {
+            {students?.map((student) => {
                 return <StudentCard key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
             })
             }

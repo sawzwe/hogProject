@@ -5,13 +5,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
 
 
-GroupCourseCard.propTypes = {
+CourseCard.propTypes = {
+    courseType: PropTypes.string,
     course: PropTypes.object,
     onDelete: PropTypes.func
 };
 
-export default function GroupCourseCard({ course, onDelete }) {
-    // console.log(course)
+export default function CourseCard({ courseType, course, onDelete }) {
+
     return (
         <Paper elevation={2} sx={{ mt: 2, p: 3 }}>
             <Grid container
@@ -28,8 +29,17 @@ export default function GroupCourseCard({ course, onDelete }) {
                 <Grid item xs={12} md={6}>
                     <TextField fullWidth disabled label="Section" value={course.section} />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <TextField fullWidth disabled label="Section" value={course.section} />
+                <Grid item xs={12} md={3}>
+                    <TextField fullWidth disabled label="Start Date" value={course.startDate} />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                    <TextField fullWidth disabled label="End Date" value={course.endDate} />
+                </Grid>
+            </Grid>
+
+            <Grid container direction="row" spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={12} md={12}>
+                    <TextField fullWidth disabled label="Section" value={course.subjects.map(subject => subject.name.toUpperCase()).join(' | ')} />
                 </Grid>
             </Grid>
 
@@ -38,12 +48,8 @@ export default function GroupCourseCard({ course, onDelete }) {
                     <Button variant="outlined" size='medium' color="error" onClick={() => { onDelete(course.id) }} sx={{ mr: 1, mb: 1 }}>
                         <DeleteIcon /> Remove
                     </Button>
-                    <Button variant="outlined" size='medium' color="secondary" sx={{ mb: 1 }}>
-                        <InfoIcon sx={{ mr: 0.5 }} /> Schedules
-                    </Button>
                 </Grid>
             </Grid>
-
         </Paper>
     )
 }

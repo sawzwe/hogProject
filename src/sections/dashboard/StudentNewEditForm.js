@@ -8,20 +8,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Chip, Grid, Stack, Switch, Typography, FormControlLabel, Button, TextField, MenuItem } from '@mui/material';
+import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
 // utils
 import { fData } from '../../utils/formatNumber';
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
-// sections
-import { StudentCurrentCourse } from './StudentCurrentCourse';
-import { StudentNewEditExam } from './StudentNewEditExam';
 // assets
 import { countries } from '../../assets/data';
 // components
-import Label from '../../components/label';
 import { useSnackbar } from '../../components/snackbar';
-import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFSwitch, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
@@ -86,7 +80,6 @@ StudentNewEditForm.propTypes = {
 };
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
-    const navigate = useNavigate();
 
     const { enqueueSnackbar } = useSnackbar();
 

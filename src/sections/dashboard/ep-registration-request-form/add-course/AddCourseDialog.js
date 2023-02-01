@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useForm, Controller, useFormContext } from 'react-hook-form';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
-import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
+import { Stack, Dialog, Button, Grid, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // utils
@@ -21,7 +21,7 @@ import AddCourseGroupDetailDialog from './AddCourseGroupDetailDialog';
 // ----------------------------------------------------------------------
 
 AddCourseDialog.propTypes = {
-    type: PropTypes.string,
+    courseType: PropTypes.string,
     open: PropTypes.bool,
     onClose: PropTypes.func,
     onSelect: PropTypes.func,
@@ -29,7 +29,7 @@ AddCourseDialog.propTypes = {
     courseOptions: PropTypes.array,
 };
 
-export default function AddCourseDialog({ type, open, onClose, onSelect, selected, courseOptions }) {
+export default function AddCourseDialog({ courseType, open, onClose, onSelect, selected, courseOptions }) {
     const {
         watch,
         setValue,
@@ -80,17 +80,25 @@ export default function AddCourseDialog({ type, open, onClose, onSelect, selecte
         setOpenAddCourseDetailDialog(false);
     };
 
-    // TO DO NEXT
-    // 1. Table for courses in dialog
-    // 2. Course detail after dialog
+    // Course options for private and semi private
+
+    const [availableCourses, setAvailableCourses] = useState([]);
+
+    useEffect(() => {
+        if (courseType !== 'Group') {
+            setAvailableCourses(courseOptions.map((eachCourse) => eachCourse.course))
+        } 
+    }, [courseType])
+
+    console.log(availableCourses)
 
     return (
         <>
-            {type === 'Group' && (
+            {courseType === 'Group' && (
                 <>
                     <Dialog fullWidth maxWidth="md" open={open} onClose={handleCloseDialog} >
                         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
-                            <Typography variant="h6"> {type === 'Group' ? 'Join Group' : 'New Course'} </Typography>
+                            <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
                             <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
                         </Stack>
 
@@ -191,12 +199,38 @@ export default function AddCourseDialog({ type, open, onClose, onSelect, selecte
                         )}
                     </Dialog>
                     <AddCourseGroupDetailDialog
-                        type={type}
+                        courseType={courseType}
                         open={openAddCourseDetailDialog}
                         close={handleCloseAddCourseDetailDialog}
                         course={selectedCourse}
-                        onSelect={() => onSelect(selectedCourse)}
+                        onSelect={(addedCourse) => onSelect(addedCourse)}
+                        onJoin={() => { onClose() }}
                     />
+                </>
+            )}
+
+
+            {courseType !== 'Group' && (
+                <>
+                    <Dialog fullWidth maxWidth="md" open={open} onClose={handleCloseDialog} >
+                        <Grid container spacing={1}>
+                            <Grid item xs={12} md={12}>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
+                                    <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
+                                    <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <Stack justifyContent="flex-start" sx={{ py: 1, pl: 3, pr: 1 }} spacing={2}>
+                                    <TextField
+                                        variant="outlined"
+                                        id="courseName"
+                                        label="Course"
+                                    />
+                                </Stack>
+                            </Grid>
+                        </Grid>
+                    </Dialog>
                 </>
             )}
         </>
