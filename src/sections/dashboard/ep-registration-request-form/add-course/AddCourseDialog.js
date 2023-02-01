@@ -1,49 +1,60 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 // form
-import { useForm, Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
-import { Stack, Dialog, Button, Grid, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
+import { Stack, Dialog, Button, Grid, TextField, Typography, InputAdornment, ListItem, Divider, Box, IconButton, MenuItem } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // utils
-import { fTimestamp, fDate } from '../../../../utils/formatTime';
+import { fTimestamp } from '../../../../utils/formatTime';
 // components
 import { useSnackbar } from '../../../../components/snackbar';
 import Iconify from '../../../../components/iconify';
-import { Upload } from '../../../../components/upload';
 import SearchNotFound from '../../../../components/search-not-found/SearchNotFound';
 import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 import AddCourseGroupDetailDialog from './AddCourseGroupDetailDialog';
+// assets
+import { RHFSelect, RHFTextField } from '../../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
+const LEARNING_METHOD_OPTIONS = [
+    'Onsite',
+    'Online'
+]
+
 AddCourseDialog.propTypes = {
-    courseType: PropTypes.string,
     open: PropTypes.bool,
     onClose: PropTypes.func,
     onSelect: PropTypes.func,
-    selected: PropTypes.array,
     courseOptions: PropTypes.array,
 };
 
-export default function AddCourseDialog({ courseType, open, onClose, onSelect, selected, courseOptions }) {
+export default function AddCourseDialog({ open, onClose, onSelect, courseOptions }) {
     const {
         watch,
         setValue,
         formState: { errors },
     } = useFormContext();
 
-    const [selectedCourse, setSelectedCourse] = useState({});
-    const [selectedCourseSubjects, setSelectedCourseSubjects] = useState([]);
+    const values = watch();
 
+    const {
+        courseType,
+        courses,
+        selectedPrivateCourse,
+        selectedPrivateSubject,
+        selectedPrivateLevel,
+        selectedHour,
+        selectedLearningMethod
+    } = values;
+
+    // Filter courses
     const [filterCourseName, setFilterCourseName] = useState('');
     const [filterStartDate, setFilterStartDate] = useState(null);
     const [filterEndDate, setFilterEndDate] = useState(null);
-
-    const [openAddCourseDetailDialog, setOpenAddCourseDetailDialog] = useState(false);
 
     const dataFiltered = applyFilter({
         courseOptions,
@@ -68,29 +79,43 @@ export default function AddCourseDialog({ courseType, open, onClose, onSelect, s
         onClose();
     }
 
+    // Watch selected course and subjects
+    const [selectedCourse, setSelectedCourse] = useState({});
+
     // Course Detail Dialog
-    const handleOpenAddCourseDetailDialog = (course) => {
+    const [openCourseDetailDialog, setOpenCourseDetailDialog] = useState(false);
+
+    const handleOpenCourseDetailDialog = (course) => {
         setSelectedCourse(course)
-        setOpenAddCourseDetailDialog(true);
+        setOpenCourseDetailDialog(true);
     };
 
-    const handleCloseAddCourseDetailDialog = () => {
+    const handleCloseCourseDetailDialog = () => {
         setSelectedCourse({});
-        setValue('selectedCourseSubjects', [])
-        setOpenAddCourseDetailDialog(false);
+        setOpenCourseDetailDialog(false);
     };
 
-    // Course options for private and semi private
+    // Track current Private/ Semi Private subjects based on selected course
+    const [privateSubjects, setPrivateSubjects] = useState([]);
+    const [privateLevels, setPrivateLevels] = useState([]);
 
-    const [availableCourses, setAvailableCourses] = useState([]);
-
+    // 1. Reset selected subject once change the course
+    // 2. Set new subjects for select options
     useEffect(() => {
-        if (courseType !== 'Group') {
-            setAvailableCourses(courseOptions.map((eachCourse) => eachCourse.course))
-        } 
-    }, [courseType])
+        setValue('selectedPrivateSubject', '')
+        setValue('selectedPrivateLevel', '')
+        if (selectedPrivateCourse) {
+            const targetCourse = courseOptions.find((option) => option.course === selectedPrivateCourse)
+            setPrivateSubjects(targetCourse.subjects)
+            setPrivateLevels(targetCourse.level)
 
-    console.log(availableCourses)
+        }
+    }, [selectedPrivateCourse]);
+
+    // console.log(selectedPrivateCourse);
+    // console.log(privateLevels)
+    // console.log(!!privateSubjects.length);
+    // console.log(selectedPrivateSubject)
 
     return (
         <>
@@ -159,12 +184,12 @@ export default function AddCourseDialog({ courseType, open, onClose, onSelect, s
                             <>
                                 <Scrollbar sx={{ p: 2.5, pt: 0, pb: 4, maxHeight: 80 * 8 }}>
                                     {dataFiltered.map((course) => (
-                                        !selected?.some((c) => c.id === course.id) &&
+                                        !courses?.some((c) => c.id === course.id) &&
                                         <Box key={course.id}>
                                             <ListItem
                                                 key={course.id}
                                                 secondaryAction={
-                                                    <IconButton variant="outlined" onClick={() => handleOpenAddCourseDetailDialog(course)}>
+                                                    <IconButton variant="outlined" onClick={() => handleOpenCourseDetailDialog(course)}>
                                                         <NavigateNextIcon />
                                                     </IconButton>
                                                 }
@@ -199,9 +224,8 @@ export default function AddCourseDialog({ courseType, open, onClose, onSelect, s
                         )}
                     </Dialog>
                     <AddCourseGroupDetailDialog
-                        courseType={courseType}
-                        open={openAddCourseDetailDialog}
-                        close={handleCloseAddCourseDetailDialog}
+                        open={openCourseDetailDialog}
+                        close={handleCloseCourseDetailDialog}
                         course={selectedCourse}
                         onSelect={(addedCourse) => onSelect(addedCourse)}
                         onJoin={() => { onClose() }}
@@ -220,14 +244,167 @@ export default function AddCourseDialog({ courseType, open, onClose, onSelect, s
                                     <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
                                 </Stack>
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Stack justifyContent="flex-start" sx={{ py: 1, pl: 3, pr: 1 }} spacing={2}>
-                                    <TextField
-                                        variant="outlined"
-                                        id="courseName"
+                            <Grid container sx={{ px: 3, py: 2 }} spacing={2}>
+                                {/* Select Course */}
+                                <Grid item xs={12} md={6}>
+                                    <RHFSelect
+                                        name="selectedPrivateCourse"
                                         label="Course"
-                                    />
-                                </Stack>
+                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                        required>
+                                        {courseOptions.map((option) => (
+                                            <MenuItem
+                                                key={option.id}
+                                                value={option.course}
+                                                sx={{
+                                                    mx: 1,
+                                                    my: 0.5,
+                                                    borderRadius: 0.75,
+                                                    typography: 'body2',
+                                                    textTransform: 'capitalize',
+                                                    '&:first-of-type': { mt: 0 },
+                                                    '&:last-of-type': { mb: 0 },
+                                                }}
+                                            >
+                                                {option.course}
+                                            </MenuItem>
+                                        ))}
+                                    </RHFSelect>
+                                </Grid>
+
+                                {/* Select Subject */}
+                                <Grid item xs={12} md={6}>
+                                    {!!privateSubjects.length ?
+                                        <RHFSelect
+                                            name="selectedPrivateSubject"
+                                            label="Subject"
+                                            disabled={!!!selectedPrivateCourse}
+                                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                            required>
+                                            {privateSubjects.map((option) => (
+                                                <MenuItem
+                                                    key={option}
+                                                    value={option}
+                                                    sx={{
+                                                        mx: 1,
+                                                        my: 0.5,
+                                                        borderRadius: 0.75,
+                                                        typography: 'body2',
+                                                        textTransform: 'capitalize',
+                                                        '&:first-of-type': { mt: 0 },
+                                                        '&:last-of-type': { mb: 0 },
+                                                    }}
+                                                >
+                                                    {option}
+                                                </MenuItem>
+                                            ))}
+                                        </RHFSelect> :
+                                        <RHFSelect
+                                            name="selectedPrivateSubject"
+                                            label="None"
+                                            disabled
+                                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                            <MenuItem
+                                                key={"None"}
+                                                value={"None"}
+                                                sx={{
+                                                    mx: 1,
+                                                    my: 0.5,
+                                                    borderRadius: 0.75,
+                                                    typography: 'body2',
+                                                    textTransform: 'capitalize',
+                                                    '&:first-of-type': { mt: 0 },
+                                                    '&:last-of-type': { mb: 0 },
+                                                }}
+                                            >
+                                                None
+                                            </MenuItem>
+                                        </RHFSelect>
+                                    }
+                                </Grid>
+
+                                {/* Select Level */}
+                                <Grid item xs={12} md={6}>
+                                    {!!privateLevels.length ?
+                                        <RHFSelect
+                                            name="selectedPrivateLevel"
+                                            label="Level"
+                                            disabled={!!!selectedPrivateCourse}
+                                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                            required>
+                                            {privateLevels.map((option) => (
+                                                <MenuItem
+                                                    key={option}
+                                                    value={option}
+                                                    sx={{
+                                                        mx: 1,
+                                                        my: 0.5,
+                                                        borderRadius: 0.75,
+                                                        typography: 'body2',
+                                                        textTransform: 'capitalize',
+                                                        '&:first-of-type': { mt: 0 },
+                                                        '&:last-of-type': { mb: 0 },
+                                                    }}
+                                                >
+                                                    {option}
+                                                </MenuItem>
+                                            ))}
+                                        </RHFSelect> :
+                                        <RHFSelect
+                                            name="selectedPrivateLevel"
+                                            label="None"
+                                            disabled
+                                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                            <MenuItem
+                                                key={"None"}
+                                                value={"None"}
+                                                sx={{
+                                                    mx: 1,
+                                                    my: 0.5,
+                                                    borderRadius: 0.75,
+                                                    typography: 'body2',
+                                                    textTransform: 'capitalize',
+                                                    '&:first-of-type': { mt: 0 },
+                                                    '&:last-of-type': { mb: 0 },
+                                                }}
+                                            >
+                                                None
+                                            </MenuItem>
+                                        </RHFSelect>
+                                    }
+                                </Grid>
+
+                                {/* Hour */}
+                                <Grid item xs={6} md={3}>
+                                    <RHFTextField name="selectedHour" label="Hours" type="number" required />
+                                </Grid>
+
+                                {/* Learning Method */}
+                                <Grid item xs={6} md={3}>
+                                    <RHFSelect
+                                        name="selectedLearningMethod"
+                                        label="Learning Method"
+                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                        required>
+                                        {LEARNING_METHOD_OPTIONS.map((option) => (
+                                            <MenuItem
+                                                key={option}
+                                                value={option}
+                                                sx={{
+                                                    mx: 1,
+                                                    my: 0.5,
+                                                    borderRadius: 0.75,
+                                                    typography: 'body2',
+                                                    textTransform: 'capitalize',
+                                                    '&:first-of-type': { mt: 0 },
+                                                    '&:last-of-type': { mb: 0 },
+                                                }}
+                                            >
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                    </RHFSelect>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Dialog>

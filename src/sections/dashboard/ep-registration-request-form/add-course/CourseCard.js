@@ -12,7 +12,6 @@ CourseCard.propTypes = {
 };
 
 export default function CourseCard({ courseType, course, onDelete }) {
-
     return (
         <Paper elevation={2} sx={{ mt: 2, p: 3 }}>
             <Grid container

@@ -49,8 +49,16 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
             courseType: currentRequest?.courseType || 'Group',
             students: currentRequest?.students || [],
             courses: currentRequest?.courses || [],
+            selectedSubjects: [], // Group
             paymentAttachmentFiles: currentRequest?.paymentAttachmentFiles || [],
-            additionalComment: currentRequest?.additionalComment || ''
+            additionalComment: currentRequest?.additionalComment || '',
+            // Private or Semi Private
+            selectedPrivateCourse: currentRequest?.selectedPrivateCourse || '',
+            selectedPrivateSubject: currentRequest?.selectedPrivateSubject || '', 
+            selectedPrivateLevel: currentRequest?.selectedPrivateLevel || '', 
+            selectedHour: currentRequest?.selectedHour || '',
+            selectedLearningMethod: currentRequest?.selectedLearningMethod || ''
+
         }),
         [currentRequest]
     );
@@ -107,14 +115,14 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
     // Course Add/Remove -----------------------------------------------------------------
     const handleAddCourse = useCallback(
         (addedCourse) => {
-            setValue('assignedCourses', [...values.assignedCourses, addedCourse]);
+            setValue('courses', [...courses, addedCourse]);
         },
-        [setValue, values.assignedCourses]
+        [setValue, courses]
     );
 
     const handleRemoveCourse = (courseId) => {
-        const filtered = values.assignedCourses?.filter((course) => course.id !== courseId);
-        setValue('assignedCourses', filtered);
+        const filtered = courses?.filter((course) => course.id !== courseId);
+        setValue('courses', filtered);
     }
 
     // Payment Attachment Files -----------------------------------------------------------------
@@ -140,8 +148,7 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
         setValue('paymentAttachmentFiles', []);
     };
 
-    // Reset values when form type changed
-
+    // Reset values when form type changed --------------------------------------------------------
     useEffect(() => {
         reset(defaultValues);
         setValue('courseType', courseType);
@@ -180,7 +187,6 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
                         {/* Add Student */}
                         <Grid item xs={12} md={12}>
                             <AddStudentForm
-                                courseType={courseType}
                                 studentLimit={courseType === 'Semi Private' ? MAX_STUDENTS_PER_REQUEST_SEMI_PRIVATE : MAX_STUDENTS_PER_REQUEST}
                                 onAddStudent={handleAddStudent}
                                 onRemoveStudent={handleRemoveStudent}
@@ -190,7 +196,6 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
                         {/* Add Course */}
                         <Grid item xs={12} md={12}>
                             <AddCourseForm
-                                courseType={courseType}
                                 onAddCourse={handleAddCourse}
                                 onRemoveCourse={handleRemoveCourse}
                             />

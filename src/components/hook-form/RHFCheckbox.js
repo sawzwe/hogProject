@@ -41,13 +41,17 @@ export function RHFMultiCheckbox({ name, options, ...other }) {
           field.value.includes(option) ? field.value.filter((value) => value !== option) : [...field.value, option];
 
         return (
-          <FormGroup sx={{display:'inline-block'}}>
+          <FormGroup sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: "row"
+          }}>
             {options.map((option) => (
               <FormControlLabel
                 key={option.value}
                 control={
                   <Checkbox
-                    checked={field.value.includes(option.value)}
+                    checked={field.value ? field.value.includes(option.value) : null}
                     onChange={() => field.onChange(onSelected(option.value))}
                   />
                 }

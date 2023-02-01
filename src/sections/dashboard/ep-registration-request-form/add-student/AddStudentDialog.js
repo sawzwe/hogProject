@@ -52,8 +52,6 @@ export default function AddStudentDialog({ open, limit, onClose, onSelect, stude
         })
     };
 
-    console.log(limit)
-
     const handleSelectStudent = (student) => {
         if (students.length >= limit) {
             handleExceedStudent();

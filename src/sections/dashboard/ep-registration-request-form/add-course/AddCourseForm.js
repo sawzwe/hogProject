@@ -3,7 +3,7 @@ import { useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
-import { Card, Grid, Box, Typography, Button } from '@mui/material'
+import { Card, Grid, Box, Typography, Button, Stack } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import CourseCard from './CourseCard';
 // hook
@@ -14,12 +14,11 @@ import AddCourseDialog from './AddCourseDialog';
 import { groupCourses, privateCourses } from '../_mockupData';
 
 AddCourseForm.propTypes = {
-    courseType: PropTypes.string,
     onAddCourse: PropTypes.func,
     onRemoveCourse: PropTypes.func,
 }
 
-export default function AddCourseForm({ courseType, onAddCourse, onRemoveCourse }) {
+export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
     const {
         watch,
         setValue,
@@ -30,7 +29,7 @@ export default function AddCourseForm({ courseType, onAddCourse, onRemoveCourse 
 
     const values = watch();
 
-    const { assignedCourses } = values;
+    const { courseType, courses } = values;
 
     const [openAddCourseDialog, setOpenAddCourseDialog] = useState(false);
 
@@ -49,26 +48,27 @@ export default function AddCourseForm({ courseType, onAddCourse, onRemoveCourse 
     return (
         <Card sx={{ p: 3 }}>
             <Grid container
-                direction="row">
-                <Grid container item xs={6} md={6} sx={{ pt: 1.2 }}>
+                direction="row"
+                alignItems="center">
+                <Grid item xs={6} md={6}>
                     <Typography variant="h6">{`New Course(s)`}</Typography>
                 </Grid>
-                <Grid container item xs={6} md={6} justifyContent="flex-end" alignItems="center">
-                    <Button variant="outlined" size='large' onClick={handleOpenAddCourseDialog}>
-                        {<AddIcon />} {courseType === "Group" ? 'Join Group' : 'New Course'}
-                    </Button>
+                <Grid item xs={6} md={6}>
+                    <Stack direction="row" justifyContent="flex-end">
+                        <Button variant="outlined" size='large' onClick={handleOpenAddCourseDialog}>
+                            {<AddIcon />} {courseType === "Group" ? 'Join Group' : 'New Course'}
+                        </Button>
+                    </Stack>
                 </Grid>
                 <AddCourseDialog
-                    courseType={courseType}
                     open={openAddCourseDialog}
                     onClose={handleCloseAddCourseDialog}
-                    selected={assignedCourses}
                     onSelect={(addedCourse) => onAddCourse(addedCourse)}
-                    courseOptions={ courseType === 'Group' ? groupCourses : privateCourses }
+                    courseOptions={courseType === 'Group' ? groupCourses : privateCourses}
                 />
             </Grid>
 
-            {assignedCourses?.map((course) => {
+            {courses?.map((course) => {
                 return <CourseCard key={course.id} courseType={courseType} course={course} onDelete={handleDeleteCourse} />
             })}
         </Card>

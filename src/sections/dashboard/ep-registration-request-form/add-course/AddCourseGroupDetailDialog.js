@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
 // form
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useForm } from 'react-hook-form';
+
 // @mui
 import { Grid, Stack, Dialog, Accordion, AccordionSummary, AccordionDetails, Button, Divider, TextField, DialogTitle, DialogContent, DialogActions, Typography, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,44 +13,68 @@ import { useSnackbar } from '../../../../components/snackbar';
 import Iconify from '../../../../components/iconify';
 
 // assets
-import { RHFMultiCheckbox } from '../../../../components/hook-form';
+import { RHFMultiCheckbox, RHFCheckbox } from '../../../../components/hook-form';
 
 
 // ----------------------------------------------------------------------
 
+const CURRENT_SUBJECTS = [{ value: 'English', label: 'English' }, { value: 'Math', label: 'Math' }]
+
+export const FILTER_GENDER_OPTIONS = [
+    { label: 'Men', value: 'Men' },
+    { label: 'Women', value: 'Women' },
+    { label: 'Kids', value: 'Kids' },
+];
+
 AddCourseGroupDetailDialog.propTypes = {
-    courseType: PropTypes.string,
     open: PropTypes.bool,
     close: PropTypes.func,
     course: PropTypes.object,
     onSelect: PropTypes.func,
-    subjectOptions: PropTypes.array,
     onJoin: PropTypes.func,
 };
 
-export default function AddCourseGroupDetailDialog({ courseType, open, close, course, onSelect, onJoin }) {
+export default function AddCourseGroupDetailDialog({ open, close, course, onSelect, onJoin }) {
     const { watch } = useFormContext();
     const { enqueueSnackbar } = useSnackbar();
 
+    const defaultValues = {
+        gender: [],
+    };
+
+    const methods = useForm({
+        defaultValues,
+    });
+
+    const {
+        reset,
+        formState: { dirtyFields },
+    } = methods;
+
+    const isDefault =
+        (!dirtyFields.gender ) ||
+        false;
+
     const values = watch();
+    const { courseType, courses, selectedSubjects } = values;
 
-    const { selectedCourseSubjects } = values;
+    const [currentSubjects, setCurrentSubjects] = useState([]);
 
-    const [courseSubjects, setCourseSubjects] = useState([]);
-
+    // Get and set subject arrays with information
     function handleSubjectChange(subjects) {
-        setCourseSubjects(subjects.map((subject) => ({ value: subject.name.toUpperCase(), label: subject.name.toUpperCase(), members: subject.members, classes: subject.classes, hours: subject.totalHours })))
+        setCurrentSubjects(subjects.map((subject) => ({ value: subject.name, label: subject.name, members: subject.members, classes: subject.classes, hours: subject.totalHours })))
     }
 
     const handleJoin = () => {
-        if (selectedCourseSubjects.length <= 0) {
+        if (selectedSubjects.length <= 0) {
             enqueueSnackbar('Please choose at least one subject', { variant: 'error' });
         }
         else {
             const addedCourse = {
-                ...course, subjects: course.subjects.filter(subject => selectedCourseSubjects.includes(subject.name.toUpperCase())
+                ...course, subjects: course.subjects.filter(subject => selectedSubjects.includes(subject.name)
                 )
             };
+            console.log(addedCourse);
             onSelect(addedCourse);
             onJoin();
             close();
@@ -62,7 +87,6 @@ export default function AddCourseGroupDetailDialog({ courseType, open, close, co
             handleSubjectChange(course.subjects);
         }
     }, [course])
-
 
     return (
         <Dialog fullWidth maxWidth="lg" open={open} onClose={close}>
@@ -122,12 +146,14 @@ export default function AddCourseGroupDetailDialog({ courseType, open, close, co
                                 disabled
                             />
                         </Stack>
+                        
                         <Stack spacing={1} sx={{ pb: 1 }}>
                             {!!course?.subjects &&
                                 <>
                                     <Typography variant="subtitle1"> Available subjects </Typography>
-                                    <RHFMultiCheckbox name="selectedCourseSubjects" options={courseSubjects} sx={{ mx: 1 }} rules={{ required: true }} />
+                                    <RHFMultiCheckbox name="selectedSubjects" options={currentSubjects} sx={{my: 1, mx: 1}} />
                                 </>
+
                             }
                         </Stack>
                     </Stack>
@@ -136,9 +162,9 @@ export default function AddCourseGroupDetailDialog({ courseType, open, close, co
                     <Stack justifyContent="flex-start" sx={{ py: 1, px: 3 }} >
                         <Typography variant="h6" sx={{ mb: 2 }}> Classes & Schedules </Typography>
                         <Divider />
-                        {courseSubjects.map((subject, index) => (
+                        {currentSubjects.map((subject, index) => (
                             // Check if subject is selected and get more information from the subject
-                            selectedCourseSubjects.some((selectedSubject) => selectedSubject === subject.value) &&
+                            selectedSubjects.some((selectedSubject) => selectedSubject === subject.value) &&
                             <Accordion key={index}>
                                 <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
@@ -167,6 +193,6 @@ export default function AddCourseGroupDetailDialog({ courseType, open, close, co
                     </Stack>
                 </Grid>
             </Grid>
-        </Dialog>
+        </Dialog >
     )
 }

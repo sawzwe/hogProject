@@ -162,7 +162,9 @@ export const groupCourses = [
 
 export const privateCourses = [
     { id: '0', course: 'IELTS', subjects: ['LISTENING', 'SPEAKING', 'WRITING', 'READING'], level: ['REGULAR', 'INTENSIVE']},
-    { id: '1', course: 'GED', subjects: ['MATH', 'ENGLISH', 'SCIENCE', 'SOCIAL'], level: ['REGULAR', 'INTENSIVE']}
+    { id: '1', course: 'GED', subjects: ['MATH', 'ENGLISH', 'SCIENCE', 'SOCIAL'], level: ['REGULAR', 'INTENSIVE']},
+    { id: '2', course: 'SAT', subjects: ['MATH', 'ENGLISH', 'SCIENCE', 'SOCIAL'], level: ['REGULAR', 'INTENSIVE']},
+    { id: '3', course: 'GPAT', subjects: [], level: ['REGULAR', 'INTENSIVE']}
 ]
 
 export const studentList = [

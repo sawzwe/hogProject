@@ -11,14 +11,6 @@ import NewViewRegistrationRequest from '../../sections/dashboard/ep-registration
 
 // ----------------------------------------------------------------------
 
-const COURSE_TYPE_OPTIONS = [
-    { id: 1, name: 'Group' },
-    { id: 2, name: 'Private' },
-    { id: 3, name: 'Semi Private' }
-]
-
-// ----------------------------------------------------------------------
-
 export default function CreateRegistrationRequestPage() {
     const { themeStretch } = useSettingsContext();
 
