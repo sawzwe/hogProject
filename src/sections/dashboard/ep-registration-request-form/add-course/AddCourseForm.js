@@ -22,6 +22,7 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
     const {
         watch,
         setValue,
+        resetField,
         formState: { errors },
     } = useFormContext();
 
@@ -38,6 +39,36 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
     };
 
     const handleCloseAddCourseDialog = () => {
+        resetField('newCourse');
+        resetField('newSubject');
+        resetField('newLevel');
+        resetField('newHour');
+        resetField('newLearningMethod');
+        resetField('newStartDate');
+        resetField('newEndDate');
+        resetField('monday');
+        resetField('tuesday');
+        resetField('wednesday');
+        resetField('thursday');
+        resetField('friday');
+        resetField('saturday');
+        resetField('sunday');
+        resetField('mondayToTime');
+        resetField('tuesdayToTime');
+        resetField('wednesdayToTime');
+        resetField('thursdayToTime');
+        resetField('fridayToTime');
+        resetField('saturdayToTime');
+        resetField('sundayToTime');
+        resetField('mondayFromTime');
+        resetField('tuesdayFromTime');
+        resetField('wednesdayFromTime');
+        resetField('thursdayFromTime');
+        resetField('fridayFromTime');
+        resetField('saturdayFromTime');
+        resetField('sundayFromTime');
+        resetField('newAvailableDays');
+
         setOpenAddCourseDialog(false);
     };
 
@@ -69,7 +100,7 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
             </Grid>
 
             {courses?.map((course) => {
-                return <CourseCard key={course.id} courseType={courseType} course={course} onDelete={handleDeleteCourse} />
+                return <CourseCard key={course.name} courseType={courseType} course={course} onDelete={handleDeleteCourse} />
             })}
         </Card>
     )

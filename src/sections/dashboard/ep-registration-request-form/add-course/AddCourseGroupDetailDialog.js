@@ -38,26 +38,9 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
     const { watch } = useFormContext();
     const { enqueueSnackbar } = useSnackbar();
 
-    const defaultValues = {
-        gender: [],
-    };
-
-    const methods = useForm({
-        defaultValues,
-    });
-
-    const {
-        reset,
-        formState: { dirtyFields },
-    } = methods;
-
-    const isDefault =
-        (!dirtyFields.gender ) ||
-        false;
 
     const values = watch();
     const { courseType, courses, selectedSubjects } = values;
-
     const [currentSubjects, setCurrentSubjects] = useState([]);
 
     // Get and set subject arrays with information
@@ -193,6 +176,6 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
                     </Stack>
                 </Grid>
             </Grid>
-        </Dialog >
+        </Dialog>
     )
 }

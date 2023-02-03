@@ -39,6 +39,10 @@ export const PATH_DASHBOARD = {
   },
   dailyCalendar: path(ROOTS_DASHBOARD, '/daily-calendar'),
   registrationRequest: path(ROOTS_DASHBOARD, '/registration-request'),
-  transferringRequest: path(ROOTS_DASHBOARD, '/transferring-request'),
+  requestManagement: {
+    root: path(ROOTS_DASHBOARD, '/request-management'),
+    studentRequest: path(ROOTS_DASHBOARD, '/request-management/student-request'),
+    staffRequest: path(ROOTS_DASHBOARD, '/request-management/staff-request'),
+  },
   changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
 };

@@ -134,7 +134,15 @@ const EAnavConfig = [
     subheader: 'request management',
     items: [
       { title: 'registration request', path: PATH_DASHBOARD.registrationRequest, icon: ICONS.mail },
-      { title: 'transferring request', path: PATH_DASHBOARD.transferringRequest, icon: ICONS.file }
+      {
+        title: 'schedule request',
+        path: PATH_DASHBOARD.requestManagement.root,
+        icon: ICONS.file,
+        children: [
+          { title: 'student', path: PATH_DASHBOARD.requestManagement.studentRequest },
+          { title: 'staff', path: PATH_DASHBOARD.requestManagement.staffRequest },
+        ],
+      },
     ]
   },
 
