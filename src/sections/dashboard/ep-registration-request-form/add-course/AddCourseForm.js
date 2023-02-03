@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
@@ -18,11 +18,13 @@ AddCourseForm.propTypes = {
     onRemoveCourse: PropTypes.func,
 }
 
-export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
+export default function AddCourseForm({ onAddCourse, onRemoveCourse, onRemovePrivateCourse }) {
     const {
         watch,
         setValue,
         resetField,
+        reset,
+        defaultValues,
         formState: { errors },
     } = useFormContext();
 
@@ -42,6 +44,7 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
         resetField('newCourse');
         resetField('newSubject');
         resetField('newLevel');
+        resetField('newHoursPerClass');
         resetField('newHour');
         resetField('newLearningMethod');
         resetField('newStartDate');
@@ -72,9 +75,13 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
         setOpenAddCourseDialog(false);
     };
 
-    const handleDeleteCourse = (courseId) => {
-        onRemoveCourse(courseId);
+    const handleDeleteCourse = (courseName) => {
+        onRemoveCourse(courseName);
     };
+
+    const handleDeletePrivateCourse = (course, subject, level) => {
+        onRemovePrivateCourse(course, subject, level);
+    }
 
     return (
         <Card sx={{ p: 3 }}>
@@ -100,7 +107,7 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse }) {
             </Grid>
 
             {courses?.map((course) => {
-                return <CourseCard key={course.name} courseType={courseType} course={course} onDelete={handleDeleteCourse} />
+                return <CourseCard key={course.name.concat(' ', course.subject, ' ', course.level)} courseType={courseType} course={course} onDelete={handleDeleteCourse} onDeletePrivate={handleDeletePrivateCourse} />
             })}
         </Card>
     )

@@ -54,10 +54,8 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
         }
         else {
             const addedCourse = {
-                ...course, subjects: course.subjects.filter(subject => selectedSubjects.includes(subject.name)
-                )
+                ...course, subjects: course.subjects.filter(subject => selectedSubjects.includes(subject.name)), availableDays: []
             };
-            console.log(addedCourse);
             onSelect(addedCourse);
             onJoin();
             close();
@@ -76,7 +74,7 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
             <Grid container spacing={1}>
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
-                        <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
+                        <Typography variant="h6"> Join Group </Typography>
                         <IconButton variant="h6" onClick={close}> <CloseIcon /> </IconButton>
                     </Stack>
                 </Grid>

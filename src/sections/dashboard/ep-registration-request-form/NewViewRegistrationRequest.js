@@ -7,7 +7,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
-import { Container, Typography, MenuItem, Grid, Stack, Card, Box } from '@mui/material';
+import { Container, Typography, MenuItem, Grid, Stack, Card, Box, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // components
 import { useSettingsContext } from '../../../components/settings';
 import FormProvider, { RHFSelect, RHFUpload, RHFTextField } from '../../../components/hook-form';
@@ -55,10 +56,11 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
             // Private or Semi Private
             newCourseType: 'Existing Course',
             newCourse: '',
-            newSubject: '', 
-            newLevel: '', 
+            newSubject: '',
+            newLevel: '',
+            newHoursPerClass: '2',
             newHour: '',
-            newLearningMethod: '',
+            newLearningMethod: 'Onsite',
             newStartDate: new Date(),
             newEndDate: new Date(),
             newAvailableDays: [],
@@ -144,12 +146,17 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
         [setValue, courses]
     );
 
-    const handleRemoveCourse = (courseId) => {
-        const filtered = courses?.filter((course) => course.id !== courseId);
+    const handleRemoveCourse = (courseName) => {
+        const filtered = courses?.filter((course) => course.name !== courseName);
         setValue('courses', filtered);
     }
 
-    // Payment Attachment Files -----------------------------------------------------------------
+    const handleRemovePrivateCourse = (course, subject, level) => {
+        const filtered = courses?.filter((course) => (course.name !== course && course.subject !== subject && course.level !== level));
+        setValue('courses', filtered);
+    }
+
+    // Payment Attachment Files ------------------------------------------------------------
     const handleDropFiles = useCallback(
         (acceptedFiles) => {
             const files = paymentAttachmentFiles || [];
@@ -172,14 +179,55 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
         setValue('paymentAttachmentFiles', []);
     };
 
-    // Reset values when form type changed --------------------------------------------------------
+    // Reset values when form type changed -----------------------------------------------
     useEffect(() => {
         reset(defaultValues);
         setValue('courseType', courseType);
     }, [courseType])
 
+    // Submit Dialog Open/Close ----------------------------------------------------------
+    const [submitDialogOpen, setSubmitDialogopen] = useState(false);
+
+    const handleClickSubmitOpen = (event) => {
+        event.preventDefault()
+        setSubmitDialogopen(true);
+    };
+
+    const handleSubmitClose = () => {
+        setSubmitDialogopen(false);
+    };
+
     return (
-        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <FormProvider methods={methods} onSubmit={(event) => { handleClickSubmitOpen(event) }}>
+
+            <Dialog
+                open={submitDialogOpen}
+                onClose={handleSubmitClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    <Stack direction="row" alignItems="center" justifyContent="flex-start">
+                        <CheckCircleOutlineIcon fontSize="large" sx={{mr: 1}} />
+                        <Typography variant="h5">{"Submit this request?"}</Typography>
+                    </Stack>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {courseType === 'Group' ?
+                            'If you submit, this request will be sent to Office Admin for payment checking.' :
+                            'If you submit, this request will be sent to Education Admin for scheduling.'
+                        }
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="inherit" variant="outlined" onClick={handleSubmitClose}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Grid container spacing={3}>
                 <Grid item xs={12} md={5}>
                     <RHFSelect
@@ -222,6 +270,7 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
                             <AddCourseForm
                                 onAddCourse={handleAddCourse}
                                 onRemoveCourse={handleRemoveCourse}
+                                onRemovePrivateCourse={handleRemovePrivateCourse}
                             />
                         </Grid>
 

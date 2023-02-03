@@ -9,7 +9,7 @@ import { Stack, Dialog, Button, Grid, TextField, Typography, InputAdornment, Lis
 import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // utils
-import { fTimestamp } from '../../../../utils/formatTime';
+import { fTimestamp, fDate } from '../../../../utils/formatTime';
 // components
 import { useSnackbar } from '../../../../components/snackbar';
 import Iconify from '../../../../components/iconify';
@@ -48,6 +48,8 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
 
     const values = watch();
 
+    const { enqueueSnackbar } = useSnackbar();
+
     const {
         courseType,
         courses,
@@ -56,6 +58,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
         newSubject,
         newLevel,
         newHour,
+        newHoursPerClass,
         newLearningMethod,
         newStartDate,
         newEndDate,
@@ -114,9 +117,8 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
     // Watch selected course and subjects
     const [selectedCourse, setSelectedCourse] = useState({});
 
-    // Course Detail Dialog
+    // Course Detail Dialog For Group
     const [openCourseDetailDialog, setOpenCourseDetailDialog] = useState(false);
-
     const handleOpenCourseDetailDialog = (course) => {
         setSelectedCourse(course)
         setOpenCourseDetailDialog(true);
@@ -152,20 +154,27 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
     }, [newCourse]);
 
     const handleCreate = () => {
-        console.log(newAvailableDays)
-        const createdCourse = {
-            name: newCourse,
-            subject: newSubject,
-            level: newLevel,
-            totalHours: newHour,
-            method: newLearningMethod,
-            startDate: newStartDate,
-            endDate: newEndDate,
-            availableDays: newAvailableDays,
+        if (courses.some((course) => (course.name === newCourse && course.subject === newSubject && course.level === newLevel))) {
+            enqueueSnackbar('The course already exists!', { variant: 'error' });
+        } else if (!newCourse || !newSubject || !newLevel || !newHour || !newHoursPerClass || !newLearningMethod || !newStartDate || !newEndDate || !newAvailableDays.length) {
+            enqueueSnackbar('Please fill required information!', { variant: 'error' });
+        } else {
+            const createdCourse = {
+                name: newCourse,
+                subject: newSubject,
+                level: newLevel,
+                totalHours: newHour,
+                hoursPerClass: newHoursPerClass,
+                method: newLearningMethod,
+                startDate: fDate(newStartDate),
+                endDate: fDate(newEndDate),
+                availableDays: newAvailableDays,
+                section: '',
+                subjects: [],
+            }
+            onSelect(createdCourse)
+            onClose();
         }
-        console.log(createdCourse)
-        onSelect(createdCourse)
-        onClose();
     };
 
     const today = dayjs();
@@ -304,7 +313,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                         <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
                                     </Stack>
                                 </Grid>
-                                <Grid container sx={{ px: 4, pb: 2, pt:0 }}>
+                                <Grid container sx={{ px: 4, pb: 2, pt: 0 }}>
                                     {/* Radio Group Button */}
                                     <Grid item xs={12} md={12}>
                                         <RHFRadioGroup
@@ -405,7 +414,6 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                                 {!!privateLevels.length ?
                                                     <RHFSelect
                                                         name="newLevel"
-                                                        defaultValue=""
                                                         label="Level"
                                                         disabled={!!!newCourse}
                                                         SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
@@ -466,13 +474,13 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                         </>
                                     }
 
-                                    {/* Hour */}
-                                    <Grid item xs={6} md={3}>
-                                        <RHFTextField name="newHour" label="Hours" type="number" required />
+                                    {/* Total Hours */}
+                                    <Grid item xs={6} md={2}>
+                                        <RHFTextField name="newHour" label="Total Hours" type="number" required />
                                     </Grid>
 
                                     {/* Learning Method */}
-                                    <Grid item xs={6} md={3}>
+                                    <Grid item xs={6} md={2}>
                                         <RHFSelect
                                             name="newLearningMethod"
                                             label="Learning Method"
@@ -496,6 +504,11 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                                 </MenuItem>
                                             ))}
                                         </RHFSelect>
+                                    </Grid>
+
+                                    {/* Hours Per Class */}
+                                    <Grid item xs={6} md={2}>
+                                        <RHFTextField name="newHoursPerClass" label="Hours/Class" type="number" required />
                                     </Grid>
                                 </Grid>
 
@@ -550,7 +563,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
 
                                 {/* Submit Button */}
                                 <Grid item xs={12} md={12}>
-                                    <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ p: 3, pt:0 }}>
+                                    <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ p: 3, pt: 0 }}>
                                         <Button
                                             variant="contained"
                                             sx={{ height: '3em', width: '6em' }}
