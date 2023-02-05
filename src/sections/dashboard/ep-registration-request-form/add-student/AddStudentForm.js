@@ -3,7 +3,7 @@ import { useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
-import { Card, Grid, Box, Typography, Button } from '@mui/material'
+import { Card, Grid, Box, Typography, Button, Stack } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import StudentCard from './StudentCard';
 // hook
@@ -14,13 +14,12 @@ import AddStudentDialog from './AddStudentDialog';
 import { studentList } from '../_mockupData';
 
 AddStudentForm.propTypes = {
-    courseType: PropTypes.string,
     studentLimit: PropTypes.number,
     onAddStudent: PropTypes.func,
     onRemoveStudent: PropTypes.func,
 };
 
-export default function AddStudentForm({ courseType, studentLimit, onAddStudent, onRemoveStudent }) {
+export default function AddStudentForm({ studentLimit, onAddStudent, onRemoveStudent }) {
     const {
         watch,
         setValue,
@@ -31,7 +30,7 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
 
     const values = watch();
 
-    const { assignedStudents } = values;
+    const { courseType, students } = values;
 
     const [openAddStudentDialog, setOpenAddStudentDialog] = useState(false);
 
@@ -52,29 +51,28 @@ export default function AddStudentForm({ courseType, studentLimit, onAddStudent,
             <Grid
                 container
                 direction="row"
-                justifyContent="space-between"
                 alignItems="center">
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h6">{`Student(s) ${assignedStudents?.length} / ${studentLimit.toString()}`}</Typography>
+                <Grid item xs={6} md={6}>
+                    <Typography variant="h6">{`Student(s) ${students?.length} / ${studentLimit.toString()}`}</Typography>
                 </Grid>
-                <Grid container item xs={12} md={6} justifyContent="flex-end">
-                    <Button variant="outlined" size='large' onClick={handleOpenAddStudentDialog}>
-                        {<AddIcon />} Add Student
-                    </Button>
+                <Grid item xs={6} md={6}>
+                    <Stack direction="row" justifyContent="flex-end">
+                        <Button variant="outlined" size='large' onClick={handleOpenAddStudentDialog}>
+                            {<AddIcon />} Add Student
+                        </Button>
+                    </Stack>
                 </Grid>
 
                 <AddStudentDialog
-                    type={courseType}
                     open={openAddStudentDialog}
                     onClose={handleCloseAddStudentDialog}
                     limit={studentLimit}
-                    selected={assignedStudents}
                     onSelect={(student) => onAddStudent(student)}
                     studentOptions={studentList}
                 />
             </Grid>
 
-            {assignedStudents?.map((student) => {
+            {students?.map((student) => {
                 return <StudentCard key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
             })
             }

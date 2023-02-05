@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { Typography, Box, Card, Container, CardHeader, Stack } from '@mui/material';
+import { Card, Container, Stack } from '@mui/material';
 // components
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';

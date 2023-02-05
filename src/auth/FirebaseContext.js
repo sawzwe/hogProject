@@ -4,7 +4,6 @@ import { initializeApp } from 'firebase/app';
 import {
     getAuth,
     signOut,
-    signInWithPopup,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
@@ -106,7 +105,7 @@ export function AuthProvider({ children }) {
     const login = (email, password) => signInWithEmailAndPassword(AUTH, email, password);
 
     // REGISTER
-    const register = (email, password, firstName, lastName, role) =>
+    const register = (email, password, firstName, lastName) =>
         createUserWithEmailAndPassword(AUTH, email, password).then(async (res) => {
             const userRef = doc(collection(DB, 'users'), res.user?.uid);
 

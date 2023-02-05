@@ -1,39 +1,23 @@
 import { Helmet } from 'react-helmet-async';
-import { useEffect } from 'react';
 // @mui
 import { Container, Typography } from '@mui/material';
-import axios from 'axios';
 // components
 import { useSettingsContext } from '../../components/settings';
 
 // ----------------------------------------------------------------------
 
-export default function DailyCalendarPage() {
-
-    console.log('render')
-
-    useEffect(() => {
-        
-        // const header 
-
-        fetch('https://houseofgriffin-api-stg.azurewebsites.net/api/Student/Get', {
-            method: 'GET',
-            headers: {},
-            credentials: 'include'
-        })
-    }, [])
-
+export default function StaffRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> EA | Daily Calendar </title>
+                <title> EA | Staff Request </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Daily Calendar
+                    Staff Request
                 </Typography>
 
                 <Typography gutterBottom>

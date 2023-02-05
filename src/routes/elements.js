@@ -37,7 +37,8 @@ export const PageDailyCalendar = Loadable(lazy(() => import('../pages/EA/DailyCa
 
 // EA requests
 export const PageRegistrationRequestEA = Loadable(lazy(() => import('../pages/EA/RegistrationRequestPage')));
-export const PageTransferringRequestEA = Loadable(lazy(() => import('../pages/EA/TransferringRequestPage')));
+export const PageStudentRequestEA = Loadable(lazy(() => import('../pages/EA/StudentRequestPage')));
+export const PageStaffRequestEA = Loadable(lazy(() => import('../pages/EA/StaffRequestPage')));
 
 
 

@@ -17,7 +17,7 @@ import {
   IconButton,
   TableContainer,
   TableRow,
-  TableCell,
+  TableCell, createTheme, ThemeProvider,
 } from '@mui/material';
 // utils
 import { fTimestamp } from '../../../utils/formatTime';
@@ -38,12 +38,12 @@ import {
   TablePaginationCustom,
 } from '../../../components/table';
 // sections
-import  RegistrationTableToolbar  from './RegistrationTableToolbar';
+import RegistrationTableToolbar from './RegistrationTableToolbar';
 
 // ----------------------------------------------------------------------
 
-function createData(id, requestDate, courseType, section, registeredCourses, requestedBy, role, status) {
-  return { id, requestDate, courseType, section, registeredCourses, requestedBy, role, status };
+function createData(id, requestDate, courseType, section, registeredCourses, requestedBy, role, incompleteReceipt) {
+  return { id, requestDate, courseType, section, registeredCourses, requestedBy, role, incompleteReceipt };
 }
 
 const TABLE_HEAD_REQUESTS = [
@@ -53,25 +53,41 @@ const TABLE_HEAD_REQUESTS = [
   { id: 'section ', label: 'Section', align: 'left', width: 200 },
   { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
   { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
-  { id: '' },
+  { id: 'incomplete' },
+  { id: 'moreInfo' },
 ];
 
 const TABLE_DATA_REQUESTS = [
-  // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,        status  }
-  createData('R032', '30-Oct-2022', 'Group', 'Semi Private 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'completed '),
-  createData('R014', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'pendingPayment', 'rejected '),
-  createData('R302', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'pendingEA', 'completed '),
-  createData('R254', '03-Nov-2022', 'Semi Private', 'Semi Group 25', 3, 'Nirawit(Boss)', 'pendingEA', 'rejected'),
-  createData('R561', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'pendingOA', 'rejected '),
-  createData('R592', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'pendingOA', 'completed '),
-  createData('R682', '30-Dec-2022', 'Group', 'Semi Private 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'completed '),
+  // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   incompleteReceipt }
+  createData('R032', '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'incompleteReceipt'),
+  createData('R014', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
+  createData('R302', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'pendingEA', ''),
+  createData('R561', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'pendingOA', ''),
+  createData('R592', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'pendingOA', ''),
+  createData('R777', '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'pendingPayment', 'incompleteReceipt'),
+  createData('R888', '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', 'incompleteReceipt'),
+  createData('R999', '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', 'incompleteReceipt'),
+  createData('R111', '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', 'incompleteReceipt'),
+  createData('R222', '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', 'incompleteReceipt'),
+  createData('R892', '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', 'incompleteReceipt'),
 
 ];
+const errorTheme = createTheme({
+  palette: {
+    primary: {
+      // Purple and green play nicely together.
+      main: '#D12E24',
+    },
+    secondary: {
+      // This is green.A700 as hex.
+      main: '#D12E24',
+    },
+  },
+});
 
 // ----------------------------------------------------------------------
 
 export default function InvoiceListPage() {
-  const theme = useTheme();
 
   const { themeStretch } = useSettingsContext();
 
@@ -96,8 +112,6 @@ export default function InvoiceListPage() {
     onChangeRowsPerPage,
   } = useTable({ defaultOrderBy: 'createDate' });
 
-  // const [tableData, setTableData] = useState(_invoices);
-
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
@@ -108,15 +122,12 @@ export default function InvoiceListPage() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterStatus, setFilterStatus] = useState('');
-
-  const [filterRole, setFilterRole] = useState('all');
+  const [filterRole, setFilterRole] = useState('pendingEA');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
     filterName,
-    filterStatus,
     filterRole,
   });
 
@@ -125,36 +136,22 @@ export default function InvoiceListPage() {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'all' || filterStatus !== '' || filterName !== ''; 
+    filterRole !== 'pendingEA' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterStatus) ||
     (!dataFiltered.length && !!filterRole);
 
-  const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length ;
-
-  const getTotalPriceByStatus = (status) =>
-    sumBy(
-      tableData.filter((item) => item.status === status),
-      'totalPrice'
-    );
-
-  // const getPercentByStatus = (status) => (getLengthByStatus(status) / tableData.length) * 100;
+  const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'all', label: 'All', color: 'info', count: tableData.length },
-    { value: 'pendingEA', label: 'Pending for EA', color: 'success', count: getLengthByStatus('pendingEA') },
+    { value: 'pendingEA', label: 'Pending for EA', color: 'warning', count: getLengthByStatus('pendingEA') },
     { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA', color: 'error', count: getLengthByStatus('pendingOA') },
-    // { value: 'completed', label: 'Completed',count: getLengthByStatus('completed')},
-    // { value: 'rejected', label: 'Rejected' ,count: getLengthByStatus('rejected')},
+    { value: 'pendingOA', label: 'Pending for OA', color: 'warning', count: getLengthByStatus('pendingOA') },
+    { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
+    { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
 
-  const STATUS=[
-    { value: 'completed', label: 'Completed'},
-    { value: 'rejected', label: 'Rejected' },
-  ]
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -164,15 +161,10 @@ export default function InvoiceListPage() {
     setOpenConfirm(false);
   };
 
-  const handleFilterStatus = (event, newValue) => {
-    setPage(0);
-    setFilterStatus(newValue);
-  };
 
   const handleFilterRole = (event, newValue) => {
     setPage(0);
     setFilterRole(newValue);
-    setFilterStatus(newValue);
   };
 
   const handleFilterName = (event) => {
@@ -211,8 +203,7 @@ export default function InvoiceListPage() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterStatus('');
-    setFilterRole('all');
+    setFilterRole('pendingEA');
   };
 
   return (
@@ -268,6 +259,17 @@ export default function InvoiceListPage() {
                       <TableCell align="left">{row.section}</TableCell>
                       <TableCell align="center">{row.registeredCourses}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
+
+                      <ThemeProvider theme={errorTheme}>
+                        <TableCell align="left" id='incompleteReciept'>
+                          <Tooltip title="Incomplete Reciept">
+                            <IconButton color='primary'>
+                              <Iconify icon="ic:error" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </ThemeProvider>
+
                       <TableCell>
                         <Tooltip title="More Info">
                           <IconButton>
@@ -322,25 +324,18 @@ function applyFilter({
 
   inputData = stabilizedThis.map((el) => el[0]);
 
-  // if (filterName) {
-  //   inputData = inputData.filter(
-  //     (request) =>
-  //       request.invoiceNumber.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-  //       request.invoiceTo.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-  //   );
-  // }
-
   if (filterName) {
     inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
-  // if (filterRole !=='hhh') {
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
 
-  if (filterRole !== 'all') {
+  if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
   }
+
+  // if (filterStatus !== 'completed') {
+  //   inputData = inputData.filter((request) => request.status === filterStatus);
+  // }
   // else if (filterRole === 'rejected' || filterRole ==='completed'){
   //   inputData = inputData.filter((request) => request.status === filterStatus);
   // }

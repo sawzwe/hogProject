@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, TextField } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -41,13 +41,61 @@ export function RHFMultiCheckbox({ name, options, ...other }) {
           field.value.includes(option) ? field.value.filter((value) => value !== option) : [...field.value, option];
 
         return (
-          <FormGroup sx={{display:'inline-block'}}>
+          <FormGroup sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: "row"
+          }}>
             {options.map((option) => (
               <FormControlLabel
                 key={option.value}
                 control={
                   <Checkbox
-                    checked={field.value.includes(option.value)}
+                    checked={field.value ? field.value.includes(option.value) : null}
+                    onChange={() => field.onChange(onSelected(option.value))}
+                  />
+                }
+                label={option.label}
+                {...other}
+              />
+            ))}
+          </FormGroup>
+        );
+      }}
+    />
+  );
+}
+
+// ----------------------------------------------------------------------
+
+RHFMultiCheckboxTextField.propTypes = {
+  name: PropTypes.string,
+  options: PropTypes.array,
+};
+
+export function RHFMultiCheckboxTextField({ name, options, ...other }) {
+  const { control } = useFormContext();
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        const onSelected = (option) =>
+          field.value.includes(option) ? field.value.filter((value) => value !== option) : [...field.value, option];
+
+        return (
+          <FormGroup sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            flexDirection: "row"
+          }}>
+            {options.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                control={
+                  <Checkbox
+                    checked={field.value ? field.value.includes(option.value) : null}
                     onChange={() => field.onChange(onSelected(option.value))}
                   />
                 }
