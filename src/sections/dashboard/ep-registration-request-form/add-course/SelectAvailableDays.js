@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useEffect } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
@@ -16,20 +17,24 @@ const AVAILABLE_TIME_OPTIONS = [
     { value: '15:00', label: '15:00' },
 ]
 
-export function EachAvailableDay({ day, toggle, onOpen, onClose }) {
+EachAvailableDay.propTypes = {
+    day: PropTypes.string,
+};
+
+export function EachAvailableDay({ day }) {
     const {
         watch,
         setValue,
-        formState: { errors },
+        resetField,
     } = useFormContext();
 
     const values = watch();
 
-    const handleClick = (e) => {
+    const handleClick = () => {
         if (values[`${day}`]) {
-            setValue(`${day}FromTime`, '')
-            setValue(`${day}ToTime`, '')
-            setValue(`${day}`, false)
+            resetField(`${day}FromTime`)
+            resetField(`${day}ToTime`)
+            resetField(`${day}`)
         } else {
             setValue(`${day}`, true)
         }
@@ -43,11 +48,10 @@ export function EachAvailableDay({ day, toggle, onOpen, onClose }) {
                 values.newAvailableDays = values.newAvailableDays.filter((eachDay) => eachDay.day!== day)
                 setValue('newAvailableDays', [...values.newAvailableDays, { day, from: values[`${day}FromTime`], to: values[`${day}ToTime`]}])
             }
-            console.log("Success")
         } else {
             setValue('newAvailableDays', values.newAvailableDays.filter((eachDay) => eachDay.day !== day))
         }
-    }, [values[`${day}FromTime`], values[`${day}ToTime`], values[`${day}`]])
+    }, [values[`${day}FromTime`], values[`${day}ToTime`]])
 
     return (
         <Stack direction="row" spacing={2} sx={{ pt: 2 }} alignContent="flex-start" alignItems="center" >
@@ -115,13 +119,6 @@ export function EachAvailableDay({ day, toggle, onOpen, onClose }) {
 }
 
 export default function SelectAvailableDays() {
-    const {
-        watch,
-        setValue,
-        formState: { errors },
-    } = useFormContext();
-
-    const values = watch();
 
     return (
         <>

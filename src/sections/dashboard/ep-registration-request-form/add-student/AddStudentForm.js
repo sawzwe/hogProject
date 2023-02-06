@@ -3,11 +3,9 @@ import { useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
-import { Card, Grid, Box, Typography, Button, Stack } from '@mui/material'
+import { Card, Grid, Typography, Button, Stack } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import StudentCard from './StudentCard';
-// hook
-import useResponsive from '../../../../hooks/useResponsive';
 // dialog
 import AddStudentDialog from './AddStudentDialog';
 // mockup data
@@ -22,15 +20,11 @@ AddStudentForm.propTypes = {
 export default function AddStudentForm({ studentLimit, onAddStudent, onRemoveStudent }) {
     const {
         watch,
-        setValue,
-        formState: { errors },
     } = useFormContext();
-
-    const upMd = useResponsive('up', 'md');
 
     const values = watch();
 
-    const { courseType, students } = values;
+    const { students } = values;
 
     const [openAddStudentDialog, setOpenAddStudentDialog] = useState(false);
 
@@ -72,9 +66,9 @@ export default function AddStudentForm({ studentLimit, onAddStudent, onRemoveStu
                 />
             </Grid>
 
-            {students?.map((student) => {
-                return <StudentCard key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
-            })
+            {students?.map((student) => (
+                <StudentCard key={student.id} id={student.id} fName={student.fName} lName={student.lName} nickname={student.nickname} onDelete={handleDeleteStudent} />
+            ))
             }
         </Card>
     )

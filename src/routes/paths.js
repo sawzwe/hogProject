@@ -36,6 +36,7 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, '/course-transfer'),
     createRequest: path(ROOTS_DASHBOARD, '/course-transfer/create-request'),
     requestStatus: path(ROOTS_DASHBOARD, '/course-transfer/request-status'),
+    view: (id) => path(ROOTS_DASHBOARD, `/course-transfer/request-status/${id}`)
   },
   dailyCalendar: path(ROOTS_DASHBOARD, '/daily-calendar'),
   registrationRequest: path(ROOTS_DASHBOARD, '/registration-request'),

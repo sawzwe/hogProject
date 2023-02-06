@@ -26,7 +26,8 @@ import {
   PageRegistrationRequestEA,
   PageStudentRequestEA,
   PageStaffRequestEA,
-  PageSearchCourseTeacher
+  PageSearchCourseTeacher,
+  PageRegistrationRequestDetail
 }
   from './elements';
 
@@ -168,6 +169,14 @@ export default function Router() {
               element: (
                 <RoleBasedGuard roles={['Education Planner']} hasContent>
                   <PageRegistrationRequestStatus />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'request-status/:id', 
+              element: (
+                <RoleBasedGuard roles={['Education Planner']} hasContent>
+                  <PageRegistrationRequestDetail />
                 </RoleBasedGuard>
               )
             }
