@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'houseofgriffin-stg'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_035DE105D8724AA4B01594DD5E42EBD6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_442D346D4CEE429388B51AAA2BEE95A0 }}
           package: .
