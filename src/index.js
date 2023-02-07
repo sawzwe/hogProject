@@ -36,7 +36,6 @@ root.render(
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <SettingsProvider>
           <BrowserRouter>
-            <ScrollToTop />
             <App />
           </BrowserRouter>
         </SettingsProvider>

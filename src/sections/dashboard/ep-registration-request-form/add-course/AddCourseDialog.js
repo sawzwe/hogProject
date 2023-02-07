@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import dayjs from 'dayjs';
 // form
-import { useForm, Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
-import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
+import { Stack, Dialog, Button, Grid, TextField, Typography, InputAdornment, List, Checkbox, ListItem, Divider, Box, IconButton, MenuItem } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // utils
@@ -13,37 +13,83 @@ import { fTimestamp, fDate } from '../../../../utils/formatTime';
 // components
 import { useSnackbar } from '../../../../components/snackbar';
 import Iconify from '../../../../components/iconify';
-import { Upload } from '../../../../components/upload';
 import SearchNotFound from '../../../../components/search-not-found/SearchNotFound';
 import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 import AddCourseGroupDetailDialog from './AddCourseGroupDetailDialog';
+import SelectAvailableDays from './SelectAvailableDays';
+// assets
+import { RHFSelect, RHFTextField, RHFRadioGroup, RHFMultiCheckbox, RHFCheckbox } from '../../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
+const LEARNING_METHOD_OPTIONS = [
+    'Onsite',
+    'Online'
+];
+
+const COURSE_TYPE_OPTIONS = [
+    { value: 'Existing Course', label: 'Existing Course' },
+    { value: 'Custom Course', label: 'Custom Course' },
+]
+
 AddCourseDialog.propTypes = {
-    type: PropTypes.string,
     open: PropTypes.bool,
     onClose: PropTypes.func,
     onSelect: PropTypes.func,
-    selected: PropTypes.array,
     courseOptions: PropTypes.array,
 };
 
-export default function AddCourseDialog({ type, open, onClose, onSelect, selected, courseOptions }) {
+export default function AddCourseDialog({ open, onClose, onSelect, courseOptions }) {
     const {
         watch,
         setValue,
         formState: { errors },
     } = useFormContext();
 
-    const [selectedCourse, setSelectedCourse] = useState({});
-    const [selectedCourseSubjects, setSelectedCourseSubjects] = useState([]);
+    const values = watch();
 
+    const { enqueueSnackbar } = useSnackbar();
+
+    const {
+        courseType,
+        courses,
+        newCourseType,
+        newCourse,
+        newSubject,
+        newLevel,
+        newHour,
+        newHoursPerClass,
+        newLearningMethod,
+        newStartDate,
+        newEndDate,
+        newAvailableDays,
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+        sunday,
+        mondayFromTime,
+        mondayToTime,
+        tuesdayFromTime,
+        tuesdayToTime,
+        wednesdayFromTime,
+        wednesdayToTime,
+        thursdayFromTime,
+        thursdayToTime,
+        fridayFromTime,
+        fridayToTime,
+        saturdayFromTime,
+        saturdayToTime,
+        sundayFromTime,
+        sundayToTime,
+    } = values;
+
+    // Filter courses
     const [filterCourseName, setFilterCourseName] = useState('');
     const [filterStartDate, setFilterStartDate] = useState(null);
     const [filterEndDate, setFilterEndDate] = useState(null);
-
-    const [openAddCourseDetailDialog, setOpenAddCourseDetailDialog] = useState(false);
 
     const dataFiltered = applyFilter({
         courseOptions,
@@ -68,29 +114,84 @@ export default function AddCourseDialog({ type, open, onClose, onSelect, selecte
         onClose();
     }
 
-    // Course Detail Dialog
-    const handleOpenAddCourseDetailDialog = (course) => {
+    // Watch selected course and subjects
+    const [selectedCourse, setSelectedCourse] = useState({});
+
+    // Course Detail Dialog For Group
+    const [openCourseDetailDialog, setOpenCourseDetailDialog] = useState(false);
+    const handleOpenCourseDetailDialog = (course) => {
         setSelectedCourse(course)
-        setOpenAddCourseDetailDialog(true);
+        setOpenCourseDetailDialog(true);
     };
 
-    const handleCloseAddCourseDetailDialog = () => {
+    const handleCloseCourseDetailDialog = () => {
         setSelectedCourse({});
-        setValue('selectedCourseSubjects', [])
-        setOpenAddCourseDetailDialog(false);
+        setOpenCourseDetailDialog(false);
     };
 
-    // TO DO NEXT
-    // 1. Table for courses in dialog
-    // 2. Course detail after dialog
+    // PRIVATE --------------------------------------------------------------------------------------------
+
+    // Track current Private/ Semi Private subjects based on selected course
+    const [privateSubjects, setPrivateSubjects] = useState([]);
+    const [privateLevels, setPrivateLevels] = useState([]);
+
+    // 1. Reset selected subject once change the course or new course type
+    // 2. Set new subjects for select options
+    useEffect(() => {
+        setValue('newCourse', '')
+        setValue('newSubject', '')
+        setValue('newLevel', '')
+    }, [newCourseType])
+
+    useEffect(() => {
+        if (newCourseType === 'Existing Course' && newCourse) {
+            setValue('newSubject', '')
+            setValue('newLevel', '')
+            const targetCourse = courseOptions.find((option) => option.course === newCourse)
+            setPrivateSubjects(targetCourse.subjects)
+            setPrivateLevels(targetCourse.level)
+        }
+    }, [newCourse]);
+
+    const handleCreate = () => {
+        if (courses.some((course) => (course.name === newCourse && course.subject === newSubject && course.level === newLevel))) {
+            enqueueSnackbar('The course already exists!', { variant: 'error' });
+        } else if (!newCourse || !newSubject || !newLevel || !newHour || !newHoursPerClass || !newLearningMethod || !newStartDate || !newEndDate || !newAvailableDays.length) {
+            enqueueSnackbar('Please fill required information!', { variant: 'error' });
+        } else {
+            const createdCourse = {
+                name: newCourse,
+                subject: newSubject,
+                level: newLevel,
+                totalHours: newHour,
+                hoursPerClass: newHoursPerClass,
+                method: newLearningMethod,
+                startDate: fDate(newStartDate),
+                endDate: fDate(newEndDate),
+                availableDays: newAvailableDays,
+                section: '',
+                subjects: [],
+            }
+            onSelect(createdCourse)
+            onClose();
+        }
+    };
+
+    const today = dayjs();
+
+    const [checked, setChecked] = useState(false);
+
+    const handleCheckboxChange = (event) => {
+        setChecked(event.target.checked);
+    };
 
     return (
         <>
-            {type === 'Group' && (
+            {courseType === 'Group' && (
                 <>
                     <Dialog fullWidth maxWidth="md" open={open} onClose={handleCloseDialog} >
                         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
-                            <Typography variant="h6"> {type === 'Group' ? 'Join Group' : 'New Course'} </Typography>
+                            <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
                             <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
                         </Stack>
 
@@ -151,12 +252,12 @@ export default function AddCourseDialog({ type, open, onClose, onSelect, selecte
                             <>
                                 <Scrollbar sx={{ p: 2.5, pt: 0, pb: 4, maxHeight: 80 * 8 }}>
                                     {dataFiltered.map((course) => (
-                                        !selected?.some((c) => c.id === course.id) &&
+                                        !courses?.some((c) => c.id === course.id) &&
                                         <Box key={course.id}>
                                             <ListItem
                                                 key={course.id}
                                                 secondaryAction={
-                                                    <IconButton variant="outlined" onClick={() => handleOpenAddCourseDetailDialog(course)}>
+                                                    <IconButton variant="outlined" onClick={() => handleOpenCourseDetailDialog(course)}>
                                                         <NavigateNextIcon />
                                                     </IconButton>
                                                 }
@@ -191,14 +292,294 @@ export default function AddCourseDialog({ type, open, onClose, onSelect, selecte
                         )}
                     </Dialog>
                     <AddCourseGroupDetailDialog
-                        type={type}
-                        open={openAddCourseDetailDialog}
-                        close={handleCloseAddCourseDetailDialog}
+                        open={openCourseDetailDialog}
+                        close={handleCloseCourseDetailDialog}
                         course={selectedCourse}
-                        onSelect={() => onSelect(selectedCourse)}
+                        onSelect={(addedCourse) => onSelect(addedCourse)}
+                        onJoin={() => { onClose() }}
                     />
                 </>
             )}
+
+            {/* Private or Semi Private */}
+            {courseType !== 'Group' && (
+                <>
+                    <Dialog fullWidth maxWidth="md" open={open} onClose={handleCloseDialog} >
+                        <Scrollbar sx={{ p: 2, pt: 0, maxHeight: 80 * 8 }}>
+                            <Grid container spacing={1}>
+                                <Grid item xs={12} md={12}>
+                                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
+                                        <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
+                                        <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
+                                    </Stack>
+                                </Grid>
+                                <Grid container sx={{ px: 4, pb: 2, pt: 0 }}>
+                                    {/* Radio Group Button */}
+                                    <Grid item xs={12} md={12}>
+                                        <RHFRadioGroup
+                                            name="newCourseType"
+                                            options={COURSE_TYPE_OPTIONS}
+                                            sx={{
+                                                '& .MuiFormControlLabel-root': { mr: 4 },
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container sx={{ px: 3 }} spacing={2}>
+                                    {/* Existing Course or Custom Course */}
+                                    {newCourseType === 'Existing Course' ? (
+                                        <>
+                                            {/* Select Course */}
+                                            <Grid item xs={12} md={6}>
+                                                <RHFSelect
+                                                    name="newCourse"
+                                                    label="Course"
+                                                    SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                                    required>
+                                                    {courseOptions.map((option) => (
+                                                        <MenuItem
+                                                            key={option.id}
+                                                            value={option.course}
+                                                            sx={{
+                                                                mx: 1,
+                                                                my: 0.5,
+                                                                borderRadius: 0.75,
+                                                                typography: 'body2',
+                                                                textTransform: 'capitalize',
+                                                                '&:first-of-type': { mt: 0 },
+                                                                '&:last-of-type': { mb: 0 },
+                                                            }}
+                                                        >
+                                                            {option.course}
+                                                        </MenuItem>
+                                                    ))}
+                                                </RHFSelect>
+                                            </Grid>
+
+                                            {/* Select Subject */}
+                                            <Grid item xs={12} md={6}>
+                                                {!!privateSubjects.length ?
+                                                    <RHFSelect
+                                                        name="newSubject"
+                                                        defaultValue=""
+                                                        label="Subject"
+                                                        disabled={!!!newCourse}
+                                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                                        required>
+                                                        {privateSubjects.map((option) => (
+                                                            <MenuItem
+                                                                key={option}
+                                                                value={option}
+                                                                sx={{
+                                                                    mx: 1,
+                                                                    my: 0.5,
+                                                                    borderRadius: 0.75,
+                                                                    typography: 'body2',
+                                                                    textTransform: 'capitalize',
+                                                                    '&:first-of-type': { mt: 0 },
+                                                                    '&:last-of-type': { mb: 0 },
+                                                                }}
+                                                            >
+                                                                {option}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </RHFSelect> :
+                                                    <RHFSelect
+                                                        name="newSubject"
+                                                        label="Unavailable"
+                                                        disabled
+                                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                                        <MenuItem
+                                                            key={"None"}
+                                                            value={"Unavailable"}
+                                                            sx={{
+                                                                mx: 1,
+                                                                my: 0.5,
+                                                                borderRadius: 0.75,
+                                                                typography: 'body2',
+                                                                textTransform: 'capitalize',
+                                                                '&:first-of-type': { mt: 0 },
+                                                                '&:last-of-type': { mb: 0 },
+                                                            }}
+                                                        >
+                                                            None
+                                                        </MenuItem>
+                                                    </RHFSelect>
+                                                }
+                                            </Grid>
+
+                                            {/* Select Level */}
+                                            <Grid item xs={12} md={6}>
+                                                {!!privateLevels.length ?
+                                                    <RHFSelect
+                                                        name="newLevel"
+                                                        label="Level"
+                                                        disabled={!!!newCourse}
+                                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                                        required>
+                                                        {privateLevels.map((option) => (
+                                                            <MenuItem
+                                                                key={option}
+                                                                value={option}
+                                                                sx={{
+                                                                    mx: 1,
+                                                                    my: 0.5,
+                                                                    borderRadius: 0.75,
+                                                                    typography: 'body2',
+                                                                    textTransform: 'capitalize',
+                                                                    '&:first-of-type': { mt: 0 },
+                                                                    '&:last-of-type': { mb: 0 },
+                                                                }}
+                                                            >
+                                                                {option}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </RHFSelect> :
+                                                    <RHFSelect
+                                                        name="newLevel"
+                                                        label="Unavailable"
+                                                        disabled
+                                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                                        <MenuItem
+                                                            key={"None"}
+                                                            value={"Unavailable"}
+                                                            sx={{
+                                                                mx: 1,
+                                                                my: 0.5,
+                                                                borderRadius: 0.75,
+                                                                typography: 'body2',
+                                                                textTransform: 'capitalize',
+                                                                '&:first-of-type': { mt: 0 },
+                                                                '&:last-of-type': { mb: 0 },
+                                                            }}
+                                                        >
+                                                            None
+                                                        </MenuItem>
+                                                    </RHFSelect>
+                                                }
+                                            </Grid>
+                                        </>
+                                    ) :
+                                        <>
+                                            <Grid item xs={6} md={6}>
+                                                <RHFTextField name="newCourse" label="Course" required />
+                                            </Grid>
+                                            <Grid item xs={6} md={6}>
+                                                <RHFTextField name="newSubject" label="Subject" />
+                                            </Grid>
+                                            <Grid item xs={6} md={6}>
+                                                <RHFTextField name="newLevel" label="Level" />
+                                            </Grid>
+                                        </>
+                                    }
+
+                                    {/* Total Hours */}
+                                    <Grid item xs={6} md={2}>
+                                        <RHFTextField name="newHour" label="Total Hours" type="number" required />
+                                    </Grid>
+
+                                    {/* Learning Method */}
+                                    <Grid item xs={6} md={2}>
+                                        <RHFSelect
+                                            name="newLearningMethod"
+                                            label="Learning Method"
+                                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                            required>
+                                            {LEARNING_METHOD_OPTIONS.map((option) => (
+                                                <MenuItem
+                                                    key={option}
+                                                    value={option}
+                                                    sx={{
+                                                        mx: 1,
+                                                        my: 0.5,
+                                                        borderRadius: 0.75,
+                                                        typography: 'body2',
+                                                        textTransform: 'capitalize',
+                                                        '&:first-of-type': { mt: 0 },
+                                                        '&:last-of-type': { mb: 0 },
+                                                    }}
+                                                >
+                                                    {option}
+                                                </MenuItem>
+                                            ))}
+                                        </RHFSelect>
+                                    </Grid>
+
+                                    {/* Hours Per Class */}
+                                    <Grid item xs={6} md={2}>
+                                        <RHFTextField name="newHoursPerClass" label="Hours/Class" type="number" required />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container sx={{ px: 3, py: 2 }} spacing={2}>
+                                    {/* Start Date */}
+                                    <Grid item xs={12} md={6}>
+                                        <DatePicker
+                                            fullWidth
+                                            label="Start Date"
+                                            minDate={today}
+                                            value={newStartDate}
+                                            onChange={(newValue) => {
+                                                setValue('newStartDate', newValue);
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    required
+                                                    fullWidth
+                                                />
+                                            )}
+                                            disableMaskedInput
+                                            inputFormat="dd-MMM-yyyy"
+                                        />
+                                    </Grid>
+
+                                    {/* End Date */}
+                                    <Grid item xs={12} md={6}>
+                                        <DatePicker
+                                            fullWidth
+                                            label="End Date"
+                                            minDate={today}
+                                            value={newEndDate}
+                                            onChange={(newValue) => {
+                                                setValue('newEndDate', newValue);
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    required
+                                                    fullWidth
+                                                />
+                                            )}
+                                            disableMaskedInput
+                                            inputFormat="dd-MMM-yyyy"
+                                        />
+                                    </Grid>
+
+                                    {/* Select Available Dates */}
+                                    <SelectAvailableDays />
+                                </Grid>
+
+                                {/* Submit Button */}
+                                <Grid item xs={12} md={12}>
+                                    <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ p: 3, pt: 0 }}>
+                                        <Button
+                                            variant="contained"
+                                            sx={{ height: '3em', width: '6em' }}
+                                            onClick={handleCreate}>
+                                            Create
+                                        </Button>
+                                    </Stack>
+                                </Grid>
+
+
+                            </Grid>
+                        </Scrollbar>
+                    </Dialog>
+                </>
+            )
+            }
         </>
     )
 }

@@ -8,4 +8,3 @@ export * from './_banking';
 export * from './_invoice';
 export * from './_ecommerce';
 export * from './_analytics';
-export * from './_student';

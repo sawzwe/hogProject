@@ -21,6 +21,12 @@ export default function ControlLabel(theme) {
         root: {
           color: theme.palette.text.disabled,
         },
+        asterisk: {
+          color: '#db3131',
+          '&$error': {
+            color: '#db3131'
+          },
+        },
       },
     },
   };

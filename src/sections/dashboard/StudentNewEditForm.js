@@ -8,20 +8,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Chip, Grid, Stack, Switch, Typography, FormControlLabel, Button, TextField, MenuItem } from '@mui/material';
+import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
 // utils
 import { fData } from '../../utils/formatNumber';
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
-// sections
-import { StudentCurrentCourse } from './StudentCurrentCourse';
-import { StudentNewEditExam } from './StudentNewEditExam';
 // assets
 import { countries } from '../../assets/data';
 // components
-import Label from '../../components/label';
 import { useSnackbar } from '../../components/snackbar';
-import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFSwitch, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
@@ -86,7 +80,6 @@ StudentNewEditForm.propTypes = {
 };
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
-    const navigate = useNavigate();
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -338,7 +331,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                     fullWidth
                                     name="studentTitle"
                                     label="Title"
-                                    SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                    SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                    required>
                                     {TITLE_OPTIONS.map((option) => (
                                         <MenuItem
                                             key={option.id}
@@ -359,13 +353,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 </RHFSelect>
                             </Box>
                             <Box gridArea={"studentFirstName"}>
-                                <RHFTextField name="studentFirstName" label="First Name" />
+                                <RHFTextField name="studentFirstName" label="First Name" required />
                             </Box>
                             <Box gridArea={"studentLastName"}>
-                                <RHFTextField name="studentLastName" label="Last Name" />
+                                <RHFTextField name="studentLastName" label="Last Name" required />
                             </Box>
                             <Box gridArea={"studentNickname"}>
-                                <RHFTextField name="studentNickname" label="Nickname" />
+                                <RHFTextField name="studentNickname" label="Nickname" required />
                             </Box>
                             <Box gridArea={"studentDateOfBirth"}>
                                 <Controller
@@ -379,7 +373,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                                 field.onChange(newValue);
                                             }}
                                             renderInput={(params) => (
-                                                <TextField {...params} fullWidth error={!!error} helperText={error?.message} />
+                                                <TextField {...params} fullWidth error={!!error} helperText={error?.message} required />
                                             )}
                                             disableMaskedInput
                                             inputFormat="dd-MMM-yyyy"
@@ -389,13 +383,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
 
                             </Box>
                             <Box gridArea={"studentPhoneNumber"}>
-                                <RHFTextField name="studentPhoneNo" label="Phone Number" />
+                                <RHFTextField name="studentPhoneNo" label="Phone Number" required />
                             </Box>
                             <Box gridArea={"studentLineId"}>
-                                <RHFTextField name="studentLineId" label="Line ID" />
+                                <RHFTextField name="studentLineId" label="Line ID" required />
                             </Box>
                             <Box gridArea={"studentEmail"}>
-                                <RHFTextField name="studentEmail" label="Email Address" />
+                                <RHFTextField name="studentEmail" label="Email Address" required />
                             </Box>
                         </Box>
                     </Card>
@@ -418,7 +412,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
-                            <RHFTextField name="schoolName" label="School Name" />
+                            <RHFTextField name="schoolName" label="School Name" required />
 
                             <RHFAutocomplete
                                 name="schoolCountry"
@@ -429,13 +423,14 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                         <Chip {...getTagProps({ index })} key={option} size="small" label={option} />
                                     ))
                                 }
-                                renderInput={(params) => <TextField label="School Country" {...params} />}
+                                renderInput={(params) => <TextField label="School Country" {...params} required />}
                             />
 
                             <RHFSelect
                                 name="levelOfStudy"
                                 label="Level of Study"
-                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
                                 {STUDY_LEVEL_OPTIONS.map((option) => (
                                     <MenuItem
                                         key={option.value}
@@ -456,8 +451,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             </RHFSelect>
                             <RHFTextField name="targetUniversity" label="Target University" />
                             <RHFTextField name="targetScore" label="Target Score" />
-                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther} />
-                            {showOtherStudyProgram ? <RHFTextField name="otherStudyProgram" label="Other" /> : null}
+                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther}  />
+                            {showOtherStudyProgram ? <RHFTextField name="otherStudyProgram" label="Other" required /> : null}
                         </Box>
                     </Card>
                 </Grid>
@@ -484,19 +479,19 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             }}
                         >
                             <Box gridArea={"address"}>
-                                <RHFTextField name="address" label="Address" />
+                                <RHFTextField name="address" label="Address" required />
                             </Box>
                             <Box gridArea={"subDistrict"}>
-                                <RHFTextField name="subDistrict" label="Sub-District" />
+                                <RHFTextField name="subDistrict" label="Sub-District" required />
                             </Box>
                             <Box gridArea={"district"}>
-                                <RHFTextField name="district" label="District" />
+                                <RHFTextField name="district" label="District" required />
                             </Box>
                             <Box gridArea={"province"}>
-                                <RHFTextField name="province" label="Province" />
+                                <RHFTextField name="province" label="Province" required />
                             </Box>
                             <Box gridArea={"zipCode"}>
-                                <RHFTextField name="zipCode" label="Zip Code/Post Code" />
+                                <RHFTextField name="zipCode" label="Zip Code/Post Code" required />
                             </Box>
                         </Box>
                     </Card>
@@ -527,6 +522,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             <Box gridArea={"parentTitle"}>
                                 <RHFSelect
                                     fullWidth
+                                    required
                                     name="parentTitle"
                                     label="Title"
                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
@@ -550,16 +546,16 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                 </RHFSelect>
                             </Box>
                             <Box gridArea={"parentFirstName"}>
-                                <RHFTextField name="parentFirstName" label="First Name" />
+                                <RHFTextField name="parentFirstName" label="First Name" required />
                             </Box>
                             <Box gridArea={"parentLastName"}>
-                                <RHFTextField name="parentLastName" label="Last Name" />
+                                <RHFTextField name="parentLastName" label="Last Name" required />
                             </Box>
                             <Box gridArea={"parentRelationships"}>
-                                <RHFTextField name="parentRelationships" label="Relationships" />
+                                <RHFTextField name="parentRelationships" label="Relationships" required />
                             </Box>
                             <Box gridArea={"parentPhone"}>
-                                <RHFTextField name="parentPhoneNo" label="Phone Number" />
+                                <RHFTextField name="parentPhoneNo" label="Phone Number" required />
                             </Box>
                             <Box gridArea={"parentEmail"}>
                                 <RHFTextField name="parentEmail" label="Email Address" />

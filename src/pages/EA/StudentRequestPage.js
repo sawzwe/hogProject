@@ -6,18 +6,18 @@ import { useSettingsContext } from '../../components/settings';
 
 // ----------------------------------------------------------------------
 
-export default function TransferringRequestPage() {
+export default function StudentRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> EA | Transferring Request </title>
+                <title> EA | Student Request </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h3" component="h1" paragraph>
-                    Transferring Request
+                    Student Request
                 </Typography>
 
                 <Typography gutterBottom>

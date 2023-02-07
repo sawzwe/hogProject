@@ -1,6 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Alert, Tooltip, Stack, Typography, Link, Box } from '@mui/material';
+import { Stack, Typography, Link } from '@mui/material';
 // hooks
 import { useAuthContext } from '../../auth/useAuthContext';
 // layouts
@@ -14,7 +14,6 @@ import AuthRegisterForm from './AuthRegisterForm';
 // ----------------------------------------------------------------------
 
 export default function Register() {
-    const { method } = useAuthContext();
 
     return (
         <LoginLayout>

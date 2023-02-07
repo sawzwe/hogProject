@@ -7,8 +7,6 @@ import { useAuthContext } from '../auth/useAuthContext';
 // layouts
 import CompactLayout from '../layouts/compact';
 import DashboardLayout from '../layouts/dashboard';
-// 
-import { PATH_DASHBOARD, PATH_AUTH } from './paths';
 //
 import {
   Page404,
@@ -26,7 +24,8 @@ import {
   PageSearchTeacher,
   PageDailyCalendar,
   PageRegistrationRequestEA,
-  PageTransferringRequestEA,
+  PageStudentRequestEA,
+  PageStaffRequestEA,
   PageSearchCourseTeacher
 }
   from './elements';
@@ -116,7 +115,7 @@ export default function Router() {
           ]
         },
 
-        // Teacher search
+        // Teacher search for EA and OA ---------------------------------------------------------------
         {
           path: 'teacher-management',
           children: [
@@ -196,9 +195,44 @@ export default function Router() {
             }
           ]
         },
-        { path: 'daily-calendar', element: <PageDailyCalendar />},
-        { path: 'registration-request', element: <PageRegistrationRequestEA />},
-        { path: 'transferring-request', element: <PageTransferringRequestEA />},
+
+        // EA Content ---------------------------------------------------------------
+        {
+          path: 'daily-calendar', element: (
+            <RoleBasedGuard roles={['Education Admin']} hasContent>
+              <PageDailyCalendar />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'registration-request', element: (
+            <RoleBasedGuard roles={['Education Admin']} hasContent>
+              <PageRegistrationRequestEA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'request-management',
+          children: [
+            { element: <Navigate to="/dashboard/request-management" replace />, index: true },
+            {
+              path: 'student-request',
+              element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <PageStudentRequestEA />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'staff-request',
+              element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <PageStaffRequestEA />
+                </RoleBasedGuard>
+              )
+            }
+          ]
+        },
         { path: 'changePassword', element: <PageChangePassword /> }
       ],
     },

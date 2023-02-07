@@ -1,16 +1,28 @@
 import { Helmet } from 'react-helmet-async';
-import {useEffect,useState} from 'react'
-import axios from 'axios';
+import { useEffect } from 'react';
 // @mui
-import { Container, Typography,Button } from '@mui/material';
+import { Container, Typography } from '@mui/material';
+import axios from 'axios';
 // components
 import { useSettingsContext } from '../../components/settings';
 import { HOG_API } from '../../config';
-
-
 // ----------------------------------------------------------------------
 
 export default function DailyCalendarPage() {
+
+    console.log('render')
+
+    useEffect(() => {
+        
+        // const header 
+
+        fetch('https://houseofgriffin-api-stg.azurewebsites.net/api/Student/Get', {
+            method: 'GET',
+            headers: {},
+            credentials: 'include'
+        })
+    }, [])
+
     const { themeStretch } = useSettingsContext();
     const [data,setData] = useState([])
     console.log(HOG_API)

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { Box, Stack, Drawer } from '@mui/material';
@@ -8,7 +8,7 @@ import useResponsive from '../../../hooks/useResponsive';
 // config
 import { NAV } from '../../../config';
 // components
-import Logo from '../../../components/logo';
+
 import Scrollbar from '../../../components/scrollbar';
 import { NavSectionVertical } from '../../../components/nav-section';
 // auth

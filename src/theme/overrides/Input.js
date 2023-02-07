@@ -30,8 +30,19 @@ export default function Input(theme) {
           '&:after': {
             borderBottomColor: theme.palette.text.primary,
           },
+
         },
       },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        asterisk: {
+          color: '#db3131',
+          '&$error': {
+            color: '#db3131'
+          },
+        },
+      }
     },
     MuiTextField: {
       styleOverrides: {
