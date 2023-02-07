@@ -18,7 +18,6 @@ import {
   TableContainer,
   TableRow,
   TableCell, createTheme, ThemeProvider,
-  Typography
 } from '@mui/material';
 // utils
 import { fTimestamp } from '../../../utils/formatTime';
@@ -64,12 +63,12 @@ const TABLE_HEAD_REQUESTS = [
 
 const TABLE_DATA_REQUESTS = [
   // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
-  createData('R032', '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
-  createData('R014', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'pendingPayment', 'incompleteReceipt'),
-  createData('R302', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'pendingEA', ''),
-  createData('R561', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData('R592', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData('R777', '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
+  createData('R032', '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'available', 'completeReceipt'),
+  createData('R014', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'myRequest', 'incompleteReceipt'),
+  createData('R302', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'available', ''),
+  createData('R561', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'available', ''),
+  createData('R592', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'available', ''),
+  createData('R777', '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'myRequest', 'completeReceipt'),
   createData('R888', '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
   createData('R999', '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
   createData('R111', '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
@@ -80,11 +79,9 @@ const TABLE_DATA_REQUESTS = [
 const errorTheme = createTheme({
   palette: {
     primary: {
-      // Purple and green play nicely together.
       main: '#D12E24',
     },
     secondary: {
-      // This is green.A700 as hex.
       main: '#D12E24',
     },
   },
@@ -127,7 +124,9 @@ export default function RegistrationRequestStatusList() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('pendingEA');
+  const [filterRole, setFilterRole] = useState('available');
+
+  const [currentRequest, setcurrentRequest] = useState([])
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -141,7 +140,7 @@ export default function RegistrationRequestStatusList() {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'pendingEA' || filterName !== '';
+    filterRole !== 'available' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -150,9 +149,8 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'pendingEA', label: 'Pending for EA', color: 'warning', count: getLengthByStatus('pendingEA') },
-    { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA', color: 'warning', count: getLengthByStatus('pendingOA') },
+    { value: 'available', label: 'Available Requests', color: 'warning', count: getLengthByStatus('available') },
+    { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
@@ -208,9 +206,16 @@ export default function RegistrationRequestStatusList() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('pendingEA');
+    setFilterRole('available');
   };
+  // console.log(tableData)
+  const acceptRequest =  (currentId,tableData,setTableData) => {
 
+    const newRow = tableData.find(el => (el.id === currentId))
+    newRow.role = 'myRequest';
+    setTableData([...tableData, newRow])
+    console.log(tableData)
+  };
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -223,32 +228,20 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-            {TABS.map((tab) =>
-            (tab.value === 'completed' || tab.value === 'rejected' ? (
+            
+            {TABS.map((tab) => (
               <Tab
                 key={tab.value}
                 value={tab.value}
                 label={tab.label}
-                style={{float: 'right' }}
+                style={{float: 'left'}}
                 icon={
                   <Label color={tab.color} sx={{ mr: 1 }}>
                     {tab.count}
                   </Label>
                 }
-                centered
-              />) : (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />))
-            )}
+              />
+            ))}
           </Tabs>
           <Divider />
 
@@ -268,6 +261,7 @@ export default function RegistrationRequestStatusList() {
 
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    // updateRequest === row.id ? <Request row={row} tableData={tableData} setTableData={setTableData}/> :
                     <TableRow
                       hover
                       key={row.id}
@@ -295,7 +289,7 @@ export default function RegistrationRequestStatusList() {
 
                       <TableCell>
                         <Tooltip title="More Info">
-                          <IconButton>
+                          <IconButton onClick={()=>acceptRequest(row.id,tableData,setTableData)}>
                             <Iconify icon="ic:chevron-right" />
                           </IconButton>
                         </Tooltip>
@@ -356,12 +350,15 @@ function applyFilter({
     inputData = inputData.filter((request) => request.role === filterRole);
   }
 
-  // if (filterStatus !== 'completed') {
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
-  // else if (filterRole === 'rejected' || filterRole ==='completed'){
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
-
   return inputData;
 }
+
+// function acceptRequest(id) {
+//   setUpdateRequest(id)
+// };
+
+// function Request(row,tableData,setTableData){
+//   return(
+//     console.log(row.role)
+//   )
+// }
