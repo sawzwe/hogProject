@@ -39,7 +39,12 @@ export const PATH_DASHBOARD = {
     view: (id) => path(ROOTS_DASHBOARD, `/course-transfer/request-status/${id}`)
   },
   dailyCalendar: path(ROOTS_DASHBOARD, '/daily-calendar'),
+  
+  // EA Registration Request
   registrationRequest: path(ROOTS_DASHBOARD, '/registration-request'),
+  schedule : (id) => path(ROOTS_DASHBOARD, `/registration-request/${id}`),
+
+  // EA Course Transfer and Leaving Request
   requestManagement: {
     root: path(ROOTS_DASHBOARD, '/request-management'),
     studentRequest: path(ROOTS_DASHBOARD, '/request-management/student-request'),

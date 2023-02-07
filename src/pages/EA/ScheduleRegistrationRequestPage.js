@@ -1,13 +1,12 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 // @mui
-import { Container } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
-// sections
-import RegistrationRequestDetail from '../../sections/dashboard/ep-registration-request-form/RegistrationRequestDetail'
+import ScheduleRegistrationRequest from '../../sections/dashboard/ea-registration-request-form/ScheduleRegistrationRequest'
 
 // ----------------------------------------------------------------------
 
@@ -48,8 +47,8 @@ const MOCKUP_PRIVATE_REQUEST = {
     courses: [
         {
             course: 'SAT',
-            section: '',
-            subjects: 'MATH',
+            section: 'Hong',
+            subjects: '',
             level: 'INTENSIVE',
             totalHours: '20',
             method: 'Onsite',
@@ -66,7 +65,7 @@ const MOCKUP_PRIVATE_REQUEST = {
         },
         {
             course: 'SAT',
-            section: '',
+            section: 'Hong',
             subjects: 'ENGLISH',
             level: 'REGULAR',
             totalHours: '20',
@@ -85,32 +84,34 @@ const MOCKUP_PRIVATE_REQUEST = {
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestDetailPage() {
+export default function StaffRequestPage() {
     const { themeStretch } = useSettingsContext();
 
-    // Request ID
-    const { id } = useParams();
+        // Request ID
+        const { id } = useParams();
 
-    // const currentRequest = _regRequests.find((request) => request.id === requestId);
-    // const currentRequest = MOCKUP_GROUP_REQUEST;
-    const currentRequest = MOCKUP_PRIVATE_REQUEST;
+        // const currentRequest = _regRequests.find((request) => request.id === requestId);
+        // const currentRequest = MOCKUP_GROUP_REQUEST;
+        const currentRequest = MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>
             <Helmet>
-                <title> EP | Request Detail </title>
+                <title> EA | Request Detail </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
                     heading="Course Registration Request"
                     links={[
-                        { name: 'Request Status', href: PATH_DASHBOARD.courseRegistration.requestStatus },
-                        { name: 'Request Detail ' }
+                        {
+                            name: 'Course Registration',
+                            href: PATH_DASHBOARD.registrationRequest,
+                        },
+                        { name: 'Request detail' },
                     ]}
                 />
-
-                <RegistrationRequestDetail request={currentRequest} />
+                <ScheduleRegistrationRequest request={currentRequest} />
             </Container>
         </>
     );

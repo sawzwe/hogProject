@@ -27,7 +27,8 @@ import {
   PageStudentRequestEA,
   PageStaffRequestEA,
   PageSearchCourseTeacher,
-  PageRegistrationRequestDetail
+  PageRegistrationRequestDetail,
+  PageScheduleRegistrationRequest
 }
   from './elements';
 
@@ -220,6 +221,15 @@ export default function Router() {
             </RoleBasedGuard>
           )
         },
+        {
+          path: 'registration-request/:id', element: (
+            <RoleBasedGuard roles={['Education Admin']} hasContent>
+              <PageScheduleRegistrationRequest />
+            </RoleBasedGuard>
+          )
+        },
+
+        // Course Transfer and Leaving Request
         {
           path: 'request-management',
           children: [
