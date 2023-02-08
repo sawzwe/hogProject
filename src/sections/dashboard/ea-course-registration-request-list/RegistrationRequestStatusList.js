@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import sumBy from 'lodash/sumBy';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // @mui
-import { useTheme } from '@mui/material/styles';
 import {
   Tab,
   Tabs,
@@ -19,13 +17,10 @@ import {
   TableRow,
   TableCell, createTheme, ThemeProvider,
 } from '@mui/material';
-// utils
-import { fTimestamp } from '../../../utils/formatTime';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
-import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
 import {
   useTable,
@@ -34,11 +29,11 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../../../components/table';
 // sections
 import RegistrationTableToolbar from './RegistrationTableToolbar';
+import ConfirmDialog from '../../../components/confirm-dialog';
 // import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
@@ -63,19 +58,21 @@ const TABLE_HEAD_REQUESTS = [
 
 const TABLE_DATA_REQUESTS = [
   // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
-  createData('R032', '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'available', 'completeReceipt'),
-  createData('R014', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'myRequest', 'incompleteReceipt'),
-  createData('R302', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'available', ''),
-  createData('R561', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'available', ''),
-  createData('R592', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'available', ''),
-  createData('R777', '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'myRequest', 'completeReceipt'),
-  createData('R888', '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData('R999', '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData('R111', '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData('R222', '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData('R892', '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData('001', '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'available', 'completeReceipt'),
+  createData('002', '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'myRequest', 'incompleteReceipt'),
+  createData('003', '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'available', ''),
+  createData('004', '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'available', ''),
+  createData('005', '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'available', ''),
+  createData('006', '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'myRequest', 'completeReceipt'),
+  createData('007', '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
+  createData('08', '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData('09', '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
+  createData('010', '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData('011', '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', ''),
 
 ];
+
+
 const errorTheme = createTheme({
   palette: {
     primary: {
@@ -93,8 +90,6 @@ export default function RegistrationRequestStatusList() {
 
   const { themeStretch } = useSettingsContext();
 
-  const navigate = useNavigate();
-
   const {
     dense,
     page,
@@ -102,13 +97,6 @@ export default function RegistrationRequestStatusList() {
     orderBy,
     rowsPerPage,
     setPage,
-    //
-    selected,
-    setSelected,
-    onSelectRow,
-    onSelectAllRows,
-    //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -122,11 +110,11 @@ export default function RegistrationRequestStatusList() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-
   const [filterRole, setFilterRole] = useState('available');
 
-  const [currentRequest, setcurrentRequest] = useState([])
+  const [openConfirm, setOpenConfirm] = useState(false);
+
+  const [currentId, setCurrentId] = useState(-1);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -135,7 +123,7 @@ export default function RegistrationRequestStatusList() {
     filterRole,
   });
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 56 : 76;
 
@@ -156,15 +144,6 @@ export default function RegistrationRequestStatusList() {
   ];
 
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
-  };
-
-
   const handleFilterRole = (event, newValue) => {
     setPage(0);
     setFilterRole(newValue);
@@ -175,46 +154,28 @@ export default function RegistrationRequestStatusList() {
     setFilterName(event.target.value);
   };
 
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
-    setSelected([]);
-    setTableData(deleteRow);
-
-    if (page > 0) {
-      if (dataInPage.length < 2) {
-        setPage(page - 1);
-      }
-    }
+  const handleOpenConfirm = (currentId) => {
+    setCurrentId(currentId);
+    setOpenConfirm(true);
   };
 
-  const handleDeleteRows = (selected) => {
-    const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-    setSelected([]);
-    setTableData(deleteRows);
-
-    if (page > 0) {
-      if (selected.length === dataInPage.length) {
-        setPage(page - 1);
-      } else if (selected.length === dataFiltered.length) {
-        setPage(0);
-      } else if (selected.length > dataInPage.length) {
-        const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-        setPage(newPage);
-      }
-    }
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
   };
 
   const handleResetFilter = () => {
     setFilterName('');
     setFilterRole('available');
   };
-  // console.log(tableData)
-  const acceptRequest =  (currentId,tableData,setTableData) => {
-
+  // console.log('After', tableData)
+  const acceptRequest = (currentId, tableData, setTableData) => {
+    // console.log('Before',tableData)
+    // console.log('Accept',currentId)
     const newRow = tableData.find(el => (el.id === currentId))
     newRow.role = 'myRequest';
-    setTableData([...tableData, newRow])
-    console.log(tableData)
+    const newTableData = tableData.filter(el => el.id !== currentId);
+    setTableData([...newTableData, newRow])
+    setOpenConfirm(false);
   };
   return (
     <>
@@ -228,13 +189,13 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-            
+
             {TABS.map((tab) => (
               <Tab
                 key={tab.value}
                 value={tab.value}
                 label={tab.label}
-                style={{float: 'left'}}
+                style={{ float: 'left' }}
                 icon={
                   <Label color={tab.color} sx={{ mr: 1 }}>
                     {tab.count}
@@ -266,7 +227,7 @@ export default function RegistrationRequestStatusList() {
                       hover
                       key={row.id}
                     >
-                      <TableCell align="left" > {row.id} </TableCell>
+                      <TableCell align="left" > R{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
@@ -289,9 +250,14 @@ export default function RegistrationRequestStatusList() {
 
                       <TableCell>
                         <Tooltip title="More Info">
-                          <IconButton onClick={()=>acceptRequest(row.id,tableData,setTableData)}>
-                            <Iconify icon="ic:chevron-right" />
-                          </IconButton>
+                          {row.role === 'available' ? (
+                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
+                              <Iconify icon="ic:chevron-right" />
+                            </IconButton>) : (
+                            <IconButton>
+                              <Iconify icon="ic:chevron-right" />
+                            </IconButton>
+                          )}
                         </Tooltip>
                       </TableCell>
 
@@ -301,11 +267,24 @@ export default function RegistrationRequestStatusList() {
                   <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
 
                   <TableNoData isNotFound={isNotFound} />
+
                 </TableBody>
               </Table>
             </Scrollbar>
           </TableContainer>
-
+          <ConfirmDialog
+            open={openConfirm}
+            onClose={handleCloseConfirm}
+            title="Take the Request"
+            content="Once the request is taken, only you can see the request and proceed it."
+            action={
+              <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
+                <Link to= {`/dashboard/registration-request/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
+                Take Request
+                </Link>
+              </Button>
+            }
+          />
           <TablePaginationCustom
             count={dataFiltered.length}
             page={page}
@@ -318,6 +297,8 @@ export default function RegistrationRequestStatusList() {
           />
         </Card>
       </Container>
+
+
     </>
   );
 }
@@ -328,7 +309,6 @@ function applyFilter({
   inputData,
   comparator,
   filterName,
-  filterStatus,
   filterRole,
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
@@ -342,9 +322,11 @@ function applyFilter({
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterName) {
-    inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) =>
+      request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
-
 
   if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
@@ -352,13 +334,3 @@ function applyFilter({
 
   return inputData;
 }
-
-// function acceptRequest(id) {
-//   setUpdateRequest(id)
-// };
-
-// function Request(row,tableData,setTableData){
-//   return(
-//     console.log(row.role)
-//   )
-// }
