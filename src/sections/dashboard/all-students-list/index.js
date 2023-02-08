@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 // @mui
-import { Table, Tooltip, Checkbox, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
+import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import {
   useTable,
-  emptyRows,
   getComparator,
-  TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../../../components/table';
 //
@@ -62,11 +59,6 @@ export default function SortingSelecting() {
     orderBy,
     rowsPerPage,
     //
-    selected,
-    onSelectRow,
-    onSelectAllRows,
-    //
-    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -88,8 +80,6 @@ export default function SortingSelecting() {
     comparator: getComparator(order, orderBy),
     filterValue,
   });
-
-  const denseHeight = dense ? 34 : 54;
 
   // Filter
   const [openFilter, setOpenFilter] = useState(false);

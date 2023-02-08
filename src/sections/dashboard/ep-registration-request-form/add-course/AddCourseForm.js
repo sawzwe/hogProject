@@ -1,13 +1,11 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // components
-import { Card, Grid, Box, Typography, Button, Stack } from '@mui/material'
+import { Card, Grid, Typography, Button, Stack } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import CourseCard from './CourseCard';
-// hook
-import useResponsive from '../../../../hooks/useResponsive';
 // dialog
 import AddCourseDialog from './AddCourseDialog';
 // mockup data
@@ -16,19 +14,14 @@ import { groupCourses, privateCourses } from '../_mockupData';
 AddCourseForm.propTypes = {
     onAddCourse: PropTypes.func,
     onRemoveCourse: PropTypes.func,
+    onRemovePrivateCourse: PropTypes.func
 }
 
 export default function AddCourseForm({ onAddCourse, onRemoveCourse, onRemovePrivateCourse }) {
     const {
         watch,
-        setValue,
         resetField,
-        reset,
-        defaultValues,
-        formState: { errors },
     } = useFormContext();
-
-    const upMd = useResponsive('up', 'md');
 
     const values = watch();
 
@@ -106,9 +99,9 @@ export default function AddCourseForm({ onAddCourse, onRemoveCourse, onRemovePri
                 />
             </Grid>
 
-            {courses?.map((course) => {
-                return <CourseCard key={course.name.concat(' ', course.subject, ' ', course.level)} courseType={courseType} course={course} onDelete={handleDeleteCourse} onDeletePrivate={handleDeletePrivateCourse} />
-            })}
+            {courses?.map((course) => 
+                <CourseCard key={course.name.concat(' ', course.subject, ' ', course.level)} courseType={courseType} course={course} onDelete={handleDeleteCourse} onDeletePrivate={handleDeletePrivateCourse} />
+            )}
         </Card>
     )
 }

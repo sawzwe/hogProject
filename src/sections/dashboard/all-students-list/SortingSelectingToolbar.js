@@ -2,15 +2,12 @@ import PropTypes from 'prop-types';
 import {
   InputAdornment, TextField, Tooltip, Typography,
   IconButton, Stack, Button, Drawer, Box, Divider,
-  List, ListItem, ListItemButton, ListItemText, MenuItem, Checkbox,Badge
+  Badge
 } from '@mui/material';
 import { useState, React } from 'react'
-import { Controller, useFormContext } from 'react-hook-form';
-import { alpha } from '@mui/material/styles';
 // components
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
-import { RHFMultiCheckbox, RHFTextField} from '../../../components/hook-form';
 
 
 // ----------------------------------------------------------------------
@@ -44,19 +41,6 @@ SortingSelectingToolbar.propTypes = {
 
 export default function SortingSelectingToolbar({ filterValue, onFilterValue, open, onOpen, onClose, isDefault, onResetFilter }) {
   // const { control } = useFormContext();
-const [groupchecked, setGroupChecked] = useState(false);
-const [privatechecked, setPrivateChecked] = useState(false);
-const [semiprivatechecked, setSemiprivateChecked] = useState(false);
-
-const handleGroupChange = (event) => {
-  setGroupChecked(event.target.checked);
-};
-const handlePrivateChange = (event) => {
-  setPrivateChecked(event.target.checked);
-};
-const handleSemiChange = (event) => {
-  setSemiprivateChecked(event.target.checked);
-};
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
