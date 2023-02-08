@@ -379,7 +379,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                                         />
                                     )}
                                 />
-
                             </Box>
                             <Box gridArea={"studentPhoneNumber"}>
                                 <RHFTextField name="studentPhoneNo" label="Phone Number" required />
