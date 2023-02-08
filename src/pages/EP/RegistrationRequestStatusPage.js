@@ -17,17 +17,18 @@ export default function RegistrationRequestStatusPage() {
             <Helmet>
                 <title> EP | Request Status </title>
             </Helmet>
-            <CustomBreadcrumbs
-                heading="Course Registration Request Status"
-                links={[
-                    {
-                        name: 'Course Registration',
-                        href: PATH_DASHBOARD.courseRegistration.root,
-                    },
-                    { name: 'Request status' },
-                ]}
-            />
+
             <Container maxWidth={themeStretch ? false : 'xl'}>
+                <CustomBreadcrumbs
+                    heading="Course Registration Request Status"
+                    links={[
+                        {
+                            name: 'Course Registration',
+                            href: PATH_DASHBOARD.courseRegistration.root,
+                        },
+                        { name: 'Request status' },
+                    ]}
+                />
                 <RegistrationRequestStatusList />
             </Container>
         </>

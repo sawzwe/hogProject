@@ -7,7 +7,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
-import NewViewRegistrationRequest from '../../sections/dashboard/ep-registration-request-form/NewViewRegistrationRequest';
+import NewRegistrationRequest from '../../sections/dashboard/ep-registration-request-form/NewRegistrationRequest';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ export default function CreateRegistrationRequestPage() {
                     ]}
                 />
 
-                <NewViewRegistrationRequest />
+                <NewRegistrationRequest />
             </Container>
         </>
     );
