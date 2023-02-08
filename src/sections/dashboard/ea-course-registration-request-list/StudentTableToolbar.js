@@ -5,14 +5,14 @@ import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
-RegistrationTableToolbar.propTypes = {
+StudentTableToolbar.propTypes = {
   isFiltered: PropTypes.bool,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   onResetFilter: PropTypes.func,
 };
 
-export default function RegistrationTableToolbar({
+export default function StudentTableToolbar({
   isFiltered,
   filterName,
   onFilterName,
@@ -33,7 +33,7 @@ export default function RegistrationTableToolbar({
         fullWidth
         value={filterName}
         onChange={onFilterName}
-        placeholder="Search RID or Course Type or Section..."
+        placeholder="Search RID or Student Fullname or Nickname..."
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
