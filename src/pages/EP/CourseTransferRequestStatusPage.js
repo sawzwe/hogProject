@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 // mui
-import {Container} from '@mui/material';
+import { Container } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
@@ -13,13 +13,14 @@ import CourseTransferRequestList from '../../sections/dashboard/ep-course-transf
 
 export default function CourseTransferRequestPage() {
 
-     const { themeStretch } = useSettingsContext();
+    const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title>Course Transfe Request</title>
+                <title> EP | Course Transfe Request</title>
             </Helmet>
+
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
                     heading="Course Transferring Request Status"
@@ -31,7 +32,7 @@ export default function CourseTransferRequestPage() {
                         { name: 'Request status' },
                     ]}
                 />
-                <CourseTransferRequestList/>
+                <CourseTransferRequestList />
             </Container>
         </>
     );

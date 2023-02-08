@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import dayjs from 'dayjs';
 // form
 import { useFormContext } from 'react-hook-form';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
-import { Stack, Dialog, Button, Grid, TextField, Typography, InputAdornment, List, Checkbox, ListItem, Divider, Box, IconButton, MenuItem } from '@mui/material';
+import { Stack, Dialog, Button, Grid, TextField, Typography, InputAdornment, ListItem, Divider, Box, IconButton, MenuItem } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // utils
@@ -18,7 +18,7 @@ import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 import AddCourseGroupDetailDialog from './AddCourseGroupDetailDialog';
 import SelectAvailableDays from './SelectAvailableDays';
 // assets
-import { RHFSelect, RHFTextField, RHFRadioGroup, RHFMultiCheckbox, RHFCheckbox } from '../../../../components/hook-form';
+import { RHFSelect, RHFTextField, RHFRadioGroup } from '../../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
     const {
         watch,
         setValue,
-        formState: { errors },
+        resetField,
     } = useFormContext();
 
     const values = watch();
@@ -63,27 +63,6 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
         newStartDate,
         newEndDate,
         newAvailableDays,
-        monday,
-        tuesday,
-        wednesday,
-        thursday,
-        friday,
-        saturday,
-        sunday,
-        mondayFromTime,
-        mondayToTime,
-        tuesdayFromTime,
-        tuesdayToTime,
-        wednesdayFromTime,
-        wednesdayToTime,
-        thursdayFromTime,
-        thursdayToTime,
-        fridayFromTime,
-        fridayToTime,
-        saturdayFromTime,
-        saturdayToTime,
-        sundayFromTime,
-        sundayToTime,
     } = values;
 
     // Filter courses
@@ -135,24 +114,6 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
     const [privateSubjects, setPrivateSubjects] = useState([]);
     const [privateLevels, setPrivateLevels] = useState([]);
 
-    // 1. Reset selected subject once change the course or new course type
-    // 2. Set new subjects for select options
-    useEffect(() => {
-        setValue('newCourse', '')
-        setValue('newSubject', '')
-        setValue('newLevel', '')
-    }, [newCourseType])
-
-    useEffect(() => {
-        if (newCourseType === 'Existing Course' && newCourse) {
-            setValue('newSubject', '')
-            setValue('newLevel', '')
-            const targetCourse = courseOptions.find((option) => option.course === newCourse)
-            setPrivateSubjects(targetCourse.subjects)
-            setPrivateLevels(targetCourse.level)
-        }
-    }, [newCourse]);
-
     const handleCreate = () => {
         if (courses.some((course) => (course.name === newCourse && course.subject === newSubject && course.level === newLevel))) {
             enqueueSnackbar('The course already exists!', { variant: 'error' });
@@ -179,11 +140,24 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
 
     const today = dayjs();
 
-    const [checked, setChecked] = useState(false);
+    // Handle Radio NewCourseType Change
+    const handleNewCourseTypeChange = (event) => {
+        setValue('newCourseType', event.target.value);
+        resetField('newCourse');
+        resetField('newSubject');
+        resetField('newLevel');
+    }
 
-    const handleCheckboxChange = (event) => {
-        setChecked(event.target.checked);
-    };
+    // Handle Select New Course Change
+    const handleNewCourseChange = (event) => {
+        setValue('newCourse', event.target.value);
+        resetField('newSubject');
+        resetField('newLevel');
+
+        const targetCourse = courseOptions.find((option) => option.course === event.target.value)
+        setPrivateSubjects(targetCourse.subjects)
+        setPrivateLevels(targetCourse.level)
+    }
 
     return (
         <>
@@ -322,6 +296,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                             sx={{
                                                 '& .MuiFormControlLabel-root': { mr: 4 },
                                             }}
+                                            onChange={handleNewCourseTypeChange}
                                         />
                                     </Grid>
                                 </Grid>
@@ -336,6 +311,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                                     name="newCourse"
                                                     label="Course"
                                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                                    onChange={handleNewCourseChange}
                                                     required>
                                                     {courseOptions.map((option) => (
                                                         <MenuItem
@@ -359,12 +335,12 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
 
                                             {/* Select Subject */}
                                             <Grid item xs={12} md={6}>
-                                                {!!privateSubjects.length ?
+                                                {privateSubjects.length ?
                                                     <RHFSelect
                                                         name="newSubject"
                                                         defaultValue=""
                                                         label="Subject"
-                                                        disabled={!!!newCourse}
+                                                        disabled={!newCourse}
                                                         SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                                                         required>
                                                         {privateSubjects.map((option) => (
@@ -411,11 +387,11 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
 
                                             {/* Select Level */}
                                             <Grid item xs={12} md={6}>
-                                                {!!privateLevels.length ?
+                                                {privateLevels.length ?
                                                     <RHFSelect
                                                         name="newLevel"
                                                         label="Level"
-                                                        disabled={!!!newCourse}
+                                                        disabled={!newCourse}
                                                         SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                                                         required>
                                                         {privateLevels.map((option) => (
@@ -462,14 +438,15 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                                         </>
                                     ) :
                                         <>
+                                            {/* Custom Course */}
                                             <Grid item xs={6} md={6}>
                                                 <RHFTextField name="newCourse" label="Course" required />
                                             </Grid>
                                             <Grid item xs={6} md={6}>
-                                                <RHFTextField name="newSubject" label="Subject" />
+                                                <RHFTextField name="newSubject" label="Subject" required />
                                             </Grid>
                                             <Grid item xs={6} md={6}>
-                                                <RHFTextField name="newLevel" label="Level" />
+                                                <RHFTextField name="newLevel" label="Level" required />
                                             </Grid>
                                         </>
                                     }

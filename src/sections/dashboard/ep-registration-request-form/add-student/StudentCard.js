@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 // components
-import { Typography, Button, Stack, IconButton, TextField, Input, InputLabel, InputAdornment } from '@mui/material'
+import { Stack, TextField, InputAdornment } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 
 StudentCard.propTypes = {
