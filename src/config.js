@@ -16,6 +16,8 @@ export const FIREBASE_API = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
+export const HOG_API = process.env.REACT_APP_HOG_API;
+
 export const COGNITO_API = {
   userPoolId: process.env.REACT_APP_AWS_COGNITO_USER_POOL_ID,
   clientId: process.env.REACT_APP_AWS_COGNITO_CLIENT_ID,
