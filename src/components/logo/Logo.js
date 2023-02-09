@@ -12,12 +12,6 @@ import hog from '../../assets/logo/hogLogo.png';
 const Logo = forwardRef(({ disabledLink = false, sx }, ref) => {
   const theme = useTheme();
 
-  const PRIMARY_LIGHT = theme.palette.primary.light;
-
-  const PRIMARY_MAIN = theme.palette.primary.main;
-
-  const PRIMARY_DARK = theme.palette.primary.dark;
-
   const logo = (
     <Box 
     component="img"

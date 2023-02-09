@@ -48,7 +48,7 @@ const MOCKUP_PRIVATE_REQUEST = {
         {
             course: 'SAT',
             section: 'Hong',
-            subjects: '',
+            subject: '',
             level: 'INTENSIVE',
             totalHours: '20',
             method: 'Onsite',
@@ -66,7 +66,7 @@ const MOCKUP_PRIVATE_REQUEST = {
         {
             course: 'SAT',
             section: 'Hong',
-            subjects: 'ENGLISH',
+            subject: 'ENGLISH',
             level: 'REGULAR',
             totalHours: '20',
             method: 'Online',
