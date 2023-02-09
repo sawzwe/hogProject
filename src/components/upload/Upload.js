@@ -57,7 +57,6 @@ export default function Upload({
   //
   files,
   thumbnail,
-  onUpload,
   onRemove,
   onRemoveAll,
   sx,

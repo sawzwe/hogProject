@@ -1,17 +1,13 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // @mui
-import { Stack, Dialog, Button, TextField, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
+import { Stack, Dialog, Button, TextField, Typography, InputAdornment, ListItem, Divider, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-// hook
-import useResponsive from '../../../../hooks/useResponsive';
 // components
 import { useSnackbar } from '../../../../components/snackbar';
 import Iconify from '../../../../components/iconify';
-import { Upload } from '../../../../components/upload';
 import SearchNotFound from '../../../../components/search-not-found/SearchNotFound';
 import Scrollbar from '../../../../components/scrollbar/Scrollbar';
 
@@ -28,8 +24,6 @@ AddStudentDialog.propTypes = {
 export default function AddStudentDialog({ open, limit, onClose, onSelect, studentOptions }) {
     const {
         watch,
-        setValue,
-        formState: { errors },
     } = useFormContext();
 
     const values = watch();
