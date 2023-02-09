@@ -10,9 +10,10 @@ import DashboardLayout from '../layouts/dashboard';
 //
 import {
   Page404,
-  PageNewStdent,
   LoginPage,
   RegisterPage,
+  // EP
+  PageNewStdent,
   PageSearchStudent,
   PageEditStudent,
   PageCreateRegistrationRequest,
@@ -22,13 +23,20 @@ import {
   PageChangePassword,
   PageSearchCourseStudent,
   PageSearchTeacher,
+  // EA
   PageDailyCalendar,
   PageRegistrationRequestEA,
   PageStudentRequestEA,
   PageStaffRequestEA,
   PageSearchCourseTeacher,
   PageRegistrationRequestDetail,
-  PageScheduleRegistrationRequest
+  PageScheduleRegistrationRequest,
+  // OA
+  PageNewAccount,
+  PageRegistrationRequestOA,
+  PageLeavingRequestOA,
+  PageRegistrationRequestDetailOA,
+  PageLeavingRequestDetailOA
 }
   from './elements';
 
@@ -43,6 +51,9 @@ export default function Router() {
     }
     if (user.role === 'Education Admin') {
       return 'daily-calendar'
+    }
+    if (user.role === 'Office Admin') {
+      return 'new-account'
     }
     return null;
   };
@@ -174,7 +185,7 @@ export default function Router() {
               )
             },
             {
-              path: 'request-status/:id', 
+              path: 'request-status/:id',
               element: (
                 <RoleBasedGuard roles={['Education Planner']} hasContent>
                   <PageRegistrationRequestDetail />
@@ -251,6 +262,73 @@ export default function Router() {
               )
             }
           ]
+        },
+
+        // OA Content ---------------------------------------------------------------
+        {
+          path: 'new-account', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageNewAccount />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'edit-account',
+          children: [
+            { element: <Navigate to="/dashboard/edit-account" replace />, index: true },
+            {
+              path: 'student',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchStudent />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'teacher',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchTeacher />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'staff',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchTeacher />
+                </RoleBasedGuard>
+              )
+            }
+          ]
+        },
+        {
+          path: 'registration-request-office-admin', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageRegistrationRequestOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'registration-request-office-admin/:id', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageRegistrationRequestDetailOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'leaving-request-office-admin', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageLeavingRequestOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'leaving-request-office-admin/:id', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageLeavingRequestDetailOA />
+            </RoleBasedGuard>
+          )
         },
         { path: 'changePassword', element: <PageChangePassword /> }
       ],

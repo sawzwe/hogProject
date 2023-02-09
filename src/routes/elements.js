@@ -29,8 +29,6 @@ export const PageRegistrationRequestDetail = Loadable(lazy(() => import('../page
 export const PageCreateCourseTransferRequest = Loadable(lazy(() => import('../pages/EP/CreateCourseTransferRequestPage')));
 export const PageCourseTransferRequestStatus = Loadable(lazy(() => import('../pages/EP/CourseTransferRequestStatusPage')));
 
-
-// EA ----------------------------------------------------------------------
 // Search student
 export const PageSearchStudent = Loadable(lazy(() => import('../pages/SearchStudentPage')));
 export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/SearchCourseStudentPage')));
@@ -39,6 +37,7 @@ export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/Searc
 export const PageSearchTeacher = Loadable(lazy(() => import('../pages/SearchTeacherPage')));
 export const PageSearchCourseTeacher = Loadable(lazy(() => import('../pages/SearchCourseTeacherPage')));
 
+// EA ----------------------------------------------------------------------
 // Daily calendar
 export const PageDailyCalendar = Loadable(lazy(() => import('../pages/EA/DailyCalendarPage')));
 
@@ -48,6 +47,13 @@ export const PageScheduleRegistrationRequest = Loadable(lazy(() => import('../pa
 export const PageStudentRequestEA = Loadable(lazy(() => import('../pages/EA/StudentRequestPage')));
 export const PageStaffRequestEA = Loadable(lazy(() => import('../pages/EA/StaffRequestPage')));
 
+// OA ----------------------------------------------------------------------
+// New Account
+export const PageNewAccount = Loadable(lazy(() => import('../pages/OA/NewAccountPage')));
+export const PageRegistrationRequestOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestPage')));
+export const PageLeavingRequestOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestPage')));
+export const PageRegistrationRequestDetailOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestDetailPage')));
+export const PageLeavingRequestDetailOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestDetailPage')));
 
 
 

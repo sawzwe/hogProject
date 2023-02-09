@@ -42,7 +42,7 @@ export const PATH_DASHBOARD = {
   
   // EA Registration Request
   registrationRequest: path(ROOTS_DASHBOARD, '/registration-request'),
-  schedule : (id) => path(ROOTS_DASHBOARD, `/registration-request/${id}`),
+  schedule: (id) => path(ROOTS_DASHBOARD, `/registration-request/${id}`),
 
   // EA Course Transfer and Leaving Request
   requestManagement: {
@@ -51,4 +51,18 @@ export const PATH_DASHBOARD = {
     staffRequest: path(ROOTS_DASHBOARD, '/request-management/staff-request'),
   },
   changePassword: path(ROOTS_DASHBOARD, '/changePassword'),
+
+  // OA New Account
+  newAccount: path(ROOTS_DASHBOARD, '/new-account'),
+  editAccount: {
+    root: path(ROOTS_DASHBOARD, '/edit-account'),
+    student: path(ROOTS_DASHBOARD, '/edit-account/student'),
+    teacher: path(ROOTS_DASHBOARD, '/edit-account/teacher'),
+    staff: path(ROOTS_DASHBOARD, '/edit-account/staff'),
+    editStudent: (id) => path(ROOTS_DASHBOARD, `/edit-account/student/${id}`),
+    editTeacher: (id) => path(ROOTS_DASHBOARD, `/edit-account/teacher/${id}`),
+    editStaff: (id) => path(ROOTS_DASHBOARD, `/edit-account/staff/${id}`),
+  },
+  registrationRequestOA: path(ROOTS_DASHBOARD, '/registration-request-office-admin'),
+  leavingRequestOA: path(ROOTS_DASHBOARD, '/leaving-request-office-admin'),
 };

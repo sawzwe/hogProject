@@ -166,8 +166,17 @@ const OAnavConfig = [
   {
     subheader: 'account management',
     items: [
-      { title: 'Search', path: PATH_DASHBOARD.epone, icon: ICONS.user },
-      { title: 'Request', path: PATH_DASHBOARD.eptwo, icon: ICONS.group },
+      { title: 'New Account', path: PATH_DASHBOARD.newAccount, icon: ICONS.user },
+      {
+        title: 'Edit Account',
+        path: PATH_DASHBOARD.editAccount.root,
+        icon: ICONS.group,
+        children: [
+          { title: 'Student', path: PATH_DASHBOARD.editAccount.student },
+          { title: 'Teacher', path: PATH_DASHBOARD.editAccount.teacher },
+          { title: 'Staff', path: PATH_DASHBOARD.editAccount.staff },
+        ],
+      },
     ],
   },
 
@@ -176,8 +185,8 @@ const OAnavConfig = [
   {
     subheader: 'request management',
     items: [
-      { title: 'Create Request', path: PATH_DASHBOARD.root, icon: ICONS.mail },
-      { title: 'Request Status', path: PATH_DASHBOARD.root, icon: ICONS.menuItem }
+      { title: 'Registration Request', path: PATH_DASHBOARD.registrationRequestOA, icon: ICONS.user },
+      { title: 'Leaving Request', path: PATH_DASHBOARD.leavingRequestOA, icon: ICONS.group },
     ],
   },
 
@@ -187,7 +196,7 @@ const OAnavConfig = [
     subheader: 'Settings',
     items: [
       { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
-      { title: 'Logout', path: PATH_DASHBOARD.root, icon: ICONS.logout }
+      { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
 ];
