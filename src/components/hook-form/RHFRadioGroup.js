@@ -12,7 +12,7 @@ RHFRadioGroup.propTypes = {
   label: PropTypes.string,
 };
 
-export default function RHFRadioGroup({ name, options, label, ...other }) {
+export default function RHFRadioGroup({ name, options, label, disabled, ...other }) {
   const { control } = useFormContext();
 
   return (
@@ -24,7 +24,7 @@ export default function RHFRadioGroup({ name, options, label, ...other }) {
             <Typography variant="subtitle1">{label}</Typography>
             <RadioGroup {...field} row {...other}>
               {options.map((option) => (
-                <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+                <FormControlLabel key={option.value} value={option.value} control={<Radio disabled={disabled} />} label={option.label} />
               ))}
             </RadioGroup>
 

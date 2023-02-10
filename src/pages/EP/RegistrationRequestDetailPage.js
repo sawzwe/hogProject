@@ -36,6 +36,7 @@ const MOCKUP_GROUP_REQUEST = {
         }
     ],
     attachedPayment: [],
+    paymentType: 'Complete Payment',
     additionalComment: '✌ Greeting from Education Planner.',
     rejectedReason: '',
     status: 'Pending OA'
@@ -78,9 +79,10 @@ const MOCKUP_PRIVATE_REQUEST = {
         }
     ],
     attachedPayment: [],
+    paymentType: 'Complete Payment',
     additionalComment: '✌ Greeting from Education Planner.',
     rejectedReason: 'There is no available time slot 🤪',
-    status: 'Rejected'
+    status: 'Pending Payment'
 }
 
 // ----------------------------------------------------------------------
@@ -93,7 +95,7 @@ export default function RegistrationRequestDetailPage() {
 
     // const currentRequest = _regRequests.find((request) => request.id === requestId);
     // const currentRequest = MOCKUP_GROUP_REQUEST;
-    const currentRequest = MOCKUP_PRIVATE_REQUEST;
+    const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>

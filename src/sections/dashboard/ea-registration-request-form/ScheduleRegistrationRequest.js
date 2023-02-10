@@ -192,9 +192,7 @@ export default function ScheduleRegistrationRequest({ request }) {
                     </Stack>
                 </DialogTitle>
                 <DialogContent>
-                    {/* <DialogContentText> */}
                     <TextField fullWidth name="rejectedReason" label="Reason" multiline rows={3} sx={{ my: 1 }} onChange={(event) => setRejectedReasonMessage(event.target.value)} required />
-                    {/* </DialogContentText> */}
                 </DialogContent>
                 <DialogActions>
                     <Button color="inherit" variant="outlined" onClick={handleRejectClose}>Cancel</Button>
