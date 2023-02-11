@@ -71,4 +71,10 @@ export const PATH_DASHBOARD = {
   studentCourse: path(ROOTS_DASHBOARD, '/student-course'),
   studentProfile: path(ROOTS_DASHBOARD, '/student-profile'),
   studentInbox: path(ROOTS_DASHBOARD, '/student-inbox'),
+
+  // Teacher
+  teacherCalendar: path(ROOTS_DASHBOARD, '/teacher-calendar'),
+  teacherCourse: path(ROOTS_DASHBOARD, '/teacher-course'),
+  teacherLeavingRequest: path(ROOTS_DASHBOARD, '/teacher-leaving-request'),
+  teacherInbox: path(ROOTS_DASHBOARD, '/teacher-inbox'),
 };

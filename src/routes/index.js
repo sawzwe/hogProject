@@ -41,7 +41,12 @@ import {
   PageStudentCalendar,
   PageStudentCourse,
   PageStudentProfile,
-  PageStudentRequestInbox
+  PageStudentRequestInbox,
+  // Teacher
+  PageTeacherCalendar,
+  PageTeacherCourse,
+  PageTeacherLeavingRequest,
+  PageTeacherRequestInbox
 }
   from './elements';
 
@@ -62,6 +67,9 @@ export default function Router() {
     }
     if (user.role === 'Student') {
       return 'student-calendar'
+    }
+    if (user.role === 'Teacher') {
+      return 'teacher-calendar'
     }
     return null;
   };
@@ -365,6 +373,36 @@ export default function Router() {
           path: 'student-inbox', element: (
             <RoleBasedGuard roles={['Student']} hasContent>
               <PageStudentRequestInbox />
+            </RoleBasedGuard>
+          )
+        },
+
+        // Teacher Content ---------------------------------------------------------------
+        {
+          path: 'teacher-calendar', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCalendar />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-course', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCourse />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-leaving-request', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherLeavingRequest />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-inbox', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherRequestInbox />
             </RoleBasedGuard>
           )
         },

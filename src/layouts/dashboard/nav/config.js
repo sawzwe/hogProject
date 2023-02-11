@@ -236,5 +236,40 @@ const StudentNavConfig = [
   }
 ];
 
+// ----------------------------------------------------------------------
+// Teacher NavConfig
 
-export { EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig };
+const TeacherNavConfig = [
+  // General
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'general',
+    items: [
+      { title: 'Calendar', path: PATH_DASHBOARD.teacherCalendar, icon: ICONS.user },
+      { title: 'Course', path: PATH_DASHBOARD.teacherCourse, icon: ICONS.mail },
+    ],
+  },
+
+  // Others
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'request management',
+    items: [
+      { title: 'Leaving Request', path: PATH_DASHBOARD.teacherLeavingRequest, icon: ICONS.user },
+      { title: 'Request History', path: PATH_DASHBOARD.teacherInbox, icon: ICONS.mail },
+    ],
+  },
+
+  // Settings
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'Settings',
+    items: [
+      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
+    ],
+  }
+];
+
+
+export { EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig, TeacherNavConfig };
