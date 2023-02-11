@@ -55,6 +55,11 @@ export const PageLeavingRequestOA = Loadable(lazy(() => import('../pages/OA/Leav
 export const PageRegistrationRequestDetailOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestDetailPage')));
 export const PageLeavingRequestDetailOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestDetailPage')));
 
+// Student ----------------------------------------------------------------------
+export const PageStudentCalendar = Loadable(lazy(() => import('../pages/Student/StudentCalendarPage')));
+export const PageStudentCourse = Loadable(lazy(() => import('../pages/Student/StudentCoursePage')));
+export const PageStudentProfile = Loadable(lazy(() => import('../pages/Student/StudentProfilePage')));
+export const PageStudentRequestInbox = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxPage')));
 
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));

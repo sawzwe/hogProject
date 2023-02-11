@@ -14,7 +14,7 @@ import { NavSectionVertical } from '../../../components/nav-section';
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import {EPnavConfig, EAnavConfig, OAnavConfig} from './config';
+import {EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig} from './config';
 import NavDocs from './NavDocs';
 import NavAccount from './NavAccount';
 
@@ -40,18 +40,22 @@ export default function NavVertical({ openNav, onCloseNav }) {
 
   function getNavConfig() {
     if (user.role === "Education Planner") {
-      return EPnavConfig
+      return EPNavConfig
     }
 
     if (user.role === "Education Admin") {
-      return EAnavConfig
+      return EANavConfig
     } 
     
     if (user.role === "Office Admin") {
-      return OAnavConfig
+      return OANavConfig
     }
 
-    return EPnavConfig;
+    if (user.role === "Student") {
+      return StudentNavConfig
+    }
+    
+    return null;
   }
 
   const navConfig = getNavConfig();

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { AppBar, Toolbar, IconButton } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Stack } from '@mui/material';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';
 // hooks
@@ -13,12 +13,11 @@ import { HEADER, NAV } from '../../../config';
 import Logo from '../../../components/logo';
 import Iconify from '../../../components/iconify';
 import { useSettingsContext } from '../../../components/settings';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 //
-// import Searchbar from './Searchbar';
-// import AccountPopover from './AccountPopover';
-// import LanguagePopover from './LanguagePopover';
-// import ContactsPopover from './ContactsPopover';
-// import NotificationsPopover from './NotificationsPopover';
+import AccountPopover from './AccountPopover';
+import NotificationsPopover from './NotificationsPopover';
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +27,7 @@ Header.propTypes = {
 
 export default function Header({ onOpenNav }) {
   const theme = useTheme();
+  const { user } = useAuthContext();
 
   const { themeLayout } = useSettingsContext();
 
@@ -49,17 +49,18 @@ export default function Header({ onOpenNav }) {
         </IconButton>
       )}
 
-      {/* <Searchbar /> */}
 
-      {/* <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
-        <LanguagePopover />
+      <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
+        {(user.role === 'Student' || user.role === 'Teacher') &&
+          (
+            <>
+              <NotificationsPopover />
+              <AccountPopover />
+            </>
+          )
+        }
+      </Stack>
 
-        <NotificationsPopover />
-
-        <ContactsPopover />
-
-        <AccountPopover />
-      </Stack> */}
     </>
   );
 

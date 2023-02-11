@@ -65,4 +65,10 @@ export const PATH_DASHBOARD = {
   },
   registrationRequestOA: path(ROOTS_DASHBOARD, '/registration-request-office-admin'),
   leavingRequestOA: path(ROOTS_DASHBOARD, '/leaving-request-office-admin'),
+
+  // Student
+  studentCalendar: path(ROOTS_DASHBOARD, '/student-calendar'),
+  studentCourse: path(ROOTS_DASHBOARD, '/student-course'),
+  studentProfile: path(ROOTS_DASHBOARD, '/student-profile'),
+  studentInbox: path(ROOTS_DASHBOARD, '/student-inbox'),
 };

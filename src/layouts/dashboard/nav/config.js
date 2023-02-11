@@ -33,7 +33,7 @@ const ICONS = {
 // ----------------------------------------------------------------------
 // Education Planner navConfig
 
-const EPnavConfig = [
+const EPNavConfig = [
   // Student Management
   // ----------------------------------------------------------------------
   {
@@ -92,7 +92,7 @@ const EPnavConfig = [
 // ----------------------------------------------------------------------
 // Education Admin navConfig
 
-const EAnavConfig = [
+const EANavConfig = [
   // Schedule Management
   // ----------------------------------------------------------------------
   {
@@ -160,7 +160,7 @@ const EAnavConfig = [
 // ----------------------------------------------------------------------
 // Office Admin NavConfig
 
-const OAnavConfig = [
+const OANavConfig = [
   // Account management
   // ----------------------------------------------------------------------
   {
@@ -201,4 +201,40 @@ const OAnavConfig = [
   }
 ];
 
-export { EPnavConfig, EAnavConfig, OAnavConfig };
+// ----------------------------------------------------------------------
+// Student NavConfig
+
+const StudentNavConfig = [
+  // General
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'general',
+    items: [
+      { title: 'Calendar', path: PATH_DASHBOARD.studentCalendar, icon: ICONS.user },
+      { title: 'Course', path: PATH_DASHBOARD.studentCourse, icon: ICONS.mail },
+    ],
+  },
+
+  // Others
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'others',
+    items: [
+      { title: 'Profile', path: PATH_DASHBOARD.studentProfile, icon: ICONS.user },
+      { title: 'Request Inbox', path: PATH_DASHBOARD.studentInbox, icon: ICONS.mail },
+    ],
+  },
+
+  // Settings
+  // ----------------------------------------------------------------------
+  {
+    subheader: 'Settings',
+    items: [
+      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
+    ],
+  }
+];
+
+
+export { EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig };

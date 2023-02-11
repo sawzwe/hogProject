@@ -36,7 +36,12 @@ import {
   PageRegistrationRequestOA,
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
-  PageLeavingRequestDetailOA
+  PageLeavingRequestDetailOA,
+  // Student
+  PageStudentCalendar,
+  PageStudentCourse,
+  PageStudentProfile,
+  PageStudentRequestInbox
 }
   from './elements';
 
@@ -54,6 +59,9 @@ export default function Router() {
     }
     if (user.role === 'Office Admin') {
       return 'new-account'
+    }
+    if (user.role === 'Student') {
+      return 'student-calendar'
     }
     return null;
   };
@@ -327,6 +335,36 @@ export default function Router() {
           path: 'leaving-request-office-admin/:id', element: (
             <RoleBasedGuard roles={['Office Admin']} hasContent>
               <PageLeavingRequestDetailOA />
+            </RoleBasedGuard>
+          )
+        },
+
+        // Student Content ---------------------------------------------------------------
+        {
+          path: 'student-calendar', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentCalendar />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-course', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentCourse />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-profile', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentProfile />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-inbox', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentRequestInbox />
             </RoleBasedGuard>
           )
         },
