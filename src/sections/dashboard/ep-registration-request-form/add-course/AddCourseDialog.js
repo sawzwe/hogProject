@@ -168,7 +168,7 @@ export default function AddCourseDialog({ open, onClose, onSelect, courseOptions
                             <Typography variant="h6"> {courseType === 'Group' ? 'Join Group' : 'New Course'} </Typography>
                             <IconButton variant="h6" onClick={handleCloseDialog}> <CloseIcon /> </IconButton>
                         </Stack>
-
+                        
                         <Stack spacing={2} sx={{ p: 2.5 }}>
                             <TextField
                                 value={filterCourseName}
