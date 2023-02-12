@@ -24,14 +24,6 @@
       "impliedStrict": true
     }
   },
-  "settings": {
-    "import/resolver": {
-        "node": {
-            "paths": ["src"],
-            "extensions": [".js", ".ts", ".d.ts", ".tsx"]
-        }
-    }
-  }, 
   "rules": {
     "no-new": 0,
     "no-alert": 0,

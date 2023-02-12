@@ -11,17 +11,15 @@ export default function TeacherCalendarPage() {
 
     return (
         <>
-            <>
-                <Helmet>
-                    <title> Teacher Calendar </title>
-                </Helmet>
+            <Helmet>
+                <title> Teacher Calendar </title>
+            </Helmet>
 
-                <Container maxWidth={themeStretch ? false : 'xl'}>
-                    <Typography variant="h4" gutterBottom>
-                        Teacher Calendar
-                    </Typography>
-                </Container>
-            </>
+            <Container maxWidth={themeStretch ? false : 'xl'}>
+                <Typography variant="h4" gutterBottom>
+                    Teacher Calendar
+                </Typography>
+            </Container>
         </>
     );
 }
