@@ -5,7 +5,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
-import StaffRequestStatusList from '../../sections/dashboard/ea-course-registration-request-list/RegistrationRequestStatusList'
+import StaffRequestStatusList from '../../sections/dashboard/ea-request-management-list/RegistrationRequestStatusList'
 
 // ----------------------------------------------------------------------
 

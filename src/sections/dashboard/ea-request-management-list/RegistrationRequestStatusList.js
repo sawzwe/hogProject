@@ -32,39 +32,43 @@ import {
   TablePaginationCustom,
 } from '../../../components/table';
 // sections
-import StaffTableToolbar from './StaffTableToolbar';
+import RegistrationTableToolbar from './RegistrationTableToolbar';
 import ConfirmDialog from '../../../components/confirm-dialog';
 // import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
 
-function createData(id, requestDate, requestType, fullname, nickname, requestedBy, role) {
-  return { id, requestDate, requestType, fullname, nickname, requestedBy, role};
+// {Condition=== true && ()}
+// {Condition=== true ? () : (else)}
+
+function createData(id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt) {
+  return { id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt };
 }
 
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'requestType', label: 'Request Type', align: 'left' },
-  { id: 'fullname ', label: 'Fullname', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Nickname', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Role', align: 'left' },
+  { id: 'courseType', label: 'Course Type', align: 'left' },
+  { id: 'section ', label: 'Section', align: 'left', width: 200 },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
+  { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
 
 const TABLE_DATA_REQUESTS = [
-  // Table {  RID,    Req Date ,     requestType,     fullname,           regiscourses, requestedBy,      role,   Receipt }
-  createData('001', '30-Oct-2022', 'Course Transfering', 'Alpha Zain', 'Zain', 'Nirawit(Boss)', 'available'),
-  createData('002', '16-Nov-2022', 'Course Transfering', 'Thanatuch Lertritsirkul', 'Tar', 'EP', 'myRequest'),
-  createData('003', '28-Nov-2022', 'Personal Leaving', 'Saw Zwe Wai Yan', 'Saw', 'Teacher', 'available'),
-  createData('004', '30-Nov-2022', 'Personal Leaving', 'Monkey D.', 'Luffy', 'EP', 'available'),
-  createData('005', '25-Dec-2022', 'Course Transfering', 'Piyaphon Wu', 'Hong', 'EP', 'available'),
-  createData('006', '30-Dec-2022', 'Personal Leaving', 'Sigma Jeff', 'Jeff', 'Teacher', 'myRequest'),
-  createData('007', '15-Dec-2022', 'Personal Leaving', 'Peter Parker', 'Spider', 'Teacher', 'completed'),
-  createData('008', '18-Dec-2022', 'Personal Leaving', 'Fruit Punch', 'Peach', 'Nirawit(Boss)', 'rejected'),
-  createData('009', '27-Dec-2022', 'Course Transfering', 'Pan', 'Pancake', 'EP', 'completed', ''),
-  createData('010', '02-Dec-2022', 'Personal Leaving', 'Class 80', 'Jane', 'Nirawit(Boss)', 'rejected'),
-  createData('011', '02-Dec-2022', 'Course Transfering', 'Tar', 'Shi', 'Teacher', 'rejected'),
+  // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
+  createData(1, '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'available', 'completeReceipt'),
+  createData(2, '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'myRequest', 'incompleteReceipt'),
+  createData(3, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'available', ''),
+  createData(4, '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'available', ''),
+  createData(5, '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'available', ''),
+  createData(6, '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'myRequest', 'completeReceipt'),
+  createData(7, '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
+  createData(8, '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData(9, '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
+  createData(10, '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData(11, '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', ''),
 
 ];
 
@@ -82,7 +86,7 @@ const errorTheme = createTheme({
 
 // ----------------------------------------------------------------------
 
-export default function StaffRequestStatusList() {
+export default function RegistrationRequestStatusList() {
 
   const { themeStretch } = useSettingsContext();
 
@@ -119,8 +123,6 @@ export default function StaffRequestStatusList() {
     filterRole,
   });
 
-  // const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
@@ -133,7 +135,7 @@ export default function StaffRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'available', label: 'Staffs', color: 'warning', count: getLengthByStatus('available') },
+    { value: 'available', label: 'Available Requests', color: 'warning', count: getLengthByStatus('available') },
     { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
@@ -163,8 +165,10 @@ export default function StaffRequestStatusList() {
     setFilterName('');
     setFilterRole('available');
   };
-
+  // console.log('After', tableData)
   const acceptRequest = (currentId, tableData, setTableData) => {
+    // console.log('Before',tableData)
+    // console.log('Accept',currentId)
     const newRow = tableData.find(el => (el.id === currentId))
     newRow.role = 'myRequest';
     const newTableData = tableData.filter(el => el.id !== currentId);
@@ -200,7 +204,7 @@ export default function StaffRequestStatusList() {
           </Tabs>
           <Divider />
 
-          <StaffTableToolbar
+          <RegistrationTableToolbar
             filterName={filterName}
             isFiltered={isFiltered}
             onFilterName={handleFilterName}
@@ -216,30 +220,19 @@ export default function StaffRequestStatusList() {
 
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    // updateRequest === row.id ? <Request row={row} tableData={tableData} setTableData={setTableData}/> :
                     <TableRow
                       hover
                       key={row.id}
                     >
-                      <TableCell align="left" > Q{row.id} </TableCell>
+                      <TableCell align="left" > R{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.requestType}</TableCell>
-                      <TableCell align="left">{row.fullname}</TableCell>
-                      <TableCell align="left">{row.nickname}</TableCell>
+                      <TableCell align="left">{row.courseType}</TableCell>
+                      <TableCell align="left">{row.section}</TableCell>
+                      <TableCell align="center">{row.registeredCourses}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
-                      <TableCell>
-                        <Tooltip title="More Info">
-                          {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>) : (
-                            <IconButton>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>
-                          )}
-                        </Tooltip>
-                      </TableCell>
-                      
-                      {/* {row.receipt === 'incompleteReceipt' ? (
+
+                      {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
                             <Tooltip title="Incomplete Reciept">
@@ -264,7 +257,7 @@ export default function StaffRequestStatusList() {
                             </IconButton>
                           )}
                         </Tooltip>
-                      </TableCell> */}
+                      </TableCell>
 
                     </TableRow>
                   ))}
@@ -328,9 +321,9 @@ function applyFilter({
 
   if (filterName) {
     inputData = inputData.filter((request) =>
-      request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-      request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-      request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+      request.id === parseInt(filterName,10)||
+      request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {

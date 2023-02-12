@@ -48,11 +48,11 @@ function createData(id, requestdate, fullname, nickname, status) {
 }
 
 const TABLE_DATA = [
-    createData('S012', '22-01-2022', 'Saw Zwe Wai Yan', 'Saw', 'pending'),
-    createData('S014', '21-01-2022', 'Siwach Toprasert', 'Pan', 'pending'),
-    createData('S002', '18-01-2022', 'Piyaphon Wu', 'Hong', 'completed'),
-    createData('S251', '25-01-2022', 'Thanatuch Lertritsirikul', 'Tar', 'pending'),
-    createData('S272', '25-02-2022', 'Zain Ijaz Janpatiew', 'Zain', 'completed'),
+    createData(12, '22-01-2022', 'Saw Zwe Wai Yan', 'Saw', 'pending'),
+    createData(14, '21-01-2022', 'Siwach Toprasert', 'Pan', 'pending'),
+    createData(2, '18-01-2022', 'Piyaphon Wu', 'Hong', 'completed'),
+    createData(251, '25-01-2022', 'Thanatuch Lertritsirikul', 'Tar', 'pending'),
+    createData(272, '25-02-2022', 'Zain Ijaz Janpatiew', 'Zain', 'completed'),
 
 ];
 
@@ -182,7 +182,7 @@ export default function CourseTransferRequestList() {
 
                                 {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                                     <TableRow key={row.id} hover>
-                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}> {row.id} </TableCell>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}> S{row.id} </TableCell>
                                         <TableCell align="left">{row.requestdate}</TableCell>
                                         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.fullname}</TableCell>
                                         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.nickname}</TableCell>
@@ -235,8 +235,12 @@ function applyFilter({ inputData, comparator, filterStatus, filterValue }) {
 
     inputData = stabilizedThis.map((el) => el[0]);
 
+    // if (filterValue) {
+    //     inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+    // }
+
     if (filterValue) {
-        inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+        inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue,10));
     }
 
     if (filterStatus !== '') {
