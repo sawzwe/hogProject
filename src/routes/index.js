@@ -10,9 +10,10 @@ import DashboardLayout from '../layouts/dashboard';
 //
 import {
   Page404,
-  PageNewStdent,
   LoginPage,
   RegisterPage,
+  // EP
+  PageNewStdent,
   PageSearchStudent,
   PageEditStudent,
   PageCreateRegistrationRequest,
@@ -22,13 +23,30 @@ import {
   PageChangePassword,
   PageSearchCourseStudent,
   PageSearchTeacher,
+  // EA
   PageDailyCalendar,
   PageRegistrationRequestEA,
   PageStudentRequestEA,
   PageStaffRequestEA,
   PageSearchCourseTeacher,
   PageRegistrationRequestDetail,
-  PageScheduleRegistrationRequest
+  PageScheduleRegistrationRequest,
+  // OA
+  PageNewAccount,
+  PageRegistrationRequestOA,
+  PageLeavingRequestOA,
+  PageRegistrationRequestDetailOA,
+  PageLeavingRequestDetailOA,
+  // Student
+  PageStudentCalendar,
+  PageStudentCourse,
+  PageStudentProfile,
+  PageStudentRequestInbox,
+  // Teacher
+  PageTeacherCalendar,
+  PageTeacherCourse,
+  PageTeacherLeavingRequest,
+  PageTeacherRequestInbox
 }
   from './elements';
 
@@ -43,6 +61,15 @@ export default function Router() {
     }
     if (user.role === 'Education Admin') {
       return 'daily-calendar'
+    }
+    if (user.role === 'Office Admin') {
+      return 'new-account'
+    }
+    if (user.role === 'Student') {
+      return 'student-calendar'
+    }
+    if (user.role === 'Teacher') {
+      return 'teacher-calendar'
     }
     return null;
   };
@@ -174,7 +201,7 @@ export default function Router() {
               )
             },
             {
-              path: 'request-status/:id', 
+              path: 'request-status/:id',
               element: (
                 <RoleBasedGuard roles={['Education Planner']} hasContent>
                   <PageRegistrationRequestDetail />
@@ -251,6 +278,133 @@ export default function Router() {
               )
             }
           ]
+        },
+
+        // OA Content ---------------------------------------------------------------
+        {
+          path: 'new-account', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageNewAccount />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'edit-account',
+          children: [
+            { element: <Navigate to="/dashboard/edit-account" replace />, index: true },
+            {
+              path: 'student',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchStudent />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'teacher',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchTeacher />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'staff',
+              element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageSearchTeacher />
+                </RoleBasedGuard>
+              )
+            }
+          ]
+        },
+        {
+          path: 'registration-request-office-admin', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageRegistrationRequestOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'registration-request-office-admin/:id', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageRegistrationRequestDetailOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'leaving-request-office-admin', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageLeavingRequestOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'leaving-request-office-admin/:id', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageLeavingRequestDetailOA />
+            </RoleBasedGuard>
+          )
+        },
+
+        // Student Content ---------------------------------------------------------------
+        {
+          path: 'student-calendar', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentCalendar />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-course', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentCourse />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-profile', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentProfile />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-inbox', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentRequestInbox />
+            </RoleBasedGuard>
+          )
+        },
+
+        // Teacher Content ---------------------------------------------------------------
+        {
+          path: 'teacher-calendar', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCalendar />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-course', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCourse />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-leaving-request', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherLeavingRequest />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-inbox', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherRequestInbox />
+            </RoleBasedGuard>
+          )
         },
         { path: 'changePassword', element: <PageChangePassword /> }
       ],

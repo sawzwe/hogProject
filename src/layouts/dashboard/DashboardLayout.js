@@ -6,6 +6,9 @@ import { Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // components
 import { useSettingsContext } from '../../components/settings';
+// auth
+import { useAuthContext } from '../../auth/useAuthContext';
+
 //
 import Main from './Main';
 import Header from './header';

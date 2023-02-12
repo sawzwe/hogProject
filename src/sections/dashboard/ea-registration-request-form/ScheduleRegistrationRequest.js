@@ -192,9 +192,7 @@ export default function ScheduleRegistrationRequest({ request }) {
                     </Stack>
                 </DialogTitle>
                 <DialogContent>
-                    {/* <DialogContentText> */}
                     <TextField fullWidth name="rejectedReason" label="Reason" multiline rows={3} sx={{ my: 1 }} onChange={(event) => setRejectedReasonMessage(event.target.value)} required />
-                    {/* </DialogContentText> */}
                 </DialogContent>
                 <DialogActions>
                     <Button color="inherit" variant="outlined" onClick={handleRejectClose}>Cancel</Button>
@@ -411,10 +409,11 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         [`&.${tableCellClasses.head}`]: {
             backgroundColor: theme.palette.divider,
             color: theme.palette.common.black,
+            fontSize: '1vw',
             border: `1px solid ${theme.palette.divider}`,
         },
         [`&.${tableCellClasses.body}`]: {
-            fontSize: 14,
+            fontSize: '1vw',
             border: `1px solid ${theme.palette.divider}`,
 
         },
@@ -433,16 +432,16 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     }
 
     const rows = [
-        createData(new Date('1-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('3-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('8-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('10-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('15-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('17-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('19-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('21-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('22-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
-        createData(new Date('24-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' }, 'Onsite', '-'),
+        createData(new Date('1-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('3-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: 'OT' }, 'Onsite', '-'),
+        createData(new Date('8-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('10-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('15-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('17-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('19-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: 'SP' }, 'Onsite', '-'),
+        createData(new Date('21-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('22-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
+        createData(new Date('24-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
     ];
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -638,7 +637,16 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                         <Grid container direction="row" spacing={2}>
                             {selectedCourse.availableDays.map((eachDay, index) => (
                                 <Grid item xs={6} md={3} key={index}>
-                                    <TextField fullWidth label={eachDay.day} value={`${eachDay.from} - ${eachDay.to}`} disabled />
+                                    <TextField
+                                        fullWidth
+                                        label={eachDay.day}
+                                        value={`${eachDay.from} - ${eachDay.to}`}
+                                        InputProps={{
+                                            style: {
+                                                fontSize: '1vw'
+                                            }
+                                        }}
+                                        disabled />
                                 </Grid>
                             ))}
                         </Grid>
@@ -700,20 +708,19 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 </Grid>
 
                 <Grid item xs={12} md={7}>
-                    <Scrollbar sx={(selectedCourse.availableDays.length > 4 ? { maxHeight: 80 * 6.27 } : { maxHeight: 80 * 5.35 })}>
+                    <Scrollbar sx={(selectedCourse.availableDays.length > 4 ? { maxHeight: 80 * 6.27, pr: 1.5 } : { maxHeight: 80 * 5.35, pr: 1.5 })}>
                         <Typography variant="h6" sx={{ mb: 2 }}> Classes & Schedules </Typography>
                         {!!schedules.length && (
-                            <TableContainer component={Paper}>
-                                <Table sx={{ minWidth: 700 }}>
+                            <TableContainer component={Paper} >
+                                <Table sx={{ minWidth: 800 }}>
                                     <TableHead>
                                         <TableRow>
                                             <StyledTableCell align="center">No.</StyledTableCell>
                                             <StyledTableCell align="center">Day</StyledTableCell>
                                             <StyledTableCell align="center">Date</StyledTableCell>
                                             <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
-                                            <StyledTableCell align="center">Teacher</StyledTableCell>
                                             <StyledTableCell align="center">Method</StyledTableCell>
-                                            <StyledTableCell align="center">Room</StyledTableCell>
+                                            <StyledTableCell align="center">Teacher</StyledTableCell>
                                             <StyledTableCell align="center">Hours</StyledTableCell>
                                             <StyledTableCell align="center" />
                                         </TableRow>
@@ -723,18 +730,17 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                             displayAccumulatedHours += parseInt(row.hoursPerClass, 10);
                                             return (
                                                 <StyledTableRow key={index}>
-                                                    <StyledTableCell component="th" scope="row" sx={{ width: '5%' }} align="center">
+                                                    <StyledTableCell component="th" scope="row" align="center">
                                                         {(index + 1).toString()}
                                                     </StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '5%' }} align="center"> {weekdays[row.date.getDay()].slice(0, 3)} </StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{fDate(row.date)}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{row.time}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '7%' }} align="center">{row.hoursPerClass}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '12%' }} align="center">{row.teacher.nickname}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '10%' }} align="center">{row.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '10%' }} align="center">{row.room}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '10%' }} align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '8%', p: 0 }} align="center" > {!isView && (
+                                                    <StyledTableCell align="center"> {weekdays[row.date.getDay()].slice(0, 3)} </StyledTableCell>
+                                                    <StyledTableCell align="center">{fDate(row.date)}</StyledTableCell>
+                                                    <StyledTableCell align="center">{row.time}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '8%' }} align="center">{row.hoursPerClass}</StyledTableCell>
+                                                    <StyledTableCell align="center">{row.method}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${row.teacher.nickname.toUpperCase()}`} {!!row.teacher.workTimeType && `(${row.teacher.workTimeType})` }</StyledTableCell>
+                                                    <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
+                                                    <StyledTableCell align="center" > {!isView && (
                                                         <IconButton onClick={() => handleOpenEditDialog(row)}>
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
@@ -743,7 +749,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                             )
                                         })}
                                         <StyledTableRow>
-                                            <StyledTableCell colSpan={8} align="center">TOTAL</StyledTableCell>
+                                            <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
                                             <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
                                             <StyledTableCell />
                                         </StyledTableRow>
@@ -886,33 +892,6 @@ export function EditScheduleDialog({ open, close, schedule, onEdit }) {
                     <Grid item xs={12} md={3}>
                         <RHFSelect
                             fullWidth
-                            name="scheduleTeacher"
-                            label="Teacher"
-                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                            required>
-                            {TEACHER_OPTIONS.map((eachTeacher, index) => (
-                                <MenuItem
-                                    key={index}
-                                    value={eachTeacher.id}
-                                    sx={{
-                                        mx: 1,
-                                        my: 0.5,
-                                        borderRadius: 0.75,
-                                        typography: 'body2',
-                                        textTransform: 'capitalize',
-                                        '&:first-of-type': { mt: 0 },
-                                        '&:last-of-type': { mb: 0 },
-                                    }}
-                                >
-                                    {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fName} ${eachTeacher.lName})`}
-                                </MenuItem>
-                            ))}
-                        </RHFSelect>
-                    </Grid>
-
-                    <Grid item xs={12} md={3}>
-                        <RHFSelect
-                            fullWidth
                             name="teacherAvailableTime"
                             label="Available Time"
                             SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
@@ -932,6 +911,33 @@ export function EditScheduleDialog({ open, close, schedule, onEdit }) {
                                     }}
                                 >
                                     {eachTime}
+                                </MenuItem>
+                            ))}
+                        </RHFSelect>
+                    </Grid>
+
+                    <Grid item xs={12} md={3}>
+                        <RHFSelect
+                            fullWidth
+                            name="scheduleTeacher"
+                            label="Teacher"
+                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                            required>
+                            {TEACHER_OPTIONS.map((eachTeacher, index) => (
+                                <MenuItem
+                                    key={index}
+                                    value={eachTeacher.id}
+                                    sx={{
+                                        mx: 1,
+                                        my: 0.5,
+                                        borderRadius: 0.75,
+                                        typography: 'body2',
+                                        textTransform: 'capitalize',
+                                        '&:first-of-type': { mt: 0 },
+                                        '&:last-of-type': { mb: 0 },
+                                    }}
+                                >
+                                    {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fName} ${eachTeacher.lName})`}
                                 </MenuItem>
                             ))}
                         </RHFSelect>

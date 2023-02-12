@@ -69,7 +69,7 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
         <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}
             PaperProps={{
                 sx: {
-                    '&::-webkit-scrollbar': { display: 'none' }
+                    '&::-webkit-scrollbar': { display: 'none' },
                 }
             }}>
             <Grid container spacing={1}>
@@ -129,11 +129,11 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
                             />
                         </Stack>
 
-                        <Stack spacing={1} sx={{ pb: 1 }}>
+                        <Stack spacing={1}>
                             {!!course?.subjects &&
                                 <>
                                     <Typography variant="subtitle1"> Available subjects </Typography>
-                                    <RHFMultiCheckbox name="groupSelectedSubjects" options={currentSubjects} sx={{ my: 1, mx: 1 }} />
+                                    <RHFMultiCheckbox name="groupSelectedSubjects" options={currentSubjects} sx={{ mt: 1, mx: 1 }} />
                                 </>
 
                             }
@@ -144,7 +144,6 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
                     <Scrollbar sx={{ maxHeight: 80 * 5 }}>
                         <Stack justifyContent="flex-start" sx={{ py: 1, px: 3 }} >
                             <Typography variant="h6" sx={{ mb: 2 }}> Classes & Schedules </Typography>
-                            <Divider />
                             {currentSubjects.map((subject, index) => (
                                 // Check if subject is selected and get more information from the subject
                                 groupSelectedSubjects.some((selectedSubject) => selectedSubject === subject.value) &&
@@ -167,7 +166,7 @@ export default function AddCourseGroupDetailDialog({ open, close, course, onSele
                     </Scrollbar>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ p: 3 }}>
+                    <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ p: 3, pt: 0 }}>
                         <Button
                             variant="contained"
                             sx={{ height: '3em', width: '6em' }}

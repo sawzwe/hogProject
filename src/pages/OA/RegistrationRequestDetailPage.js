@@ -7,7 +7,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import RegistrationRequestDetail from '../../sections/dashboard/ep-registration-request-form/RegistrationRequestDetail'
+import RegistrationRequestDetail from '../../sections/dashboard/oa-registration-request-form/RegistrationRequestDetail'
 
 // ----------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ const MOCKUP_GROUP_REQUEST = {
         }
     ],
     attachedPayment: [],
-    paymentType: 'Complete Payment',
+    paymentType: 'Installments Payment',
     additionalComment: '✌ Greeting from Education Planner.',
     rejectedReason: '',
     status: 'Pending OA'
@@ -79,10 +79,10 @@ const MOCKUP_PRIVATE_REQUEST = {
         }
     ],
     attachedPayment: [],
-    paymentType: 'Complete Payment',
     additionalComment: '✌ Greeting from Education Planner.',
+    paymentType: 'Complete Payment',
     rejectedReason: 'There is no available time slot 🤪',
-    status: 'Pending Payment'
+    status: 'Pending OA'
 }
 
 // ----------------------------------------------------------------------
@@ -90,25 +90,22 @@ const MOCKUP_PRIVATE_REQUEST = {
 export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
 
-    // Request ID
     const { id } = useParams();
 
-    // const currentRequest = _regRequests.find((request) => request.id === requestId);
-    // const currentRequest = MOCKUP_GROUP_REQUEST;
     const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>
             <Helmet>
-                <title> EP | Request Detail </title>
+                <title> OA | Registration Request </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
                     heading="Course Registration Request"
                     links={[
-                        { name: 'Request Status', href: PATH_DASHBOARD.courseRegistration.requestStatus },
-                        { name: 'Request Detail ' }
+                        { name: 'All Requests', href: PATH_DASHBOARD.registrationRequestOA },
+                        { name: 'Request Detail' }
                     ]}
                 />
 

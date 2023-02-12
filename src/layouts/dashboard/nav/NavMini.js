@@ -10,7 +10,7 @@ import { NavSectionMini } from '../../../components/nav-section';
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import {EPnavConfig, EAnavConfig, OAnavConfig} from './config';
+import {EPNavConfig, EANavConfig, OANavConfig} from './config';
 
 // ----------------------------------------------------------------------
 
@@ -19,15 +19,15 @@ export default function NavMini() {
 
   function getNavConfig(err) {
     if (user.role === "Education Planner") {
-      return EPnavConfig
+      return EPNavConfig
     }
 
     if (user.role === "Education Admin") {
-      return EAnavConfig
+      return EANavConfig
     } 
     
     if (user.role === "Office Admin") {
-      return OAnavConfig
+      return OANavConfig
     }
 
     return err;
