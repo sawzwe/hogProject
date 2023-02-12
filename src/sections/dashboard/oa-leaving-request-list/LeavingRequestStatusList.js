@@ -39,38 +39,38 @@ import {
   TablePaginationCustom,
 } from '../../../components/table';
 // sections
-import RegistrationTableToolbar from './RegistrationTableToolbar';
+import LeavingTableToolbar from './LeavingTableToolbar';
 
-function createData(id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt) {
-  return { id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt };
+function createData(id, requestDate, fullname, nickname, role) {
+  return { id, requestDate, fullname, nickname, role };
 }
 
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'courseType', label: 'Course Type', align: 'left' },
-  { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
-  { id: 'incomplete' },
+  { id: 'courseType', label: 'Lecturer Name', align: 'left' },
+  { id: 'section ', label: 'Lecturer Nickname', align: 'left', width: 200 },
   { id: 'moreInfo' },
 ];
 
-const TABLE_DATA_REQUESTS = [
-  // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
-  createData(222, '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
-  createData(102, '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'pendingPayment', 'incompleteReceipt'),
-  createData(545, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'pendingEA', ''),
-  createData(565, '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData(585, '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData(458, '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
-  createData(123, '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData(451, '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData(111, '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData(333, '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData(845, '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', ''),
-];
+// const TABLE_DATA_REQUESTS = [
+//   // Table {  RID,    Req Date ,    Fullname , Nickname    role}
+//   createData('R302', '28-Nov-2022', 'Piyapat Arunrung', 'Tem ', 'all'),
+//   createData('R888', '15-Dec-2022', 'Kanokpong Natapiwat', 'Champ', 'approved'),
+//   createData('R345', '28-Nov-2022', 'Chalathip Treewanich', 'Pie', 'all'),
+//   createData('R222', '02-Dec-2022', 'Surawat Udompak', 'Tle', 'rejected'),
+//   createData('R892', '02-Dec-2022', 'Jaree Jantaraprasert', 'Kun', 'rejected'),
+// ];
 
+const TABLE_DATA_REQUESTS = [
+  // Table {  RID,    Req Date ,    Fullname , Nickname    role}
+  createData(1, '28-Nov-2022', 'Piyapat Arunrung', 'Tem ', 'all'),
+  createData(2, '15-Dec-2022', 'Kanokpong Natapiwat', 'Champ', 'approved'),
+  createData(3, '28-Nov-2022', 'Chalathip Treewanich', 'Pie', 'all'),
+  createData(4, '02-Dec-2022', 'Surawat Udompak', 'Tle', 'rejected'),
+  createData(5, '02-Dec-2022', 'Jaree Jantaraprasert', 'Kun', 'rejected'),
+
+];
 const errorTheme = createTheme({
   palette: {
     primary: {
@@ -121,7 +121,7 @@ export default function RegistrationRequestStatusList() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('pendingEA');
+  const [filterRole, setFilterRole] = useState('all');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -135,7 +135,7 @@ export default function RegistrationRequestStatusList() {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'pendingEA' || filterName !== '';
+    filterRole !== 'all' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -144,10 +144,8 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'pendingEA', label: 'Pending for EA', color: 'warning', count: getLengthByStatus('pendingEA') },
-    { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA', color: 'warning', count: getLengthByStatus('pendingOA') },
-    { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
+    { value: 'all', label: 'All', color: 'warning', count: getLengthByStatus('all') },
+    { value: 'approved', label: 'Approved', count: getLengthByStatus('approved'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
 
@@ -202,7 +200,7 @@ export default function RegistrationRequestStatusList() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('pendingEA');
+    setFilterRole('all');
   };
 
   return (
@@ -246,7 +244,7 @@ export default function RegistrationRequestStatusList() {
           </Tabs>
           <Divider />
 
-          <RegistrationTableToolbar
+          <LeavingTableToolbar
             filterName={filterName}
             isFiltered={isFiltered}
             onFilterName={handleFilterName}
@@ -268,25 +266,9 @@ export default function RegistrationRequestStatusList() {
                     >
                       <TableCell align="left" > R{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.courseType}</TableCell>
-                      <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.registeredCourses}</TableCell>
-                      <TableCell align="left">{row.requestedBy}</TableCell>
-
-                      {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Tooltip title="Incomplete Reciept">
-                              <IconButton color='primary'>
-                                <Iconify icon="ic:error" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </ThemeProvider>
-                      ) :
-                        <TableCell align="left" />
-                      }
-
+                      <TableCell align="left">{row.fullname}</TableCell>
+                      <TableCell align="left">{row.nickname}</TableCell>
+                      
                       <TableCell>
                         <Tooltip title="More Info">
                           <IconButton>
@@ -342,22 +324,17 @@ function applyFilter({
   inputData = stabilizedThis.map((el) => el[0]);
 
   // if (filterName) {
-  //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+  //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   // }
+
   if (filterName) {
-    inputData = inputData.filter((request) =>   request.id === parseInt(filterName,10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => request.id === parseInt(filterName,10) || request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
+
 
   if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
   }
-
-  // if (filterStatus !== 'completed') {
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
-  // else if (filterRole === 'rejected' || filterRole ==='completed'){
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
 
   return inputData;
 }

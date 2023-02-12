@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import sumBy from 'lodash/sumBy';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // @mui
+import { useTheme } from '@mui/material/styles';
 import {
   Tab,
   Tabs,
@@ -16,11 +18,15 @@ import {
   TableContainer,
   TableRow,
   TableCell, createTheme, ThemeProvider,
+  Typography
 } from '@mui/material';
+// utils
+import { fTimestamp } from '../../../utils/formatTime';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
+import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
 import {
   useTable,
@@ -29,52 +35,50 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
+  TableSelectedAction,
   TablePaginationCustom,
 } from '../../../components/table';
 // sections
-import StudentTableToolbar from './StudentTableToolbar';
-import ConfirmDialog from '../../../components/confirm-dialog';
+import RegistrationTableToolbar from './RegistrationTableToolbar';
 // import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
 
-function createData(id, requestDate, requestType, fullname, nickname, requestedBy, role) {
-  return { id, requestDate, requestType, fullname, nickname, requestedBy, role};
+// {Condition=== true && ()}
+// {Condition=== true ? () : (else)}
+
+function createData(id, requestDate, courseType, section, paymentType, requestedBy, role, receipt) {
+  return { id, requestDate, courseType, section, paymentType, requestedBy, role, receipt };
 }
 
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'requestType', label: 'Request Type', align: 'left' },
-  { id: 'fullname ', label: 'Fullname', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Nickname', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Role', align: 'left' },
+  { id: 'courseType', label: 'Course Type', align: 'left' },
+  { id: 'section ', label: 'Section', align: 'left', width: 200 },
+  { id: 'paymentType', label: 'Payment Type', align: 'left', width: 200 },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
+  { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
 
 const TABLE_DATA_REQUESTS = [
-  // Table {  RID,    Req Date ,     requestType,     fullname,           regiscourses, requestedBy,      role,   Receipt }
-  createData('001', '30-Oct-2022', 'Hour Adjustment', 'Alpha Zain', 'Zain', 'Nirawit(Boss)', 'available'),
-  createData('002', '16-Nov-2022', 'Hour Adjustment', 'Thanatuch Lertritsirkul', 'Tar', 'EP', 'myRequest'),
-  createData('003', '28-Nov-2022', 'Hour Adjustment', 'Saw Zwe Wai Yan', 'Saw', 'Teacher', 'available'),
-  createData('004', '30-Nov-2022', 'Hour Adjustment', 'Monkey D.', 'Luffy', 'EP', 'available'),
-  createData('005', '25-Dec-2022', 'Hour Adjustment', 'Piyaphon Wu', 'Hong', 'EP', 'available'),
-  createData('006', '30-Dec-2022', 'Hour Adjustment', 'Sigma Jeff', 'Jeff', 'Teacher', 'myRequest'),
-  createData('007', '15-Dec-2022', 'Hour Adjustment', 'Peter Parker', 'Spider', 'Teacher', 'completed'),
-  createData('008', '18-Dec-2022', 'Hour Adjustment', 'Fruit Punch', 'Peach', 'Nirawit(Boss)', 'rejected'),
-  createData('009', '27-Dec-2022', 'Hour Adjustment', 'Pan', 'Pancake', 'EP', 'completed', ''),
-  createData('010', '02-Dec-2022', 'Hour Adjustment', 'Class 80', 'Jane', 'Nirawit(Boss)', 'rejected'),
-  createData('011', '02-Dec-2022', 'Hour Adjustment', 'Tar', 'Shi', 'Teacher', 'rejected'),
+  // Table {  RID,    Req Date ,     courseType,     section,           paymentType, requestedBy,      role,   Receipt }
+  createData(222, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', "Full Payment", 'Nirawit(Boss)', 'all', 'completeReceipt'),
+  createData(125, '15-Dec-2022', 'Group', 'Class 50', "Full Payment", 'Nirawit(Boss)', 'completed', ''),
+  createData(128, '28-Nov-2022', 'Private', 'Zain', "Installment", 'Nirawit(Boss)', 'all', 'incompleteReceipt'),
+  createData(258, '02-Dec-2022', 'Group', 'Class 80', "Full Payment", 'Nirawit(Boss)', 'rejected', ''),
+  createData(545, '02-Dec-2022', 'Private', 'Tar', "Full Payment", 'Nirawit(Boss)', 'rejected', ''),
 
 ];
-
-
 const errorTheme = createTheme({
   palette: {
     primary: {
+      // Purple and green play nicely together.
       main: '#D12E24',
     },
     secondary: {
+      // This is green.A700 as hex.
       main: '#D12E24',
     },
   },
@@ -82,9 +86,11 @@ const errorTheme = createTheme({
 
 // ----------------------------------------------------------------------
 
-export default function StaffRequestStatusList() {
+export default function RegistrationRequestStatusList() {
 
   const { themeStretch } = useSettingsContext();
+
+  const navigate = useNavigate();
 
   const {
     dense,
@@ -93,6 +99,13 @@ export default function StaffRequestStatusList() {
     orderBy,
     rowsPerPage,
     setPage,
+    //
+    selected,
+    setSelected,
+    onSelectRow,
+    onSelectAllRows,
+    //
+    onSort,
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
@@ -106,11 +119,9 @@ export default function StaffRequestStatusList() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('available');
-
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [currentId, setCurrentId] = useState(-1);
+  const [filterRole, setFilterRole] = useState('all');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -119,12 +130,12 @@ export default function StaffRequestStatusList() {
     filterRole,
   });
 
-  // const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'available' || filterName !== '';
+    filterRole !== 'all' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -133,11 +144,19 @@ export default function StaffRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'available', label: 'Students', color: 'warning', count: getLengthByStatus('available') },
-    { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
+    { value: 'all', label: 'All', color: 'warning', count: getLengthByStatus('all') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
+
+
+  const handleOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
 
 
   const handleFilterRole = (event, newValue) => {
@@ -150,27 +169,40 @@ export default function StaffRequestStatusList() {
     setFilterName(event.target.value);
   };
 
-  const handleOpenConfirm = (currentId) => {
-    setCurrentId(currentId);
-    setOpenConfirm(true);
+  const handleDeleteRow = (id) => {
+    const deleteRow = tableData.filter((row) => row.id !== id);
+    setSelected([]);
+    setTableData(deleteRow);
+
+    if (page > 0) {
+      if (dataInPage.length < 2) {
+        setPage(page - 1);
+      }
+    }
   };
 
-  const handleCloseConfirm = () => {
-    setOpenConfirm(false);
+  const handleDeleteRows = (selected) => {
+    const deleteRows = tableData.filter((row) => !selected.includes(row.id));
+    setSelected([]);
+    setTableData(deleteRows);
+
+    if (page > 0) {
+      if (selected.length === dataInPage.length) {
+        setPage(page - 1);
+      } else if (selected.length === dataFiltered.length) {
+        setPage(0);
+      } else if (selected.length > dataInPage.length) {
+        const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
+        setPage(newPage);
+      }
+    }
   };
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('available');
+    setFilterRole('all');
   };
 
-  const acceptRequest = (currentId, tableData, setTableData) => {
-    const newRow = tableData.find(el => (el.id === currentId))
-    newRow.role = 'myRequest';
-    const newTableData = tableData.filter(el => el.id !== currentId);
-    setTableData([...newTableData, newRow])
-    setOpenConfirm(false);
-  };
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -183,8 +215,20 @@ export default function StaffRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-
-            {TABS.map((tab) => (
+            {TABS.map((tab) =>
+            (tab.value === 'completed' || tab.value === 'rejected' ? (
+              <Tab
+                key={tab.value}
+                value={tab.value}
+                label={tab.label}
+                style={{float: 'right' }}
+                icon={
+                  <Label color={tab.color} sx={{ mr: 1 }}>
+                    {tab.count}
+                  </Label>
+                }
+                centered
+              />) : (
               <Tab
                 key={tab.value}
                 value={tab.value}
@@ -195,12 +239,12 @@ export default function StaffRequestStatusList() {
                     {tab.count}
                   </Label>
                 }
-              />
-            ))}
+              />))
+            )}
           </Tabs>
           <Divider />
 
-          <StudentTableToolbar
+          <RegistrationTableToolbar
             filterName={filterName}
             isFiltered={isFiltered}
             onFilterName={handleFilterName}
@@ -220,26 +264,14 @@ export default function StaffRequestStatusList() {
                       hover
                       key={row.id}
                     >
-                      <TableCell align="left" > Q{row.id} </TableCell>
+                      <TableCell align="left" > R{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.requestType}</TableCell>
-                      <TableCell align="left">{row.fullname}</TableCell>
-                      <TableCell align="left">{row.nickname}</TableCell>
+                      <TableCell align="left">{row.courseType}</TableCell>
+                      <TableCell align="left">{row.section}</TableCell>
+                      <TableCell align="center">{row.paymentType}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
-                      <TableCell>
-                        <Tooltip title="More Info">
-                          {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>) : (
-                            <IconButton>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>
-                          )}
-                        </Tooltip>
-                      </TableCell>
-                      
-                      {/* {row.receipt === 'incompleteReceipt' ? (
+
+                      {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
                             <Tooltip title="Incomplete Reciept">
@@ -255,16 +287,11 @@ export default function StaffRequestStatusList() {
 
                       <TableCell>
                         <Tooltip title="More Info">
-                          {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>) : (
-                            <IconButton>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>
-                          )}
+                          <IconButton>
+                            <Iconify icon="ic:chevron-right" />
+                          </IconButton>
                         </Tooltip>
-                      </TableCell> */}
+                      </TableCell>
 
                     </TableRow>
                   ))}
@@ -272,24 +299,11 @@ export default function StaffRequestStatusList() {
                   <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
 
                   <TableNoData isNotFound={isNotFound} />
-
                 </TableBody>
               </Table>
             </Scrollbar>
           </TableContainer>
-          <ConfirmDialog
-            open={openConfirm}
-            onClose={handleCloseConfirm}
-            title="Take the Request"
-            content="Once the request is taken, only you can see the request and proceed it."
-            action={
-              <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
-                <Link to= {`/dashboard/registration-request/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
-                Take Request
-                </Link>
-              </Button>
-            }
-          />
+
           <TablePaginationCustom
             count={dataFiltered.length}
             page={page}
@@ -302,8 +316,6 @@ export default function StaffRequestStatusList() {
           />
         </Card>
       </Container>
-
-
     </>
   );
 }
@@ -314,6 +326,7 @@ function applyFilter({
   inputData,
   comparator,
   filterName,
+  filterStatus,
   filterRole,
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
@@ -326,16 +339,24 @@ function applyFilter({
 
   inputData = stabilizedThis.map((el) => el[0]);
 
+  // if (filterName) {
+  //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+  // }
+
   if (filterName) {
-    inputData = inputData.filter((request) =>
-      request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-      request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-      request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => request.id === parseInt(filterName,10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
   }
+
+  // if (filterStatus !== 'completed') {
+  //   inputData = inputData.filter((request) => request.status === filterStatus);
+  // }
+  // else if (filterRole === 'rejected' || filterRole ==='completed'){
+  //   inputData = inputData.filter((request) => request.status === filterStatus);
+  // }
 
   return inputData;
 }

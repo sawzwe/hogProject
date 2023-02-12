@@ -21,24 +21,24 @@ function createData(id, fullname, nickname) {
 }
 
 const TABLE_DATA = [
-  createData('S012', 'Saw Zwe Wai Yan', 'Saw'),
-  createData('S015', 'Siwach Toprasert', 'Pan'),
-  createData('S879', 'Piyaphon Wu', 'Hong'),
-  createData('S122', 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData('S002', 'Thanatuch Lertritsirikul', 'Tar'),
-  createData('S272', 'Zain Ijaz Janpatiew', 'Zain'),
-  createData('S662', 'Saw Zwe Wai Yan', 'Saw'),
-  createData('S085', 'Siwach Toprasert', 'Pan'),
-  createData('S052', 'Piyaphon Wu', 'Hong'),
-  createData('S162', 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData('S422', 'Thanatuch Lertritsirikul', 'Tar'),
-  createData('S984', 'Zain Ijaz Janpatiew', 'Zain'),
-  createData('S155', 'Saw Zwe Wai Yan', 'Saw'),
-  createData('S468', 'Siwach Toprasert', 'Pan'),
-  createData('S777', 'Piyaphon Wu', 'Hong'),
-  createData('S666', 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData('S333', 'Thanatuch Lertritsirikul', 'Tar'),
-  createData('S222', 'Zain Ijaz Janpatiew', 'Zain'),
+  createData(12, 'Saw Zwe Wai Yan', 'Saw'),
+  createData(15, 'Siwach Toprasert', 'Pan'),
+  createData(879, 'Piyaphon Wu', 'Hong'),
+  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData(2, 'Thanatuch Lertritsirikul', 'Tar'),
+  createData(272, 'Zain Ijaz Janpatiew', 'Zain'),
+  createData(662, 'Saw Zwe Wai Yan', 'Saw'),
+  createData(85, 'Siwach Toprasert', 'Pan'),
+  createData(52, 'Piyaphon Wu', 'Hong'),
+  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData(422, 'Thanatuch Lertritsirikul', 'Tar'),
+  createData(984, 'Zain Ijaz Janpatiew', 'Zain'),
+  createData(155, 'Saw Zwe Wai Yan', 'Saw'),
+  createData(468, 'Siwach Toprasert', 'Pan'),
+  createData(777, 'Piyaphon Wu', 'Hong'),
+  createData(666, 'Jeffrey Zhi Chi Chong', 'Jeff'),
+  createData(333, 'Thanatuch Lertritsirikul', 'Tar'),
+  createData(222, 'Zain Ijaz Janpatiew', 'Zain'),
 
 ];
 
@@ -153,7 +153,7 @@ export default function SortingSelecting() {
                  hover
                 key={row.id}
                 >
-                  <TableCell align="left" > {row.id} </TableCell>
+                  <TableCell align="left" > S{row.id} </TableCell>
                   <TableCell align="left">{row.fullname}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
@@ -202,7 +202,7 @@ function applyFilter({ inputData, comparator,filterValue }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
 }
 
   return inputData;
