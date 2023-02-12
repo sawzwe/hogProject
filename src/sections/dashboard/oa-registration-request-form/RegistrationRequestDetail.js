@@ -20,13 +20,16 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Divider
+    Divider,
+    DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // components
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
+import { Upload } from '../../../components/upload';
 import FormProvider, { RHFUpload, RHFRadioGroup } from '../../../components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -38,6 +41,10 @@ RegistrationRequestDetail.propTypes = {
 // ----------------------------------------------------------------------
 
 export default function RegistrationRequestDetail({ request }) {
+
+    const [openAcceptDialog, setOpenAcceptDialog] = useState(false);
+    const [openSendBackDialog, setOpenSendBackDialog] = useState(false);
+
     if (!request) {
         return null;
     }
@@ -66,15 +73,13 @@ export default function RegistrationRequestDetail({ request }) {
                 <CourseSection courseType={courseType} courses={courses} />
             </Grid>
 
-            {status !== 'Pending EA' && (
-                <Grid item xs={12} md={12}>
-                    <AttachedPayment
-                        courseType={courseType}
-                        payment={attachedPayment}
-                        paymentType={paymentType}
-                        status={status} />
-                </Grid>
-            )}
+            <Grid item xs={12} md={12}>
+                <AttachedPayment
+                    courseType={courseType}
+                    payment={attachedPayment}
+                    paymentType={paymentType}
+                    status={status} />
+            </Grid>
 
             <Grid item xs={12} md={12}>
                 <AdditionalCommentSection message={additionalComment} />
@@ -86,23 +91,114 @@ export default function RegistrationRequestDetail({ request }) {
                 </Grid>
             )}
 
-            <Grid item xs={12} md={12}>
-                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                    {status === 'Pending Payment' && (
-                        <>
-                            <LoadingButton variant="contained" color="error" sx={{ height: '3em' }}>
-                                Reject
-                            </LoadingButton>
-                            <LoadingButton variant="contained" color="primary" sx={{ height: '3em' }}>
-                                Submit
-                            </LoadingButton>
-                        </>
-                    )}
-                </Stack>
-            </Grid>
+            {status === 'Pending OA' && (
+                <Grid item xs={12} md={12}>
+                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                        <LoadingButton variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => setOpenSendBackDialog(true)}>
+                            Send back to EP
+                        </LoadingButton>
+                        <LoadingButton variant="contained" color="primary" sx={{ height: '3em' }} onClick={() => setOpenAcceptDialog(true)}>
+                            Accept
+                        </LoadingButton>
+                    </Stack>
+                    <AcceptDialog open={openAcceptDialog} close={() => setOpenAcceptDialog(false)} />
+                    <SendBackDialog open={openSendBackDialog} close={() => setOpenSendBackDialog(false)} />
+                </Grid>
+            )}
         </Grid>
     )
 
+}
+
+// ----------------------------------------------------------------------
+
+AcceptDialog.propTypes = {
+    open: PropTypes.bool,
+    close: PropTypes.func,
+}
+
+export function AcceptDialog({ open, close }) {
+
+    const onAccept = () => {
+        console.log('accept')
+        close();
+    }
+
+    return (
+        <Dialog
+            open={open}
+            onClose={close}
+            maxWidth="sm"
+        >
+            <DialogTitle>
+                <Stack direction="row" alignItems="center" justifyContent="flex-start">
+                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    <Typography variant="h5">Accept the request?</Typography>
+                </Stack>
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    If you accept, the class schedule will be updated on both teacher and student mobile applications.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button color="inherit" variant="outlined" onClick={close}>Cancel</Button>
+                <LoadingButton variant="contained" onClick={onAccept} color="primary">
+                    Accept
+                </LoadingButton>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+// ----------------------------------------------------------------------
+
+SendBackDialog.propTypes = {
+    open: PropTypes.bool,
+    close: PropTypes.func,
+}
+
+export function SendBackDialog({ open, close }) {
+
+    const [sendingBackReason, setSendingBackReason] = useState('');
+
+    const onSendBack = () => {
+        console.log('Sent Back')
+        close();
+    }
+
+    return (
+        <Dialog
+            open={open}
+            onClose={close}
+            maxWidth="sm"
+            fullWidth
+        >
+            <DialogTitle>
+                <Stack direction="row" alignItems="center" justifyContent="flex-start">
+                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    <Typography variant="h5">Reason of sending back to EP</Typography>
+                </Stack>
+            </DialogTitle>
+            <DialogContent>
+                <TextField
+                    fullWidth
+                    name="sendingBackReason"
+                    label="Reason"
+                    multiline
+                    rows={3}
+                    sx={{ my: 1 }}
+                    onChange={(event) => setSendingBackReason(event.target.value)}
+                    required />
+            </DialogContent>
+            <DialogActions>
+                <Button color="inherit" variant="outlined" onClick={close}>Cancel</Button>
+                <LoadingButton variant="contained" onClick={onSendBack} color="error">
+                    Confirm
+                </LoadingButton>
+            </DialogActions>
+        </Dialog>
+    )
 }
 
 // ----------------------------------------------------------------------
@@ -409,38 +505,6 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
         }
     })
 
-    const {
-        watch,
-        setValue,
-    } = methods;
-
-    const values = watch();
-
-    const { paymentAttachmentFiles } = values
-
-    // Payment Attachment Files ------------------------------------------------------------
-    const handleDropFiles = useCallback(
-        (acceptedFiles) => {
-            const files = paymentAttachmentFiles || [];
-            const newFiles = acceptedFiles.map((file) =>
-                Object.assign(file, {
-                    preview: URL.createObjectURL(file),
-                })
-            );
-            setValue('paymentAttachmentFiles', [...files, ...newFiles]);
-        },
-        [setValue, paymentAttachmentFiles]
-    );
-
-    const handleRemoveFile = (inputFile) => {
-        const filtered = paymentAttachmentFiles && paymentAttachmentFiles?.filter((file) => file !== inputFile);
-        setValue('paymentAttachmentFiles', filtered);
-    };
-
-    const handleRemoveAllFiles = () => {
-        setValue('paymentAttachmentFiles', []);
-    };
-
     return (
         <FormProvider methods={methods}>
             <Grid item xs={12} md={12}>
@@ -450,15 +514,17 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
                             mb: 2,
                             display: 'block',
                         }}>Additional Files</Typography>
-                    <RHFRadioGroup
-                        name="paymentType"
-                        options={PAYMENT_TYPE_OPTIONS}
-                        sx={{
-                            '& .MuiFormControlLabel-root': { mr: 4 },
-                        }}
-                        required
-                        disabled={(status !== 'Pending Payment')}
-                    />
+
+                        <RHFRadioGroup
+                            name="paymentType"
+                            options={PAYMENT_TYPE_OPTIONS}
+                            sx={{
+                                '& .MuiFormControlLabel-root': { mr: 4 },
+                            }}
+                            required
+                            disabled={(status !== 'Pending Payment')}
+                        />
+
                     <Box
                         rowGap={3}
                         columnGap={2}
@@ -468,28 +534,14 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
                             sm: 'repeat(1, 1fr)',
                         }}
                         sx={{ mt: 2 }}
-                    >
-                        {status === 'Pending Payment' && (
-                            <RHFUpload
-                                multiple
-                                thumbnail
-                                name="paymentAttachmentFiles"
-                                maxSize={3145728}
-                                onDrop={handleDropFiles}
-                                onRemove={handleRemoveFile}
-                                onRemoveAll={handleRemoveAllFiles}
-                            />
-                        )}
-                        {status !== 'Pending EA' && status !== 'Pending Payment' && (
-                            <RHFUpload
-                                multiple
-                                thumbnail
-                                disabled
-                                name="paymentAttachmentFiles"
-                                maxSize={3145728}
-                            />
-                        )}
-                    </Box>
+                    />
+                    <Upload
+                        multiple
+                        thumbnail
+                        disabled
+                        name="paymentAttachmentFiles"
+                        maxSize={3145728}
+                    />
                 </Card>
             </Grid>
         </FormProvider>

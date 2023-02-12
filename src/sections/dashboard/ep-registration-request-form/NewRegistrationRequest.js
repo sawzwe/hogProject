@@ -9,7 +9,7 @@ import { LoadingButton } from '@mui/lab';
 import { Typography, MenuItem, Grid, Stack, Card, Box, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // components
-import FormProvider, { RHFSelect, RHFUpload, RHFTextField } from '../../../components/hook-form';
+import FormProvider, { RHFSelect, RHFUpload, RHFTextField, RHFRadioGroup } from '../../../components/hook-form';
 import { AddStudentForm, AddCourseForm } from '.';
 
 // ----------------------------------------------------------------------
@@ -18,11 +18,16 @@ const COURSE_TYPE_OPTIONS = [
     { id: 1, name: 'Group' },
     { id: 2, name: 'Private' },
     { id: 3, name: 'Semi Private' }
-]
+];
 
-const MAX_STUDENTS_PER_REQUEST = 1
+const PAYMENT_TYPE_OPTIONS = [
+    { value: 'Complete Payment', label: 'Complete Payment' },
+    { value: 'Installments Payment', label: 'Installments Payment' }
+];
 
-const MAX_STUDENTS_PER_REQUEST_SEMI_PRIVATE = 15
+const MAX_STUDENTS_PER_REQUEST = 1;
+
+const MAX_STUDENTS_PER_REQUEST_SEMI_PRIVATE = 15;
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +45,7 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
         students: Yup.array().required('At least one student is required'),
         courses: Yup.array().required('At least one course is required'),
         paymentAttachmentFiles: Yup.array().required('At least one payment attachment file is required'),
+        paymentType: Yup.string().required('Payment type is required'),
         additionalComment: Yup.string()
     });
 
@@ -50,9 +56,11 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
             courses: currentRequest?.courses || [],
             groupSelectedSubjects: [],
             paymentAttachmentFiles: currentRequest?.paymentAttachmentFiles || [],
+            paymentType: '',
             additionalComment: currentRequest?.additionalComment || '',
             // Private or Semi Private
             newCourseType: 'Existing Course',
+            section: '',
             newCourse: '',
             newSubject: '',
             newLevel: '',
@@ -197,31 +205,40 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
     return (
         <FormProvider methods={methods} onSubmit={(event) => { handleClickSubmitOpen(event) }}>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={5}>
-                    <RHFSelect
-                        name="courseType"
-                        label="Course Type"
-                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                        onChange={handleChangeCourseType}>
-                        {COURSE_TYPE_OPTIONS.map((option) => (
-                            <MenuItem
-                                key={option.id}
-                                value={option.name}
-                                sx={{
-                                    mx: 1,
-                                    my: 0.5,
-                                    borderRadius: 0.75,
-                                    typography: 'body2',
-                                    textTransform: 'capitalize',
-                                    '&:first-of-type': { mt: 0 },
-                                    '&:last-of-type': { mb: 0 },
-                                }}
-                            >
-                                {option.name}
-                            </MenuItem>
-                        ))}
-                    </RHFSelect>
-                </Grid>
+                    <Grid container item xs={12} md={5}>
+                        <RHFSelect
+                            name="courseType"
+                            label="Course Type"
+                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                            onChange={handleChangeCourseType}>
+                            {COURSE_TYPE_OPTIONS.map((option) => (
+                                <MenuItem
+                                    key={option.id}
+                                    value={option.name}
+                                    sx={{
+                                        mx: 1,
+                                        my: 0.5,
+                                        borderRadius: 0.75,
+                                        typography: 'body2',
+                                        textTransform: 'capitalize',
+                                        '&:first-of-type': { mt: 0 },
+                                        '&:last-of-type': { mb: 0 },
+                                    }}
+                                >
+                                    {option.name}
+                                </MenuItem>
+                            ))}
+                        </RHFSelect>
+                    </Grid>
+                    <Grid container item xs={12} md={5}>
+                        {courseType === 'Semi Private' && (
+                            <RHFTextField
+                                name="section"
+                                label="Section"
+                                required
+                            />
+                        )}
+                    </Grid>
 
                 {courseType &&
                     <>
@@ -253,6 +270,14 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
                                                 mb: 2,
                                                 display: 'block',
                                             }}>Additional Files</Typography>
+                                        <RHFRadioGroup
+                                            name="paymentType"
+                                            options={PAYMENT_TYPE_OPTIONS}
+                                            sx={{
+                                                '& .MuiFormControlLabel-root': { mr: 4 },
+                                            }}
+                                            required
+                                        />
                                         <Box
                                             rowGap={3}
                                             columnGap={2}
@@ -261,6 +286,7 @@ export default function NewViewRegistrationRequest({ isView = false, currentRequ
                                                 xs: 'repeat(1, 1fr)',
                                                 sm: 'repeat(1, 1fr)',
                                             }}
+                                            sx={{ mt: 2 }}
                                         >
                                             <RHFUpload
                                                 multiple

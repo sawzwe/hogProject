@@ -29,8 +29,6 @@ export const PageRegistrationRequestDetail = Loadable(lazy(() => import('../page
 export const PageCreateCourseTransferRequest = Loadable(lazy(() => import('../pages/EP/CreateCourseTransferRequestPage')));
 export const PageCourseTransferRequestStatus = Loadable(lazy(() => import('../pages/EP/CourseTransferRequestStatusPage')));
 
-
-// EA ----------------------------------------------------------------------
 // Search student
 export const PageSearchStudent = Loadable(lazy(() => import('../pages/SearchStudentPage')));
 export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/SearchCourseStudentPage')));
@@ -39,6 +37,7 @@ export const PageSearchCourseStudent = Loadable(lazy(()=> import('../pages/Searc
 export const PageSearchTeacher = Loadable(lazy(() => import('../pages/SearchTeacherPage')));
 export const PageSearchCourseTeacher = Loadable(lazy(() => import('../pages/SearchCourseTeacherPage')));
 
+// EA ----------------------------------------------------------------------
 // Daily calendar
 export const PageDailyCalendar = Loadable(lazy(() => import('../pages/EA/DailyCalendarPage')));
 
@@ -48,7 +47,25 @@ export const PageScheduleRegistrationRequest = Loadable(lazy(() => import('../pa
 export const PageStudentRequestEA = Loadable(lazy(() => import('../pages/EA/StudentRequestPage')));
 export const PageStaffRequestEA = Loadable(lazy(() => import('../pages/EA/StaffRequestPage')));
 
+// OA ----------------------------------------------------------------------
+// New Account
+export const PageNewAccount = Loadable(lazy(() => import('../pages/OA/NewAccountPage')));
+export const PageRegistrationRequestOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestPage')));
+export const PageLeavingRequestOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestPage')));
+export const PageRegistrationRequestDetailOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestDetailPage')));
+export const PageLeavingRequestDetailOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestDetailPage')));
 
+// Student ----------------------------------------------------------------------
+export const PageStudentCalendar = Loadable(lazy(() => import('../pages/Student/StudentCalendarPage')));
+export const PageStudentCourse = Loadable(lazy(() => import('../pages/Student/StudentCoursePage')));
+export const PageStudentProfile = Loadable(lazy(() => import('../pages/Student/StudentProfilePage')));
+export const PageStudentRequestInbox = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxPage')));
+
+// Teacher ----------------------------------------------------------------------
+export const PageTeacherCalendar = Loadable(lazy(() => import('../pages/Teacher/TeacherCalendarPage')));
+export const PageTeacherCourse = Loadable(lazy(() => import('../pages/Teacher/TeacherCoursePage')));
+export const PageTeacherLeavingRequest = Loadable(lazy(() => import('../pages/Teacher/TeacherLeavingRequestPage')));
+export const PageTeacherRequestInbox = Loadable(lazy(() => import('../pages/Teacher/TeacherRequestInboxPage')));
 
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
