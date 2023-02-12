@@ -1,42 +1,35 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
+import { PATH_DASHBOARD } from '../../routes/paths';
 // components
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import LeavingRequestStatusList from '../../sections/dashboard/oa-leaving-request-list/LeavingRequestStatusList'
 
 // ----------------------------------------------------------------------
 
-export default function LeavingRequestPage() {
+export default function RegistrationRequestStatusPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> OA | Leaving Request</title>
+                <title> OA | Leaving Request </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
-                <Typography variant="h3" component="h1" paragraph>
-                    Leaving Request
-                </Typography>
-
-                <Typography gutterBottom>
-                    Curabitur turpis. Vestibulum facilisis, purus nec pulvinar iaculis, ligula mi congue nunc,
-                    vitae euismod ligula urna in dolor. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit
-                    id, lorem. Phasellus blandit leo ut odio. Vestibulum ante ipsum primis in faucibus orci
-                    luctus et ultrices posuere cubilia Curae; Fusce id purus. Aliquam lorem ante, dapibus in,
-                    viverra quis, feugiat a, tellus. In consectetuer turpis ut velit. Aenean posuere, tortor
-                    sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus.
-                    Vestibulum suscipit nulla quis orci. Nam commodo suscipit quam. Sed a libero.
-                </Typography>
-
-                <Typography>
-                    Praesent ac sem eget est egestas volutpat. Phasellus viverra nulla ut metus varius
-                    laoreet. Curabitur ullamcorper ultricies nisi. Ut non enim eleifend felis pretium feugiat.
-                    Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Fusce vel dui. Quisque
-                    libero metus, condimentum nec, tempor a, commodo mollis, magna. In enim justo, rhoncus ut,
-                    imperdiet a, venenatis vitae, justo. Cras dapibus.
-                </Typography>
+                <CustomBreadcrumbs
+                    heading="Leaving Request List"
+                    links={[
+                        {
+                            name: 'Leaving Request',
+                            href: PATH_DASHBOARD.courseRegistration.root,
+                        },
+                        { name: 'Request status' },
+                    ]}
+                />
+                <LeavingRequestStatusList />
             </Container>
         </>
     );
