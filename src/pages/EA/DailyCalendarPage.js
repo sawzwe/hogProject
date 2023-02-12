@@ -47,7 +47,9 @@ export default function DailyCalendarPage() {
         //     countryOfSchool: 'Thailand',
         //     levelOfStudy: 'Matthayom 6',
         //     line: 'pnw029',
-        //     program: 'Thai program'
+        //     program: 'Thai program',
+        //     address: '5/89 Hong Baker Street, Hongland',
+        //     parent: 'Mr. Daddy Hong'
         // })
         //     .then((response) => {
         //         console.log(response);
