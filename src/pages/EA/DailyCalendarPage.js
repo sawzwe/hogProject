@@ -56,8 +56,28 @@ export default function DailyCalendarPage() {
     //         //         console.log(error);
     //         //     });
 
-    //         // axios.get('${HOG_API}/api/Student/Get/1')
-    //         // .then((res) => console.log(res.data))
+        // axios.post('https://houseofgriffin-api-stg.azurewebsites.net/api/Student/Post', {
+        //     title: 'Mr.',
+        //     fName: 'Piyaphon',
+        //     lName: 'Wu',
+        //     nickname: 'Hong',
+        //     dob: '23-Feb-2022',
+        //     email: 'hong@hotmail.com',
+        //     phone: '0973574151',
+        //     school: 'Assumption Rayong',
+        //     countryOfSchool: 'Thailand',
+        //     levelOfStudy: 'Matthayom 6',
+        //     line: 'pnw029',
+        //     program: 'Thai program',
+        //     address: '5/89 Hong Baker Street, Hongland',
+        //     parent: 'Mr. Daddy Hong'
+        // })
+        //     .then((response) => {
+        //         console.log(response);
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //     });
 
     //         // axios.delete(`${HOG_API}/api/Student/Delete/${id}`)
     //         //     .then(res => {
