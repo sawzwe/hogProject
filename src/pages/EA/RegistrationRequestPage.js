@@ -5,7 +5,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
-import StaffRequestStatusList from '../../sections/dashboard/ea-request-management-list/RegistrationRequestStatusList'
+import RegistrationRequestStatusList from '../../sections/dashboard/ea-request-management-list/RegistrationRequestStatusList'
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ export default function RegistrationRequestPage() {
                 ]}
             />
             <Container maxWidth={themeStretch ? false : 'xl'}>
-                <StaffRequestStatusList />
+                <RegistrationRequestStatusList />
             </Container>
         </>
     );

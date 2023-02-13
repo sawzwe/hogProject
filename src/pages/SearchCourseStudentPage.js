@@ -7,7 +7,7 @@ import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // Table
-import SortingSelecting from '../sections/dashboard/all-students-list';
+import {StudentCourseList} from '../sections/dashboard/all-students-list';
 
 // ----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ export default function SearchCourseStudentPage() {
     return (
         <>
             <Helmet>
-                <title> All Student Table</title>
+                <title>Student Course List Table</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
@@ -32,7 +32,7 @@ export default function SearchCourseStudentPage() {
                 />
                 <Stack spacing={3}>
                     <Card>
-                        <SortingSelecting />
+                        <StudentCourseList />
                     </Card>
                 </Stack>
             </Container>
