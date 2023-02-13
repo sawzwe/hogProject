@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 // @mui
-import { Container, Typography, TextField, InputAdornment,Button, } from '@mui/material';
+import { Container, Typography, TextField, InputAdornment, Button, } from '@mui/material';
 import axios from 'axios';
 // components
 import { useSettingsContext } from '../../components/settings';
@@ -96,7 +96,30 @@ export default function DailyCalendarPage() {
                 console.log(res.data);
             })
     };
-    
+
+    const post = () => {
+        axios.post(`${HOG_API}/api/Student/Post`, {
+            title: 'Mr.',
+            fName: 'SawZwe',
+            lName: 'WaiYan',
+            nickname: 'Saw',
+            dob: '26-Mar-2022',
+            email: 'saw@hotmail.com',
+            phone: '0978486',
+            school: 'Assumption Rayong',
+            countryOfSchool: 'Thailand',
+            levelOfStudy: 'Matthayom 6',
+            line: 'pnw029',
+            program: 'Thai program'
+        })
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
     return (
         <>
             <Helmet>
@@ -116,9 +139,11 @@ export default function DailyCalendarPage() {
                             </InputAdornment>
                         ),
                     }}
-                    
+
                 />
-                <Button variant='contained' onClick={()=>deleteData(filterName)}>Delete Data</Button>
+                {/* <Button variant='contained' onClick={() => deleteData(filterName)}>Delete Data</Button> */}
+                <Button variant='contained' onClick={post}>Post Data</Button> 
+                
             </Container>
         </>
     );
