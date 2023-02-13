@@ -24,7 +24,7 @@ export const FILTER_GENDER_OPTIONS = [
 // const onSelected = (selected, item) =>
 //   selected.includes(item) ? selected.filter((value) => value !== item) : [...selected, item];
 
-SortingSelectingToolbar.propTypes = {
+ToolbarStudentSearch.propTypes = {
   open: PropTypes.bool,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
@@ -39,13 +39,13 @@ SortingSelectingToolbar.propTypes = {
 // Filter
 
 
-export default function SortingSelectingToolbar({ filterValue, onFilterValue, open, onOpen, onClose, isDefault, onResetFilter }) {
+export default function ToolbarStudentSearch({ filterValue, onFilterValue, open, onOpen, onClose, isDefault, onResetFilter }) {
   // const { control } = useFormContext();
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
         <TextField value={filterValue}
-        onChange={onFilterValue} id="search-student" label="Search" variant="outlined" sx={{ width: 980 }}
+        onChange={onFilterValue} id="search-student" placeholder="Search SID or Student Fullname or Nickname..." variant="outlined" sx={{ width: 980 }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
