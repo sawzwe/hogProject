@@ -10,11 +10,15 @@ StudentCourse.propTypes = {
 export default function StudentCourse({ currentStudent }) {
 
     const {
-        studyCourses
+        privateCourse,
+        groupCourse
     } = currentStudent;
 
     return (
-        studyCourses.map((eachCourse, index) => <CourseCard key={index} eachCourse={eachCourse} />)
+        <>
+            {privateCourse.length > 0 && privateCourse.map((course, index) => <CourseCard key={index} course={course} />)}
+            {groupCourse.length > 0 && groupCourse.map((course, index) => <CourseCard key={index} course={course} />)}
+        </>
     )
 }
 

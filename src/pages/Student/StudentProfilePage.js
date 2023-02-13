@@ -13,17 +13,15 @@ export default function StudentProfilePage() {
 
     return (
         <>
-            <>
-                <Helmet>
-                    <title> Student Profile </title>
-                </Helmet>
+            <Helmet>
+                <title> Student Profile </title>
+            </Helmet>
 
-                <Container maxWidth={themeStretch ? false : 'xl'}>
-                    <Typography variant="h4" gutterBottom>
-                        Student Profile
-                    </Typography>
-                </Container>
-            </>
+            <Container maxWidth={themeStretch ? false : 'xl'}>
+                <Typography variant="h4" gutterBottom>
+                    Student Profile
+                </Typography>
+            </Container>
         </>
     );
 }
