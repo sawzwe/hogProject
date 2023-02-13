@@ -14,9 +14,13 @@ const currentStudent = {
     fName: 'Piyaphon',
     lName: 'Wu',
     schedules: [
-        {date: '10-Feb-2023', from: '10:00', to: '12:00', type: 'Private', subject: 'SAT Math', room: 'R.306', teacher: 'Kiratijuta Bhumichitr'},
-        {date: '10-Feb-2023', from: '14:00', to: '6:00', type: 'Private', subject: 'SAT Reading', room: 'R.306', teacher: 'Kiratijuta Bhumichitr'},
-        {date: '12-Feb-2023', from: '10:00', to: '12:00', type: 'Private', subject: 'SAT Math', room: '-', teacher: 'Kiratijuta Bhumichitr'}
+        {scheduleId: '0', date: '13-Mar-2023', from: '10:00', to: '12:00', type: 'Private', subject: 'SAT MATH', room: '306', teacher: 'Kiratijuta Bhumichitr'},
+        {scheduleId: '1', date: '13-Mar-2023', from: '14:00', to: '16:00', type: 'Private', subject: 'SAT READING', room: '306', teacher: 'Kiratijuta Bhumichitr'},
+        {scheduleId: '2', date: '15-Mar-2023', from: '10:00', to: '12:00', type: 'Private', subject: 'SAT MATH', room: '', teacher: 'Kiratijuta Bhumichitr'}
+    ],
+    studyCourses: [
+        {studyCourseId: '0', subject: 'SAT MATH', type: 'Private'},
+        {studyCourseId: '1', subject: 'SAT READING', type: 'Private'},
     ]
 }
 
