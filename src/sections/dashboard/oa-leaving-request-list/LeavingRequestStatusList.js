@@ -295,8 +295,8 @@ export default function RegistrationRequestStatusList() {
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
             //
-            dense={dense}
-            onChangeDense={onChangeDense}
+            // dense={dense}
+            // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>

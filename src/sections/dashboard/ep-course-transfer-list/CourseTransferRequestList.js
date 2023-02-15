@@ -182,7 +182,7 @@ export default function CourseTransferRequestList() {
 
                                 {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                                     <TableRow key={row.id} hover>
-                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}> S{row.id} </TableCell>
+                                        <TableCell align="left" sx={{ textTransform: 'capitalize' }}> R{row.id} </TableCell>
                                         <TableCell align="left">{row.requestdate}</TableCell>
                                         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.fullname}</TableCell>
                                         <TableCell align="left" sx={{ textTransform: 'capitalize' }}>{row.nickname}</TableCell>
@@ -215,8 +215,8 @@ export default function CourseTransferRequestList() {
                     onPageChange={onChangePage}
                     onRowsPerPageChange={onChangeRowsPerPage}
                     //
-                    dense={dense}
-                    onChangeDense={onChangeDense}
+                    // dense={dense}
+                    // onChangeDense={onChangeDense}
                 />
             </Card>
         </>
