@@ -8,7 +8,7 @@ import EventIcon from '@mui/icons-material/Event';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
-import ClassCard from '../../../components/app-card/ClassCard';
+import CalendarClassCard from '../../../components/app-card/CalendarClassCard';
 
 StudentCalendar.propTypes = {
     currentStudent: PropTypes.object,
@@ -21,7 +21,7 @@ export default function StudentCalendar({ currentStudent }) {
     const today = new Date(2023, 2, 13)
     const [value, setValue] = useState(today);
 
-    const { schedules } = currentStudent;
+    const { classes } = currentStudent;
 
     return (
         <>
@@ -55,8 +55,8 @@ export default function StudentCalendar({ currentStudent }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {schedules.length > 0 && (
-                schedules.map((schedule, index) => (new Date(schedule.date).getTime() === value.getTime() && <ClassCard key={index} schedule={schedule} />))
+            {classes.length > 0 && (
+                classes.map((_class, index) => (new Date(_class.date).getTime() === value.getTime() && <CalendarClassCard key={index} _class={_class} />))
             )}
         </>
     )
