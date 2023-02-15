@@ -11,7 +11,6 @@ import Iconify from '../../components/iconify';
 
 export default function DailyCalendarPage() {
 
-
     // useEffect(() => {
 
     //     const header =
