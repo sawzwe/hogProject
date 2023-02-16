@@ -7,10 +7,11 @@ import { Card, CardActions, CardContent, Grid, Typography, Box, Link } from '@mu
 import { Icon } from '@iconify/react';
 
 CourseCard.propTypes = {
+    accountRole: PropTypes.string,
     eachCourse: PropTypes.object,
 };
 
-export default function CourseCard({ eachCourse }) {
+export default function CourseCard({ accountRole, eachCourse }) {
     const {
         id,
         course,
@@ -19,10 +20,13 @@ export default function CourseCard({ eachCourse }) {
         type,
     } = eachCourse
 
+    const privateCourseLink = (accountRole === 'student' ? `/dashboard/student-course/private-course/${id}` : `/dashboard/teacher-course/private-course/${id}`)
+    const groupCourseLink = (accountRole === 'student' ? `/dashboard/student-course/group-course/${id}` : `/dashboard/teacher-course/group-course/${id}`)
+
     return (
         <Grid container sx={{ my: 2 }}>
             <Box display="inline-block" sx={{ width: '100%' }}>
-                <Link to={type === 'Group' ? `/dashboard/student-course/group-course/${id}` : `/dashboard/student-course/private-course/${id}`} underline='none' component={RouterLink} sx={{ display: 'flex', flexDirection: 'column', color: 'text.primary' }}>
+                <Link to={type === 'Group' ? groupCourseLink : privateCourseLink} underline='none' component={RouterLink} sx={{ display: 'flex', flexDirection: 'column', color: 'text.primary' }}>
                     <Card
                         variant="outlined"
                         sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}>
