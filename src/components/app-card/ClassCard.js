@@ -17,10 +17,9 @@ export default function ClassCard({ eachClass, onOpen }) {
     const {
         classNo,
         date,
-        from,
-        to,
+        fromTime,
+        toTime,
         room,
-        teacher,
         attendance
     } = eachClass;
 
@@ -37,7 +36,7 @@ export default function ClassCard({ eachClass, onOpen }) {
                                 Class {classNo.toString()}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {fDate(date, 'dd MMMM yyyy')} | {from} - {to} {!!room ? `| R.${room}` : ''}
+                                {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {!!room ? `| R.${room}` : ''}
                             </Typography>
                             {attendance !== 'None' && (
                                 <Typography variant="body2" sx={{ color: (attendance === 'Present' ? '#36B37E' : attendance === 'Absent' ? '#FF5630' : '#FFAB00') }}>

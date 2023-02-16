@@ -2,21 +2,22 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Card, CardActions, CardContent, Grid, Typography, Box, Button, Divider, Link } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Card, CardActions, CardContent, Grid, Typography, Box, Link } from '@mui/material';
 //
 import { Icon } from '@iconify/react';
 
 CourseCard.propTypes = {
-    course: PropTypes.object,
+    eachCourse: PropTypes.object,
 };
 
-export default function CourseCard({ course }) {
+export default function CourseCard({ eachCourse }) {
     const {
         id,
+        course,
         subject,
+        level,
         type,
-    } = course
+    } = eachCourse
 
     return (
         <Grid container sx={{ my: 2 }}>
@@ -28,7 +29,7 @@ export default function CourseCard({ course }) {
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <CardContent>
                                 <Typography variant="h6" component="div" gutterBottom>
-                                    {subject}
+                                    {course} {subject} {level}
                                 </Typography>
                                 <Typography color="text.secondary">
                                     {type}

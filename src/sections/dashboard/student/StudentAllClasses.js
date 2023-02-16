@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Divider, Dialog, DialogContent, Button, Typography, Stack, Card } from '@mui/material';
+import { Divider, Dialog, DialogContent, Typography, Stack, Card } from '@mui/material';
 //
 import { Icon } from '@iconify/react';
 // components
@@ -10,10 +10,9 @@ import ClassCard from '../../../components/app-card/ClassCard';
 
 StudentAllClasses.propTypes = {
     classes: PropTypes.array,
-    type: PropTypes.string
 };
 
-export default function StudentAllClasses({ classes, type }) {
+export default function StudentAllClasses({ classes }) {
 
     // Separate Completed class and Incomplete class here
     const completeClass = classes.filter(eachClass => eachClass.attendance !== 'None');
@@ -23,9 +22,9 @@ export default function StudentAllClasses({ classes, type }) {
     const [open, setOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState({});
 
-    const handleOpenDialog = (data) => {
-        setSelectedClass(data)
-        setOpen(true)
+    const handleOpenDialog = (eachClass) => {
+        setSelectedClass(eachClass);
+        setOpen(true);
     };
 
     const handleCloseDialog = () => {
@@ -38,25 +37,26 @@ export default function StudentAllClasses({ classes, type }) {
     return (
         <>
             {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} eachClass={eachClass} onOpen={handleOpenDialog} />)}
-            <Divider />
+            {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
             {completeClass.length > 0 && completeClass.map((eachClass, index) => <ClassCard key={index} eachClass={eachClass} onOpen={handleOpenDialog} />)}
-            <ClassDialog open={open} onClose={handleCloseDialog} type={type} selectedClass={selectedClass} />
+            {Object.keys(selectedClass).length > 0 && (<ClassDialog open={open} onClose={handleCloseDialog} selectedClass={selectedClass} />)}
         </>
     )
 }
 
+// --------------------------------------------------------------------------------------------------------
+
 ClassDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    type: PropTypes.string,
     selectedClass: PropTypes.object,
 };
 
-export function ClassDialog({ open, onClose, type, selectedClass }) {
+export function ClassDialog({ open, onClose, selectedClass }) {
     const navigate = useNavigate();
 
     const handleClickMakeup = () => {
-        navigate(`/dashboard/student-course/private-course/${selectedClass.courseId}/makeup-class/${selectedClass.id}`)
+        navigate(`/dashboard/student-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
     }
 
     return (
@@ -67,17 +67,17 @@ export function ClassDialog({ open, onClose, type, selectedClass }) {
             onClose={onClose}>
             <DialogContent sx={{ p: 3, textAlign: 'center' }}>
                 <Card variant="outlined" sx={{ py: 2, borderRadius: '5px 5px 0px 0px' }}>
-                    <Typography variant="h6" sx={{ mx: 'auto' }}>{`${selectedClass.subject} (${type.toUpperCase()})`} </Typography>
+                    <Typography variant="h6" sx={{ mx: 'auto' }}>{`${selectedClass.course.course} ${selectedClass.course.subject} ${selectedClass.course.level} (${selectedClass.course.type.toUpperCase()})`} </Typography>
                 </Card>
                 <Card sx={{ py: 2, borderRadius: 0, backgroundColor: '#007B55', color: 'white' }}>
                     <Typography variant="inherit">
-                        {selectedClass.teacher}
+                        {selectedClass.teacher.fullName}
                     </Typography>
                 </Card>
                 <Card variant="outlined" sx={{ py: 2, borderRadius: '0px 0px 5px 5px' }}>
                     <Stack direction="row" justifyContent="center" spacing={1}>
                         <Typography>
-                            {`Time ${selectedClass.from} - ${selectedClass.to} `}
+                            {`Time ${selectedClass.fromTime} - ${selectedClass.toTime} `}
                         </Typography>
                         {!!selectedClass.room && (
                             <Typography>
@@ -86,7 +86,7 @@ export function ClassDialog({ open, onClose, type, selectedClass }) {
                         )}
                     </Stack>
                 </Card>
-                {selectedClass.attendance === 'None' && type !== 'Group' && (
+                {selectedClass.attendance === 'None' && selectedClass.course.type !== 'Group' && (
                     <>
                         <Card sx={{ mt: 3, py: 2, borderRadius: '5px 5px 0px 0px', backgroundColor: '#007B55', color: 'white' }}>
                             <Typography >

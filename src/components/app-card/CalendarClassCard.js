@@ -6,20 +6,20 @@ import { Card, CardActions, CardContent, Grid, Typography, Box, Button, Divider 
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 CalendarClassCard.propTypes = {
-    type: PropTypes.string,
+    accountRole: PropTypes.string,
     eachClass: PropTypes.object,
 };
 
-export default function CalendarClassCard({ type, eachClass }) {
+export default function CalendarClassCard({ accountRole, eachClass }) {
 
     const {
         id,
-        courseId,
-        subject,
-        from,
-        to,
+        course,
+        fromTime,
+        toTime,
         room,
-        teacher
+        teacher,
+        section
     } = eachClass
 
     return (
@@ -28,13 +28,13 @@ export default function CalendarClassCard({ type, eachClass }) {
                 <Card variant="outlined" sx={{ borderRadius: 1, boxShadow: 0 }}>
                     <CardContent sx={{ pb: 2 }}>
                         <Typography variant="h6" component="div" gutterBottom>
-                            {from} - {to}
+                            {fromTime} - {toTime}
                         </Typography>
                         <Typography color="text.secondary">
-                            {subject}
+                            {`${course.course} ${course.subject} ${course.level} (${course.type.toUpperCase()})`}
                         </Typography>
                         <Typography color="text.secondary">
-                            {!!room && `R.${room} | `} {teacher}
+                            {!!room && `R.${room} | `} {accountRole === 'student' ? teacher.fullName : section}
                         </Typography>
                     </CardContent>
                     <Divider />
@@ -45,7 +45,7 @@ export default function CalendarClassCard({ type, eachClass }) {
                             endIcon={<NavigateNextIcon />}
                             sx={{ justifyContent: "flex-start", pl: 2 }}
                             component={Link}
-                            to={type === 'Group' ? `/dashboard/student-course/group-course/${courseId}` : `/dashboard/student-course/private-course/${courseId}`}>
+                            to={course.type === 'Group' ? `/dashboard/student-course/group-course/${course.id}` : `/dashboard/student-course/private-course/${course.id}`}>
                             Course detail
                         </Button>
                     </CardActions>

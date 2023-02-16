@@ -3,6 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { Container, Typography } from '@mui/material';
 // components
 import { useSettingsContext } from '../../components/settings';
+// sections
+import TeacherCalendar from '../../sections/dashboard/teacher/TeacherCalendar'
+//
+import { currentTeacher } from './mockup'
 
 // ----------------------------------------------------------------------
 
@@ -19,6 +23,7 @@ export default function TeacherCalendarPage() {
                 <Typography variant="h4" gutterBottom>
                     Teacher Calendar
                 </Typography>
+                <TeacherCalendar currentTeacher={currentTeacher} />
             </Container>
         </>
     );
