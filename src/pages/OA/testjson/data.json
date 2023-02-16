@@ -1,0 +1,105 @@
+{
+    "lecturers": {
+      "1001": {
+        "records": {
+          "2021": [
+            {
+              "recordId": "R001",
+              "leaveType": "Annual Leave",
+              "fromDate": "2021-01-05",
+              "fromHour": "AM",
+              "toDate": "2021-01-07",
+              "toHour": "PM",
+              "days": 3,
+              "hours": 16,
+              "status": "Approved",
+              "remark": "Vacation"
+            },
+            {
+              "recordId": "R002",
+              "leaveType": "Sick Leave",
+              "fromDate": "2021-02-15",
+              "fromHour": "AM",
+              "toDate": "2021-02-17",
+              "toHour": "PM",
+              "days": 3,
+              "hours": 16,
+              "status": "Approved",
+              "remark": "Flu"
+            }
+          ],
+          "2022": [
+            {
+              "recordId": "R003",
+              "leaveType": "Annual Leave",
+              "fromDate": "2022-05-01",
+              "fromHour": "AM",
+              "toDate": "2022-05-05",
+              "toHour": "PM",
+              "days": 5,
+              "hours": 32,
+              "status": "Pending",
+              "remark": "Vacation"
+            },
+            {
+              "recordId": "R004",
+              "leaveType": "Maternity Leave",
+              "fromDate": "2022-11-01",
+              "fromHour": "AM",
+              "toDate": "2023-01-31",
+              "toHour": "PM",
+              "days": 91,
+              "hours": 488,
+              "status": "Approved",
+              "remark": "Childbirth"
+            }
+          ]
+        }
+      },
+      "1002": {
+        "records": {
+          "2021": [
+            {
+              "recordId": "R005",
+              "leaveType": "Personal Leave",
+              "fromDate": "2021-08-05",
+              "fromHour": "AM",
+              "toDate": "2021-08-07",
+              "toHour": "PM",
+              "days": 3,
+              "hours": 16,
+              "status": "Approved",
+              "remark": "Family event"
+            }
+          ],
+          "2022": [
+            {
+              "recordId": "R006",
+              "leaveType": "Sick Leave",
+              "fromDate": "2022-03-15",
+              "fromHour": "AM",
+              "toDate": "2022-03-17",
+              "toHour": "PM",
+              "days": 3,
+              "hours": 16,
+              "status": "Approved",
+              "remark": "Stomach flu"
+            },
+            {
+              "recordId": "R007",
+              "leaveType": "Maternity Leave",
+              "fromDate": "2022-10-01",
+              "fromHour": "AM",
+              "toDate": "2022-12-31",
+              "toHour": "PM",
+              "days": 92,
+              "hours": 480,
+              "status": "Pending",
+              "remark": "Childbirth"
+            }
+          ]
+        }
+      }
+    }
+  }
+  
