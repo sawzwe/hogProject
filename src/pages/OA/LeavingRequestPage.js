@@ -7,9 +7,6 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import LeavingRequestStatusList from '../../sections/dashboard/oa-leaving-request-list/LeavingRequestStatusList'
 
-import LecturerRecordsTable from './testjson/Record';
-import data from './testjson/data.json';
-import LecturerRecordsTable2 from './testjson/Record2';
 
 // ----------------------------------------------------------------------
 
@@ -34,8 +31,6 @@ export default function RegistrationRequestStatusPage() {
                     ]}
                 />
                 <LeavingRequestStatusList />
-                {/* <LecturerRecordsTable lecturers={data} /> */}
-                {/* <LecturerRecordsTable2/> */}
             </Container>
         </>
     );
