@@ -216,33 +216,6 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-<<<<<<< HEAD
-            {TABS.map((tab) =>
-            (tab.value === 'completed' || tab.value === 'rejected' ? (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{float: 'right' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />) : (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />))
-            )}
-=======
             <Tab
               key={TABS[0].value}
               value={TABS[0].value}
@@ -271,7 +244,6 @@ export default function RegistrationRequestStatusList() {
                   {TABS[2].count}
                 </Label>
               } />
->>>>>>> 9a8a0a17e3502f9f02ed4242aa26fdd01d931fbe
           </Tabs>
           <Divider />
 

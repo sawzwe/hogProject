@@ -228,31 +228,34 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-            {TABS.map((tab) =>
-            (tab.value === 'completed' || tab.value === 'rejected' ? (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'right' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />) : (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />))
-            )}
+            <Tab
+              key={TABS[0].value}
+              value={TABS[0].value}
+              label={TABS[0].label}
+              icon={
+                <Label color={TABS[0].color} sx={{ mr: 1 }}>
+                  {TABS[0].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[1].value}
+              value={TABS[1].value}
+              label={TABS[1].label}
+              sx={{ ml: 'auto' }}
+              icon={
+                <Label color={TABS[1].color} sx={{ mr: 1 }}>
+                  {TABS[1].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[2].value}
+              value={TABS[2].value}
+              label={TABS[2].label}
+              icon={
+                <Label color={TABS[2].color} sx={{ mr: 1 }}>
+                  {TABS[2].count}
+                </Label>
+              } />
           </Tabs>
           <Divider />
 
@@ -280,7 +283,6 @@ export default function RegistrationRequestStatusList() {
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>
                       <TableCell align="left">{row.nickname}</TableCell>
-
                       <TableCell>
                         <Tooltip title="More Info">
                           {/* <IconButton onClick={() => handleOpenConfirm(row.id)}>
