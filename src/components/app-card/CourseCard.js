@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { Card, CardActions, CardContent, Grid, Typography, Box, Button, Divider, Link } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -12,9 +12,6 @@ CourseCard.propTypes = {
 };
 
 export default function CourseCard({ course }) {
-
-    const navigate = useNavigate();
-
     const {
         id,
         subject,

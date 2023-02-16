@@ -8,23 +8,23 @@ import { Icon } from '@iconify/react';
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
-import StudentAllClasses from '../../sections/dashboard/student/StudentAllClasses'
+import StudentMakeup from '../../sections/dashboard/student/StudentMakeup';
 import { currentStudent } from './mockup';
 
 // ----------------------------------------------------------------------
 
-export default function StudentPrivateCourseDetailPage() {
+export default function StudentMakeupPage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
-    const { id } = useParams();
-    const currentCourse = currentStudent.privateCourse.find(course => course.id === id);
-    const classes = currentStudent.privateClass.filter(eachClass => (eachClass.courseId === currentCourse.id));
+    const { courseId, classId } = useParams();
+    const currentCourse = currentStudent.privateCourse.find(course => course.id === courseId);
+    const currentClass = currentStudent.privateClass.find(eachClass => (eachClass.id === classId));
 
     return (
         <>
             <Helmet>
-                <title> Private Course Detail </title>
+                <title> Cancel and makeup </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -34,10 +34,10 @@ export default function StudentPrivateCourseDetailPage() {
                     direction="row">
                     <Icon icon="ic:round-chevron-left" width="40" height="40" onClick={() => navigate(-1)} />
                     <Typography variant="h4">
-                        {`${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
+                        Cancel and Makeup Class
                     </Typography>
                 </Stack>
-                <StudentAllClasses classes={classes} type="Private" />
+                <StudentMakeup currentCourse={currentCourse} currentClass={currentClass} />
             </Container>
         </>
     );

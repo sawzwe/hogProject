@@ -1,21 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+// @mui
 import { Card, CardActions, CardContent, Grid, Typography, Box, Button, Divider } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 CalendarClassCard.propTypes = {
-    _class: PropTypes.object,
+    type: PropTypes.string,
+    eachClass: PropTypes.object,
 };
 
-export default function CalendarClassCard({ _class }) {
+export default function CalendarClassCard({ type, eachClass }) {
 
     const {
+        id,
+        courseId,
+        subject,
         from,
         to,
-        studyCourse,
         room,
         teacher
-    } = _class
+    } = eachClass
 
     return (
         <Grid container sx={{ my: 2 }}>
@@ -26,7 +31,7 @@ export default function CalendarClassCard({ _class }) {
                             {from} - {to}
                         </Typography>
                         <Typography color="text.secondary">
-                            {studyCourse.subject}
+                            {subject}
                         </Typography>
                         <Typography color="text.secondary">
                             {!!room && `R.${room} | `} {teacher}
@@ -38,7 +43,9 @@ export default function CalendarClassCard({ _class }) {
                             fullWidth
                             size="medium"
                             endIcon={<NavigateNextIcon />}
-                            sx={{ justifyContent: "flex-start", pl: 2 }}>
+                            sx={{ justifyContent: "flex-start", pl: 2 }}
+                            component={Link}
+                            to={type === 'Group' ? `/dashboard/student-course/group-course/${courseId}` : `/dashboard/student-course/private-course/${courseId}`}>
                             Course detail
                         </Button>
                     </CardActions>
