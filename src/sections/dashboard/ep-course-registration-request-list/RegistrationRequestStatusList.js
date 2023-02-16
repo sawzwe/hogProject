@@ -229,7 +229,6 @@ export default function RegistrationRequestStatusList() {
                     {tab.count}
                   </Label>
                 }
-                centered
               />) : (
               <Tab
                 key={tab.value}

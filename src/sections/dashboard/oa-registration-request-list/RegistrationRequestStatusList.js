@@ -18,7 +18,8 @@ import {
   TableContainer,
   TableRow,
   TableCell, createTheme, ThemeProvider,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
 // utils
 import { fTimestamp } from '../../../utils/formatTime';
@@ -215,6 +216,7 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
+<<<<<<< HEAD
             {TABS.map((tab) =>
             (tab.value === 'completed' || tab.value === 'rejected' ? (
               <Tab
@@ -240,6 +242,36 @@ export default function RegistrationRequestStatusList() {
                 }
               />))
             )}
+=======
+            <Tab
+              key={TABS[0].value}
+              value={TABS[0].value}
+              label={TABS[0].label}
+              icon={
+                <Label color={TABS[0].color} sx={{ mr: 1 }}>
+                  {TABS[0].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[1].value}
+              value={TABS[1].value}
+              label={TABS[1].label}
+              sx={{ ml: 'auto' }}
+              icon={
+                <Label color={TABS[1].color} sx={{ mr: 1 }}>
+                  {TABS[1].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[2].value}
+              value={TABS[2].value}
+              label={TABS[2].label}
+              icon={
+                <Label color={TABS[2].color} sx={{ mr: 1 }}>
+                  {TABS[2].count}
+                </Label>
+              } />
+>>>>>>> 9a8a0a17e3502f9f02ed4242aa26fdd01d931fbe
           </Tabs>
           <Divider />
 
@@ -343,7 +375,7 @@ function applyFilter({
   // }
 
   if (filterName) {
-    inputData = inputData.filter((request) => request.id === parseInt(filterName,10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => request.id === parseInt(filterName, 10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {

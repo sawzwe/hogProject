@@ -21,7 +21,7 @@ export default function StudentCalendar({ currentStudent }) {
     const today = new Date(2023, 2, 13)
     const [value, setValue] = useState(today);
 
-    const { classes } = currentStudent;
+    const { privateClass, groupClass, privateCourse, groupCourse } = currentStudent;
 
     return (
         <>
@@ -55,8 +55,15 @@ export default function StudentCalendar({ currentStudent }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {classes.length > 0 && (
-                classes.map((_class, index) => (new Date(_class.date).getTime() === value.getTime() && <CalendarClassCard key={index} _class={_class} />))
+            {privateClass.length > 0 && (
+                privateClass.map((eachClass, index) =>
+                (new Date(eachClass.date).getTime() === value.getTime() &&
+                    <CalendarClassCard key={index} type='Private' eachClass={eachClass} />))
+            )}
+            {groupClass.length > 0 && (
+                groupClass.map((eachClass, index) =>
+                (new Date(eachClass.date).getTime() === value.getTime() &&
+                    <CalendarClassCard key={index} type='Group' eachClass={eachClass} />))
             )}
         </>
     )

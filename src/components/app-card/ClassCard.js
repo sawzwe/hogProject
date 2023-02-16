@@ -8,18 +8,20 @@ import { Icon } from '@iconify/react';
 import { fDate } from '../../utils/formatTime'
 
 ClassCard.propTypes = {
-    classNo: PropTypes.number,
     eachClass: PropTypes.object,
+    onOpen: PropTypes.func
 };
 
-export default function ClassCard({ classNo, eachClass }) {
+export default function ClassCard({ eachClass, onOpen }) {
 
     const {
+        classNo,
         date,
         from,
         to,
         room,
-        teacher
+        teacher,
+        attendance
     } = eachClass;
 
     return (
@@ -27,7 +29,8 @@ export default function ClassCard({ classNo, eachClass }) {
             <Box display="inline-block" sx={{ width: '100%' }}>
                 <Card
                     variant="outlined"
-                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}>
+                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}
+                    onClick={() => onOpen(eachClass)}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ pr: 0 }}>
                             <Typography variant="h6" component="div" gutterBottom>
@@ -36,6 +39,11 @@ export default function ClassCard({ classNo, eachClass }) {
                             <Typography variant="body2" color="text.secondary">
                                 {fDate(date, 'dd MMMM yyyy')} | {from} - {to} {!!room ? `| R.${room}` : ''}
                             </Typography>
+                            {attendance !== 'None' && (
+                                <Typography variant="body2" sx={{ color: (attendance === 'Present' ? '#36B37E' : attendance === 'Absent' ? '#FF5630' : '#FFAB00') }}>
+                                    {attendance.toUpperCase()}
+                                </Typography>
+                            )}
                         </CardContent>
                     </Box>
                     <CardActions sx={{ pl: 0 }}>
