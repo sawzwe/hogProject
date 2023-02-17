@@ -35,6 +35,9 @@ export default function TeacherGroupCourseDetailPage() {
                         {`${currentCourse.course} ${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
+                <Typography variant="body2" sx={{ ml: 3.5 }}>
+                    {currentCourse.section}
+                </Typography>
                 <TeacherAllClasses classes={classes} />
             </Container>
         </>

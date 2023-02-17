@@ -10,7 +10,6 @@ import useResponsive from '../../../hooks/useResponsive';
 // config
 import { HEADER, NAV } from '../../../config';
 // components
-import Logo from '../../../components/logo';
 import Iconify from '../../../components/iconify';
 import { useSettingsContext } from '../../../components/settings';
 // auth
@@ -41,19 +40,18 @@ export default function Header({ onOpenNav }) {
 
   const renderContent = (
     <>
-      {isDesktop && isNavHorizontal && <Logo sx={{ mr: 2.5 }} />}
-
       {!isDesktop && (
         <IconButton onClick={onOpenNav} sx={{ mr: 1, color: 'text.primary' }}>
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
       )}
 
-      <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
-        <NotificationsPopover />
-        <AccountPopover />
-      </Stack>
-
+      {(user.role === 'Student' || user.role === 'Teacher') && (!isDesktop) && (
+        <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
+          <NotificationsPopover />
+          <AccountPopover />
+        </Stack>
+      )}
     </>
   );
 
@@ -87,16 +85,16 @@ export default function Header({ onOpenNav }) {
         }),
       }}
     >
-      {(user.role === 'Student' || user.role === 'Teacher') && (!isDesktop) && (
-        <Toolbar
-          sx={{
-            height: 1,
-            px: { lg: 5 },
-          }}
-        >
-          {renderContent}
-        </Toolbar>
-      )}
+    {!isDesktop && (
+      <Toolbar
+        sx={{
+          height: 1,
+          px: { lg: 5 },
+        }}
+      >
+        {renderContent}
+      </Toolbar>
+    )}
     </AppBar>
   );
 }
