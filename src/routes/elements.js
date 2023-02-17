@@ -60,6 +60,7 @@ export const PageStudentCalendar = Loadable(lazy(() => import('../pages/Student/
 export const PageStudentCourse = Loadable(lazy(() => import('../pages/Student/StudentCoursePage')));
 export const PageStudentProfile = Loadable(lazy(() => import('../pages/Student/StudentProfilePage')));
 export const PageStudentRequestInbox = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxPage')));
+export const PageStudentRequestInboxDetail = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxDetailPage')));
 export const PageStudentPrivateCourseDetail = Loadable(lazy(() => import('../pages/Student/StudentPrivateCourseDetailPage')));
 export const PageStudentGroupCourseDetail = Loadable(lazy(() => import('../pages/Student/StudentGroupCourseDetailPage')));
 export const PageStudentMakeup = Loadable(lazy(() => import('../pages/Student/StudentMakeupPage')));

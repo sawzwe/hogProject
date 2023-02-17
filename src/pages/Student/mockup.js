@@ -116,4 +116,10 @@ export const currentStudent = {
     studentGroupCourse: [
         { id: '0', course: 'SAT', subject: 'READING', level: 'INTENSIVE', type: 'Group' }
     ],
+
+    studentClassRequest:[
+        { id: '0', course:'SAT', subject: 'READING', level: 'Intensive', type: 'Private', requestDate:'17-Feb-2022',cancelDate:'18-Feb-2022  09:00 - 12:00',makeupDate:'20-Feb-2022  09:00 - 12:00',status:'Pending',remark:"Can I change to feb 20?",tutor:"Kiratijuta Bhumichitr"},
+        { id: '1', course:'SAT', subject: 'MATH', level: 'Intensive', type: 'Private', requestDate:'15-Feb-2022',cancelDate:'17-Feb-2022 | 09:00 - 12:00',makeupDate:'22-Feb-2022  09:00 - 12:00',status:'Complete',remark:"Can I change to feb 22?",tutor:"Kiratijuta Bhumichitr"},
+        { id: '2', course:'SAT', subject: 'VERBAL', level: 'Intensive', type: 'Semi-Private', requestDate:'19-Feb-2022',cancelDate:'19-Feb-2022  09:00 - 12:00',makeupDate:'21-Feb-2022  09:00 - 12:00',status:'Reject',remark:"Can I change to feb 21?",tutor:"Kiratijuta Bhumichitr"},
+    ],
 }

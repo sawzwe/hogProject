@@ -52,7 +52,8 @@ import {
   PageTeacherLeavingRequest,
   PageTeacherRequestInbox,
   PageTeacherPrivateCourseDetail,
-  PageTeacherGroupCourseDetail
+  PageTeacherGroupCourseDetail,
+  PageStudentRequestInboxDetail
 }
   from './elements';
 
@@ -379,6 +380,13 @@ export default function Router() {
           path: 'student-inbox', element: (
             <RoleBasedGuard roles={['Student']} hasContent>
               <PageStudentRequestInbox />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'student-inbox/:id', element: (
+            <RoleBasedGuard roles={['Student']} hasContent>
+              <PageStudentRequestInboxDetail />
             </RoleBasedGuard>
           )
         },
