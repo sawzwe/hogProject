@@ -52,7 +52,9 @@ import {
   PageTeacherLeavingRequest,
   PageTeacherRequestInbox,
   PageTeacherPrivateCourseDetail,
-  PageTeacherGroupCourseDetail
+  PageTeacherGroupCourseDetail,
+  PageTeacherCheckGroupAttendance,
+  PageTeacherCheckPrivateAttendance
 }
   from './elements';
 
@@ -451,6 +453,20 @@ export default function Router() {
           path: 'teacher-course/group-course/:courseId', element: (
             <RoleBasedGuard roles={['Teacher']} hasContent>
               <PageTeacherGroupCourseDetail />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-course/private-course/:courseId/check-attendance/:classId', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCheckPrivateAttendance />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-course/group-course/:courseId/check-attendance/:classId', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherCheckGroupAttendance />
             </RoleBasedGuard>
           )
         },

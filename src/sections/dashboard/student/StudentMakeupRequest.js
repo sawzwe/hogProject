@@ -14,11 +14,10 @@ import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import { fDate } from '../../../utils/formatTime';
 
 StudentMakeup.propTypes = {
-    currentCourse: PropTypes.object,
     currentClass: PropTypes.object
 };
 
-export default function StudentMakeup({ currentCourse, currentClass }) {
+export default function StudentMakeup({ currentClass }) {
 
     // Specific class
     const {
@@ -88,9 +87,9 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
             </Grid>
 
             <Typography variant="h6" sx={{ mx: 1, mt: 3, mb: 1.5 }}>
-                Makeup Request
+                Remark
             </Typography>
-            <RHFTextField name="remark" label="Remark" multiline rows={3} />
+            <RHFTextField name="remark" label="Type here..." multiline rows={3} />
 
             <LoadingButton fullWidth size="large" type="submit" variant="contained" color="primary" loading={isSubmitting} sx={{ mt: 3 }}>
                 Submit

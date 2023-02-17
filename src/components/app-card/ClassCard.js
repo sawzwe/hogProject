@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { Card, CardActions, CardContent, Grid, Typography, Box } from '@mui/material';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
@@ -15,6 +16,7 @@ ClassCard.propTypes = {
 export default function ClassCard({ accountRole, eachClass, onOpen }) {
 
     const {
+        id,
         classNo,
         date,
         fromTime,
@@ -54,13 +56,17 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
         )
     }
 
+    const groupClassLink = (accountRole === 'teacher' && `/dashboard/teacher-course/group-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
+    const privateClassLink = (accountRole === 'teacher' && `/dashboard/teacher-course/private-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
+
     return (
         <Grid container sx={{ my: 2 }}>
             <Box display="inline-block" sx={{ width: '100%' }}>
                 <Card
                     variant='outlined'
-                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}
-                    onClick={() => onOpen(eachClass)}>
+                    to={eachClass.course.type === 'Group' ? groupClassLink : privateClassLink}
+                    component={RouterLink}
+                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer", textDecoration: 'none' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ pr: 0 }}>
                             <Typography variant="body1" component="div">
