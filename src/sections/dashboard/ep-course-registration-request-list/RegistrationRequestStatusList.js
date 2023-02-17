@@ -217,31 +217,52 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-            {TABS.map((tab) =>
-            (tab.value === 'completed' || tab.value === 'rejected' ? (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{float: 'right' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />) : (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />))
-            )}
+            <Tab
+              key={TABS[0].value}
+              value={TABS[0].value}
+              label={TABS[0].label}
+              icon={
+                <Label color={TABS[0].color} sx={{ mr: 1 }}>
+                  {TABS[0].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[1].value}
+              value={TABS[1].value}
+              label={TABS[1].label}
+              icon={
+                <Label color={TABS[1].color} sx={{ mr: 1 }}>
+                  {TABS[1].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[2].value}
+              value={TABS[2].value}
+              label={TABS[2].label}
+              icon={
+                <Label color={TABS[2].color} sx={{ mr: 1 }}>
+                  {TABS[2].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[3].value}
+              value={TABS[3].value}
+              label={TABS[3].label}
+              sx={{ ml: 'auto' }}
+              icon={
+                <Label color={TABS[3].color} sx={{ mr: 1 }}>
+                  {TABS[3].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[4].value}
+              value={TABS[4].value}
+              label={TABS[4].label}
+              icon={
+                <Label color={TABS[4].color} sx={{ mr: 1 }}>
+                  {TABS[4].count}
+                </Label>
+              } />
           </Tabs>
           <Divider />
 
@@ -311,9 +332,9 @@ export default function RegistrationRequestStatusList() {
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            dense={dense}
-            onChangeDense={onChangeDense}
+          //
+          // dense={dense}
+          // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
@@ -344,7 +365,7 @@ function applyFilter({
   //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   // }
   if (filterName) {
-    inputData = inputData.filter((request) =>   request.id === parseInt(filterName,10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => request.id === parseInt(filterName, 10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {

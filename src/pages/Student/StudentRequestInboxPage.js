@@ -5,25 +5,29 @@ import { Container, Typography } from '@mui/material';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import { useSettingsContext } from '../../components/settings';
+// sections
+import StudentRequestInbox from '../../sections/dashboard/student/StudentRequestInbox';
+// mock data
+import { currentStudent } from './mockup';
+
 
 // ----------------------------------------------------------------------
 
-export default function StudentRequestInboxPage() {
+export default function StudentCoursePage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
-            <>
-                <Helmet>
-                    <title> Request Inbox </title>
-                </Helmet>
+            <Helmet>
+                <title> Request Inbox </title>
+            </Helmet>
 
-                <Container maxWidth={themeStretch ? false : 'xl'}>
-                    <Typography variant="h4" gutterBottom>
-                        Request Inbox
-                    </Typography>
-                </Container>
-            </>
+            <Container maxWidth={themeStretch ? false : 'xl'}>
+                <Typography variant="h4" gutterBottom>
+                    Request Inbox
+                </Typography>
+                <StudentRequestInbox currentStudentRequest= {currentStudent} />
+            </Container>
         </>
     );
 }

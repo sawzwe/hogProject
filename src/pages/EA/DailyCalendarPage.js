@@ -116,20 +116,44 @@ export default function DailyCalendarPage() {
             })
     };
 
-    const post = () => {
+    const postData = () => {
         axios.post(`${HOG_API}/api/Student/Post`, {
             title: 'Mr.',
             fName: 'SawZwe',
             lName: 'WaiYan',
             nickname: 'Saw',
             dob: '26-Mar-2022',
+            age: 20,
+            phone: "123456789",
+            line: "dummy-line",
             email: 'saw@hotmail.com',
-            phone: '0978486',
             school: 'Assumption Rayong',
             countryOfSchool: 'Thailand',
             levelOfStudy: 'Matthayom 6',
-            line: 'pnw029',
-            program: 'Thai program'
+            program: 'Thai program',
+            targetUni: "ABAC",
+            targetScore: "A+",
+            hogInfo: "New Student",
+            healthInfo: "Seafood Allergy ",
+
+            // "title": "Mr",
+            // "fName": "dummy-first",
+            // "lName": "dummy-last",
+            // "fullName": "dummy-first dummy-last",
+            // "nickname": "dummy-pan",
+            // "dob": "01/02/2003 00:00:00",
+            // "age": 20,
+            // "phone": "123456789",
+            // "line": "dummy-line",
+            // "email": "dummy-email",
+            // "school": "dummy-school",
+            // "countryOfSchool": "dummy-country",
+            // "levelOfStudy": "dummy-level",
+            // "program": "dummy-program",
+            // "targetUni": "dummy",
+            // "targetScore": "dummy",
+            // "hogInfo": "dummy",
+            // "healthInfo": "dummy"
         })
             .then((response) => {
                 console.log(response);
@@ -161,8 +185,8 @@ export default function DailyCalendarPage() {
 
                 />
                 {/* <Button variant='contained' onClick={() => deleteData(filterName)}>Delete Data</Button> */}
-                <Button variant='contained' onClick={post}>Post Data</Button> 
-                
+                <Button variant='contained' onClick={()=>postData()}>Post Data</Button>
+
             </Container>
         </>
     );
