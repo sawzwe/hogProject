@@ -101,12 +101,12 @@ export default function DailyCalendarPage() {
         axios.get(`${HOG_API}/api/Student/Get`)
             .then(res => {
                 const data = res.data
-                // console.log(data)
+                console.log(data)
                 setData(data)
             }).catch(err => {
                 console.error(err)
             })
-    }, [])
+    }, []);
 
     const deleteData = (id) => {
         axios.delete(`${HOG_API}/api/Student/Delete/${id}`)

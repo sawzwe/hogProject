@@ -10,18 +10,18 @@ import useResponsive from '../../../hooks/useResponsive';
 // components
 import CalendarClassCard from '../../../components/app-card/CalendarClassCard';
 
-StudentCalendar.propTypes = {
-    currentStudent: PropTypes.object,
+TeacherCalendar.propTypes = {
+    currentTeacher: PropTypes.object,
 };
 
-export default function StudentCalendar({ currentStudent }) {
+export default function TeacherCalendar({ currentTeacher }) {
 
     const isDesktop = useResponsive('up', 'lg');
 
     const today = new Date(2023, 2, 13)
     const [value, setValue] = useState(today);
 
-    const { studentPrivateClass, studentGroupClass, studentPrivateCourse, studentGroupCourse } = currentStudent;
+    const { teacherPrivateClass, teacherGroupClass, teacherPrivateCourse, teacherGroupCourse } = currentTeacher;
 
     const onKeyDown = (e) => {
         e.preventDefault();
@@ -59,15 +59,15 @@ export default function StudentCalendar({ currentStudent }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {studentPrivateClass.length > 0 && (
-                studentPrivateClass.map((eachClass, index) =>
+            {teacherPrivateClass.length > 0 && (
+                teacherPrivateClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
-                    <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />))
+                    <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />))
             )}
-            {studentGroupClass.length > 0 && (
-                studentGroupClass.map((eachClass, index) =>
+            {teacherGroupClass.length > 0 && (
+                teacherGroupClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
-                    <CalendarClassCard key={index} accountRole='student'  eachClass={eachClass} />))
+                    <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />))
             )}
         </>
     )
