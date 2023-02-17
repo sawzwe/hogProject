@@ -53,7 +53,7 @@ import {
   PageTeacherRequestInbox,
   PageTeacherPrivateCourseDetail,
   PageTeacherGroupCourseDetail,
-  PageStudentRequestInboxDetail
+  PageStudentRequestInboxDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance
 }
