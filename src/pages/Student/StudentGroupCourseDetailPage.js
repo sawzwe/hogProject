@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 // @mui
 import { Container, Typography, Stack } from '@mui/material';
 //
@@ -18,8 +17,8 @@ export default function StudentGroupCourseDetailPage() {
     const navigate = useNavigate();
 
     const { id } = useParams();
-    const currentCourse = currentStudent.groupCourse.find(course => course.id === id);
-    const classes = currentStudent.groupClass.filter(eachClass => (eachClass.subject === currentCourse.subject));
+    const currentCourse = currentStudent.studentGroupCourse.find(course => course.id === id);
+    const classes = currentStudent.studentGroupClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
 
     return (
         <>
@@ -33,12 +32,12 @@ export default function StudentGroupCourseDetailPage() {
                     alignItems="center"
                     direction="row"
                     sx={{verticalAlign: 'middle'}}>
-                    <Icon icon="ic:round-chevron-left" width="40" height="40" onClick={() => navigate(-1)} />
-                    <Typography variant="h4" >
-                        {`${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
+                    <Icon icon="ic:round-chevron-left" width="40" height="40" style={{cursor: 'pointer'}} onClick={() => navigate(-1)} />
+                    <Typography variant="h6" >
+                        {`${currentCourse.course} ${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
-                <StudentAllClasses classes={classes} type="Group" />
+                <StudentAllClasses classes={classes}/>
             </Container>
         </>
     );

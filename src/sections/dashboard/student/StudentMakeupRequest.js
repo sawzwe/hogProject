@@ -26,18 +26,14 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
     const {
         id,
         classNo,
-        courseId,
+        course,
         date,
-        from,
-        to,
+        fromTime,
+        toTime,
         room,
         subject,
         teacher
     } = currentClass;
-
-    const {
-        type
-    } = currentCourse;
 
     // Sent Dialog
     const [openDialog, setOpenDialog] = useState(false);
@@ -89,13 +85,13 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                 <Grid item xs md>
                     <Card variant='outlined' sx={{ py: 2, px: 2, borderRadius: 1 }}>
                         <Typography>
-                            {`${fDate(date, 'dd MMMM yyyy')} | ${from} - ${to}`}
+                            {`${fDate(date, 'dd MMMM yyyy')} | ${fromTime} - ${toTime}`}
                         </Typography>
                         <Typography variant='caption' color='text.secondary'>
-                            {`${subject} (${type})`}
+                            {`${course.subject} (${course.type})`}
                         </Typography>
                         <Typography variant="caption" component='div' color='text.secondary'>
-                            {teacher}
+                            {teacher.fullName}
                         </Typography>
                     </Card>
                 </Grid>

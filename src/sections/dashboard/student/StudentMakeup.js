@@ -11,11 +11,10 @@ import MakeupCard from '../../../components/app-card/MakeupCard';
 import { fDate } from '../../../utils/formatTime';
 
 StudentMakeup.propTypes = {
-    currentCourse: PropTypes.object,
     currentClass: PropTypes.object
 };
 
-export default function StudentMakeup({ currentCourse, currentClass }) {
+export default function StudentMakeup({ currentClass }) {
 
     const AVAILABLE_TIME = [
         '09:00', '10:00', '11:00', '12:00'
@@ -31,40 +30,32 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
     ];
 
     const {
-        id,
-        classNo,
-        courseId,
+        course,
         date,
-        from,
-        to,
-        room,
-        subject,
+        fromTime,
+        toTime,
         teacher
     } = currentClass;
-
-    const {
-        type
-    } = currentCourse;
 
     const [cancelType, setCancelType] = useState('');
 
     // Custom Hours
-    const [fromTime, setFromTime] = useState('');
-    const [toTime, setToTime] = useState('');
+    const [customFromTime, setCustomFromTime] = useState('');
+    const [customToTime, setCustomToTime] = useState('');
 
     const handleChange = (event) => {
-        setFromTime('');
-        setToTime('');
+        setCustomFromTime('');
+        setCustomToTime('');
         setCancelType(event.target.value);
     };
 
     const handleChangeFromTime = (event) => {
-        setFromTime(event.target.value);
-        setToTime('');
+        setCustomFromTime(event.target.value);
+        setCustomToTime('');
     }
 
     const handleChangeToTime = (event) => {
-        setToTime(event.target.value);
+        setCustomToTime(event.target.value);
     }
 
     // Dialog for selected time slot
@@ -89,13 +80,13 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                 <Grid item xs md>
                     <Card variant='outlined' sx={{ py: 2, px: 2, borderRadius: 1 }}>
                         <Typography>
-                            {`${fDate(date, 'dd MMMM yyyy')} | ${from} - ${to}`}
+                            {`${fDate(date, 'dd MMMM yyyy')} | ${fromTime} - ${toTime}`}
                         </Typography>
                         <Typography variant='caption' color='text.secondary'>
-                            {`${subject} (${type})`}
+                            {`${course.subject} (${course.type})`}
                         </Typography>
                         <Typography variant="caption" component='div' color='text.secondary'>
-                            {teacher}
+                            {teacher.fullName}
                         </Typography>
                     </Card>
                 </Grid>
@@ -104,8 +95,6 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
             <FormControl sx={{ mx: 1, mb: 1 }}>
                 <Typography variant="h6" sx={{ color: "black" }}>Cancel</Typography>
                 <RadioGroup
-                    aria-labelledby="demo-controlled-radio-buttons-group"
-                    name="controlled-radio-buttons-group"
                     value={cancelType}
                     onChange={handleChange}
                 >
@@ -121,7 +110,7 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                     <FormControl variant="standard" fullWidth>
                         <InputLabel>From</InputLabel>
                         <Select
-                            value={fromTime}
+                            value={customFromTime}
                             label="From"
                             onChange={handleChangeFromTime}
                             onClose={() => {
@@ -130,7 +119,7 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                                 }, 0)
                             }}
                         >
-                            {AVAILABLE_TIME.map((time, index) => time >= currentClass.from && (
+                            {AVAILABLE_TIME.map((time, index) => time >= currentClass.fromTime && (
                                 <MenuItem
                                     key={index}
                                     value={time}
@@ -150,17 +139,17 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                     <FormControl variant="standard" fullWidth>
                         <InputLabel>To</InputLabel>
                         <Select
-                            value={toTime}
+                            value={customToTime}
                             label="To"
                             onChange={handleChangeToTime}
-                            disabled={!fromTime}
+                            disabled={!customFromTime}
                             onClose={() => {
                                 setTimeout(() => {
                                     document.activeElement.blur()
                                 }, 0)
                             }}
                         >
-                            {AVAILABLE_TIME.map((time, index) => time > fromTime && (
+                            {AVAILABLE_TIME.map((time, index) => time > customFromTime && (
                                 <MenuItem key={index} value={time} sx={{
                                     mx: 1,
                                     my: 0.5,
@@ -178,7 +167,7 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                 </Stack>
             )}
 
-            {cancelType === 'Custom Hour' && !!fromTime && !!toTime && (
+            {cancelType === 'Custom Hour' && !!customFromTime && !!customToTime && (
                 <TimeSlots options={AVAILABLE_TIME_SLOTS} onSelect={handleSelectTimeSlot} currentClass={currentClass} />
             )}
 
@@ -189,8 +178,7 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
             <TimeSlotDialog
                 open={openTimeSlotDialog}
                 onClose={handleCloseTimeSlotDialog}
-                type={type}
-                subject={subject}
+                course={course}
                 currentClass={currentClass}
                 selectedTimeSlot={selectedTimeSlot}
             />
@@ -203,13 +191,12 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
 TimeSlotDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    type: PropTypes.string,
-    subject: PropTypes.string,
+    course: PropTypes.object,
     currentClass: PropTypes.object,
     selectedTimeSlot: PropTypes.object
 };
 
-export function TimeSlotDialog({ open, onClose, type, subject, currentClass, selectedTimeSlot }) {
+export function TimeSlotDialog({ open, onClose, course, currentClass, selectedTimeSlot }) {
     const navigate = useNavigate();
 
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -238,10 +225,10 @@ export function TimeSlotDialog({ open, onClose, type, subject, currentClass, sel
                         Cancel and Makeup Class
                     </Typography>
                     <Typography align="center">
-                        {type.toUpperCase()} {subject}
+                        {course.type.toUpperCase()} {course.subject}
                     </Typography>
                     <Typography align="center">
-                        {`FROM ${fDate(currentClass.date, 'dd MMM yyyy').toUpperCase()} (${currentClass.from} - ${currentClass.to})`}
+                        {`FROM ${fDate(currentClass.date, 'dd MMM yyyy').toUpperCase()} (${currentClass.fromTime} - ${currentClass.toTime})`}
                     </Typography>
                     <Typography align="center">
                         {`TO ${fDate(selectedTimeSlot.date, 'dd MMM yyyy').toUpperCase()} (${selectedTimeSlot.fromTime} - ${selectedTimeSlot.toTime})`}
@@ -303,7 +290,7 @@ export function TimeSlots({ options, onSelect, currentClass }) {
             <Grid container sx={{ mt: 0.5 }} spacing={1}>
                 {options.length > 0 &&
                     options.map((slot, index) => (
-                        <Grid key={index} item xs={6} md={3}>
+                        <Grid key={index} item xs={6} md={4}>
                             <MakeupCard slot={slot} select={onSelect} />
                         </Grid>
                     ))
@@ -318,7 +305,7 @@ export function TimeSlots({ options, onSelect, currentClass }) {
             </Typography>
             <Stack direction="row" justifyContent="flex-start" sx={{ mx: 1, mt: 1 }}>
                 <Button
-                    to={`/dashboard/student-course/private-course/${currentClass.courseId}/makeup-class/${currentClass.id}/request`}
+                    to={`/dashboard/student-course/private-course/${currentClass.course.id}/makeup-class/${currentClass.id}/request`}
                     component={RouterLink}
                     fullWidth
                     size="large"

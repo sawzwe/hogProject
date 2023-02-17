@@ -8,15 +8,15 @@ import { Icon } from '@iconify/react';
 // components
 import ClassCard from '../../../components/app-card/ClassCard';
 
-StudentAllClasses.propTypes = {
+TeacherAllClasses.propTypes = {
     classes: PropTypes.array,
 };
 
-export default function StudentAllClasses({ classes }) {
+export default function TeacherAllClasses({ classes }) {
 
     // Separate Completed class and Incomplete class here
-    const completeClass = classes.filter(eachClass => eachClass.attendance !== 'None');
-    const upcommingClass = classes.filter(eachClass => eachClass.attendance === 'None');
+    const completeClass = classes.filter(eachClass => eachClass.attendanceStatus !== 'None');
+    const upcommingClass = classes.filter(eachClass => eachClass.attendanceStatus === 'None');
 
     // Action Dialog
     const [open, setOpen] = useState(false);
@@ -36,10 +36,10 @@ export default function StudentAllClasses({ classes }) {
 
     return (
         <>
-            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="student" eachClass={eachClass} onOpen={handleOpenDialog} />)}
+            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="teacher" eachClass={eachClass} onOpen={handleOpenDialog} />)}
             {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
-            {completeClass.length > 0 && completeClass.map((eachClass, index) => <ClassCard key={index} accountRole="student" eachClass={eachClass} onOpen={handleOpenDialog} />)}
-            {Object.keys(selectedClass).length > 0 && (<ClassDialog open={open} onClose={handleCloseDialog} selectedClass={selectedClass} />)}
+            {completeClass.length > 0 && completeClass.map((eachClass, index) => <ClassCard key={index} accountRole="teacher" eachClass={eachClass} onOpen={handleOpenDialog} />)}
+            {/* {Object.keys(selectedClass).length > 0 && (<ClassDialog open={open} onClose={handleCloseDialog} selectedClass={selectedClass} />)} */}
         </>
     )
 }
@@ -56,7 +56,7 @@ export function ClassDialog({ open, onClose, selectedClass }) {
     const navigate = useNavigate();
 
     const handleClickMakeup = () => {
-        navigate(`/dashboard/student-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
+        navigate(`/dashboard/teacher-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
     }
 
     return (

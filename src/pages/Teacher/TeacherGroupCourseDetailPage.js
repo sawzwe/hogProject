@@ -7,36 +7,37 @@ import { Icon } from '@iconify/react';
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
-import StudentAllClasses from '../../sections/dashboard/student/StudentAllClasses'
-import { currentStudent } from './mockup';
+import TeacherAllClasses from '../../sections/dashboard/teacher/TeacherAllClasses'
+import { currentTeacher } from './mockup';
 
 // ----------------------------------------------------------------------
 
-export default function StudentPrivateCourseDetailPage() {
+export default function TeacherGroupCourseDetailPage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
-    const { id } = useParams();
-    const currentCourse = currentStudent.studentPrivateCourse.find(course => course.id === id);
-    const classes = currentStudent.studentPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
+    const { courseId } = useParams();
+    const currentCourse = currentTeacher.teacherGroupCourse.find(course => course.id === courseId);
+    const classes = currentTeacher.teacherGroupClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
 
     return (
         <>
             <Helmet>
-                <title> Private Course Detail </title>
+                <title> Group Course Detail </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Stack
                     justifyContent="flex-start"
                     alignItems="center"
-                    direction="row">
-                    <Icon icon="ic:round-chevron-left" width="40" height="40" style={{cursor: 'pointer'}} onClick={() => navigate(-1)} />
-                    <Typography variant="h6">
+                    direction="row"
+                    sx={{ verticalAlign: 'middle' }}>
+                    <Icon icon="ic:round-chevron-left" width="40" height="40" style={{ cursor: 'pointer' }} onClick={() => navigate(-1)} />
+                    <Typography variant="h6" >
                         {`${currentCourse.course} ${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
-                <StudentAllClasses classes={classes} />
+                <TeacherAllClasses classes={classes} />
             </Container>
         </>
     );

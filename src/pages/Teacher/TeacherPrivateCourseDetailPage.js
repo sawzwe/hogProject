@@ -7,18 +7,20 @@ import { Icon } from '@iconify/react';
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
-import StudentAllClasses from '../../sections/dashboard/student/StudentAllClasses'
-import { currentStudent } from './mockup';
+import TeacherAllClasses from '../../sections/dashboard/teacher/TeacherAllClasses'
+import { currentTeacher } from './mockup';
 
 // ----------------------------------------------------------------------
 
-export default function StudentPrivateCourseDetailPage() {
+export default function TeacherPrivateCourseDetailPage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
-    const { id } = useParams();
-    const currentCourse = currentStudent.studentPrivateCourse.find(course => course.id === id);
-    const classes = currentStudent.studentPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
+    const { courseId } = useParams();
+    const currentCourse = currentTeacher.teacherPrivateCourse.find(course => course.id === courseId);
+    const classes = currentTeacher.teacherPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
+
+    console.log(classes);
 
     return (
         <>
@@ -36,7 +38,7 @@ export default function StudentPrivateCourseDetailPage() {
                         {`${currentCourse.course} ${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
-                <StudentAllClasses classes={classes} />
+                <TeacherAllClasses classes={classes} />
             </Container>
         </>
     );

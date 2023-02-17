@@ -49,16 +49,9 @@ export default function Header({ onOpenNav }) {
         </IconButton>
       )}
 
-
       <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
-        {(user.role === 'Student' || user.role === 'Teacher') &&
-          (
-            <>
-              <NotificationsPopover />
-              <AccountPopover />
-            </>
-          )
-        }
+        <NotificationsPopover />
+        <AccountPopover />
       </Stack>
 
     </>
@@ -94,14 +87,16 @@ export default function Header({ onOpenNav }) {
         }),
       }}
     >
-      <Toolbar
-        sx={{
-          height: 1,
-          px: { lg: 5 },
-        }}
-      >
-        {renderContent}
-      </Toolbar>
+      {(user.role === 'Student' || user.role === 'Teacher') && (!isDesktop) && (
+        <Toolbar
+          sx={{
+            height: 1,
+            px: { lg: 5 },
+          }}
+        >
+          {renderContent}
+        </Toolbar>
+      )}
     </AppBar>
   );
 }
