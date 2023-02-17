@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { Divider, Dialog, DialogContent, Typography, Stack, Card } from '@mui/material';
-//
-import { Icon } from '@iconify/react';
+import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 // components
 import ClassCard from '../../../components/app-card/ClassCard';
 
@@ -94,11 +93,11 @@ export function ClassDialog({ open, onClose, selectedClass }) {
                             </Typography>
                         </Card>
                         <Card variant="outlined" sx={{ py: 1, borderRadius: '0px 0px 5px 5px', cursor: 'pointer' }} onClick={handleClickMakeup} >
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2 }}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ ml: 2, mr:1 }}>
                                 <Typography >
                                     Cancel and makeup class
                                 </Typography>
-                                <Icon icon="ic:round-chevron-right" color="#c2c2c2" width="40" height="40" />
+                                <NavigateNextRoundedIcon fontSize='large' sx={{color: "#D7D7D7"}} />
                             </Stack>
                         </Card>
                     </>
