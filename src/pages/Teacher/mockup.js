@@ -97,10 +97,10 @@ export const currentTeacher = {
         }
     ],
     teacherPrivateCourse: [
-        { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private' },
-        { id: '1', course: 'GED', subject: 'MATH', level: 'REGULAR', type: 'Semi Private' }
+        { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private', section: 'Michael John Bull' },
+        { id: '1', course: 'GED', subject: 'MATH', level: 'REGULAR', type: 'Semi Private', section: 'Kaphao Mookrob Group' },
     ],
     teacherGroupCourse: [
-        { id: '0', course: 'SAT', subject: 'READING', level: 'INTENSIVE', type: 'Group' }
+        { id: '0', course: 'SAT', subject: 'READING', level: 'INTENSIVE', type: 'Group', section: 'CY/123' },
     ],
 }

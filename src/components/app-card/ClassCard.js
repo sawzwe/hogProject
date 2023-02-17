@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 // @mui
 import { Card, CardActions, CardContent, Grid, Typography, Box } from '@mui/material';
-//
-import { Icon } from '@iconify/react';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 // utils
 import { fDate } from '../../utils/formatTime'
 
@@ -29,14 +28,14 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                 <Box display="inline-block" sx={{ width: '100%' }}>
                     <Card
                         variant="outlined"
-                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}
+                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}
                         onClick={() => onOpen(eachClass)}>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <CardContent sx={{ pr: 0 }}>
-                                <Typography variant="h6" component="div" gutterBottom>
+                                <Typography variant="body1" component="div">
                                     Class {classNo.toString()}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendance !== 'None'}>
                                     {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
                                 </Typography>
                                 {eachClass.attendance !== 'None' && (
@@ -47,7 +46,7 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                             </CardContent>
                         </Box>
                         <CardActions sx={{ pl: 0 }}>
-                            <Icon icon="ic:round-chevron-right" color="#c2c2c2" width="50" height="50" />
+                            <ArrowForwardIosRoundedIcon fontSize='large' sx={{ color: "#D7D7D7" }} />
                         </CardActions>
                     </Card>
                 </Box>
@@ -57,31 +56,31 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
 
     return (
         <Grid container sx={{ my: 2 }}>
-        <Box display="inline-block" sx={{ width: '100%' }}>
-            <Card
-                variant="outlined"
-                sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}
-                onClick={() => onOpen(eachClass)}>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ pr: 0 }}>
-                        <Typography variant="h6" component="div" gutterBottom>
-                            Class {classNo.toString()}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
-                        </Typography>
-                        {eachClass.attendanceStatus !== 'None' && (
-                            <Typography variant="body2" sx={{ color: (eachClass.attendanceStatus === 'Complete' ? '#36B37E' : eachClass.attendanceStatus === 'Incomplete' && '#FF5630') }}>
-                                {eachClass.attendanceStatus.toUpperCase()}
+            <Box display="inline-block" sx={{ width: '100%' }}>
+                <Card
+                    variant='outlined'
+                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}
+                    onClick={() => onOpen(eachClass)}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <CardContent sx={{ pr: 0 }}>
+                            <Typography variant="body1" component="div">
+                                Class {classNo.toString()}
                             </Typography>
-                        )}
-                    </CardContent>
-                </Box>
-                <CardActions sx={{ pl: 0 }}>
-                    <Icon icon="ic:round-chevron-right" color="#c2c2c2" width="50" height="50" />
-                </CardActions>
-            </Card>
-        </Box>
-    </Grid>
+                            <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendanceStatus !== 'None'}>
+                                {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
+                            </Typography>
+                            {eachClass.attendanceStatus !== 'None' && (
+                                <Typography variant="body2" sx={{ color: (eachClass.attendanceStatus === 'Complete' ? '#36B37E' : eachClass.attendanceStatus === 'Incomplete' && '#FF5630') }}>
+                                    {eachClass.attendanceStatus.toUpperCase()}
+                                </Typography>
+                            )}
+                        </CardContent>
+                    </Box>
+                    <CardActions sx={{ pl: 0 }}>
+                        <ArrowForwardIosRoundedIcon fontSize='large' sx={{ color: "#D7D7D7" }} />
+                    </CardActions>
+                </Card>
+            </Box>
+        </Grid>
     )
 }
