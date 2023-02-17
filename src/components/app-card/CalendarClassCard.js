@@ -13,7 +13,6 @@ CalendarClassCard.propTypes = {
 export default function CalendarClassCard({ accountRole, eachClass }) {
 
     const {
-        id,
         course,
         fromTime,
         toTime,
@@ -22,10 +21,13 @@ export default function CalendarClassCard({ accountRole, eachClass }) {
         section
     } = eachClass
 
+    const groupCourseLink = (accountRole === 'student') ? `/dashboard/student-course/group-course/${course.id}` : `/dashboard/teacher-course/group-course/${course.id}`
+    const privateCourseLink = (accountRole === 'student') ? `/dashboard/student-course/private-course/${course.id}` : `/dashboard/teacher-course/private-course/${course.id}`
+
     return (
         <Grid container sx={{ my: 2 }}>
             <Box display="inline-block" sx={{ width: '100%' }}>
-                <Card variant="outlined" sx={{ borderRadius: 1, boxShadow: 0 }}>
+                <Card variant="outlined" sx={{ borderRadius: 1, boxShadow: 1 }}>
                     <CardContent sx={{ pb: 2 }}>
                         <Typography variant="h6" component="div" gutterBottom>
                             {fromTime} - {toTime}
@@ -45,7 +47,7 @@ export default function CalendarClassCard({ accountRole, eachClass }) {
                             endIcon={<NavigateNextIcon />}
                             sx={{ justifyContent: "flex-start", pl: 2 }}
                             component={Link}
-                            to={course.type === 'Group' ? `/dashboard/student-course/group-course/${course.id}` : `/dashboard/student-course/private-course/${course.id}`}>
+                            to={course.type === 'Group' ? groupCourseLink : privateCourseLink}>
                             Course detail
                         </Button>
                     </CardActions>

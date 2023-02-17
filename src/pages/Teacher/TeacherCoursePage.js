@@ -20,7 +20,7 @@ export default function TeacherCoursePage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <Typography variant="h4" gutterBottom>
-                    Teacher Courses
+                    Courses
                 </Typography>
                 <TeacherCourse currentTeacher={currentTeacher} />
             </Container>

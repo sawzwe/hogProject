@@ -3,8 +3,7 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { Card, CardActions, CardContent, Grid, Typography, Box, Link } from '@mui/material';
-//
-import { Icon } from '@iconify/react';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 
 CourseCard.propTypes = {
     accountRole: PropTypes.string,
@@ -17,6 +16,7 @@ export default function CourseCard({ accountRole, eachCourse }) {
         course,
         subject,
         level,
+        section,
         type,
     } = eachCourse
 
@@ -29,19 +29,24 @@ export default function CourseCard({ accountRole, eachCourse }) {
                 <Link to={type === 'Group' ? groupCourseLink : privateCourseLink} underline='none' component={RouterLink} sx={{ display: 'flex', flexDirection: 'column', color: 'text.primary' }}>
                     <Card
                         variant="outlined"
-                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 0, cursor: "pointer" }}>
+                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <CardContent>
-                                <Typography variant="h6" component="div" gutterBottom>
+                                <Typography variant="body1" component="div">
                                     {course} {subject} {level}
                                 </Typography>
                                 <Typography color="text.secondary">
                                     {type}
                                 </Typography>
+                                {accountRole === 'teacher' && (
+                                    <Typography color="text.secondary" >
+                                        {section}
+                                    </Typography>
+                                )}
                             </CardContent>
                         </Box>
                         <CardActions>
-                            <Icon icon="ic:round-chevron-right" color="#c2c2c2" width="50" height="50" />
+                            <ArrowForwardIosRoundedIcon fontSize='large' sx={{color: "#D7D7D7"}} />
                         </CardActions>
                     </Card>
                 </Link>
