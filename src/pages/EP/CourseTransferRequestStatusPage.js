@@ -23,7 +23,7 @@ export default function CourseTransferRequestPage() {
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="Course Transferring Request Status"
+                    heading="Schedule Management"
                     links={[
                         {
                             name: 'Course transferring',

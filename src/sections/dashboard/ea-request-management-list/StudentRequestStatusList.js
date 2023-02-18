@@ -175,7 +175,7 @@ export default function StaffRequestStatusList() {
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <Card>
-          <Tabs
+        <Tabs
             value={filterRole}
             onChange={handleFilterRole}
             sx={{
@@ -183,20 +183,43 @@ export default function StaffRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-
-            {TABS.map((tab) => (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />
-            ))}
+            <Tab
+              key={TABS[0].value}
+              value={TABS[0].value}
+              label={TABS[0].label}
+              icon={
+                <Label color={TABS[0].color} sx={{ mr: 1 }}>
+                  {TABS[0].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[1].value}
+              value={TABS[1].value}
+              label={TABS[1].label}
+              icon={
+                <Label color={TABS[1].color} sx={{ mr: 1 }}>
+                  {TABS[1].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[2].value}
+              value={TABS[2].value}
+              label={TABS[2].label}
+              sx={{ ml: 'auto' }}
+              icon={
+                <Label color={TABS[2].color} sx={{ mr: 1 }}>
+                  {TABS[2].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[3].value}
+              value={TABS[3].value}
+              label={TABS[3].label}
+              icon={
+                <Label color={TABS[3].color} sx={{ mr: 1 }}>
+                  {TABS[3].count}
+                </Label>
+              } />
           </Tabs>
           <Divider />
 

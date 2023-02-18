@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import sumBy from 'lodash/sumBy';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -40,6 +40,8 @@ import {
 } from '../../../components/table';
 // sections
 import LeavingTableToolbar from './LeavingTableToolbar';
+import ConfirmDialog from '../../../components/confirm-dialog';
+
 
 function createData(id, requestDate, fullname, nickname, role) {
   return { id, requestDate, fullname, nickname, role };
@@ -123,6 +125,8 @@ export default function RegistrationRequestStatusList() {
 
   const [filterRole, setFilterRole] = useState('all');
 
+  const [currentId, setCurrentId] = useState(-1)
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -150,9 +154,9 @@ export default function RegistrationRequestStatusList() {
   ];
 
 
-  const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
+  // const handleOpenConfirm = () => {
+  //   setOpenConfirm(true);
+  // };
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
@@ -167,6 +171,11 @@ export default function RegistrationRequestStatusList() {
   const handleFilterName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
+  };
+
+  const handleOpenConfirm = (currentId) => {
+    setCurrentId(currentId);
+    setOpenConfirm(true);
   };
 
   const handleDeleteRow = (id) => {
@@ -203,6 +212,10 @@ export default function RegistrationRequestStatusList() {
     setFilterRole('all');
   };
 
+  const acceptRequest = (currentId) => {
+    setOpenConfirm(false);
+  };
+
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -215,31 +228,34 @@ export default function RegistrationRequestStatusList() {
               bgcolor: 'background.neutral',
             }}
           >
-            {TABS.map((tab) =>
-            (tab.value === 'completed' || tab.value === 'rejected' ? (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{float: 'right' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />) : (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                style={{ float: 'left' }}
-                icon={
-                  <Label color={tab.color} sx={{ mr: 1 }}>
-                    {tab.count}
-                  </Label>
-                }
-              />))
-            )}
+            <Tab
+              key={TABS[0].value}
+              value={TABS[0].value}
+              label={TABS[0].label}
+              icon={
+                <Label color={TABS[0].color} sx={{ mr: 1 }}>
+                  {TABS[0].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[1].value}
+              value={TABS[1].value}
+              label={TABS[1].label}
+              sx={{ ml: 'auto' }}
+              icon={
+                <Label color={TABS[1].color} sx={{ mr: 1 }}>
+                  {TABS[1].count}
+                </Label>
+              } />
+            <Tab
+              key={TABS[2].value}
+              value={TABS[2].value}
+              label={TABS[2].label}
+              icon={
+                <Label color={TABS[2].color} sx={{ mr: 1 }}>
+                  {TABS[2].count}
+                </Label>
+              } />
           </Tabs>
           <Divider />
 
@@ -267,11 +283,15 @@ export default function RegistrationRequestStatusList() {
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>
                       <TableCell align="left">{row.nickname}</TableCell>
-                      
                       <TableCell>
                         <Tooltip title="More Info">
-                          <IconButton>
+                          {/* <IconButton onClick={() => handleOpenConfirm(row.id)}>
                             <Iconify icon="ic:chevron-right" />
+                          </IconButton> */}
+                          <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
+                            <Link to={`/dashboard/leaving-request-office-admin/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
+                              <Iconify icon="ic:chevron-right" />
+                            </Link>
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -287,15 +307,29 @@ export default function RegistrationRequestStatusList() {
             </Scrollbar>
           </TableContainer>
 
+          {/* <ConfirmDialog
+            open={openConfirm}
+            onClose={handleCloseConfirm}
+            title="Take the Request"
+            content="Once the request is taken, only you can see the request and proceed it."
+            action={
+              <Button variant="contained" color="success" onClick={() => acceptRequest(currentId)}>
+                <Link to= {`/dashboard/leaving-request-office-admin/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
+                Take Request
+                </Link>
+              </Button>
+            }
+          /> */}
+
           <TablePaginationCustom
             count={dataFiltered.length}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            dense={dense}
-            onChangeDense={onChangeDense}
+          //
+          // dense={dense}
+          // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
@@ -327,7 +361,7 @@ function applyFilter({
   // }
 
   if (filterName) {
-    inputData = inputData.filter((request) => request.id === parseInt(filterName,10) || request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => request.id === parseInt(filterName, 10) || request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
 

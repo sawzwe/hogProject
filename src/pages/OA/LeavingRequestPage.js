@@ -7,6 +7,7 @@ import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import LeavingRequestStatusList from '../../sections/dashboard/oa-leaving-request-list/LeavingRequestStatusList'
 
+
 // ----------------------------------------------------------------------
 
 export default function RegistrationRequestStatusPage() {
@@ -24,7 +25,7 @@ export default function RegistrationRequestStatusPage() {
                     links={[
                         {
                             name: 'Leaving Request',
-                            href: PATH_DASHBOARD.courseRegistration.root,
+                            href: PATH_DASHBOARD.leavingRequestOA.root,
                         },
                         { name: 'Request status' },
                     ]}

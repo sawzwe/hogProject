@@ -60,6 +60,7 @@ export const PageStudentCalendar = Loadable(lazy(() => import('../pages/Student/
 export const PageStudentCourse = Loadable(lazy(() => import('../pages/Student/StudentCoursePage')));
 export const PageStudentProfile = Loadable(lazy(() => import('../pages/Student/StudentProfilePage')));
 export const PageStudentRequestInbox = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxPage')));
+export const PageStudentRequestInboxDetail = Loadable(lazy(() => import('../pages/Student/StudentRequestInboxDetailPage')));
 export const PageStudentPrivateCourseDetail = Loadable(lazy(() => import('../pages/Student/StudentPrivateCourseDetailPage')));
 export const PageStudentGroupCourseDetail = Loadable(lazy(() => import('../pages/Student/StudentGroupCourseDetailPage')));
 export const PageStudentMakeup = Loadable(lazy(() => import('../pages/Student/StudentMakeupPage')));
@@ -73,6 +74,8 @@ export const PageTeacherLeavingRequest = Loadable(lazy(() => import('../pages/Te
 export const PageTeacherRequestInbox = Loadable(lazy(() => import('../pages/Teacher/TeacherRequestInboxPage')));
 export const PageTeacherPrivateCourseDetail = Loadable(lazy(() => import('../pages/Teacher/TeacherPrivateCourseDetailPage')));
 export const PageTeacherGroupCourseDetail = Loadable(lazy(() => import('../pages/Teacher/TeacherGroupCourseDetailPage')));
+export const PageTeacherCheckGroupAttendance = Loadable(lazy(() => import('../pages/Teacher/TeacherCheckGroupAttendancePage')));
+export const PageTeacherCheckPrivateAttendance = Loadable(lazy(() => import('../pages/Teacher/TeacherCheckPrivateAttendancePage')));
 
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
