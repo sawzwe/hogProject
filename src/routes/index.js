@@ -52,12 +52,11 @@ import {
   PageTeacherCourse,
   PageTeacherLeavingRequest,
   PageTeacherRequestInbox,
+  PageTeacherRequestInboxDetail,
   PageTeacherPrivateCourseDetail,
   PageTeacherGroupCourseDetail,
-  PageStudentRequestInboxDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance
-  PageTeacherRequestInboxDetail
 }
   from './elements';
 
