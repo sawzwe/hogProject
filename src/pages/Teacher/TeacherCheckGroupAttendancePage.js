@@ -6,17 +6,17 @@ import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRound
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
-import StudentMakeup from '../../sections/dashboard/student/StudentMakeup';
-import { currentStudent } from './mockup';
+import TeacherCheckAttendance from '../../sections/dashboard/teacher/TeacherCheckAttendance';
+import { currentTeacher } from './mockup';
 
 // ----------------------------------------------------------------------
 
-export default function StudentMakeupPage() {
+export default function TeacherCheckGroupAttendance() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
     const { classId } = useParams();
-    const currentClass = currentStudent.studentPrivateClass.find(eachClass => (eachClass.id === classId));
+    const currentClass = currentTeacher.teacherGroupClass.find(eachClass => (eachClass.id === classId));
 
     return (
         <>
@@ -31,10 +31,13 @@ export default function StudentMakeupPage() {
                     direction="row">
                     <ArrowBackIosNewRoundedIcon sx={{ cursor: 'pointer', mr: 0.5 }} onClick={() => navigate(-1)} />
                     <Typography variant="h6">
-                        Cancel and Makeup Class
+                        {`${currentClass.course.course} ${currentClass.course.subject} (${currentClass.course.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
-                <StudentMakeup currentClass={currentClass} />
+                <Typography variant="body2" sx={{ ml: 3.5 }}>
+                    {currentClass.section}
+                </Typography>
+                <TeacherCheckAttendance currentClass={currentClass} />
             </Container>
         </>
     );

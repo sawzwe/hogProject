@@ -82,10 +82,10 @@ export default function StudentMakeup({ currentClass }) {
                         <Typography>
                             {`${fDate(date, 'dd MMMM yyyy')} | ${fromTime} - ${toTime}`}
                         </Typography>
-                        <Typography variant='caption' color='text.secondary'>
+                        <Typography variant='body2' color='text.secondary'>
                             {`${course.subject} (${course.type})`}
                         </Typography>
-                        <Typography variant="caption" component='div' color='text.secondary'>
+                        <Typography variant="body2" component='div' color='text.secondary'>
                             {teacher.fullName}
                         </Typography>
                     </Card>

@@ -1,37 +1,30 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 // form
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Card, Typography, Grid, Stack, Button, TextField, Dialog, DialogContent, DialogActions, DialogTitle } from '@mui/material';
+import { Card, Typography, Grid, Button, Dialog, DialogContent, DialogActions, DialogTitle } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 // components
-import MakeupCard from '../../../components/app-card/MakeupCard';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
 // utils
 import { fDate } from '../../../utils/formatTime';
 
 StudentMakeup.propTypes = {
-    currentCourse: PropTypes.object,
     currentClass: PropTypes.object
 };
 
-export default function StudentMakeup({ currentCourse, currentClass }) {
+export default function StudentMakeup({ currentClass }) {
 
     // Specific class
     const {
-        id,
-        classNo,
         course,
         date,
         fromTime,
         toTime,
-        room,
-        subject,
         teacher
     } = currentClass;
 
@@ -57,14 +50,10 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
     });
 
     const {
-        reset,
-        watch,
         setError,
         handleSubmit,
         formState: { isSubmitting },
     } = methods;
-
-    const values = watch();
 
     const onSubmit = async (data) => {
         try {
@@ -87,10 +76,10 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
                         <Typography>
                             {`${fDate(date, 'dd MMMM yyyy')} | ${fromTime} - ${toTime}`}
                         </Typography>
-                        <Typography variant='caption' color='text.secondary'>
+                        <Typography variant='body2' color='text.secondary'>
                             {`${course.subject} (${course.type})`}
                         </Typography>
-                        <Typography variant="caption" component='div' color='text.secondary'>
+                        <Typography variant="body2" component='div' color='text.secondary'>
                             {teacher.fullName}
                         </Typography>
                     </Card>
@@ -98,9 +87,9 @@ export default function StudentMakeup({ currentCourse, currentClass }) {
             </Grid>
 
             <Typography variant="h6" sx={{ mx: 1, mt: 3, mb: 1.5 }}>
-                Makeup Request
+                Remark
             </Typography>
-            <RHFTextField name="remark" label="Remark" multiline rows={3} />
+            <RHFTextField name="remark" label="Type here..." multiline rows={3} />
 
             <LoadingButton fullWidth size="large" type="submit" variant="contained" color="primary" loading={isSubmitting} sx={{ mt: 3 }}>
                 Submit

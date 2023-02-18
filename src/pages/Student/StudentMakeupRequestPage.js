@@ -2,8 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 // @mui
 import { Container, Typography, Stack } from '@mui/material';
-//
-import { Icon } from '@iconify/react';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
@@ -16,8 +15,7 @@ export default function StudentMakeupRequestPage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
-    const { courseId, classId } = useParams();
-    const currentCourse = currentStudent.studentPrivateCourse.find(course => course.id === courseId);
+    const { classId } = useParams();
     const currentClass = currentStudent.studentPrivateClass.find(eachClass => (eachClass.id === classId));
 
     return (
@@ -31,12 +29,12 @@ export default function StudentMakeupRequestPage() {
                     justifyContent="flex-start"
                     alignItems="center"
                     direction="row">
-                    <Icon icon="ic:round-chevron-left" width="40" height="40" style={{cursor: 'pointer'}} onClick={() => navigate(-1)} />
-                    <Typography variant="h4">
+                    <ArrowBackIosNewRoundedIcon sx={{ cursor: 'pointer', mr: 0.5 }} onClick={() => navigate(-1)} />
+                    <Typography variant="h6">
                         Makeup Request
                     </Typography>
                 </Stack>
-                <StudentMakeupRequest currentCourse={currentCourse} currentClass={currentClass} />
+                <StudentMakeupRequest currentClass={currentClass} />
             </Container>
         </>
     );

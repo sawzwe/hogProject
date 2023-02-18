@@ -2,8 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 // @mui
 import { Container, Typography, Stack } from '@mui/material';
-//
-import { Icon } from '@iconify/react';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 // components
 import { useSettingsContext } from '../../components/settings';
 // sections
@@ -30,13 +29,15 @@ export default function TeacherGroupCourseDetailPage() {
                 <Stack
                     justifyContent="flex-start"
                     alignItems="center"
-                    direction="row"
-                    sx={{ verticalAlign: 'middle' }}>
-                    <Icon icon="ic:round-chevron-left" width="40" height="40" style={{ cursor: 'pointer' }} onClick={() => navigate(-1)} />
+                    direction="row">
+                    <ArrowBackIosNewRoundedIcon sx={{ cursor: 'pointer', mr: 0.5 }} onClick={() => navigate(-1)} />
                     <Typography variant="h6" >
                         {`${currentCourse.course} ${currentCourse.subject} (${currentCourse.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
+                <Typography variant="body2" sx={{ ml: 3.5 }}>
+                    {currentCourse.section}
+                </Typography>
                 <TeacherAllClasses classes={classes} />
             </Container>
         </>

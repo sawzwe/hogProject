@@ -75,6 +75,8 @@ export const PageTeacherRequestInbox = Loadable(lazy(() => import('../pages/Teac
 export const PageTeacherRequestInboxDetail = Loadable(lazy(() => import('../pages/Teacher/TeacherRequestInboxDetailPage')));
 export const PageTeacherPrivateCourseDetail = Loadable(lazy(() => import('../pages/Teacher/TeacherPrivateCourseDetailPage')));
 export const PageTeacherGroupCourseDetail = Loadable(lazy(() => import('../pages/Teacher/TeacherGroupCourseDetailPage')));
+export const PageTeacherCheckGroupAttendance = Loadable(lazy(() => import('../pages/Teacher/TeacherCheckGroupAttendancePage')));
+export const PageTeacherCheckPrivateAttendance = Loadable(lazy(() => import('../pages/Teacher/TeacherCheckPrivateAttendancePage')));
 
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
