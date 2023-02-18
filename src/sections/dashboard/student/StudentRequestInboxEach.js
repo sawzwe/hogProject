@@ -53,74 +53,9 @@ export default function StudentRequestInboxEach({ currentRequest }) {
                 </Card>
                 <Box>
                     <Typography variant='h6'>Remark</Typography>
-                    <Typography variant='body2'>{currentRequest.remark}</Typography>
+                    <Typography variant='body2'>{remark}</Typography>
                 </Box>
             </Stack>
         </>
     )
 }
-
-// --------------------------------------------------------------------------------------------------------
-
-// ClassDialog.propTypes = {
-//     open: PropTypes.bool,
-//     onClose: PropTypes.func,
-//     selectedClass: PropTypes.object,
-// };
-
-// export function ClassDialog({ open, onClose, selectedClass }) {
-//     const navigate = useNavigate();
-
-//     const handleClickMakeup = () => {
-//         navigate(`/dashboard/student-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
-//     }
-
-//     return (
-//         <Dialog
-//             fullWidth
-//             maxWidth="xs"
-//             open={open}
-//             onClose={onClose}>
-//             <DialogContent sx={{ p: 3, textAlign: 'center' }}>
-//                 <Card variant="outlined" sx={{ py: 2, borderRadius: '5px 5px 0px 0px' }}>
-//                     <Typography variant="h6" sx={{ mx: 'auto' }}>{`${selectedClass.course.course} ${selectedClass.course.subject} ${selectedClass.course.level} (${selectedClass.course.type.toUpperCase()})`} </Typography>
-//                 </Card>
-//                 <Card sx={{ py: 2, borderRadius: 0, backgroundColor: '#007B55', color: 'white' }}>
-//                     <Typography variant="inherit">
-//                         {selectedClass.teacher.fullName}
-//                     </Typography>
-//                 </Card>
-//                 <Card variant="outlined" sx={{ py: 2, borderRadius: '0px 0px 5px 5px' }}>
-//                     <Stack direction="row" justifyContent="center" spacing={1}>
-//                         <Typography>
-//                             {`Time ${selectedClass.fromTime} - ${selectedClass.toTime} `}
-//                         </Typography>
-//                         {!!selectedClass.room && (
-//                             <Typography>
-//                                 {`Room ${selectedClass.room}`}
-//                             </Typography>
-//                         )}
-//                     </Stack>
-//                 </Card>
-//                 {selectedClass.attendance === 'None' && selectedClass.course.type !== 'Group' && (
-//                     <>
-//                         <Card sx={{ mt: 3, py: 2, borderRadius: '5px 5px 0px 0px', backgroundColor: '#007B55', color: 'white' }}>
-//                             <Typography >
-//                                 Actions
-//                             </Typography>
-//                         </Card>
-//                         <Card variant="outlined" sx={{ py: 1, borderRadius: '0px 0px 5px 5px', cursor: 'pointer' }} onClick={handleClickMakeup} >
-//                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2 }}>
-//                                 <Typography >
-//                                     Cancel and makeup class
-//                                 </Typography>
-//                                 <Icon icon="ic:round-chevron-right" color="#c2c2c2" width="40" height="40" />
-//                             </Stack>
-//                         </Card>
-//                     </>
-//                 )}
-//             </DialogContent>
-//         </Dialog>
-//     )
-// }
-

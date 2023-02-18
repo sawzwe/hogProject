@@ -3,6 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { Container, Typography } from '@mui/material';
 // components
 import { useSettingsContext } from '../../components/settings';
+// sections
+import TeacherRequestInbox from '../../sections/dashboard/teacher/TeacherRequestInbox';
+// mock data
+import { currentTeacher } from './mockup';
 
 // ----------------------------------------------------------------------
 
@@ -17,9 +21,7 @@ export default function TeacherRequestInboxPage() {
                 </Helmet>
 
                 <Container maxWidth={themeStretch ? false : 'xl'}>
-                    <Typography variant="h4" gutterBottom>
-                        Teacher Inbox Page
-                    </Typography>
+                    <TeacherRequestInbox currentTeacherRequest={currentTeacher} />
                 </Container>
             </>
         </>
