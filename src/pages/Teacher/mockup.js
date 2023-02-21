@@ -156,4 +156,9 @@ export const currentTeacher = {
     teacherGroupCourse: [
         { id: '0', course: 'SAT', subject: 'READING', level: 'INTENSIVE', type: 'Group', section: 'CY/123' },
     ],
+    teacherLeaveRequest:[
+        { id: '0', leaveType:'Sick Leave',       requestDate:'17-Feb-2022',fromDate:'18-Feb-2022',fromTime:"full day", toDate:'20-Feb-2022', toTime:"full day", durationDay:"2",durationHour:"-",status:'Pending',remark:"High-Blood Pressure"},
+        { id: '1', leaveType:'Vacation Leave',   requestDate:'15-Feb-2022',fromDate:'17-Feb-2022',fromTime:"full day", toDate:'22-Feb-2022', toTime:"full day", durationDay:"5",durationHour:"-",status:'Complete',remark:"Annual Vacation Leave"},
+        { id: '2', leaveType:'Vacation Leave',   requestDate:'19-Feb-2022',fromDate:'19-Feb-2022',fromTime:"full day", toDate:'21-Feb-2022', toTime:"full day", durationDay:"3",durationHour:"-",status:'Reject',remark:"Annual Vacation Leave"},
+    ],
 }
