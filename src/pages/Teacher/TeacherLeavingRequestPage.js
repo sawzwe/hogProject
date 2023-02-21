@@ -12,16 +12,16 @@ export default function TeacherLeavingRequestPage() {
 
     return (
         <>
-                <Helmet>
-                    <title> Teacher Leaving </title>
-                </Helmet>
+            <Helmet>
+                <title> Teacher Leaving </title>
+            </Helmet>
 
-                <Container maxWidth={themeStretch ? false : 'xl'}>
-                    <Typography variant="h4" gutterBottom>
-                        Teacher Leaving Page
-                    </Typography>
-                    <TeacherNewLeavingRequest />
-                </Container>
+            <Container maxWidth={themeStretch ? false : 'xl'}>
+                <Typography variant="h4" gutterBottom>
+                    Teacher Leaving Page
+                </Typography>
+                <TeacherNewLeavingRequest />
+            </Container>
         </>
     );
 }
