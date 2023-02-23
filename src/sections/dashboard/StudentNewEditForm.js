@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -8,6 +9,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
+// auth
+import { useAuthContext } from '../../auth/useAuthContext';
 // utils
 import { fData } from '../../utils/formatNumber';
 // assets
@@ -79,6 +82,10 @@ StudentNewEditForm.propTypes = {
 };
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
+    const navigate = useNavigate();
+
+
+    const { registerStudent } = useAuthContext();
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -151,7 +158,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
             parentLineId: currentStudent?.parentLineId || 'dad@line',
             studentHealthInfo: currentStudent?.studentHealthInfo || 'Seafood allergy',
             studentSource: currentStudent?.studentSource || 'Know from friends',
-            studentImageUrl: currentStudent?.studentImageUrl || '',
+            studentImageURL: currentStudent?.studentImageUrl || '',
             studentAdditionalFiles: currentStudent?.studentAdditionalFiles || [],
         }),
         [currentStudent]
@@ -183,10 +190,10 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
     }, [isEdit, currentStudent]);
 
     // Create student to Firebase Auth, Firestore, and Azure Database
-    const createStudent = () => {
+    const createStudent = async (data) => {
         // Add Logic here
-
-        enqueueSnackbar('Create success!')
+        await registerStudent(data)
+            .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
     }
 
     // Update student data to the database
@@ -198,15 +205,15 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
 
     const onSubmit = async (data) => {
         try {
-            // updateStudent(data);
             if (isEdit) {
                 await updateStudent(data);
             } else {
                 await createStudent(data);
+                await enqueueSnackbar('Successfully created!');
             }
-            console.log('DATA', JSON.stringify(data, null, 2));
+            // console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
-            console.error(error);
+            enqueueSnackbar('Unknown Error!', { variant: 'error' });
         }
     };
 
@@ -251,6 +258,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
         },
         [setValue, values.studentAdditionalFiles]
     );
+
 
     const handleRemoveFile = (inputFile) => {
         const filtered = values.studentAdditionalFiles && values.studentAdditionalFiles?.filter((file) => file !== inputFile);
@@ -316,7 +324,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             display="grid"
                             gridTemplateColumns={{
                                 xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(6, 1fr)',
+                                sm: 'repeat(1, 1fr)',
                             }}
                             gridTemplateAreas={{
                                 xs: `"studentTitle" "studentFirstName" "studentLastName" "studentNickname" "studentDateOfBirth" "studentPhoneNumber" "studentLineId" "studentEmail"`,
@@ -449,7 +457,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
                             </RHFSelect>
                             <RHFTextField name="targetUniversity" label="Target University" />
                             <RHFTextField name="targetScore" label="Target Score" />
-                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther}  />
+                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther} />
                             {showOtherStudyProgram ? <RHFTextField name="otherStudyProgram" label="Other" required /> : null}
                         </Box>
                     </Card>

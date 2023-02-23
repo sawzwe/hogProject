@@ -271,5 +271,14 @@ const TeacherNavConfig = [
   }
 ];
 
+const BugNavConfig = [
+  {
+    subheader: 'Settings',
+    items: [
+      { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
+    ],
+  }
+];
 
-export { EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig, TeacherNavConfig };
+
+export { EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig, TeacherNavConfig, BugNavConfig };

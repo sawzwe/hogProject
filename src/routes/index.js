@@ -67,7 +67,7 @@ export default function Router() {
 
   function firstPage() {
     if (user.role === 'Education Planner') {
-      return 'new-student'
+      return 'student-management/search-student'
     }
     if (user.role === 'Education Admin') {
       return 'daily-calendar'
@@ -83,6 +83,7 @@ export default function Router() {
     }
     return null;
   };
+  
 
   return useRoutes([
     {

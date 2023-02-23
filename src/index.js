@@ -8,7 +8,7 @@ import 'simplebar/src/simplebar.css';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 // ----------------------------------------------------------------------
-
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -31,17 +31,19 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <AuthProvider>
-    <HelmetProvider>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <SettingsProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </SettingsProvider>
-      </LocalizationProvider>
-    </HelmetProvider>
-  </AuthProvider>
+  <React.StrictMode>
+    <AuthProvider>
+      <HelmetProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <SettingsProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </SettingsProvider>
+        </LocalizationProvider>
+      </HelmetProvider>
+    </AuthProvider>
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

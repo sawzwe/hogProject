@@ -14,7 +14,7 @@ import { NavSectionVertical } from '../../../components/nav-section';
 // auth
 import { useAuthContext } from '../../../auth/useAuthContext';
 //
-import {EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig, TeacherNavConfig} from './config';
+import {EPNavConfig, EANavConfig, OANavConfig, StudentNavConfig, TeacherNavConfig, BugNavConfig} from './config';
 import NavDocs from './NavDocs';
 import NavAccount from './NavAccount';
 
@@ -59,7 +59,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
       return TeacherNavConfig
 
     }
-    return null;
+    return BugNavConfig;
   }
 
   const navConfig = getNavConfig();
