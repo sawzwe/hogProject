@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext, useEffect, useReducer, useCallback } from 'react';
+import { createContext, useEffect, useReducer, useCallback, useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import {
     getAuth,
@@ -7,11 +7,17 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    updatePassword
+    setPersistence,
+    updatePassword,
+    browserLocalPersistence
 } from 'firebase/auth';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+
+import { getFirestore, collection, doc, getDoc, setDoc, clearIndexedDbPersistence } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes } from "firebase/storage"
+import axios from 'axios';
+import { v4 } from 'uuid';
 // config
-import { FIREBASE_API } from '../config';
+import { FIREBASE_API, HOG_API } from '../config';
 
 // ----------------------------------------------------------------------
 
@@ -47,8 +53,34 @@ export const AuthContext = createContext(null);
 
 const firebaseApp = initializeApp(FIREBASE_API);
 
+const studentAppConfig = {
+    apiKey: "AIzaSyBtyBmAPXMLJSuE7Y8mSC9EVUiXqpOFJRI",
+    authDomain: "authen-hog-project.firebaseapp.com",
+    projectId: "authen-hog-project",
+    storageBucket: "authen-hog-project.appspot.com",
+    messagingSenderId: "121884697124",
+    appId: "1:121884697124:web:f39ec7fd70d1ac3fbcaeb1"
+}
+const studentApp = initializeApp(studentAppConfig, "studentApp");
+
+const adminAppConfig = {
+    apiKey: "AIzaSyCIVrYZVba_34k3M9mBA1JO_Knmw88RfU8",
+    authDomain: "houseofgriffin-admin-auth.firebaseapp.com",
+    projectId: "houseofgriffin-admin-auth",
+    storageBucket: "houseofgriffin-admin-auth.appspot.com",
+    messagingSenderId: "528572467703",
+    appId: "1:528572467703:web:b1393764b5ffc08b41c6f2"
+}
+
+const adminApp = initializeApp(adminAppConfig, "adminApp");
+
 const AUTH = getAuth(firebaseApp);
+const AUTH_STUDENT = getAuth(studentApp);
+const AUTH_ADMIN = getAuth(adminApp);
+
 const DB = getFirestore(firebaseApp);
+
+const storage = getStorage(firebaseApp);
 
 AuthProvider.propTypes = {
     children: PropTypes.node,
@@ -61,7 +93,6 @@ export function AuthProvider({ children }) {
         try {
             onAuthStateChanged(AUTH, async (user) => {
                 if (user) {
-
                     const userRef = doc(DB, 'users', user.uid);
 
                     const docSnap = await getDoc(userRef);
@@ -80,12 +111,57 @@ export function AuthProvider({ children }) {
                         },
                     });
                 } else {
-                    dispatch({
-                        type: 'INITIAL',
-                        payload: {
-                            isAuthenticated: false,
-                            user: null,
-                        },
+                    onAuthStateChanged(AUTH_STUDENT, async (user) => {
+                        if (user) {
+
+                            const userRef = doc(DB, 'users', user.uid);
+
+                            const docSnap = await getDoc(userRef);
+
+                            const profile = docSnap.data();
+
+                            dispatch({
+                                type: 'INITIAL',
+                                payload: {
+                                    isAuthenticated: true,
+                                    user: {
+                                        ...user,
+                                        ...profile,
+                                        // role: 'admin',
+                                    },
+                                },
+                            });
+                        } else {
+                            onAuthStateChanged(AUTH_ADMIN, async (user) => {
+                                if (user) {
+                                    const userRef = doc(DB, 'users', user.uid);
+
+                                    const docSnap = await getDoc(userRef);
+
+                                    const profile = docSnap.data();
+
+                                    dispatch({
+                                        type: 'INITIAL',
+                                        payload: {
+                                            isAuthenticated: true,
+                                            user: {
+                                                ...user,
+                                                ...profile,
+                                                // role: 'admin',
+                                            },
+                                        },
+                                    });
+                                } else {
+                                    dispatch({
+                                        type: 'INITIAL',
+                                        payload: {
+                                            isAuthenticated: false,
+                                            user: null,
+                                        },
+                                    });
+                                }
+                            })
+                        }
                     });
                 }
             });
@@ -96,29 +172,102 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         initialize();
-    }, [initialize]);
+    }, []);
 
     // UPDATE PASSWORD
     const changePassword = (newPassword) => updatePassword(AUTH.currentUser, newPassword);
 
     // LOGIN
-    const login = (email, password) => signInWithEmailAndPassword(AUTH, email, password);
+    const login = async (email, password) => {
+        signInWithEmailAndPassword(AUTH_ADMIN, email, password)
+            .catch(() => signInWithEmailAndPassword(AUTH, email, password)
+                .catch(() => signInWithEmailAndPassword(AUTH_STUDENT, email, password)));
+    }
 
-    // REGISTER
-    const register = (email, password, firstName, lastName) =>
-        createUserWithEmailAndPassword(AUTH, email, password).then(async (res) => {
-            const userRef = doc(collection(DB, 'users'), res.user?.uid);
+    // REGISTER STUDENT (WAIT TO ADD TO AZURE SQL)
+    const registerStudent = async (data) =>
+        createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
+            .then(async (res) => {
+                const userRef = doc(collection(DB, 'users'), res.user?.uid);
+                return setDoc(userRef, {
+                    uid: res.user?.uid,
+                    email: data.studentEmail,
+                    displayName: `${data.studentFirstName} ${data.studentLastName}`,
+                    role: "Student"
+                })
+                    .catch((error) => console.error(error))
+                    .then(() => {
+                        const file = data.studentImageURL
+                        const storageProfileRef = ref(storage, `users/${res.user?.uid}/Avatar/${file.name}`);
+                        uploadBytes(storageProfileRef, file)
+                            .then((snapshot) => { console.log("uploaded!") })
+                            .catch((error) => console.error(error));
+                    })
+                    .catch((error) => console.error(error))
+                    .then(() => {
+                        data.studentAdditionalFiles.map((file, index) => {
+                            const storageAdditionalFilesRef = ref(storage, `users/${res.user?.uid}/Files/${file.name}`);
+                            return uploadBytes(storageAdditionalFilesRef, file)
+                                .then((snapshot) => console.log("Additional File uploaded!"))
+                                .catch((error) => console.error(error));
+                        })
+                    })
+                    .then(() => signOut(AUTH_STUDENT))
+                    .then(() => {
+                        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({file: file.name}))
+                        axios.post(`${HOG_API}/api/Student/Post`, {
+                            firebaseId: res.user?.uid,
+                            title: data.studentTitle,
+                            fName: data.studentFirstName,
+                            lName: data.studentLastName,
+                            nickname: data.studentNickname,
+                            profilePicture: data.studentImageURL.name,
+                            additionalFiles: nameAdditionalFiles,
+                            dob: data.studentDateOfBirth,
+                            phone: data.studentPhoneNo,
+                            line: data.studentLineId,
+                            email: data.studentEmail,
+                            school: data.schoolName,
+                            countryOfSchool: data.schoolCountry,
+                            levelOfStudy: data.levelOfStudy,
+                            program: data.studyProgram,
+                            targetUni: data.targetUniversity,
+                            targetScore: data.targetScore,
+                            hogInfo: data.studentSource,
+                            healthInfo: data.studentHealthInfo,
+                            parent: {
+                                fName: data.parentFirstName,
+                                lName: data.parentLastName,
+                                relationship: data.parentRelationships,
+                                phone: data.parentPhoneNo,
+                                email: data.parentEmail,
+                                line: data.parentLineId,
+                            },
+                            address: {
+                                address: data.address,
+                                subdistrict: data.subDistrict,
+                                district: data.district,
+                                province: data.province,
+                                zipcode: data.zipCode,
+                            }
+                        })
+                            .then((res) => console.log(res))
+                            .catch((error) => console.error(error))
+                    })
+            })
 
-            await setDoc(userRef, {
-                uid: res.user?.uid,
-                email,
-                displayName: `${firstName} ${lastName}`,
-                role: "Education Planner"
-            });
-        });
 
     // LOGOUT
-    const logout = () => signOut(AUTH);
+    const logout = async () => {
+        try {
+            await signOut(AUTH_STUDENT)
+            await signOut(AUTH)
+            await signOut(AUTH_ADMIN)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
     return (
         <AuthContext.Provider
@@ -126,7 +275,7 @@ export function AuthProvider({ children }) {
                 ...state,
                 method: 'firebase',
                 login,
-                register,
+                registerStudent,
                 logout,
                 changePassword,
             }}

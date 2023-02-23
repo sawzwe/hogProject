@@ -42,6 +42,7 @@ import {
   PageStudentCourse,
   PageStudentProfile,
   PageStudentRequestInbox,
+  PageStudentRequestInboxDetail,
   PageStudentPrivateCourseDetail,
   PageStudentGroupCourseDetail,
   PageStudentMakeup,
@@ -51,9 +52,9 @@ import {
   PageTeacherCourse,
   PageTeacherLeavingRequest,
   PageTeacherRequestInbox,
+  PageTeacherRequestInboxDetail,
   PageTeacherPrivateCourseDetail,
   PageTeacherGroupCourseDetail,
-  PageStudentRequestInboxDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance
 }
@@ -66,7 +67,7 @@ export default function Router() {
 
   function firstPage() {
     if (user.role === 'Education Planner') {
-      return 'new-student'
+      return 'student-management/search-student'
     }
     if (user.role === 'Education Admin') {
       return 'daily-calendar'
@@ -82,6 +83,7 @@ export default function Router() {
     }
     return null;
   };
+  
 
   return useRoutes([
     {
@@ -447,6 +449,13 @@ export default function Router() {
           path: 'teacher-inbox', element: (
             <RoleBasedGuard roles={['Teacher']} hasContent>
               <PageTeacherRequestInbox />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'teacher-inbox/:id', element: (
+            <RoleBasedGuard roles={['Teacher']} hasContent>
+              <PageTeacherRequestInboxDetail />
             </RoleBasedGuard>
           )
         },
