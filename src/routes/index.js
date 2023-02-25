@@ -15,6 +15,7 @@ import {
   // EP
   PageNewStdent,
   PageSearchStudent,
+  PageViewStudent,
   PageEditStudent,
   PageCreateRegistrationRequest,
   PageRegistrationRequestStatus,
@@ -135,6 +136,13 @@ export default function Router() {
               path: 'search-student', element: (
                 <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
                   <PageSearchStudent />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'search-student/:id', element: (
+                <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
+                  <PageViewStudent />
                 </RoleBasedGuard>
               )
             },

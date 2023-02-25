@@ -79,9 +79,10 @@ const FILE_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
 StudentNewEditForm.propTypes = {
     isEdit: PropTypes.bool,
     currentStudent: PropTypes.object,
+    isView: PropTypes.bool,
 };
 
-export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
+export default function StudentNewEditForm({ isEdit = false, currentStudent, isView }) {
     const navigate = useNavigate();
 
 
@@ -208,7 +209,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
             if (isEdit) {
                 await updateStudent(data);
             } else {
-                await createStudent(data);
+                console.log(data);
+                // await createStudent(data);
                 await enqueueSnackbar('Successfully created!');
             }
             // console.log('DATA', JSON.stringify(data, null, 2));
@@ -271,7 +273,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent }) {
 
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-
             {/* Student Image */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
