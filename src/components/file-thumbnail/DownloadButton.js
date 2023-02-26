@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 // utils
 import { bgBlur } from '../../utils/cssStyles';
 //
@@ -45,7 +46,7 @@ export default function DownloadButton({ onDownload }) {
         },
       }}
     >
-      <Iconify icon="eva:arrow-circle-down-fill" width={24} />
+      <OpenInNewRoundedIcon width={24} />
     </IconButton>
   );
 }

@@ -1,25 +1,26 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
+import { Box, Card, Chip, Grid, Stack, Typography, TextField } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 // utils
 import { fDate } from '../../utils/formatTime';
 // components
-import { AvatarPreview, MultiFilePreview } from '../../components/upload';
+import { AvatarPreview } from '../../components/upload';
+import FileThumbnail from '../../components/file-thumbnail';
 
 // ----------------------------------------------------------------------
 
 ViewStudent.propTypes = {
     student: PropTypes.object,
-    avatarURL: PropTypes.string
+    avatarURL: PropTypes.string,
+    filesURL: PropTypes.array
 };
 
-export default function ViewStudent({ student, avatarURL }) {
+export default function ViewStudent({ student, avatarURL, filesURL }) {
     // const navigate = useNavigate();
 
     // Firebase Storage
@@ -27,6 +28,8 @@ export default function ViewStudent({ student, avatarURL }) {
     // const pathReference = ref(storage, `users/${student.firebaseId}/Avatar/${student.profilePicture}`);
     // getDownloadURL(pathReference)
     // .then((url) => console.log(url))
+
+    // console.log(filesURL);
 
     return (
         <Grid container spacing={3}>
@@ -56,7 +59,7 @@ export default function ViewStudent({ student, avatarURL }) {
             </Grid>
 
             <Grid item xs={12} md={12}>
-                <AdditionalFiles student={student} avatarURL={avatarURL} />
+                <AdditionalFiles student={student} filesURL={filesURL} />
             </Grid>
 
         </Grid>
@@ -360,14 +363,13 @@ export function AdditionalInfo({ student }) {
 
 AdditionalFiles.propTypes = {
     student: PropTypes.object,
-    avatarURL: PropTypes.string
+    filesURL: PropTypes.array
 };
 
 // ----------------------------------------------------------------------
 
-export function AdditionalFiles({ student, avatarURL }) {
-    const newFiles = [avatarURL];
-    console.log(newFiles)
+export function AdditionalFiles({ student, filesURL }) {
+
     return (
         <Card sx={{ p: 3 }}>
             <Typography variant="h5"
@@ -377,7 +379,33 @@ export function AdditionalFiles({ student, avatarURL }) {
                 }}>
                 Additional Files
             </Typography>
-            <MultiFilePreview files={newFiles} />
+            {filesURL.map((file) => {
+                return (
+                    <Stack
+                        key={file.name}
+                        component={'div'}
+                        alignItems="center"
+                        display="inline-flex"
+                        justifyContent="center"
+                        sx={{
+                            m: 0.5,
+                            width: 80,
+                            height: 80,
+                            borderRadius: 1.25,
+                            overflow: 'hidden',
+                            position: 'relative',
+                            border: (theme) => `solid 1px ${theme.palette.divider}`,
+                        }}
+                    >
+                        <FileThumbnail
+                            tooltip
+                            imageView
+                            file={file}
+                            onDownload={() => window.open(`${file.preview}`)}
+                        />
+                    </Stack>
+                )
+            })}
         </Card>
     )
 }

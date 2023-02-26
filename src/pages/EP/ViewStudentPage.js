@@ -1,10 +1,10 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 // firebase
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
-import { Container } from '@mui/material';
+import { Container, Button } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
@@ -24,31 +24,55 @@ export default function ViewStudentPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const dataFetchedRef = useRef(false);
+
     const [student, setStudent] = useState();
     const [avatarURL, setAvatarURL] = useState();
+    const [filesURL, setFilesURL] = useState([]);
     const [notFound, setNotFound] = useState(false);
 
     // Firebase Storage
     const storage = getStorage();
     // const pathReference = ref(storage, `users/${student.firebaseId}/Avatar/${student.profilePicture}`);
 
-    useEffect(() => {
-        axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+    const fetchData = async () => {
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
             .then((res) => {
                 const data = res.data.data
                 setStudent(data)
                 const pathReference = ref(storage, `users/${data.firebaseId}/Avatar/${data.profilePicture}`);
                 getDownloadURL(pathReference)
-                .then((url) => setAvatarURL(url));
+                    .then((url) => setAvatarURL(url));
+
+                const listRef = ref(storage, `users/${data.firebaseId}/Files`);
+                listAll(listRef)
+                    .then((res) => {
+                        res.items.map((itemRef) => (
+                            // getDownloadURL(itemRef)
+                            //     .then((url) => setFilesURL(filesURL => [...filesURL, url]))
+                            getMetadata(itemRef)
+                                .then((metadata) => {
+                                    getDownloadURL(itemRef)
+                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
+                                        .catch((error) => console.error(error));
+                                })
+                                .catch((error) => console.error(error))
+                        )
+                        )
+                    })
             })
             .catch((error) => navigate('*', { replace: false }))
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+        fetchData();
     }, [])
 
     if (!student && !avatarURL) {
         return <LoadingScreen />;
     }
-
-    console.log(student);
 
     return (
         <>
@@ -57,6 +81,7 @@ export default function ViewStudentPage() {
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
+                
                 <CustomBreadcrumbs
                     heading="View student"
                     links={[
@@ -66,9 +91,12 @@ export default function ViewStudentPage() {
                         },
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
+                    action={
+                        <Button component={Link} to={`/dashboard/student-management/search-student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+                    }
                 />
 
-                <ViewStudent student={student} avatarURL={avatarURL} />
+                <ViewStudent student={student} avatarURL={avatarURL} filesURL={filesURL} />
             </Container>
         </>
     );
