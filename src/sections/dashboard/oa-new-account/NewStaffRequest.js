@@ -13,21 +13,21 @@ import { fData } from '../../../utils/formatNumber';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFSelect, RHFTextField } from '../../../components/hook-form';
+import SelectAvailableDays from './newAccount/SelectAvailableDays';
 
 // ----------------------------------------------------------------------
 
 const STAFF_ROLES_OPTIONS = [
     { id: 1, name: 'Education Admin' },
-    { id: 2, name: 'Education Planner' },
-    { id: 3, name: 'Test' }
+    { id: 2, name: 'Teacher' },
 ];
 
-StaffNewEditForm.propTypes = {
+NewStaffRequest.propTypes = {
     isEdit: PropTypes.bool,
     currentStaff: PropTypes.object,
 };
 
-export default function StaffNewEditForm({ isEdit = false, currentStaff }) {
+export default function NewStaffRequest({ isEdit = false, currentStaff }) {
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -159,7 +159,7 @@ export default function StaffNewEditForm({ isEdit = false, currentStaff }) {
                     </RHFSelect>
                 </Grid>
 
-
+                {eaRole === 'Education Admin' ?(                
                 <Grid item xs={12} md={12}>
                     <Card sx={{ p: 3 }}>
                         <Typography variant="h5"
@@ -200,7 +200,52 @@ export default function StaffNewEditForm({ isEdit = false, currentStaff }) {
                             </Box>
                         </Box>
                     </Card>
-                </Grid>
+                </Grid>) : 
+                (                
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}>Teacher Personal Information</Typography>
+                        <Box
+                            rowGap={3}
+                            columnGap={2}
+                            display="grid"
+                            gridTemplateColumns={{
+                                xs: 'repeat(1, 1fr)',
+                                md: 'repeat(3, 1fr)',
+                            }}
+                            gridTemplateAreas={{
+                                xs: `"eaFirstName" "eaLastName" "eaNickname" "eaPhoneNumber" "eaLineId" "eaEmail"`,
+                                md: `"eaFirstName eaLastName eaNickname" "eaPhoneNumber eaLineId eaEmail"`
+                            }}
+                        >
+                            <Box gridArea={"eaFirstName"}>
+                                <RHFTextField name="eaFirstName" label="First Name" required />
+                            </Box>
+                            <Box gridArea={"eaLastName"}>
+                                <RHFTextField name="eaLastName" label="Last Name" required />
+                            </Box>
+                            <Box gridArea={"eaNickname"}>
+                                <RHFTextField name="eaNickname" label="Nick Name" required />
+                            </Box>
+                            <Box gridArea={"eaPhoneNumber"}>
+                                <RHFTextField name="eaPhoneNumber" label="Phone Number" required />
+                            </Box>
+                            <Box gridArea={"eaLineId"}>
+                                <RHFTextField name="eaLineId" label="Line ID" required />
+                            </Box>
+                            <Box gridArea={"eaEmail"}>
+                                <RHFTextField name="eaEmail" label="Email" required />
+                            </Box>
+                        </Box>
+                        <SelectAvailableDays/>
+                    </Card>
+                </Grid>)
+                }
+
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" justifyContent="flex-end" alignItems="center">

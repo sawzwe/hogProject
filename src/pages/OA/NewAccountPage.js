@@ -6,7 +6,7 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import StaffNewEditForm from '../../sections/dashboard/oa-new-account/StaffNewEditForm';
+import NewStaffRequest from '../../sections/dashboard/oa-new-account/NewStaffRequest';
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ export default function NewAccountPage() {
                     ]}
                 />
 
-                <StaffNewEditForm />
+                <NewStaffRequest />
             </Container>
         </>
     );
