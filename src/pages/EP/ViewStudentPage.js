@@ -25,15 +25,13 @@ export default function ViewStudentPage() {
     const { id } = useParams();
 
     const dataFetchedRef = useRef(false);
+    
+    // Firebase Storage
+    const storage = getStorage();
 
     const [student, setStudent] = useState();
     const [avatarURL, setAvatarURL] = useState();
     const [filesURL, setFilesURL] = useState([]);
-    const [notFound, setNotFound] = useState(false);
-
-    // Firebase Storage
-    const storage = getStorage();
-    // const pathReference = ref(storage, `users/${student.firebaseId}/Avatar/${student.profilePicture}`);
 
     const fetchData = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
@@ -67,10 +65,11 @@ export default function ViewStudentPage() {
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
+
         fetchData();
     }, [])
 
-    if (!student && !avatarURL) {
+    if (student === undefined || !avatarURL) {
         return <LoadingScreen />;
     }
 
