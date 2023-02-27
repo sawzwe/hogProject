@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,7 +18,7 @@ import FormProvider, { RHFSelect, RHFTextField } from '../../../components/hook-
 import SelectAvailableDays from './SelectAvailableDays';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import Iconify from '../../../components/iconify';
-
+import { useSettingsContext } from '../../../components/settings';
 // ----------------------------------------------------------------------
 
 const STAFF_ROLES_OPTIONS = [
@@ -24,14 +26,18 @@ const STAFF_ROLES_OPTIONS = [
     { id: 2, name: 'Teacher' },
 ];
 
-NewStaffRequest.propTypes = {
+EditStaffRequest.propTypes = {
     isEdit: PropTypes.bool,
     currentStaff: PropTypes.object,
 };
 
-export default function NewStaffRequest({ isEdit = false, currentStaff, Id }) {
-
+export default function EditStaffRequest({ isEdit = false, currentStaff, Id }) {
+    const { themeStretch } = useSettingsContext();
     const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
+
+    const [currentId, SetCurrentId] = useState(Id)
+    const [Edit, setEdit] = useState(isEdit)
 
     const NewEASchema = Yup.object().shape({
         eaRole: Yup.string().required('Role is required'),
@@ -46,12 +52,12 @@ export default function NewStaffRequest({ isEdit = false, currentStaff, Id }) {
     const defaultValues = {
 
         eaRole: 'Education Admin',
-        eaFirstName: '',
-        eaLastName: '',
-        eaNickname: '',
-        eaPhoneNumber: '',
-        eaLineId: '',
-        eaEmail: '',
+        eaFirstName: 'Saw',
+        eaLastName: 'Zwe',
+        eaNickname: 'Matt',
+        eaPhoneNumber: '84688648',
+        eaLineId: 'fs55s',
+        eaEmail: 'saw@gmail.com',
         eaRole2: '',
 
     }
@@ -138,6 +144,10 @@ export default function NewStaffRequest({ isEdit = false, currentStaff, Id }) {
         setOpenCreate(false);
     };
 
+    const handleEditAccount = () => {
+        setEdit(true)
+    }
+
 
 
 
@@ -148,18 +158,29 @@ export default function NewStaffRequest({ isEdit = false, currentStaff, Id }) {
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={12}>
                         <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}>Education Student Personal Information</Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                <Typography variant="h5" sx={{ display: 'inline-block' }}>
+                                    Education Student Personal Information
+                                </Typography>
+                                <Box >
+                                    <Stack spacing={2} direction="row-reverse" justifyContent="space-between" alignItems="center">
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 1em' }}>
+                                            <Button variant="outlined" sx={{ height: '3em', width: '12em', ml: 1, color: 'black', border: '1px solid #919EAB', marginLeft: 'auto' }}>
+                                                <Iconify icon="ic:vpn-key" sx={{ fontSize: 40, marginRight: 1 }} />
+                                                Reset Password
+                                            </Button>
 
-                            <Button variant="contained" color="warning">
-                                Reset Account Password
-                            </Button>
-                            <Button variant="outlined" color="success">
-                                Edit Personal Information
-                            </Button>
+                                            <Button variant="outlined" onClick={() => handleEditAccount()} sx={{ height: '3em', width: '8em', ml: 1 }}>
+                                                <Iconify icon="mdi:lead-pencil" sx={{ fontSize: 40, marginRight: 1 }} />
+                                                Edit
+                                            </Button>
+                                        </Box>
+
+                                    </Stack>
+                                </Box>
+
+                            </Box>
+
                             <Box
                                 rowGap={3}
                                 columnGap={2}
@@ -174,34 +195,52 @@ export default function NewStaffRequest({ isEdit = false, currentStaff, Id }) {
                                 }}
                             >
                                 <Box gridArea={"eaFirstName"}>
-                                    <RHFTextField name="eaFirstName" label="First Name" required />
+                                    <RHFTextField disabled={!Edit} name="eaFirstName" label="First Name" required />
                                 </Box>
                                 <Box gridArea={"eaLastName"}>
-                                    <RHFTextField name="eaLastName" label="Last Name" required />
+                                    <RHFTextField disabled={!Edit} name="eaLastName" label="Last Name" required />
                                 </Box>
                                 <Box gridArea={"eaNickname"}>
-                                    <RHFTextField name="eaNickname" label="Nick Name" required />
+                                    <RHFTextField disabled={!Edit} name="eaNickname" label="Nick Name" required />
                                 </Box>
                                 <Box gridArea={"eaPhoneNumber"}>
-                                    <RHFTextField name="eaPhoneNumber" label="Phone Number" required />
+                                    <RHFTextField disabled={!Edit} name="eaPhoneNumber" label="Phone Number" required />
                                 </Box>
                                 <Box gridArea={"eaLineId"}>
-                                    <RHFTextField name="eaLineId" label="Line ID" required />
+                                    <RHFTextField disabled={!Edit} name="eaLineId" label="Line ID" required />
                                 </Box>
                                 <Box gridArea={"eaEmail"}>
-                                    <RHFTextField name="eaEmail" label="Email" required />
+                                    <RHFTextField disabled={!Edit} name="eaEmail" label="Email" required />
                                 </Box>
                             </Box>
                         </Card>
                     </Grid>
 
-
                     <Grid item xs={12} md={12}>
-                        <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                            <LoadingButton type="submit" variant="contained" loading={isSubmitting} onClick={() => handleOpenCreateAccount()} sx={{ height: '3em' }}>
-                                {!isEdit ? 'Create Staff' : 'Save Changes'}
-                            </LoadingButton>
-                        </Stack>
+                        {Edit === false ? (
+                            <>
+                                <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center">
+                                    <Box>
+                                        <Button type="submit" variant="outlined" onClick={() => navigate(-1)} sx={{ height: '3em', width: '8em', ml: 1, color: 'black', border: '1px solid #919EAB', marginLeft: 'auto' }}>
+                                            Back
+                                        </Button>
+                                    </Box>
+                                </Stack>
+                            </>
+                        ) : <Stack spacing={2} direction="row-reverse" justifyContent="space-between" alignItems="center">
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 1em' }}>
+                                <Button variant="outlined" onClick={() => setEdit(false)} sx={{ height: '3em', width: '8em', ml: 1, color: 'black', border: '1px solid #919EAB', marginLeft: 'auto' }}>
+                                    <Iconify icon="radix-icons:cross-2" sx={{ fontSize: 40, marginRight: 1 }} />
+                                    Cancel
+                                </Button>
+
+                                <Button variant="outlined" sx={{ height: '3em', width: '8em', ml: 1 }}>
+                                    <Iconify icon="mdi:tick" sx={{ fontSize: 40, marginRight: 1 }} />
+                                    Save
+                                </Button>
+                            </Box>
+
+                        </Stack>}
                     </Grid>
                 </Grid>
 

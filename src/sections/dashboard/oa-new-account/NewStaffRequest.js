@@ -254,7 +254,7 @@
                                     <RHFTextField name="eaEmail" label="Email" required />
                                 </Box>
                             </Box>
-                            <SelectAvailableDays/>
+                            {/* <SelectAvailableDays/> */}
                         </Card>
                     </Grid>)
                     }
@@ -262,7 +262,10 @@
 
                     <Grid item xs={12} md={12}>
                         <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                            <LoadingButton type="submit" variant="contained" loading={isSubmitting} onClick={() => handleOpenCreateAccount()} sx={{ height: '3em' }}>
+                            <LoadingButton 
+                            variant="contained" 
+                            loading={isSubmitting} 
+                            onClick={() => handleOpenCreateAccount()} sx={{ height: '3em' }}>
                                 {!isEdit ? 'Create Staff' : 'Save Changes'}
                             </LoadingButton>
                         </Stack>
@@ -282,7 +285,12 @@
                         'If you submit, this  account will be create according to this information.'}
                     direction="row-reverse"
                     action={
-                        <Button variant="contained" color="success">
+                        <Button 
+                        type="submit"
+                        variant="contained" 
+                        color="success"
+                        onClick={handleSubmit()}
+                        >
                             Submit
                         </Button>
                     }

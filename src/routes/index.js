@@ -38,7 +38,7 @@ import {
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
   PageLeavingRequestDetailOA,
-  EditStudentAccount,
+  EditStaffAccount,
   // Student
   PageStudentCalendar,
   PageStudentCourse,
@@ -367,9 +367,9 @@ export default function Router() {
           )
         },
         {
-          path: 'edit-account/student/:id', element: (
-            <RoleBasedGuard roles={['Office Admin']} hasContent>
-              < EditStudentAccount />
+          path: 'edit-account/teacher/:id', element: (
+            <RoleBasedGuard roles={['Office Admin', 'Education Admin','Education Planner']} hasContent>
+              < EditStaffAccount />
             </RoleBasedGuard>
           )
         },

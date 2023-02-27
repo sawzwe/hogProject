@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -128,9 +127,9 @@ export default function StudentList() {
     setFilterValue(event.target.value);
 };
 
-const acceptRequest = (currentId) => {
-  setOpenConfirm(false);
-};
+// const acceptRequest = (currentId) => {
+//   setOpenConfirm(false);
+// };
 
 
 
@@ -167,11 +166,9 @@ const acceptRequest = (currentId) => {
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Tooltip title="More Info">
-                    <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
-                            <Link to={`/dashboard/edit-account/student/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
-                              <Iconify icon="ic:chevron-right" />
-                            </Link>
-                          </IconButton>
+                    <IconButton>
+                        <Iconify icon="ic:chevron-right" />
+                      </IconButton>
                     </Tooltip>
                   </TableCell>
 
