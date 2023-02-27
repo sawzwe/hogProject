@@ -15,7 +15,6 @@ import {
 import { getFirestore, collection, doc, getDoc, setDoc, clearIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes } from "firebase/storage"
 import axios from 'axios';
-import { v4 } from 'uuid';
 // config
 import { FIREBASE_API, HOG_API } from '../config';
 
@@ -178,11 +177,11 @@ export function AuthProvider({ children }) {
     const changePassword = (newPassword) => updatePassword(AUTH.currentUser, newPassword);
 
     // LOGIN
-    const login = async (email, password) => {
+    const login = async (email, password) => (
         signInWithEmailAndPassword(AUTH_ADMIN, email, password)
             .catch(() => signInWithEmailAndPassword(AUTH, email, password)
-                .catch(() => signInWithEmailAndPassword(AUTH_STUDENT, email, password)));
-    }
+                .catch(() => signInWithEmailAndPassword(AUTH_STUDENT, email, password)))
+    )
 
     // REGISTER STUDENT (WAIT TO ADD TO AZURE SQL)
     const registerStudent = async (data) =>
@@ -214,7 +213,7 @@ export function AuthProvider({ children }) {
                     })
                     .then(() => signOut(AUTH_STUDENT))
                     .then(() => {
-                        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({file: file.name}))
+                        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
                         axios.post(`${HOG_API}/api/Student/Post`, {
                             firebaseId: res.user?.uid,
                             title: data.studentTitle,
@@ -222,7 +221,7 @@ export function AuthProvider({ children }) {
                             lName: data.studentLastName,
                             nickname: data.studentNickname,
                             profilePicture: data.studentImageURL.name,
-                            additionalFiles: nameAdditionalFiles,
+                            additionalFiles: nameAdditionalFiles || [],
                             dob: data.studentDateOfBirth,
                             phone: data.studentPhoneNo,
                             line: data.studentLineId,
@@ -267,7 +266,6 @@ export function AuthProvider({ children }) {
             console.log(error)
         }
     }
-
 
     return (
         <AuthContext.Provider
