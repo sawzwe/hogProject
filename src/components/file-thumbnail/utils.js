@@ -112,7 +112,7 @@ export function fileThumb(fileUrl) {
 // ----------------------------------------------------------------------
 
 export function fileTypeByUrl(fileUrl = '') {
-  return (fileUrl && fileUrl.split('.').pop()) || '';
+  return (fileUrl && fileUrl.split('.').pop().split('?')[0]) || '';
 }
 
 // ----------------------------------------------------------------------
