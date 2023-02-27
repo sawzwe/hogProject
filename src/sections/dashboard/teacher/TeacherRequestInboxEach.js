@@ -88,7 +88,7 @@ export default function TeacherRequestInboxEach({ currentRequest }) {
                             Date
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            {durationDay}
+                             {durationDay} 
                         </Typography>
                     </Box>
 
@@ -97,7 +97,7 @@ export default function TeacherRequestInboxEach({ currentRequest }) {
                             Hour
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            {durationHour}
+                            {durationHour} 
                         </Typography>
                     </Box>
                 </Box>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate, Link } from 'react-router-dom';
+
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -67,6 +69,8 @@ export default function TeacherList() {
   });
 
   const [tableData, setTableData] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
+
 
   useEffect(() => {
     setTableData(TABLE_DATA);
@@ -84,9 +88,9 @@ export default function TeacherList() {
   // Filter
   const [openFilter, setOpenFilter] = useState(false);
 
-  const isFiltered = filterValue !== '' ;
+  const isFiltered = filterValue !== '';
   const isNotFound =
-        (!dataFiltered.length && !!filterValue);
+    (!dataFiltered.length && !!filterValue);
 
 
   const defaultValues = {
@@ -123,15 +127,19 @@ export default function TeacherList() {
 
   const handleFilterValue = (event) => {
     setFilterValue(event.target.value);
-};
+  };
+
+  const acceptRequest = (currentId) => {
+    setOpenConfirm(false);
+  };
 
 
   return (
     <div>
-      <ToolbarTeacherSearch 
+      <ToolbarTeacherSearch
         isFiltered={isFiltered}
         filterValue={filterValue}
-        onFilterValue={handleFilterValue} 
+        onFilterValue={handleFilterValue}
         isDefault={isDefault}
         open={openFilter}
         onOpen={handleOpenFilter}
@@ -150,16 +158,18 @@ export default function TeacherList() {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                 hover
-                key={row.id}
+                  hover
+                  key={row.id}
                 >
                   <TableCell align="left" > T{row.id} </TableCell>
                   <TableCell align="left">{row.fullname}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Tooltip title="More Info">
-                      <IconButton>
-                        <Iconify icon="ic:chevron-right" />
+                      <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
+                        <Link to={`/dashboard/edit-account/teacher/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
+                          <Iconify icon="ic:chevron-right" />
+                        </Link>
                       </IconButton>
                     </Tooltip>
                   </TableCell>
@@ -178,9 +188,9 @@ export default function TeacherList() {
         rowsPerPage={rowsPerPage}
         onPageChange={onChangePage}
         onRowsPerPageChange={onChangeRowsPerPage}
-        //
-        // dense={dense}
-        // onChangeDense={onChangeDense}
+      //
+      // dense={dense}
+      // onChangeDense={onChangeDense}
       />
     </div>
   );
@@ -188,7 +198,7 @@ export default function TeacherList() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator,filterValue }) {
+function applyFilter({ inputData, comparator, filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -202,8 +212,8 @@ function applyFilter({ inputData, comparator,filterValue }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
-}
+    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
+  }
 
   return inputData;
 }

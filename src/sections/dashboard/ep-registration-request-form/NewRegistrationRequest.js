@@ -39,6 +39,7 @@ NewViewRegistrationRequest.propTypes = {
 // ----------------------------------------------------------------------
 
 export default function NewViewRegistrationRequest({ isView = false, currentRequest }) {
+    
 
     const NewRequestSchema = Yup.object().shape({
         courseType: Yup.string().required('Course type is required'),

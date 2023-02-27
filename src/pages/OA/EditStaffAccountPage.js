@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { useParams } from 'react-router-dom';
 // @mui
 import { Container, Typography } from '@mui/material';
 import { PATH_DASHBOARD } from '../../routes/paths';
@@ -6,29 +7,29 @@ import { PATH_DASHBOARD } from '../../routes/paths';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import NewStaffRequest from '../../sections/dashboard/oa-new-account/NewStaffRequest';
+import EditStaffRequest from '../../sections/dashboard/oa-edit-account/EditStaffRequest';
 
 // ----------------------------------------------------------------------
 
 export default function NewAccountPage() {
     const { themeStretch } = useSettingsContext();
-
+    const { id } = useParams();
     return (
         <>
             <Helmet>
-                <title> OA | New Account </title>
+                <title> OA | Edit Account </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
-                    heading="New Account"
+                    heading="Edit Account"
                     links={[
                         { name: 'Account Management', href: PATH_DASHBOARD.newAccount },
-                        { name: 'New Account' }
+                        { name: 'Edit Account' }
                     ]}
                 />
 
-                <NewStaffRequest />
+                <EditStaffRequest Id={id}/>
             </Container>
         </>
     );
