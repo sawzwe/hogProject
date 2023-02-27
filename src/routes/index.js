@@ -38,6 +38,7 @@ import {
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
   PageLeavingRequestDetailOA,
+  EditStudentAccount,
   // Student
   PageStudentCalendar,
   PageStudentCourse,
@@ -365,6 +366,15 @@ export default function Router() {
             </RoleBasedGuard>
           )
         },
+        {
+          path: 'edit-account/student/:id', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              < EditStudentAccount />
+            </RoleBasedGuard>
+          )
+        },
+        
+       
 
         // Student Content ---------------------------------------------------------------
         {

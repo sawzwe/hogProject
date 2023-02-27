@@ -13,7 +13,7 @@
     // components
     import { useSnackbar } from '../../../components/snackbar';
     import FormProvider, { RHFSelect, RHFTextField } from '../../../components/hook-form';
-    import SelectAvailableDays from './newAccount/SelectAvailableDays';
+    import SelectAvailableDays from './SelectAvailableDays';
     import ConfirmDialog from '../../../components/confirm-dialog';
     import Iconify from '../../../components/iconify';
 
@@ -29,7 +29,7 @@
         currentStaff: PropTypes.object,
     };
 
-    export default function NewStaffRequest({ isEdit = false, currentStaff }) {
+    export default function NewStaffRequest({ isEdit = false, currentStaff,Id }) {
 
         const { enqueueSnackbar } = useSnackbar();
 
@@ -146,32 +146,6 @@
         <>
             <FormProvider methods={methods} onSubmit={(event) => { handleClickSubmitOpen(event) }}>
                 <Grid container spacing={3}>
-                    <Grid container item xs={12} md={5}>
-                        <RHFSelect
-                            name="eaRole"
-                            label="Role"
-                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                            onChange={handleChangeeaRole}>
-                            {STAFF_ROLES_OPTIONS.map((option) => (
-                                <MenuItem
-                                    key={option.id}
-                                    value={option.name}
-                                    sx={{
-                                        mx: 1,
-                                        my: 0.5,
-                                        borderRadius: 0.75,
-                                        typography: 'body2',
-                                        textTransform: 'capitalize',
-                                        '&:first-of-type': { mt: 0 },
-                                        '&:last-of-type': { mb: 0 },
-                                    }}
-                                >
-                                    {option.name}
-                                </MenuItem>
-                            ))}
-                        </RHFSelect>
-                    </Grid>
-
                     {eaRole === 'Education Admin' ?(                
                     <Grid item xs={12} md={12}>
                         <Card sx={{ p: 3 }}>

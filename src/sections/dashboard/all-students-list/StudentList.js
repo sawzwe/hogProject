@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate, Link } from 'react-router-dom';
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -75,6 +76,8 @@ export default function StudentList() {
   // Search
   const [filterValue, setFilterValue] = useState('');
 
+  const [openConfirm, setOpenConfirm] = useState(false);
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -125,6 +128,12 @@ export default function StudentList() {
     setFilterValue(event.target.value);
 };
 
+const acceptRequest = (currentId) => {
+  setOpenConfirm(false);
+};
+
+
+
 
   return (
     <div>
@@ -158,9 +167,11 @@ export default function StudentList() {
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Tooltip title="More Info">
-                      <IconButton>
-                        <Iconify icon="ic:chevron-right" />
-                      </IconButton>
+                    <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
+                            <Link to={`/dashboard/edit-account/student/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
+                              <Iconify icon="ic:chevron-right" />
+                            </Link>
+                          </IconButton>
                     </Tooltip>
                   </TableCell>
 
