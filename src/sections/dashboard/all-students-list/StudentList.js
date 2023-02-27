@@ -75,6 +75,8 @@ export default function StudentList() {
   // Search
   const [filterValue, setFilterValue] = useState('');
 
+  const [openConfirm, setOpenConfirm] = useState(false);
+
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -125,6 +127,12 @@ export default function StudentList() {
     setFilterValue(event.target.value);
 };
 
+// const acceptRequest = (currentId) => {
+//   setOpenConfirm(false);
+// };
+
+
+
 
   return (
     <div>
@@ -158,7 +166,7 @@ export default function StudentList() {
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Tooltip title="More Info">
-                      <IconButton>
+                    <IconButton>
                         <Iconify icon="ic:chevron-right" />
                       </IconButton>
                     </Tooltip>
