@@ -254,7 +254,7 @@
                                     <RHFTextField name="eaEmail" label="Email" required />
                                 </Box>
                             </Box>
-                            {/* <SelectAvailableDays/> */}
+                            <SelectAvailableDays/>
                         </Card>
                     </Grid>)
                     }

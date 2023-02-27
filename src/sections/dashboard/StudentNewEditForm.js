@@ -194,6 +194,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
     const createStudent = async (data) => {
         // Add Logic here
         await registerStudent(data)
+            .then(() => enqueueSnackbar('Successfully created!'))
             .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
     }
 
@@ -210,7 +211,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
                 await updateStudent(data);
             } else {
                 console.log(data);
-                // await createStudent(data);
+                await createStudent(data);
                 await enqueueSnackbar('Successfully created!');
             }
             // console.log('DATA', JSON.stringify(data, null, 2));
