@@ -20,7 +20,6 @@ export default function FileThumbnail({ file, tooltip, imageView, onDownload, sx
   const { name = '', path = '', preview = '' } = fileData(file);
 
   const format = fileFormat(path || preview);
-  console.log(format)
 
   const renderContent =
     format === 'image' && imageView ? (

@@ -17,6 +17,7 @@ import { fData } from '../../utils/formatNumber';
 import { countries } from '../../assets/data';
 // components
 import { useSnackbar } from '../../components/snackbar';
+import { fileFormat } from '../../components/file-thumbnail';
 import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -79,16 +80,18 @@ const FILE_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
 StudentNewEditForm.propTypes = {
     isEdit: PropTypes.bool,
     currentStudent: PropTypes.object,
-    isView: PropTypes.bool,
+    currentAvatar: PropTypes.object,
+    currentFiles: PropTypes.array,
 };
 
-export default function StudentNewEditForm({ isEdit = false, currentStudent, isView }) {
+export default function StudentNewEditForm({ isEdit = false, currentStudent, currentAvatar, currentFiles }) {
     const navigate = useNavigate();
-
-
     const { registerStudent } = useAuthContext();
-
     const { enqueueSnackbar } = useSnackbar();
+
+    console.log('current Avatar:', currentAvatar);
+
+    const re = /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/gm
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -114,7 +117,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
         district: Yup.string().required('District is required'),
         province: Yup.string().required('Province is required'),
         zipCode: Yup.string().required('ZipCode is required'),
-        parentTitle: Yup.string().required('Title is required'),
         parentFirstName: Yup.string().required('Firstname is required'),
         parentLastName: Yup.string().required('Lastname is required'),
         parentRelationships: Yup.string().required('Relationships is required'),
@@ -123,46 +125,46 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
         parentLineId: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
         studentSource: Yup.string(),
-        studentImageURL: Yup.mixed().required('Student photo is required')
+        studentImageURL: Yup.mixed()
+            .test('required', "Student photo is required", (file) => file !== '')
             .test('fileSize', 'The file is too large', (file) => file && file.size <= MAX_FILE_SIZE)
-            .test('fileFormat', 'Unsupported Format', (file) => file && FILE_FORMATS.includes(file.type)),
+            .test('fileFormat', 'Unsupported Format', (file) => file && (FILE_FORMATS.includes(file.type))),
     });
 
     const defaultValues = useMemo(
         () => ({
-            studentTitle: currentStudent?.studentTitle || 'Mr.',
-            studentFirstName: currentStudent?.studentFirstName || 'Piyaphon',
-            studentLastName: currentStudent?.studentLastName || 'Wu',
-            studentNickname: currentStudent?.studentNickname || 'Hong',
-            studentDateOfBirth: currentStudent?.studentDateOfBirth || '1-May-2002',
-            studentPhoneNo: currentStudent?.studentPhoneNo || '098-xxx-xxxx',
-            studentLineId: currentStudent?.studentLineId || 'pnw029',
-            studentEmail: currentStudent?.studentEmail || 'hong@gmail.com',
-            schoolName: currentStudent?.schoolName || 'Assumption College Rayong',
-            schoolCountry: currentStudent?.schoolCountry || countries[216].label,
+            studentTitle: currentStudent?.title || 'Mr.',
+            studentFirstName: currentStudent?.fName || 'Piyaphon',
+            studentLastName: currentStudent?.lName || 'Wu',
+            studentNickname: currentStudent?.nickname || 'Hong',
+            studentDateOfBirth: currentStudent?.dob || '1-May-2002',
+            studentPhoneNo: currentStudent?.phone || '098-xxx-xxxx',
+            studentLineId: currentStudent?.line || 'pnw029',
+            studentEmail: currentStudent?.email || 'hong@gmail.com',
+            schoolName: currentStudent?.school || 'Assumption College Rayong',
+            schoolCountry: currentStudent?.countryOfSchool || countries[216].label,
             levelOfStudy: currentStudent?.levelOfStudy || 'Matthayom 6',
-            targetUniversity: currentStudent?.targetUniversity || 'Assumption University',
+            targetUniversity: currentStudent?.targetUni || 'Assumption University',
             targetScore: currentStudent?.targetScore || 'IELTS 9.0',
-            studyProgram: currentStudent?.studyProgram || STUDY_PROGRAM_OPTIONS[2].value,
+            studyProgram: currentStudent?.program || STUDY_PROGRAM_OPTIONS[2].value,
             otherStudyProgram: currentStudent?.otherStudyProgram || '',
-            address: currentStudent?.address || '2/18 Moo 2 Rd.Sukhumwit',
-            subDistrict: currentStudent?.subDistrict || 'Nernpra',
-            district: currentStudent?.district || 'Mueng Rayong',
-            province: currentStudent?.province || 'Rayong',
-            zipCode: currentStudent?.zipCode || '21000',
-            parentTitle: currentStudent?.parentTitle || 'Mr.',
-            parentFirstName: currentStudent?.parentFirstName || 'dadFirstname',
-            parentLastName: currentStudent?.parentLastName || 'dadLastname',
-            parentRelationships: currentStudent?.parentRelationships || 'Father',
-            parentPhoneNo: currentStudent?.parentPhoneNo || '097-xxx-xxxx',
-            parentEmail: currentStudent?.parentEmail || 'dad@gmail.com',
-            parentLineId: currentStudent?.parentLineId || 'dad@line',
-            studentHealthInfo: currentStudent?.studentHealthInfo || 'Seafood allergy',
-            studentSource: currentStudent?.studentSource || 'Know from friends',
-            studentImageURL: currentStudent?.studentImageUrl || '',
-            studentAdditionalFiles: currentStudent?.studentAdditionalFiles || [],
+            address: currentStudent?.address.address || '2/18 Moo 2 Rd.Sukhumwit',
+            subDistrict: currentStudent?.address.subdistrict || 'Nernpra',
+            district: currentStudent?.address.district || 'Mueng Rayong',
+            province: currentStudent?.address.province || 'Rayong',
+            zipCode: currentStudent?.address.zipcode || '21000',
+            parentFirstName: currentStudent?.parent.fName || 'dadFirstname',
+            parentLastName: currentStudent?.parent.lName || 'dadLastname',
+            parentRelationships: currentStudent?.parent.relationship || 'Father',
+            parentPhoneNo: currentStudent?.parent.phone || '097-xxx-xxxx',
+            parentEmail: currentStudent?.parent.email || 'dad@gmail.com',
+            parentLineId: currentStudent?.parent.line || 'dad@line',
+            studentHealthInfo: currentStudent?.healthInfo || 'Seafood allergy',
+            studentSource: currentStudent?.hogInfo || 'Know from friends',
+            studentImageURL: currentAvatar || '',
+            studentAdditionalFiles: currentFiles || [],
         }),
-        [currentStudent]
+        [currentStudent, currentAvatar, currentFiles]
     );
 
     const methods = useForm({
@@ -188,31 +190,28 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
         if (!isEdit) {
             reset(defaultValues);
         }
-    }, [isEdit, currentStudent]);
+    }, [isEdit, currentStudent, currentAvatar, currentFiles]);
 
     // Create student to Firebase Auth, Firestore, and Azure Database
     const createStudent = async (data) => {
-        // Add Logic here
         await registerStudent(data)
             .then(() => enqueueSnackbar('Successfully created!'))
             .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
     }
 
-    // Update student data to the database
+    // Update student data to Azure, and Upload new files to Firebase Storage
     const updateStudent = () => {
-        // Add Logic here
-
         enqueueSnackbar('Update success!')
     }
 
     const onSubmit = async (data) => {
         try {
             if (isEdit) {
-                await updateStudent(data);
+                console.log("HI")
+                // await updateStudent(data);
             } else {
                 console.log(data);
                 await createStudent(data);
-                await enqueueSnackbar('Successfully created!');
             }
             // console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
@@ -479,7 +478,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
                             display="grid"
                             gridTemplateColumns={{
                                 xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(4, 1fr)',
+                                sm: 'repeat(1, 1fr)',
                             }}
                             gridTemplateAreas={{
                                 xs: '"address" "subDistrict" "district" "province" "zipCode"',
@@ -513,65 +512,26 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
                                 mb: 2,
                                 display: 'block',
                             }}>Parent Information</Typography>
-                        <Box
-                            rowGap={3}
-                            columnGap={2}
-                            display="grid"
-                            gridTemplateColumns={{
-                                xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(6, 1fr)',
-                            }}
-                            gridTemplateAreas={{
-                                xs: `"parentTitle" "parentFirstName" "parentLastName" "parentRelationships" "parentPhone" "parentEmail" "parentLineId"`,
-                                md: `"parentTitle parentFirstName parentFirstName parentLastName parentLastName parentRelationships" 
-                                "parentPhone parentPhone parentEmail parentEmail parentLineId parentLineId"`
-                            }}
-                        >
-                            <Box gridArea={"parentTitle"}>
-                                <RHFSelect
-                                    fullWidth
-                                    required
-                                    name="parentTitle"
-                                    label="Title"
-                                    SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}>
-                                    {TITLE_OPTIONS.map((option) => (
-                                        <MenuItem
-                                            key={option.id}
-                                            value={option.name}
-                                            sx={{
-                                                mx: 1,
-                                                my: 0.5,
-                                                borderRadius: 0.75,
-                                                typography: 'body2',
-                                                textTransform: 'capitalize',
-                                                '&:first-of-type': { mt: 0 },
-                                                '&:last-of-type': { mb: 0 },
-                                            }}
-                                        >
-                                            {option.name}
-                                        </MenuItem>
-                                    ))}
-                                </RHFSelect>
-                            </Box>
-                            <Box gridArea={"parentFirstName"}>
+                        <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} md={5}>
                                 <RHFTextField name="parentFirstName" label="First Name" required />
-                            </Box>
-                            <Box gridArea={"parentLastName"}>
+                            </Grid>
+                            <Grid item xs={12} md={5}>
                                 <RHFTextField name="parentLastName" label="Last Name" required />
-                            </Box>
-                            <Box gridArea={"parentRelationships"}>
+                            </Grid>
+                            <Grid item xs={12} md={2}>
                                 <RHFTextField name="parentRelationships" label="Relationships" required />
-                            </Box>
-                            <Box gridArea={"parentPhone"}>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentPhoneNo" label="Phone Number" required />
-                            </Box>
-                            <Box gridArea={"parentEmail"}>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentEmail" label="Email Address" />
-                            </Box>
-                            <Box gridArea={"parentLineId"}>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentLineId" label="Line ID" />
-                            </Box>
-                        </Box>
+                            </Grid>
+                        </Grid>
                     </Card>
                 </Grid>
 
@@ -623,37 +583,10 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, isV
                                 onDrop={handleDropFiles}
                                 onRemove={handleRemoveFile}
                                 onRemoveAll={handleRemoveAllFiles}
-                                onUpload={() => console.log('ON UPLOAD')}
                             />
                         </Box>
                     </Card>
                 </Grid>
-
-                {/* Registered Courses */}
-                {isEdit && (
-                    <Grid item xs={12} md={12}>
-                        <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}>{`Registered Course(s)`}</Typography>
-                        </Card>
-                    </Grid>
-                )}
-
-                {/* Exam Dates */}
-                {isEdit && (
-                    <Grid item xs={12} md={12}>
-                        <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}>{`Exam Date(s)`}</Typography>
-                        </Card>
-                    </Grid>
-                )}
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" justifyContent="flex-end" alignItems="center">
