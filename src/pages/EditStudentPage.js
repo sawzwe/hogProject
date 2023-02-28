@@ -1,32 +1,31 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 // firebase
 import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
-import { Container, Button } from '@mui/material';
+import { Container } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_DASHBOARD } from '../routes/paths';
 // components
-import LoadingScreen from '../../components/loading-screen/LoadingScreen';
-import { useSettingsContext } from '../../components/settings';
-import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import { useSettingsContext } from '../components/settings';
+import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // sections
-import ViewStudent from '../../sections/dashboard/ViewStudent';
-import { studentList } from '../../sections/dashboard/ep-registration-request-form/_mockupData';
+import LoadingScreen from '../components/loading-screen/LoadingScreen';
+import StudentNewEditForm from '../sections/dashboard/StudentNewEditForm';
+import { studentList } from '../sections/dashboard/ep-registration-request-form/_mockupData';
 
 // ----------------------------------------------------------------------
 
-export default function ViewStudentPage() {
+export default function EditStudentPage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
     const { id } = useParams();
 
     const dataFetchedRef = useRef(false);
-    
-    // Firebase Storage
+
     const storage = getStorage();
 
     const [student, setStudent] = useState();
@@ -38,9 +37,13 @@ export default function ViewStudentPage() {
             .then((res) => {
                 const data = res.data.data
                 setStudent(data)
+
                 const pathReference = ref(storage, `users/students/${data.firebaseId}/Avatar/${data.profilePicture}`);
-                getDownloadURL(pathReference)
-                    .then((url) => setAvatarURL(url));
+                getMetadata(pathReference)
+                    .then((metadata) => {
+                        getDownloadURL(pathReference)
+                            .then((url) => setAvatarURL({ name: metadata.name, type: metadata.contentType, size: metadata.size, preview: url }));
+                    })
 
                 const listRef = ref(storage, `users/students/${data.firebaseId}/Files`);
                 listAll(listRef)
@@ -49,7 +52,7 @@ export default function ViewStudentPage() {
                             getMetadata(itemRef)
                                 .then((metadata) => {
                                     getDownloadURL(itemRef)
-                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
+                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, type: metadata.contentType, ref: itemRef, preview: url }]))
                                         .catch((error) => console.error(error));
                                 })
                                 .catch((error) => console.error(error))
@@ -74,26 +77,22 @@ export default function ViewStudentPage() {
     return (
         <>
             <Helmet>
-                <title> Student Detail </title>
+                <title> Edit Student </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                
                 <CustomBreadcrumbs
-                    heading="View student"
+                    heading="Edit student"
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.allStudents,
+                            href: PATH_DASHBOARD.studentManagement.searchStudent,
                         },
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
-                    action={
-                        <Button component={Link} to={`/dashboard/student-management/search-student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
-                    }
                 />
 
-                <ViewStudent student={student} avatarURL={avatarURL} filesURL={filesURL} />
+                <StudentNewEditForm isEdit currentStudent={student} currentAvatar={avatarURL} currentFiles={filesURL} />
             </Container>
         </>
     );
