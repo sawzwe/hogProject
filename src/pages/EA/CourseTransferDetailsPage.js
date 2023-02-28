@@ -1,35 +1,35 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
 // @mui
 import { Container, Typography } from '@mui/material';
 import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
-import StaffRequestStatusList from '../../sections/dashboard/ea-request-management-list/StaffRequestStatusList'
+// import RegistrationRequestStatusList from '../../sections/dashboard/ea-request-management-list/RegistrationRequestStatusList'
 
 // ----------------------------------------------------------------------
 
-export default function StaffRequestPage() {
+export default function CourseTransferRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
         <>
             <Helmet>
-                <title> EA | Staff Request</title>
+                <title> EA | Course Transfer Request Details</title>
             </Helmet>
             <CustomBreadcrumbs
-                heading="Staff Request Status"
+                heading="Course Registration Request Status"
                 links={[
                     {
-                        name: 'Staff Requests',
+                        name: 'Course Transfer Details',
                         href: PATH_DASHBOARD.courseRegistration.root,
                     },
                     { name: 'Request status' },
                 ]}
             />
             <Container maxWidth={themeStretch ? false : 'xl'}>
-                <StaffRequestStatusList />
+                {/* <RegistrationRequestStatusList /> */}
+                <Typography >Course Transfer Details</Typography>
             </Container>
         </>
     );

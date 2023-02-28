@@ -32,6 +32,8 @@ import {
   PageSearchCourseTeacher,
   PageRegistrationRequestDetail,
   PageScheduleRegistrationRequest,
+  PageTeacherLeaveDetailsEA,
+  PageCourseTransferDetailsEA,
   // OA
   PageNewAccount,
   PageRegistrationRequestOA,
@@ -85,7 +87,7 @@ export default function Router() {
     }
     return null;
   };
-  
+
 
   return useRoutes([
     {
@@ -296,9 +298,26 @@ export default function Router() {
                   <PageStaffRequestEA />
                 </RoleBasedGuard>
               )
-            }
+            },
+            // Teacher Personal Leave Details
+            {
+              path: 'staff-request/leave-req/:id', element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <  PageTeacherLeaveDetailsEA />
+                </RoleBasedGuard>
+              )
+            },
+            // EP Transfer Leave Details
+            {
+              path: 'staff-request/transfer-req/:id', element: (
+                <RoleBasedGuard roles={['Education Admin']} hasContent>
+                  <  PageCourseTransferDetailsEA />
+                </RoleBasedGuard>
+              )
+            },
           ]
         },
+
 
         // OA Content ---------------------------------------------------------------
         {
@@ -368,13 +387,13 @@ export default function Router() {
         },
         {
           path: 'edit-account/teacher/:id', element: (
-            <RoleBasedGuard roles={['Office Admin', 'Education Admin','Education Planner']} hasContent>
+            <RoleBasedGuard roles={['Office Admin', 'Education Admin', 'Education Planner']} hasContent>
               < EditStaffAccount />
             </RoleBasedGuard>
           )
         },
-        
-       
+
+
 
         // Student Content ---------------------------------------------------------------
         {
