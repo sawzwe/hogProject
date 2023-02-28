@@ -215,7 +215,6 @@ export default function StudentList() {
 function applyFilter({ inputData, comparator, filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
   // console.log('inputData', inputData)
-  console.log('comparator', typeof (filterValue), filterValue)
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
