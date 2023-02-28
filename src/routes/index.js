@@ -58,7 +58,8 @@ import {
   PageTeacherPrivateCourseDetail,
   PageTeacherGroupCourseDetail,
   PageTeacherCheckGroupAttendance,
-  PageTeacherCheckPrivateAttendance
+  PageTeacherCheckPrivateAttendance,
+  PageViewStudentCourse
 }
   from './elements';
 
@@ -158,6 +159,13 @@ export default function Router() {
               path: 'search-course', element: (
                 <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
                   <PageSearchCourseStudent />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'search-course/:id', element: (
+                <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
+                  <PageViewStudentCourse />
                 </RoleBasedGuard>
               )
             },

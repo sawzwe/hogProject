@@ -23,7 +23,6 @@ import { countries } from '../../assets/data';
 import { useSnackbar } from '../../components/snackbar';
 // import { fileFormat } from '../../components/file-thumbnail';
 import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
-import { FIREBASE_API, HOG_API } from '../../config';
 
 // ----------------------------------------------------------------------
 
