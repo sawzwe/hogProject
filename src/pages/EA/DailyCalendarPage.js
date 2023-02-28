@@ -185,7 +185,7 @@ export default function DailyCalendarPage() {
 
                 />
                 {/* <Button variant='contained' onClick={() => deleteData(filterName)}>Delete Data</Button> */}
-                <Button variant='contained' onClick={()=>postData()}>Post Data</Button>
+                <Button variant='contained' onClick={()=>deleteData(filterName)}>Post Data</Button>
 
             </Container>
         </>
