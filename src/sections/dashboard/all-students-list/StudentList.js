@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
+import axios from 'axios';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import {
@@ -12,6 +13,8 @@ import {
   TablePaginationCustom,
 } from '../../../components/table';
 //
+import { HOG_API } from '../../../config';
+
 import ToolbarStudentSearch from './ToolbarStudentSearch';
 
 // ----------------------------------------------------------------------
@@ -19,6 +22,7 @@ import ToolbarStudentSearch from './ToolbarStudentSearch';
 function createData(id, fullname, nickname) {
   return { id, fullname, nickname };
 }
+
 
 const TABLE_DATA = [
   createData(12, 'Saw Zwe Wai Yan', 'Saw'),
@@ -66,13 +70,25 @@ export default function StudentList() {
     defaultOrderBy: 'id',
   });
 
+  // console.log(typeof(TABLE_DATA)) 
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
-    setTableData(TABLE_DATA);
+    axios.get(`${HOG_API}/api/Student/Get`)
+      .then(response => {
+        setTableData(response.data.data);
+        // console.log("API table" ,response.data.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }, []);
 
-  // Search
+
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA);
+  // }, []);
+
   const [filterValue, setFilterValue] = useState('');
 
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -86,9 +102,9 @@ export default function StudentList() {
   // Filter
   const [openFilter, setOpenFilter] = useState(false);
 
-  const isFiltered = filterValue !== '' ;
+  const isFiltered = filterValue !== '';
   const isNotFound =
-        (!dataFiltered.length && !!filterValue);
+    (!dataFiltered.length && !!filterValue);
 
 
   const defaultValues = {
@@ -125,21 +141,21 @@ export default function StudentList() {
 
   const handleFilterValue = (event) => {
     setFilterValue(event.target.value);
-};
+  };
 
-// const acceptRequest = (currentId) => {
-//   setOpenConfirm(false);
-// };
+  // const acceptRequest = (currentId) => {
+  //   setOpenConfirm(false);
+  // };
 
 
 
 
   return (
     <div>
-      <ToolbarStudentSearch 
+      <ToolbarStudentSearch
         isFiltered={isFiltered}
         filterValue={filterValue}
-        onFilterValue={handleFilterValue} 
+        onFilterValue={handleFilterValue}
         isDefault={isDefault}
         open={openFilter}
         onOpen={handleOpenFilter}
@@ -158,15 +174,15 @@ export default function StudentList() {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                 hover
-                key={row.id}
+                  hover
+                  key={row.id}
                 >
-                  <TableCell align="left" > S{row.id} </TableCell>
-                  <TableCell align="left">{row.fullname}</TableCell>
+                  <TableCell align="left" > S{row.studentId} </TableCell>
+                  <TableCell align="left">{row.fullName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Tooltip title="More Info">
-                    <IconButton>
+                      <IconButton>
                         <Iconify icon="ic:chevron-right" />
                       </IconButton>
                     </Tooltip>
@@ -186,9 +202,9 @@ export default function StudentList() {
         rowsPerPage={rowsPerPage}
         onPageChange={onChangePage}
         onRowsPerPageChange={onChangeRowsPerPage}
-        //
-        // dense={dense}
-        // onChangeDense={onChangeDense}
+      //
+      // dense={dense}
+      // onChangeDense={onChangeDense}
       />
     </div>
   );
@@ -196,8 +212,10 @@ export default function StudentList() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator,filterValue }) {
+function applyFilter({ inputData, comparator, filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
+  // console.log('inputData', inputData)
+  console.log('comparator', typeof (filterValue), filterValue)
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -210,8 +228,17 @@ function applyFilter({ inputData, comparator,filterValue }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
-}
+    // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));    
+
+    inputData = inputData.filter((user) => {
+      // console.log("user", user);
+      return (
+        user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+        user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+        user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1
+      );
+    });
+  }
 
   return inputData;
 }
