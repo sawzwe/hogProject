@@ -37,23 +37,22 @@ export default function EditStudentPage() {
             .then((res) => {
                 const data = res.data.data
                 setStudent(data)
-                const pathReference = ref(storage, `users/${data.firebaseId}/Avatar/${data.profilePicture}`);
+
+                const pathReference = ref(storage, `users/students/${data.firebaseId}/Avatar/${data.profilePicture}`);
                 getMetadata(pathReference)
                     .then((metadata) => {
                         getDownloadURL(pathReference)
                             .then((url) => setAvatarURL({ name: metadata.name, type: metadata.contentType, size: metadata.size, preview: url }));
                     })
 
-                const listRef = ref(storage, `users/${data.firebaseId}/Files`);
+                const listRef = ref(storage, `users/students/${data.firebaseId}/Files`);
                 listAll(listRef)
                     .then((res) => {
                         res.items.map((itemRef) => (
-                            // getDownloadURL(itemRef)
-                            //     .then((url) => setFilesURL(filesURL => [...filesURL, url]))
                             getMetadata(itemRef)
                                 .then((metadata) => {
                                     getDownloadURL(itemRef)
-                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, ref: itemRef, preview: url }]))
+                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, type: metadata.contentType, ref: itemRef, preview: url }]))
                                         .catch((error) => console.error(error));
                                 })
                                 .catch((error) => console.error(error))
@@ -74,8 +73,6 @@ export default function EditStudentPage() {
     if (student === undefined || !avatarURL) {
         return <LoadingScreen />;
     }
-
-    console.log(filesURL)
 
     return (
         <>

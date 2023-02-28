@@ -13,8 +13,10 @@ import {
 } from 'firebase/auth';
 
 import { getFirestore, collection, doc, getDoc, setDoc, clearIndexedDbPersistence } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes } from "firebase/storage"
+import { getStorage, ref, uploadBytes, deleteObject, listAll, getBlob } from "firebase/storage"
 import axios from 'axios';
+// utils
+import { fDate } from '../utils/formatTime';
 // config
 import { FIREBASE_API, HOG_API } from '../config';
 
@@ -183,7 +185,7 @@ export function AuthProvider({ children }) {
                 .catch(() => signInWithEmailAndPassword(AUTH_STUDENT, email, password)))
     )
 
-    // REGISTER STUDENT (WAIT TO ADD TO AZURE SQL)
+    // REGISTER STUDENT
     const registerStudent = async (data) =>
         createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
             .then(async (res) => {
@@ -197,7 +199,7 @@ export function AuthProvider({ children }) {
                     .catch((error) => console.error(error))
                     .then(() => {
                         const file = data.studentImageURL
-                        const storageProfileRef = ref(storage, `users/${res.user?.uid}/Avatar/${file.name}`);
+                        const storageProfileRef = ref(storage, `users/students/${res.user?.uid}/Avatar/${file.name}`);
                         uploadBytes(storageProfileRef, file)
                             .then((snapshot) => { console.log("uploaded!") })
                             .catch((error) => console.error(error));
@@ -205,7 +207,7 @@ export function AuthProvider({ children }) {
                     .catch((error) => console.error(error))
                     .then(() => {
                         data.studentAdditionalFiles.map((file, index) => {
-                            const storageAdditionalFilesRef = ref(storage, `users/${res.user?.uid}/Files/${file.name}`);
+                            const storageAdditionalFilesRef = ref(storage, `users/students/${res.user?.uid}/Files/${file.name}`);
                             return uploadBytes(storageAdditionalFilesRef, file)
                                 .then((snapshot) => console.log("Additional File uploaded!"))
                                 .catch((error) => console.error(error));
@@ -255,6 +257,105 @@ export function AuthProvider({ children }) {
                     })
             })
 
+    // UPDATE STUDENT
+    const updateStudent = async (currentStudent, data) => {
+
+        // Display name to Firestore
+        // const displayNameRef = DB.collection('users').doc(currentStudent.firebaseId);
+        // console.log(currentStudent.firebaseId)
+        // console.log(DB.collection('users'));
+        // await displayNameRef.update({ displayName: `${data.studentFirstName} ${data.studentLastName}` })
+        //     .catch((error) => console.error(error))
+
+        // console.log('studentImageURL', data.studentImageURL)
+
+
+        // Image to Firebase Storage (I need to enable CORS to use getBlob)
+        // const lastImageRef = ref(storage, `users/students/${currentStudent.firebaseId}/Avatar/${currentStudent.profilePicture}`);
+        // const newImageRef = ref(storage, `users/students/${currentStudent.firebaseId}/Avatar/${data.studentImageURL.name}`);
+        // const newImage = data.studentImageURL
+        // const metadata = {
+        //     contentType: newImage.type
+        // };
+
+        // console.log(getBlob(newImage.preview))
+
+        // console.log(new File([newImage.preview.blob(), newImage.name, metadata]))
+        // if (newImage instanceof File) {
+        //     console.log("File type!")
+        //     await deleteObject(lastImageRef)
+        //     await uploadBytes(newImageRef, newImage)
+        //         .then(() => deleteObject(lastImageRef))
+        //         .catch((error) => console.error(error))
+        // } else {
+        //     console.log("Not file type!")
+        //     await deleteObject(lastImageRef)
+        //     const data = new File([newImage.preview.blob(), newImage.name, metadata]);
+        //     await uploadBytes(newImageRef, data)
+        //         .catch((error) => console.error(error))
+        // }
+
+
+        // Files to Firebase Storage
+        // const filesRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files`);
+        // await listAll(filesRef)
+        //     .then((res) => {
+        //         res.items.forEach((itemRef) => {
+        //             deleteObject(itemRef)
+        //         });
+        //     })
+        //     .catch((error) => console.error(error))
+
+        // await data.studentAdditionalFiles.map((file) => {
+        //     const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
+        //     const metadata = {
+        //         contentType: file.type,
+        //     };
+        //     return uploadBytes(fileRef, file, metadata)
+        //         .catch((error) => console.error(error));
+        // })
+
+        // // Axios to Azure
+        // const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
+        // await axios.put(`${HOG_API}/api/Student/Put`, {
+        //     id: currentStudent.id,
+        //     firebaseId: currentStudent.firebaseId,
+        //     title: data.studentTitle,
+        //     fName: data.studentFirstName,
+        //     lName: data.studentLastName,
+        //     nickname: data.studentNickname,
+        //     profilePicture: data.studentImageURL.name,
+        //     additionalFiles: nameAdditionalFiles || [],
+        //     dob: fDate(data.studentDateOfBirth, 'dd MMMM yyyy'),
+        //     phone: data.studentPhoneNo,
+        //     line: data.studentLineId,
+        //     email: data.studentEmail,
+        //     school: data.schoolName,
+        //     countryOfSchool: data.schoolCountry,
+        //     levelOfStudy: data.levelOfStudy,
+        //     program: data.studyProgram,
+        //     targetUni: data.targetUniversity,
+        //     targetScore: data.targetScore,
+        //     hogInfo: data.studentSource,
+        //     healthInfo: data.studentHealthInfo,
+        //     parent: {
+        //         fName: data.parentFirstName,
+        //         lName: data.parentLastName,
+        //         relationship: data.parentRelationships,
+        //         phone: data.parentPhoneNo,
+        //         email: data.parentEmail,
+        //         line: data.parentLineId,
+        //     },
+        //     address: {
+        //         address: data.address,
+        //         subdistrict: data.subDistrict,
+        //         district: data.district,
+        //         province: data.province,
+        //         zipcode: data.zipCode,
+        //     }
+        // }).catch((error) => console.error(error))
+    }
+
 
     // LOGOUT
     const logout = async () => {
@@ -274,6 +375,7 @@ export function AuthProvider({ children }) {
                 method: 'firebase',
                 login,
                 registerStudent,
+                updateStudent,
                 logout,
                 changePassword,
             }}

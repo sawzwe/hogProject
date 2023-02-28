@@ -21,15 +21,6 @@ ViewStudent.propTypes = {
 };
 
 export default function ViewStudent({ student, avatarURL, filesURL }) {
-    // const navigate = useNavigate();
-
-    // Firebase Storage
-    // const storage = getStorage();
-    // const pathReference = ref(storage, `users/${student.firebaseId}/Avatar/${student.profilePicture}`);
-    // getDownloadURL(pathReference)
-    // .then((url) => console.log(url))
-
-    // console.log(filesURL);
 
     return (
         <Grid container spacing={3}>

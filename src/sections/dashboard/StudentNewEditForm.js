@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+// firebase
+import { getStorage, listAll, ref, deleteObject, uploadBytes } from "firebase/storage";
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,16 +11,19 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
+import axios from 'axios';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
 // utils
 import { fData } from '../../utils/formatNumber';
+import { fDate } from '../../utils/formatTime';
 // assets
 import { countries } from '../../assets/data';
 // components
 import { useSnackbar } from '../../components/snackbar';
-import { fileFormat } from '../../components/file-thumbnail';
+// import { fileFormat } from '../../components/file-thumbnail';
 import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import { FIREBASE_API, HOG_API } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -86,12 +91,8 @@ StudentNewEditForm.propTypes = {
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent, currentAvatar, currentFiles }) {
     const navigate = useNavigate();
-    const { registerStudent } = useAuthContext();
+    const { registerStudent, updateStudent } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
-
-    console.log('current Avatar:', currentAvatar);
-
-    const re = /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/gm
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -128,7 +129,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         studentImageURL: Yup.mixed()
             .test('required', "Student photo is required", (file) => file !== '')
             .test('fileSize', 'The file is too large', (file) => file && file.size <= MAX_FILE_SIZE)
-            .test('fileFormat', 'Unsupported Format', (file) => file && (FILE_FORMATS.includes(file.type))),
+            .test('fileFormat', 'Unsupported Format', (file) => file && (FILE_FORMATS.includes(file.type)))
     });
 
     const defaultValues = useMemo(
@@ -192,30 +193,20 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         }
     }, [isEdit, currentStudent, currentAvatar, currentFiles]);
 
-    // Create student to Firebase Auth, Firestore, and Azure Database
-    const createStudent = async (data) => {
-        await registerStudent(data)
-            .then(() => enqueueSnackbar('Successfully created!'))
-            .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
-    }
-
-    // Update student data to Azure, and Upload new files to Firebase Storage
-    const updateStudent = () => {
-        enqueueSnackbar('Update success!')
-    }
-
     const onSubmit = async (data) => {
         try {
             if (isEdit) {
-                console.log("HI")
-                // await updateStudent(data);
+                await updateStudent(currentStudent, data)
+                    .then(() => enqueueSnackbar('Update successfully!'))
+                    .then(() => navigate(`/dashboard/student-management/search-student/${currentStudent.id}`))
+                    .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             } else {
-                console.log(data);
-                await createStudent(data);
+                await registerStudent(data)
+                    .then(() => enqueueSnackbar('Successfully created!'))
+                    .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             }
-            // console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
-            enqueueSnackbar('Unknown Error!', { variant: 'error' });
+            enqueueSnackbar(`${error.message}`, { variant: 'error' });
         }
     };
 
@@ -260,7 +251,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         },
         [setValue, values.studentAdditionalFiles]
     );
-
 
     const handleRemoveFile = (inputFile) => {
         const filtered = values.studentAdditionalFiles && values.studentAdditionalFiles?.filter((file) => file !== inputFile);

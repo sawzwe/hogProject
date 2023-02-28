@@ -38,16 +38,14 @@ export default function ViewStudentPage() {
             .then((res) => {
                 const data = res.data.data
                 setStudent(data)
-                const pathReference = ref(storage, `users/${data.firebaseId}/Avatar/${data.profilePicture}`);
+                const pathReference = ref(storage, `users/students/${data.firebaseId}/Avatar/${data.profilePicture}`);
                 getDownloadURL(pathReference)
                     .then((url) => setAvatarURL(url));
 
-                const listRef = ref(storage, `users/${data.firebaseId}/Files`);
+                const listRef = ref(storage, `users/students/${data.firebaseId}/Files`);
                 listAll(listRef)
                     .then((res) => {
                         res.items.map((itemRef) => (
-                            // getDownloadURL(itemRef)
-                            //     .then((url) => setFilesURL(filesURL => [...filesURL, url]))
                             getMetadata(itemRef)
                                 .then((metadata) => {
                                     getDownloadURL(itemRef)
