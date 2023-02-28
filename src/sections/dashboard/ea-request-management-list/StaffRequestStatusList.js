@@ -54,17 +54,17 @@ const TABLE_HEAD_REQUESTS = [
 
 const TABLE_DATA_REQUESTS = [
   // Table {  RID,    Req Date ,     requestType,     fullname,           regiscourses, requestedBy,      role,   Receipt }
-  createData(1, '30-Oct-2022', 'Course Transfering', 'Alpha Zain', 'Zain', 'Nirawit(Boss)', 'available'),
+  createData(1, '30-Oct-2022', 'Course Transfering', 'Alpha Zain', 'Zain', 'EP', 'available'),
   createData(2, '16-Nov-2022', 'Course Transfering', 'Thanatuch Lertritsirkul', 'Tar', 'EP', 'myRequest'),
   createData(3, '28-Nov-2022', 'Personal Leaving', 'Saw Zwe Wai Yan', 'Saw', 'Teacher', 'available'),
-  createData(4, '30-Nov-2022', 'Personal Leaving', 'Monkey D.', 'Luffy', 'EP', 'available'),
+  createData(4, '30-Nov-2022', 'Personal Leaving', 'Monkey D.', 'Luffy', 'Teacher', 'available'),
   createData(5, '25-Dec-2022', 'Course Transfering', 'Piyaphon Wu', 'Hong', 'EP', 'available'),
   createData(6, '30-Dec-2022', 'Personal Leaving', 'Sigma Jeff', 'Jeff', 'Teacher', 'myRequest'),
   createData(7, '15-Dec-2022', 'Personal Leaving', 'Peter Parker', 'Spider', 'Teacher', 'completed'),
-  createData(8, '18-Dec-2022', 'Personal Leaving', 'Fruit Punch', 'Peach', 'Nirawit(Boss)', 'rejected'),
+  createData(8, '18-Dec-2022', 'Personal Leaving', 'Fruit Punch', 'Peach', 'Teacher', 'rejected'),
   createData(9, '27-Dec-2022', 'Course Transfering', 'Pan', 'Pancake', 'EP', 'completed', ''),
-  createData(10, '02-Dec-2022', 'Personal Leaving', 'Class 80', 'Jane', 'Nirawit(Boss)', 'rejected'),
-  createData(11, '02-Dec-2022', 'Course Transfering', 'Tar', 'Shi', 'Teacher', 'rejected'),
+  createData(10, '02-Dec-2022', 'Personal Leaving', 'Class 80', 'Jane', 'Teacher', 'rejected'),
+  createData(11, '02-Dec-2022', 'Course Transfering', 'Tar', 'Shi', 'EP', 'rejected'),
 
 ];
 
@@ -242,6 +242,9 @@ export default function StaffRequestStatusList() {
                     <TableRow
                       hover
                       key={row.id}
+                      component={Link}
+                      to={ row.requestType === 'Course Transfering' ? `/dashboard/request-management/staff-request/transfer-req/${row.id}` : `/dashboard/request-management/staff-request/leave-req/${row.id}`}
+                      sx= {{textDecoration: 'none' }}
                     >
                       <TableCell align="left" > Q{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
@@ -252,7 +255,7 @@ export default function StaffRequestStatusList() {
                       <TableCell>
                         <Tooltip title="More Info">
                           {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
+                            <IconButton onClick={() => handleOpenConfirm(row.id, row.requestType)}>
                               <Iconify icon="ic:chevron-right" />
                             </IconButton>) : (
                             <IconButton>
@@ -261,33 +264,6 @@ export default function StaffRequestStatusList() {
                           )}
                         </Tooltip>
                       </TableCell>
-                      
-                      {/* {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Tooltip title="Incomplete Reciept">
-                              <IconButton color='primary'>
-                                <Iconify icon="ic:error" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </ThemeProvider>
-                      ) :
-                        <TableCell align="left" />
-                      }
-
-                      <TableCell>
-                        <Tooltip title="More Info">
-                          {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>) : (
-                            <IconButton>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>
-                          )}
-                        </Tooltip>
-                      </TableCell> */}
 
                     </TableRow>
                   ))}
@@ -307,7 +283,7 @@ export default function StaffRequestStatusList() {
             content="Once the request is taken, only you can see the request and proceed it."
             action={
               <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
-                <Link to= {`/dashboard/registration-request/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
+                <Link to= {`/dashboard/request-management/staff-request/leave-req/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
                 Take Request
                 </Link>
               </Button>
@@ -363,3 +339,4 @@ function applyFilter({
 
   return inputData;
 }
+

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate, Link } from 'react-router-dom';
+
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -170,25 +172,27 @@ export default function StudentList() {
             <TableHeadCustom
               headLabel={TABLE_HEAD}
             />
-
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
                   hover
                   key={row.id}
+                  component={Link}
+                  to={`/dashboard/student-management/search-student/${parseInt(row.id, 10)}`}
+                  sx={{textDecoration: 'none'}}
                 >
-                  <TableCell align="left" > S{row.studentId} </TableCell>
-                  <TableCell align="left">{row.fullName}</TableCell>
-                  <TableCell align="left">{row.nickname}</TableCell>
-                  <TableCell>
-                    <Tooltip title="More Info">
-                      <IconButton>
-                        <Iconify icon="ic:chevron-right" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-
+                    <TableCell align="left" > S{row.studentId} </TableCell>
+                    <TableCell align="left">{row.fullName}</TableCell>
+                    <TableCell align="left">{row.nickname}</TableCell>
+                    <TableCell>
+                      <Tooltip title="More Info">
+                        <IconButton>
+                          <Iconify icon="ic:chevron-right" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
                 </TableRow>
+
               ))}
 
             </TableBody>

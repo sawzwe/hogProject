@@ -47,6 +47,9 @@ export const PageRegistrationRequestEA = Loadable(lazy(() => import('../pages/EA
 export const PageScheduleRegistrationRequest = Loadable(lazy(() => import('../pages/EA/ScheduleRegistrationRequestPage')));
 export const PageStudentRequestEA = Loadable(lazy(() => import('../pages/EA/StudentRequestPage')));
 export const PageStaffRequestEA = Loadable(lazy(() => import('../pages/EA/StaffRequestPage')));
+export const PageTeacherLeaveDetailsEA = Loadable(lazy(() => import('../pages/EA/TeacherLeaveDetailsPage')));
+export const PageCourseTransferDetailsEA = Loadable(lazy(() => import('../pages/EA/CourseTransferDetailsPage')));
+
 
 // OA ----------------------------------------------------------------------
 // New Account

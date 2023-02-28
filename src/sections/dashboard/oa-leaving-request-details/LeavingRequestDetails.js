@@ -482,7 +482,7 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
                                 sx={{
                                     mb: 2,
                                     display: 'block',
-                                }}>Requeset</Typography>
+                                }}>Request</Typography>
                             <TableContainer component={Paper}>
                                 <Table sx={{ minWidth: 100 }}>
                                     <TableHead>
