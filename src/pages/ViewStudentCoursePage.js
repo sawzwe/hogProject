@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 // firebase
 import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
-import { Container, Button } from '@mui/material';
+import { Container, Button, Stack, Card } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
@@ -14,7 +14,7 @@ import LoadingScreen from '../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // sections
-import ViewStudent from '../sections/dashboard/ViewStudent';
+import ViewStudentCourse from '../sections/dashboard/ViewStudentCourse';
 import { studentList } from '../sections/dashboard/ep-registration-request-form/_mockupData';
 
 // ----------------------------------------------------------------------
@@ -25,37 +25,16 @@ export default function ViewStudentPage() {
     const { id } = useParams();
 
     const dataFetchedRef = useRef(false);
-    
-    // Firebase Storage
-    const storage = getStorage();
 
     const [student, setStudent] = useState();
-    const [avatarURL, setAvatarURL] = useState();
-    const [filesURL, setFilesURL] = useState([]);
+
 
     const fetchData = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
             .then((res) => {
+                console.log('res', res);
                 const data = res.data.data
                 setStudent(data)
-                const pathReference = ref(storage, `users/students/${data.firebaseId}/Avatar/${data.profilePicture}`);
-                getDownloadURL(pathReference)
-                    .then((url) => setAvatarURL(url));
-
-                const listRef = ref(storage, `users/students/${data.firebaseId}/Files`);
-                listAll(listRef)
-                    .then((res) => {
-                        res.items.map((itemRef) => (
-                            getMetadata(itemRef)
-                                .then((metadata) => {
-                                    getDownloadURL(itemRef)
-                                        .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
-                                        .catch((error) => console.error(error));
-                                })
-                                .catch((error) => console.error(error))
-                        )
-                        )
-                    })
             })
             .catch((error) => navigate('*', { replace: false }))
     }
@@ -67,33 +46,33 @@ export default function ViewStudentPage() {
         fetchData();
     }, [])
 
-    if (student === undefined || !avatarURL) {
+    if (student === undefined) {
         return <LoadingScreen />;
     }
 
     return (
         <>
             <Helmet>
-                <title> Student Detail </title>
+                <title> Course Detail </title>
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                
+
                 <CustomBreadcrumbs
-                    heading="Student Information"
+                    heading="Student Course"
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.allStudents,
+                            href: PATH_DASHBOARD.studentManagement.searchCourseStudent,
                         },
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
-                    action={
-                        <Button component={Link} to={`/dashboard/student-management/search-student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
-                    }
                 />
-
-                <ViewStudent student={student} avatarURL={avatarURL} filesURL={filesURL} />
+                <Stack spacing={3}>
+                    <Card sx={{p: 3}}>
+                    <ViewStudentCourse student={student} />
+                    </Card>
+                </Stack>
             </Container>
         </>
     );
