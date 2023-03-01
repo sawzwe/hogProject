@@ -263,7 +263,6 @@ export default function EditStaffRequest({ isEdit = false, currentStaff, Id }) {
                     }
                 />
             </FormProvider>
-            <SelectAvailableDays />
         </>
 
     )

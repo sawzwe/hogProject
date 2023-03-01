@@ -58,9 +58,164 @@ const RECORDING_YEAR = [
 LeavingRequestDetails.propTypes = {
     newRequest: PropTypes.bool,
     currentStaff: PropTypes.object,
+    status: PropTypes.string,
 };
 
-export default function LeavingRequestDetails({ newRequest = true, currentStaff, Id }) {
+export default function LeavingRequestDetails({ currentStatus = "rejected", newRequest = true, currentStaff, Id }) {
+    const [status, setStatus] = useState(currentStatus);
+    return (
+        <>
+            {status === "myRequest" ?
+                (
+                    // Can Edit, Approve, Reject and Withdraw
+                    <LeaveRequestEdit Id={Id} newRequest={newRequest} currentStaff={currentStaff} />
+                )
+                :
+                (   
+                    // Can only view the result
+                    <LeavingRequestStatus Id={Id} status={status} />
+                )}
+        </>
+
+    )
+}
+
+
+LeavingRequestStatus.propTypes = {
+    status: PropTypes.string,
+    currentId: PropTypes.string,
+};
+
+export function LeavingRequestStatus({ status, Id }) {
+    const [currentId, setCurrentId] = useState(Id);
+    const navigate = useNavigate();
+
+    return (
+        <>
+            <Grid container spacing={3}>
+                <Grid container item xs={12} md={12}>
+                    <Card sx={{ p: 3, width: "100%", display: "flex", justifyContent: 'space-between', alignItems: 'center', }} >
+                        <Typography variant="h5"
+                            sx={{
+                                display: 'block',
+                            }}>Teacher Personal Leaving </Typography>
+                        {
+                            status === "rejected" ? (
+                                <Box sx={{
+                                    backgroundColor: '#FF5630',
+                                    color: '#fff',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    display: 'inline-block',
+                                }}>
+                                    <Typography variant='button' >Rejected</Typography>
+                                </Box>
+                            ) : (
+                                <Box sx={{
+                                    backgroundColor: '#00AB55',
+                                    color: '#fff',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    display: 'inline-block',
+                                }}>
+                                    <Typography variant='button' >Completed</Typography>
+                                </Box>
+
+                            )
+                        }
+                    </Card>
+                </Grid>
+
+
+
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}>
+                            Teacher: KEEN - Chaipod Suktip ID: {currentId}
+                        </Typography>
+                        <Typography variant="body"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}>
+                            Course: SAT VERBAL INTENSIVE (Semi Private)
+                        </Typography>
+                        <Typography variant="body"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}>
+                            Leaving Date:  17-Oct-2022
+                        </Typography>
+
+
+                    </Card >
+                </Grid >
+
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}>
+                            Cancel Class
+                        </Typography>
+                        <Grid container direction="row" spacing={2} justifyContent="flex-end">
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="Course" defaultValue={"SAT"} />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="Course Type" defaultValue={"Semi-Private"} />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="Section" defaultValue={"403"} />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="Primary Teacher" defaultValue={"KEEN"} />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="Start Date" defaultValue={"17-Feb-2023"} />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <TextField fullWidth disabled label="End Date" defaultValue={"17-Jun-2023"} />
+                            </Grid>
+                        </Grid>
+
+                    </Card >
+                </Grid >
+
+                <Grid item xs={12} md={12}>
+
+                    <>
+                        <Stack spacing={2} direction="row" justifyContent="space-between" alignItems="center">
+                            <Box>
+                                <Button onClick={() => navigate(-1)} type="submit" variant="outlined" sx={{ height: '3em', width: '8em', ml: 1, color: 'black', border: '1px solid #919EAB', marginLeft: 'auto' }}>
+                                    Back
+                                </Button>
+                            </Box>
+                        </Stack>
+                    </>
+
+                </Grid>
+
+            </Grid >
+        </>
+    )
+}
+
+
+LeaveRequestEdit.propTypes = {
+    newRequest: PropTypes.bool,
+    currentStaff: PropTypes.object,
+    Id: PropTypes.string,
+};
+
+export function LeaveRequestEdit({ Id, newRequest, currentStaff }) {
     const navigate = useNavigate();
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -96,8 +251,6 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
     const [currentId, setCurrentId] = useState(Id);
 
     const [tableData, setTableData] = useState([]);
-
-    const [status, setStatus] = useState('');
 
     const [selectedCourse, setSelectedCourse] = useState({});
 
@@ -357,12 +510,12 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
                                 }}>
                                 Cancel Class
                             </Typography>
-                            <Grid container direction="row" spacing={2}>
+                            <Grid container direction="row" spacing={2} justifyContent="flex-end">
                                 <Grid item xs={12} md={4}>
                                     <TextField fullWidth disabled label="Course" defaultValue={"SAT"} />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
-                                    <TextField fullWidth disabled label="Course Type" defaultValue={"Semi-Private"}/>
+                                    <TextField fullWidth disabled label="Course Type" defaultValue={"Semi-Private"} />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
                                     <TextField fullWidth disabled label="Section" defaultValue={"403"} />
@@ -371,12 +524,20 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
                                     <TextField fullWidth disabled label="Primary Teacher" defaultValue={"KEEN"} />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
-                                    <TextField fullWidth disabled label="Start Date" defaultValue={"17-Feb-2023"}/>
+                                    <TextField fullWidth disabled label="Start Date" defaultValue={"17-Feb-2023"} />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
-                                    <TextField fullWidth disabled label="End Date" defaultValue={"17-Jun-2023"}/>
+                                    <TextField fullWidth disabled label="End Date" defaultValue={"17-Jun-2023"} />
+                                </Grid>
+
+                                <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Button variant="outlined" size="large" sx={{ ml: 1, color: 'black', border: '1px solid #919EAB' }}>
+                                        <Iconify icon="mdi:lead-pencil" sx={{ fontSize: 40, marginRight: 1 }} />
+                                        Edit Class
+                                    </Button>
                                 </Grid>
                             </Grid>
+
                         </Card >
                     </Grid >
 
@@ -406,7 +567,6 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
 
                 </Grid >
             </FormProvider >
-
 
             <ConfirmDialog
                 open={openConfirmReject}
@@ -452,8 +612,6 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
                     </Button>
                 }
             />
-
         </>
-
     )
 }
