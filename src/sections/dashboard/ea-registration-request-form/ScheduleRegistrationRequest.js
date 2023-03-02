@@ -24,7 +24,10 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    DialogTitle, DialogContent, DialogContentText, DialogActions
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import InfoIcon from '@mui/icons-material/Info';
@@ -286,15 +289,73 @@ export function CourseSection({ courseType, courses, onCreate }) {
     }, [open]);
 
     return (
-        <Card sx={{ p: 3 }}>
-            <Grid container
-                direction="row"
-                alignItems="center">
-                <Grid item xs={6} md={6}>
-                    <Typography variant="h6">{`New Course(s)`}</Typography>
+        <>
+            <Card sx={{ p: 3 }}>
+                <Grid container
+                    direction="row"
+                    alignItems="center">
+                    <Grid item xs={6} md={6}>
+                        <Typography variant="h6">{`New Course(s)`}</Typography>
+                    </Grid>
                 </Grid>
-            </Grid>
+                {courses.map((course, index) => (
+                    <Paper key={index} elevation={2} sx={{ mt: 2, p: 3 }}>
+                        <Grid container
+                            direction="column"
+                            spacing={2}
+                            justifyContent="space-between"
+                            alignItems="flex-start">
+                            <Grid container item xs={12} md={12}>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{course.course} {course.subject} {course.level} ({courseType.toUpperCase()})</Typography>
+                            </Grid>
+                        </Grid>
 
+                        <Grid container direction="row" spacing={2} sx={{ mt: 1, mb: 2 }}>
+                            <Grid item xs={6} md={3}>
+                                <TextField fullWidth disabled label="Start Date" value={course.startDate} />
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <TextField fullWidth disabled label="End Date" value={course.endDate} />
+                            </Grid>
+                            <Grid item xs={12} md={2}>
+                                <TextField fullWidth disabled label="Total Hours" value={course.totalHours} />
+                            </Grid>
+                            <Grid item xs={6} md={2}>
+                                <TextField fullWidth disabled label="Learning Method" value={course.method} />
+                            </Grid>
+                            <Grid item xs={6} md={2}>
+                                <TextField fullWidth disabled label="Hours/Class" value={course.hoursPerClass} />
+                            </Grid>
+                        </Grid>
+                        <Typography variant="inherit" sx={{ color: 'text.disabled', mt: 2, mb: 2, ml: 0.5 }}>Available Days</Typography>
+                        <Grid container direction="row" spacing={2}>
+                            {course.availableDays.map((eachDay, index) => (
+                                <Grid item xs={6} md={2.4} key={index}>
+                                    <TextField fullWidth label={eachDay.day} value={`${eachDay.from} - ${eachDay.to}`} disabled />
+                                </Grid>
+                            ))}
+                        </Grid>
+
+                        <Grid container direction="row" sx={{ mt: 2 }} justifyContent="flex-end">
+                            {checkAlreadyCreated(completeCourses, course) ? (
+                                <Button variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => {
+                                    handleOpenDialog(course)
+                                    setIsView(true)
+                                }}>
+                                    <InfoIcon sx={{ mr: 0.5 }} /> Successfully created
+                                </Button>
+                            ) : (
+                                <Button variant="contained" disabled={checkAlreadyCreated(completeCourses, course)} color="primary" sx={{ height: '3em' }} onClick={() => handleOpenDialog(course)}>
+                                    Create Class
+                                </Button>
+                            )}
+                        </Grid>
+
+                    </Paper>
+                ))
+                }
+
+            </Card>
             {
                 !!Object.keys(selectedCourse).length && (
                     <CreateScheduleDialog
@@ -308,65 +369,7 @@ export function CourseSection({ courseType, courses, onCreate }) {
                     />
                 )
             }
-
-            {courses.map((course, index) => (
-                <Paper key={index} elevation={2} sx={{ mt: 2, p: 3 }}>
-                    <Grid container
-                        direction="column"
-                        spacing={2}
-                        justifyContent="space-between"
-                        alignItems="flex-start">
-                        <Grid container item xs={12} md={12}>
-                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{course.course} {course.subject} {course.level} ({courseType.toUpperCase()})</Typography>
-                        </Grid>
-                    </Grid>
-
-                    <Grid container direction="row" spacing={2} sx={{ mt: 1, mb: 2 }}>
-                        <Grid item xs={6} md={3}>
-                            <TextField fullWidth disabled label="Start Date" value={course.startDate} />
-                        </Grid>
-                        <Grid item xs={6} md={3}>
-                            <TextField fullWidth disabled label="End Date" value={course.endDate} />
-                        </Grid>
-                        <Grid item xs={12} md={2}>
-                            <TextField fullWidth disabled label="Total Hours" value={course.totalHours} />
-                        </Grid>
-                        <Grid item xs={6} md={2}>
-                            <TextField fullWidth disabled label="Learning Method" value={course.method} />
-                        </Grid>
-                        <Grid item xs={6} md={2}>
-                            <TextField fullWidth disabled label="Hours/Class" value={course.hoursPerClass} />
-                        </Grid>
-                    </Grid>
-                    <Typography variant="inherit" sx={{ color: 'text.disabled', mt: 2, mb: 2, ml: 0.5 }}>Available Days</Typography>
-                    <Grid container direction="row" spacing={2}>
-                        {course.availableDays.map((eachDay, index) => (
-                            <Grid item xs={6} md={2.4} key={index}>
-                                <TextField fullWidth label={eachDay.day} value={`${eachDay.from} - ${eachDay.to}`} disabled />
-                            </Grid>
-                        ))}
-                    </Grid>
-
-                    <Grid container direction="row" sx={{ mt: 2 }} justifyContent="flex-end">
-                        {checkAlreadyCreated(completeCourses, course) ? (
-                            <Button variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => {
-                                handleOpenDialog(course)
-                                setIsView(true)
-                            }}>
-                                <InfoIcon sx={{ mr: 0.5 }} /> Successfully created
-                            </Button>
-                        ) : (
-                            <Button variant="contained" disabled={checkAlreadyCreated(completeCourses, course)} color="primary" sx={{ height: '3em' }} onClick={() => handleOpenDialog(course)}>
-                                Create Class
-                            </Button>
-                        )}
-                    </Grid>
-
-                </Paper>
-            ))
-            }
-
-        </Card>
+        </>
     )
 }
 
@@ -409,11 +412,12 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         [`&.${tableCellClasses.head}`]: {
             backgroundColor: theme.palette.divider,
             color: theme.palette.common.black,
-            fontSize: '1vw',
+            fontSize: '0.7rem',
             border: `1px solid ${theme.palette.divider}`,
         },
         [`&.${tableCellClasses.body}`]: {
-            fontSize: '1vw',
+            fontSize: '0.7rem',
+            padding: 5,
             border: `1px solid ${theme.palette.divider}`,
 
         },
@@ -423,6 +427,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         // hide last border
         '&:last-child td, &:last-child th': {
             backgroundColor: theme.palette.divider,
+            padding: 16,
+            fontWeight: 600,
             border: `1px solid ${theme.palette.divider}`,
         },
     }));
@@ -487,19 +493,19 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
     // Edit Schedule ---------------------------------------------------------------------------------
     const [selectedSchedule, setSelectedSchedule] = useState({})
-    const [openEditSchedule, setOpenEditSchedule] = useState(false);
+    const [openEditClass, setOpenEditClass] = useState(false);
 
     const handleOpenEditDialog = (row) => {
         setSelectedSchedule(row);
-        setOpenEditSchedule(true);
+        setOpenEditClass(true);
     }
 
     const handleCloseEditDialog = () => {
         setSelectedSchedule({});
-        setOpenEditSchedule(false);
+        setOpenEditClass(false);
     }
 
-    const handleEditSchedule = (schedule) => {
+    const handleEditClass = (schedule) => {
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
         const updatedSchedules = [...filteredSchedules, schedule]
         //  shallow copy the array
@@ -534,7 +540,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 sx: {
                     '&::-webkit-scrollbar': { display: 'none' }
                 }
-            }}>
+            }}
+        >
 
             <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
                 <Grid container item xs={12} md={12} justifyContent="space-between">
@@ -738,7 +745,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                                     <StyledTableCell align="center">{row.time}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '8%' }} align="center">{row.hoursPerClass}</StyledTableCell>
                                                     <StyledTableCell align="center">{row.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${row.teacher.nickname.toUpperCase()}`} {!!row.teacher.workTimeType && `(${row.teacher.workTimeType})` }</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${row.teacher.nickname.toUpperCase()}`} {!!row.teacher.workTimeType && `(${row.teacher.workTimeType})`}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                                     <StyledTableCell align="center" > {!isView && (
                                                         <IconButton onClick={() => handleOpenEditDialog(row)}>
@@ -758,11 +765,11 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                             </TableContainer>
                         )}
                     </Scrollbar>
-                    <EditScheduleDialog
-                        open={openEditSchedule}
+                    <EditClassDialog
+                        open={openEditClass}
                         close={handleCloseEditDialog}
                         schedule={selectedSchedule}
-                        onEdit={handleEditSchedule}
+                        onEdit={handleEditClass}
                     />
                 </Grid>
             </Grid>
@@ -779,14 +786,14 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
 // ----------------------------------------------------------------------
 
-EditScheduleDialog.propTypes = {
+EditClassDialog.propTypes = {
     open: PropTypes.bool,
     close: PropTypes.func,
     schedule: PropTypes.object,
     onEdit: PropTypes.func
 }
 
-export function EditScheduleDialog({ open, close, schedule, onEdit }) {
+export function EditClassDialog({ open, close, schedule, onEdit }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [

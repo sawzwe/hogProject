@@ -61,7 +61,7 @@ import {
   PageTeacherGroupCourseDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance,
-  PageViewStudentCourse
+  ViewEditStudentCoursePage
 }
   from './elements';
 
@@ -167,7 +167,7 @@ export default function Router() {
             {
               path: 'search-course/:id', element: (
                 <RoleBasedGuard roles={['Education Planner', 'Education Admin']} hasContent>
-                  <PageViewStudentCourse />
+                  <ViewEditStudentCoursePage />
                 </RoleBasedGuard>
               )
             },
