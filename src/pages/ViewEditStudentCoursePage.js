@@ -14,7 +14,7 @@ import LoadingScreen from '../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // sections
-import ViewStudentCourse from '../sections/dashboard/ViewStudentCourse';
+import ViewEditStudentCourse from '../sections/dashboard/ViewEditStudentCourse';
 import { studentList } from '../sections/dashboard/ep-registration-request-form/_mockupData';
 
 // ----------------------------------------------------------------------
@@ -24,31 +24,30 @@ export default function ViewStudentPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const dataFetchedRef = useRef(false);
+    // const dataFetchedRef = useRef(false);
 
-    const [student, setStudent] = useState();
+    // const [student, setStudent] = useState();
 
 
-    const fetchData = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
-            .then((res) => {
-                console.log('res', res);
-                const data = res.data.data
-                setStudent(data)
-            })
-            .catch((error) => navigate('*', { replace: false }))
-    }
+    // const fetchData = async () => {
+    //     return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+    //         .then((res) => {
+    //             console.log('res', res);
+    //             const data = res.data.data
+    //             setStudent(data)
+    //         })
+    //         .catch((error) => navigate('*', { replace: false }))
+    // }
 
-    useEffect(() => {
-        if (dataFetchedRef.current) return;
-        dataFetchedRef.current = true;
+    // useEffect(() => {
+    //     if (dataFetchedRef.current) return;
+    //     fetchData();
+    //     dataFetchedRef.current = true;
+    // }, [])
 
-        fetchData();
-    }, [])
-
-    if (student === undefined) {
-        return <LoadingScreen />;
-    }
+    // if (!dataFetchedRef.current) {
+    //     return <LoadingScreen />;
+    // }
 
     return (
         <>
@@ -65,12 +64,12 @@ export default function ViewStudentPage() {
                             name: 'All students',
                             href: PATH_DASHBOARD.studentManagement.searchCourseStudent,
                         },
-                        { name: student?.fName.concat(' ', student?.lName) },
+                        // { name: student?.fName.concat(' ', student?.lName) },
                     ]}
                 />
                 <Stack spacing={3}>
                     <Card sx={{p: 3}}>
-                    <ViewStudentCourse student={student} />
+                    <ViewEditStudentCourse />
                     </Card>
                 </Stack>
             </Container>
