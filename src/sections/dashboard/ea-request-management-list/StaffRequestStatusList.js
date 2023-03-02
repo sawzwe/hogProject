@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 // @mui
 import {
   Tab,
@@ -39,7 +40,7 @@ import ConfirmDialog from '../../../components/confirm-dialog';
 // ----------------------------------------------------------------------
 
 function createData(id, requestDate, requestType, fullname, nickname, requestedBy, role) {
-  return { id, requestDate, requestType, fullname, nickname, requestedBy, role};
+  return { id, requestDate, requestType, fullname, nickname, requestedBy, role };
 }
 
 const TABLE_HEAD_REQUESTS = [
@@ -84,6 +85,8 @@ const errorTheme = createTheme({
 
 export default function StaffRequestStatusList() {
 
+  const navigate = useNavigate();
+
   const { themeStretch } = useSettingsContext();
 
   const {
@@ -109,6 +112,11 @@ export default function StaffRequestStatusList() {
   const [filterRole, setFilterRole] = useState('available');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
+  const [openConfirmLeave, setOpenConfirmLeave] = useState(false);
+
+  const [openConfirmTransfer, setOpenConfirmTransfer] = useState(false);
+
 
   const [currentId, setCurrentId] = useState(-1);
 
@@ -155,8 +163,37 @@ export default function StaffRequestStatusList() {
     setOpenConfirm(true);
   };
 
+  const navigateTo = (requestType, currentId) => {
+    if (requestType === 'Course Transfering') {
+      navigate(`/dashboard/request-management/staff-request/transfer-req/${currentId}`)
+    } else {
+      navigate(`/dashboard/request-management/staff-request/leave-req/${currentId}`);
+    }
+  }
+
+  const openDialog = (requestType, currentId) => {
+    if (requestType === 'Course Transfering') {
+      setOpenConfirmTransfer(true);
+    }
+    else{
+      setOpenConfirmLeave(true);
+    }
+  };
+
+  const handleClickRequest = (currentId, requestType, role) => {
+    setCurrentId(currentId);
+    if (role === 'available') { 
+      openDialog(requestType, currentId);
+    } 
+     else {
+      navigateTo(requestType, currentId);
+    };
+  }
+
+
   const handleCloseConfirm = () => {
-    setOpenConfirm(false);
+    setOpenConfirmTransfer(false);
+    setOpenConfirmLeave(false);
   };
 
   const handleResetFilter = () => {
@@ -242,9 +279,8 @@ export default function StaffRequestStatusList() {
                     <TableRow
                       hover
                       key={row.id}
-                      component={Link}
-                      to={ row.requestType === 'Course Transfering' ? `/dashboard/request-management/staff-request/transfer-req/${row.id}` : `/dashboard/request-management/staff-request/leave-req/${row.id}`}
-                      sx= {{textDecoration: 'none' }}
+                      onClick={() => handleClickRequest(row.id, row.requestType, row.role)}
+                      sx={{ textDecoration: 'none' }}
                     >
                       <TableCell align="left" > Q{row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
@@ -277,14 +313,28 @@ export default function StaffRequestStatusList() {
             </Scrollbar>
           </TableContainer>
           <ConfirmDialog
-            open={openConfirm}
+            open={openConfirmLeave}
             onClose={handleCloseConfirm}
-            title="Take the Request"
+            title="Take the Leave Request"
             content="Once the request is taken, only you can see the request and proceed it."
             action={
               <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
-                <Link to= {`/dashboard/request-management/staff-request/leave-req/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
-                Take Request
+                <Link to={`/dashboard/request-management/staff-request/leave-req/${parseInt(currentId, 10)}`} style={{ textDecoration: 'none', color: 'white' }}>
+                  Take Request
+                </Link>
+              </Button>
+            }
+          />
+
+          <ConfirmDialog
+            open={openConfirmTransfer}
+            onClose={handleCloseConfirm}
+            title="Take the Transfer Request"
+            content="Once the request is taken, only you can see the request and proceed it."
+            action={
+              <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
+                <Link to={`/dashboard/request-management/staff-request/transfer-req/${parseInt(currentId, 10)}`} style={{ textDecoration: 'none', color: 'white' }}>
+                  Take Request
                 </Link>
               </Button>
             }
@@ -295,9 +345,6 @@ export default function StaffRequestStatusList() {
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            // dense={dense}
-            // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
@@ -327,7 +374,7 @@ function applyFilter({
 
   if (filterName) {
     inputData = inputData.filter((request) =>
-      request.id === parseInt(filterName,10)||
+      request.id === parseInt(filterName, 10) ||
       // request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
       request.fullname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
       request.nickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
