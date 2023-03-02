@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
+import { useNavigate } from 'react-router';
+// form
+import { useForm, Controller } from 'react-hook-form';
 // @mui
 import {
     Grid,
@@ -10,6 +13,8 @@ import {
     Paper,
     Stack,
     Dialog,
+    DialogTitle,
+    DialogContent,
     DialogActions,
     IconButton,
     Table,
@@ -17,19 +22,22 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    MenuItem
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
 // utils
 import { fDate } from '../../utils/formatTime'
 // components
+import { useSnackbar } from '../../components/snackbar';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
+import FormProvider, { RHFSelect } from '../../components/hook-form';
 
 // ----------------------------------------------------------------
 
@@ -59,16 +67,16 @@ export default function ViewStudentCourse({ student }) {
             { day: 'Friday', fromTime: '10:00', toTime: '12:00' },
         ],
         schedule: [
-            { date: '01 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '03 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '08 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '10 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '15 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '17 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '22 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '24 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '29 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
-            { date: '31 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '01-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '03-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '08-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '10-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '15-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '17-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '22-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '24-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '29-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
+            { date: '31-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'KWAN' },
         ],
     }
 
@@ -79,7 +87,7 @@ export default function ViewStudentCourse({ student }) {
         type: 'Semi Private',
         section: 'Haw',
         method: 'Onsite',
-        totalHour: '20',
+        totalHour: '10',
         hourPerClass: '2',
         startDate: '07 Mar 2023',
         endDate: '28 Mar 2023',
@@ -89,10 +97,10 @@ export default function ViewStudentCourse({ student }) {
             { day: 'Thursday', fromTime: '10:00', toTime: '12:00' },
         ],
         schedule: [
-            { date: '07 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'BOY' },
-            { date: '14 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Online', teacher: 'BOY' },
-            { date: '21 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Online', teacher: 'BOY' },
-            { date: '28 Mar 2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'BOY' }
+            { date: '07-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'BOY' },
+            { date: '14-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Online', teacher: 'BOY' },
+            { date: '21-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Online', teacher: 'BOY' },
+            { date: '28-Mar-2023', fromTime: '10:00', toTime: '12:00', method: 'Onsite', teacher: 'BOY' }
         ]
     }
 
@@ -114,7 +122,7 @@ export default function ViewStudentCourse({ student }) {
         <>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
-                    <Typography variant="h6">
+                    <Typography variant="">
                         Registered Course
                     </Typography>
                 </Grid>
@@ -126,12 +134,16 @@ export default function ViewStudentCourse({ student }) {
                     </Stack>
                 </Grid>
             </Grid>
-            <ViewEditScheduleDialog
-                open={openViewEditSchedule}
-                onClose={() => setOpenViewEditSchedule(false)}
-                selectedCourse={selectedCourse}
-                role={role}
-            />
+            {
+                Object.keys(selectedCourse).length !== 0 && (
+                    <ViewEditScheduleDialog
+                        open={openViewEditSchedule}
+                        onClose={() => setOpenViewEditSchedule(false)}
+                        selectedCourse={selectedCourse}
+                        role={role}
+                    />
+                )
+            }
         </>
     )
 }
@@ -215,46 +227,81 @@ ViewEditScheduleDialog.propTypes = {
 }
 
 export function ViewEditScheduleDialog({ selectedCourse, open, onClose, role }) {
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     const {
         schedule,
         preferredDay
     } = selectedCourse;
 
+    const [currentSchedule, setCurrentSchedule] = useState(selectedCourse.schedule);
 
-    // const handleSubmit = async (data) => {
+    useEffect(() => {
+        setCurrentSchedule(schedule);
+    }, [schedule])
 
-    // }
+    const handleAddClass = (newClass) => {
+        const newSchedule = [...currentSchedule, newClass];
+        setCurrentSchedule(newSchedule.sort((class1, class2) => new Date(class1.date).getTime() - new Date(class2.date).getTime()));
+    };
+
+    const handleSaveChange = () => {
+        const totalHour = calculateTotalHour(currentSchedule);
+        if (totalHour !== parseInt(selectedCourse.totalHour, 10)) {
+            return enqueueSnackbar(`Total hours is invalid. Must be ${selectedCourse.totalHour} hours`, { variant: 'error' });
+        }
+        // If schedule is not changed once saved then we must reload the page
+        // navigate(0);
+        onClose();
+        return enqueueSnackbar('Schedule saved', { variant: 'success' });
+        
+    };
+
+    const calculateTotalHour = (schedule) => {
+        let HoursCount = 0;
+        schedule.forEach((eachSchedule) => {
+            const timeA = moment([eachSchedule.fromTime.slice(0, 2), eachSchedule.fromTime.slice(3, 5)], "HH:mm")
+            const timeB = moment([eachSchedule.toTime.slice(0, 2), eachSchedule.toTime.slice(3, 5)], "HH:mm")
+            HoursCount += timeB.diff(timeA, 'hours');
+        })
+        return HoursCount;
+    };
+
+    console.log('currentSchedule', currentSchedule);
 
     return (
         <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}
             PaperProps={{
                 sx: {
                     '&::-webkit-scrollbar': { display: 'none' },
-                    // height: '100%'
                 }
             }}
         >
-            {/* <Grid container direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 3, pt: 2 }}>
-                <Typography variant="h6"> Edit Schedule </Typography>
-                <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
-            </Grid> */}
 
-            <Grid container direction="row" alignItems="flex-start" sx={{ px: 3, pt: 3 }} spacing={2}>
-                <CourseInfo selectedCourse={selectedCourse} />
-                <ScheduleInfo schedule={schedule} preferredDay={preferredDay} role={role} />
-            </Grid>
+            {currentSchedule !== undefined && (
+                <Grid container direction="row" alignItems="flex-start" sx={{ px: 3, pt: 3 }} spacing={2}>
+                    <CourseInfo selectedCourse={selectedCourse} />
+                    <ScheduleInfo
+                        schedule={currentSchedule}
+                        preferredDay={preferredDay}
+                        role={role}
+                        onAdd={handleAddClass}
+                    />
+                </Grid>
+            )}
 
             {role === 'Education Admin' ? (
                 <DialogActions>
                     <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
-                    <Button variant="contained" color="primary">Save Changes</Button>
+                    <Button variant="contained" color="primary" onClick={handleSaveChange}>Save Changes</Button>
                 </DialogActions>
             ) : (
                 <DialogActions>
                     <Button variant="outlined" color="inherit" onClick={onClose}>Close</Button>
                 </DialogActions>
             )}
+
         </Dialog>
     )
 }
@@ -287,7 +334,7 @@ export function CourseInfo({ selectedCourse }) {
     }
 
     return (
-        
+
         <Grid item xs={12} md={5}>
             <Grid item xs={12} md={12} sx={{ mb: 2 }}>
                 <Typography variant="h6"> Course Information </Typography>
@@ -299,8 +346,8 @@ export function CourseInfo({ selectedCourse }) {
                         <TextField
                             fullWidth
                             variant="outlined"
-                            defaultValue={type}
-                            label="Course Type"
+                            defaultValue={`${course} ${subject} ${level}`}
+                            label="Course"
                             disabled
                             InputProps={{
                                 style: customTextFieldStyle
@@ -311,8 +358,8 @@ export function CourseInfo({ selectedCourse }) {
                         <TextField
                             fullWidth
                             variant="outlined"
-                            defaultValue={`${course} ${subject} ${level}`}
-                            label="Course"
+                            defaultValue={type}
+                            label="Course Type"
                             disabled
                             InputProps={{
                                 style: customTextFieldStyle
@@ -393,7 +440,9 @@ export function CourseInfo({ selectedCourse }) {
             </Stack>
 
             <Stack direction="row">
-                <Typography variant="inherit" sx={{ color: 'text.disabled', mt: 2, mb: 2, ml: 0.5 }}>Preferred Days</Typography>
+                <Typography sx={{ color: 'text.disabled', fontSize: 'h1', mt: 2, mb: 2, ml: 0.5 }}>
+                    Preferred Days
+                </Typography>
             </Stack>
 
             <Stack direction="row" sx={{ mb: 2 }}>
@@ -437,11 +486,11 @@ export function CourseInfo({ selectedCourse }) {
 
 ScheduleInfo.propTypes = {
     schedule: PropTypes.array,
-    preferredDay: PropTypes.array,
-    role: PropTypes.string
+    role: PropTypes.string,
+    onAdd: PropTypes.func,
 }
 
-export function ScheduleInfo({ schedule, preferredDay, role }) {
+export function ScheduleInfo({ schedule, role, onAdd }) {
 
     let rowAccumulatedHours = 0;
 
@@ -482,14 +531,19 @@ export function ScheduleInfo({ schedule, preferredDay, role }) {
         },
     }));
 
+    // Add Class
+    const [openAddClassDialog, setOpenAddClassDialog] = useState(false);
+
+    // Edit Class
+    const [selectedClass, setSelectedClass] = useState({});
+
     return (
         <Grid item xs={12} md={7}>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pr: 1.5, mb: 1 }}>
                 <Typography variant="h6"> Classes & Schedules </Typography>
                 {role === 'Education Admin' && (
-                    <Button variant="text">
-                        <AddIcon sx={{ mr: 0.5 }} />
-                        Add Class
+                    <Button variant="text" onClick={() => setOpenAddClassDialog(true)}>
+                        <AddIcon sx={{ mr: 0.5 }} /> Add Class
                     </Button>
                 )}
             </Stack>
@@ -550,7 +604,195 @@ export function ScheduleInfo({ schedule, preferredDay, role }) {
                     </TableContainer>
                 )}
             </Scrollbar>
+            <AddClassDialog
+                open={openAddClassDialog}
+                onClose={() => setOpenAddClassDialog(false)}
+                onAdd={onAdd}
+            />
         </Grid>
+    )
+}
+
+// ----------------------------------------------------------------
+
+AddClassDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onAdd: PropTypes.func
+}
+
+export function AddClassDialog({ open, onClose, onAdd }) {
+
+    // fetch all teachers
+    const TEACHER_OPTIONS = [
+        { fullName: 'John Smith', nickname: 'Tar' },
+        { fullName: 'John Smite', nickname: 'Keen' },
+        { fullName: 'Jane Smoke', nickname: 'Kwan' }
+    ];
+
+    // fetch available time of specific teacher
+    const TIME_OPTIONS = [
+        '10:00-12:00', '13:00-15:00', '16:00-18:00'
+    ];
+
+    // don't fetch
+    const METHOD_OPTIONS = [
+        'Onsite', 'Online'
+    ];
+
+    const defaultValues = {
+        classDate: '',
+        classTime: '',
+        classTeacher: '',
+        classMethod: 'Onsite'
+    };
+
+    const methods = useForm({
+        defaultValues
+    });
+
+    const {
+        control,
+        reset,
+        handleSubmit
+    } = methods;
+
+    const onSubmit = (data) => {
+        const newClass = {
+            date: fDate(data.classDate),
+            fromTime: data.classTime.slice(0, 5),
+            toTime: data.classTime.slice(6, 11),
+            method: data.classMethod,
+            teacher: data.classTeacher
+        }
+        onAdd(newClass);
+        onClose();
+        setTimeout(() => {
+            reset(defaultValues);
+        }, 200)
+    }
+
+    return (
+        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+                <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
+                <DialogContent>
+                    <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
+
+                        <Grid item xs={12} md={3}>
+                            <Controller
+                                name="classDate"
+                                control={control}
+                                render={({ field, fieldState: { error } }) => (
+                                    <DatePicker
+                                        label="Date"
+                                        value={field.value}
+                                        onChange={(newValue) => {
+                                            field.onChange(newValue);
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField {...params} fullWidth error={!!error} helperText={error?.message} required />
+                                        )}
+                                        disableMaskedInput
+                                        inputFormat="dd-MMM-yyyy"
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classTime"
+                                label="Time"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {TIME_OPTIONS.map((eachTime, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachTime}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachTime}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classTeacher"
+                                label="Teacher"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {TEACHER_OPTIONS.map((eachTeacher, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachTeacher.nickname}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classMethod"
+                                label="Learning Method"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {METHOD_OPTIONS.map((eachMethod, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachMethod}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachMethod}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="inherit" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="contained" color="primary">
+                        Add
+                    </Button>
+                </DialogActions>
+            </FormProvider>
+        </Dialog>
     )
 }
 

@@ -68,8 +68,8 @@ export default function ViewStudentPage() {
                     ]}
                 />
                 <Stack spacing={3}>
-                    <Card sx={{p: 3}}>
-                    <ViewEditStudentCourse />
+                    <Card sx={{ p: 3 }}>
+                        <ViewEditStudentCourse />
                     </Card>
                 </Stack>
             </Container>
