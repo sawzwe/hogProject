@@ -8,7 +8,7 @@ import { Container, Button, Stack, Card } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_ACCOUNT } from '../routes/paths';
 // components
 import LoadingScreen from '../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../components/settings';
@@ -62,7 +62,7 @@ export default function ViewStudentPage() {
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.studentManagement.searchCourseStudent,
+                            href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
                         },
                         // { name: student?.fName.concat(' ', student?.lName) },
                     ]}

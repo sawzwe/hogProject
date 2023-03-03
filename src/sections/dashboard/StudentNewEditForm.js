@@ -197,7 +197,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             if (isEdit) {
                 await updateStudent(currentStudent, data)
                     .then(() => enqueueSnackbar('Update successfully!'))
-                    .then(() => navigate(`/dashboard/student-management/search-student/${currentStudent.id}`))
+                    .then(() => navigate(`/account/student-management/student/${currentStudent.id}`))
                     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             } else {
                 await registerStudent(data)

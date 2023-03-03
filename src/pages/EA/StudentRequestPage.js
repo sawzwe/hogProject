@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 // @mui
 import { Container, Typography } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_SCHEDULE_CHANGING } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -23,7 +23,7 @@ export default function StaffRequestPage() {
                 links={[
                     {
                         name: 'Course Registration',
-                        href: PATH_DASHBOARD.courseRegistration.root,
+                        href: PATH_SCHEDULE_CHANGING.studentRequest,
                     },
                     { name: 'Request status' },
                 ]}

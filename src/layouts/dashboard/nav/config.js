@@ -3,7 +3,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LockResetIcon from '@mui/icons-material/LockReset';
 // routes
-import { PATH_AUTH, PATH_DASHBOARD } from '../../../routes/paths';
+import { PATH_AUTH, PATH_ACCOUNT, PATH_REGISTRATION, PATH_COURSE_TRANSFER, PATH_SCHEDULE_CHANGING } from '../../../routes/paths';
 // components
 import SvgColor from '../../../components/svg-color';
 // icons
@@ -35,55 +35,52 @@ const ICONS = {
 
 const EPNavConfig = [
   // Student Management
-  // ----------------------------------------------------------------------
   {
     subheader: 'student management',
     items: [
       {
         title: 'search student',
-        path: PATH_DASHBOARD.studentManagement.root,
+        path: PATH_ACCOUNT.studentManagement.root,
         icon: ICONS.user,
         children: [
-          { title: 'personal detail', path: PATH_DASHBOARD.studentManagement.searchStudent },
-          { title: 'course detail', path: PATH_DASHBOARD.studentManagement.searchCourseStudent },
+          { title: 'personal detail', path: PATH_ACCOUNT.studentManagement.searchStudent },
+          { title: 'course detail', path: PATH_ACCOUNT.studentManagement.searchCourseStudent },
         ],
       },
-      { title: 'new student', path: PATH_DASHBOARD.newStudent, icon: ICONS.user },
+      { title: 'new student', path: 'new-student', icon: ICONS.user },
     ],
   },
 
-  // Course Management
-  // ----------------------------------------------------------------------
+  // Course Registration and Course Transfer Management
   {
     subheader: 'course management',
     items: [
       {
         title: 'course registration',
-        path: PATH_DASHBOARD.courseRegistration.root,
+        path: PATH_REGISTRATION.root,
         icon: ICONS.mail,
         children: [
-          { title: 'Create Request', path: PATH_DASHBOARD.courseRegistration.createRequest },
-          { title: 'Request Status', path: PATH_DASHBOARD.courseRegistration.requestStatus },
+          { title: 'Create Request', path: PATH_REGISTRATION.createRequest },
+          { title: 'Request Status', path: PATH_REGISTRATION.epRequestStatus },
         ]
       },
       {
         title: 'course transferring',
-        path: PATH_DASHBOARD.courseTransferring.root,
+        path: PATH_COURSE_TRANSFER.root,
         icon: ICONS.file,
         children: [
-          { title: 'Create Request', path: PATH_DASHBOARD.courseTransferring.createRequest },
-          { title: 'Request Status', path: PATH_DASHBOARD.courseTransferring.requestStatus },
+          { title: 'Create Request', path: PATH_COURSE_TRANSFER.createRequest},
+          { title: 'Request Status', path: PATH_COURSE_TRANSFER.epCourseTransferRequest },
         ]
       },
     ],
   },
 
-  // // Settings
-  // // ----------------------------------------------------------------------
+  // Settings
   {
     subheader: 'Settings',
     items: [
-      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Change Password', path: PATH_AUTH.changePassword, icon: ICONS.changePassword },
       { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
@@ -94,64 +91,60 @@ const EPNavConfig = [
 
 const EANavConfig = [
   // Schedule Management
-  // ----------------------------------------------------------------------
   {
     subheader: 'schedule management',
     items: [
-      { title: 'Daily Calendar', path: PATH_DASHBOARD.dailyCalendar, icon: ICONS.calendar },
+      { title: 'Daily Calendar', path: 'daily-calendar', icon: ICONS.calendar },
     ],
   },
 
   // Students and Teachers Management
-  // ----------------------------------------------------------------------
   {
-    subheader: 'students and teachers',
+    subheader: 'account management',
     items: [
       {
         title: 'student',
-        path: PATH_DASHBOARD.studentManagement.root,
+        path: PATH_ACCOUNT.studentManagement.root,
         icon: ICONS.user,
         children: [
-          { title: 'personal detail', path: PATH_DASHBOARD.studentManagement.searchStudent },
-          { title: 'course detail', path: PATH_DASHBOARD.studentManagement.searchCourseStudent },
+          { title: 'personal detail', path: PATH_ACCOUNT.studentManagement.searchStudent },
+          { title: 'course detail', path: PATH_ACCOUNT.studentManagement.searchCourseStudent },
         ],
       },
       {
         title: 'teacher',
-        path: PATH_DASHBOARD.teacherManagement.root,
+        path: PATH_ACCOUNT.teacherManagement.root,
         icon: ICONS.user,
         children: [
-          { title: 'personal detail', path: PATH_DASHBOARD.teacherManagement.searchTeacher },
-          { title: 'course detail', path: PATH_DASHBOARD.teacherManagement.searchCourseTeacher },
+          { title: 'personal detail', path: PATH_ACCOUNT.teacherManagement.searchTeacher },
+          { title: 'course detail', path: PATH_ACCOUNT.teacherManagement.searchCourseTeacher },
         ],
       },
     ],
   },
 
   // Request Management
-  // ----------------------------------------------------------------------
   {
     subheader: 'request management',
     items: [
-      { title: 'registration request', path: PATH_DASHBOARD.registrationRequest, icon: ICONS.mail },
+      { title: 'registration request', path: PATH_REGISTRATION.eaRequestStatus, icon: ICONS.mail },
       {
         title: 'schedule request',
-        path: PATH_DASHBOARD.requestManagement.root,
+        path: PATH_SCHEDULE_CHANGING.root,
         icon: ICONS.file,
         children: [
-          { title: 'student', path: PATH_DASHBOARD.requestManagement.studentRequest },
-          { title: 'staff', path: PATH_DASHBOARD.requestManagement.staffRequest },
+          { title: 'student', path: PATH_SCHEDULE_CHANGING.studentRequest },
+          { title: 'staff', path: PATH_SCHEDULE_CHANGING.staffRequest },
         ],
       },
     ]
   },
 
   // Settings
-  // ----------------------------------------------------------------------
   {
     subheader: 'Settings',
     items: [
-      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Change Password', path: PATH_AUTH.changePassword, icon: ICONS.changePassword },
       { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
@@ -162,40 +155,37 @@ const EANavConfig = [
 
 const OANavConfig = [
   // Account management
-  // ----------------------------------------------------------------------
   {
     subheader: 'account management',
     items: [
-      { title: 'New Account', path: PATH_DASHBOARD.newAccount, icon: ICONS.user },
+      { title: 'New Account', path: 'new-staff', icon: ICONS.user },
       {
         title: 'Edit Account',
-        path: PATH_DASHBOARD.editAccount.root,
+        path: PATH_ACCOUNT.root,
         icon: ICONS.group,
         children: [
-          { title: 'Student', path: PATH_DASHBOARD.editAccount.student },
-          { title: 'Teacher', path: PATH_DASHBOARD.editAccount.teacher },
-          { title: 'Staff', path: PATH_DASHBOARD.editAccount.staff },
+          { title: 'Student', path: PATH_ACCOUNT.studentManagement.searchStudent },
+          { title: 'Teacher', path: PATH_ACCOUNT.teacherManagement.searchTeacher },
+          { title: 'Staff', path: PATH_ACCOUNT.staffManagement.searchStaff },
         ],
       },
     ],
   },
 
   // Request management
-  // ----------------------------------------------------------------------
   {
     subheader: 'request management',
     items: [
-      { title: 'Registration Request', path: PATH_DASHBOARD.registrationRequestOA, icon: ICONS.user },
-      { title: 'Leaving Request', path: PATH_DASHBOARD.leavingRequestOA, icon: ICONS.group },
+      { title: 'Registration Request', path: PATH_REGISTRATION.oaRequestStatus, icon: ICONS.user },
+      { title: 'Leaving Request', path: 'schedule-changing/leaving-request', icon: ICONS.group },
     ],
   },
 
   // Settings
-  // ----------------------------------------------------------------------
   {
     subheader: 'Settings',
     items: [
-      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Change Password', path: PATH_AUTH.changePassword, icon: ICONS.changePassword },
       { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
@@ -206,31 +196,28 @@ const OANavConfig = [
 
 const StudentNavConfig = [
   // General
-  // ----------------------------------------------------------------------
   {
     subheader: 'general',
     items: [
-      { title: 'Calendar', path: PATH_DASHBOARD.studentCalendar, icon: ICONS.user },
-      { title: 'Course', path: PATH_DASHBOARD.studentCourse, icon: ICONS.mail },
+      { title: 'Calendar', path: 'student-calendar', icon: ICONS.user },
+      { title: 'Course', path: 'student-course', icon: ICONS.mail },
     ],
   },
 
   // Others
-  // ----------------------------------------------------------------------
   {
     subheader: 'others',
     items: [
-      { title: 'Profile', path: PATH_DASHBOARD.studentProfile, icon: ICONS.user },
-      { title: 'Request Inbox', path: PATH_DASHBOARD.studentInbox, icon: ICONS.mail },
+      { title: 'Profile', path: 'student-profile', icon: ICONS.user },
+      { title: 'Request Inbox', path: 'student-inbox', icon: ICONS.mail },
     ],
   },
 
   // Settings
-  // ----------------------------------------------------------------------
   {
     subheader: 'Settings',
     items: [
-      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Change Password', path: PATH_AUTH.changePassword, icon: ICONS.changePassword },
       { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
@@ -241,35 +228,35 @@ const StudentNavConfig = [
 
 const TeacherNavConfig = [
   // General
-  // ----------------------------------------------------------------------
   {
     subheader: 'general',
     items: [
-      { title: 'Calendar', path: PATH_DASHBOARD.teacherCalendar, icon: ICONS.user },
-      { title: 'Course', path: PATH_DASHBOARD.teacherCourse, icon: ICONS.mail },
+      { title: 'Calendar', path: 'teacher-calendar', icon: ICONS.user },
+      { title: 'Course', path: 'teacher-course', icon: ICONS.mail },
     ],
   },
 
   // Others
-  // ----------------------------------------------------------------------
   {
     subheader: 'request management',
     items: [
-      { title: 'Leaving Request', path: PATH_DASHBOARD.teacherLeavingRequest, icon: ICONS.user },
-      { title: 'Request History', path: PATH_DASHBOARD.teacherInbox, icon: ICONS.mail },
+      { title: 'Leaving Request', path: 'teacher-leaving-request', icon: ICONS.user },
+      { title: 'Request History', path: 'teacher-inbox', icon: ICONS.mail },
     ],
   },
 
   // Settings
-  // ----------------------------------------------------------------------
   {
     subheader: 'Settings',
     items: [
-      { title: 'Change Password', path: PATH_DASHBOARD.changePassword, icon: ICONS.changePassword },
+      { title: 'Change Password', path: PATH_AUTH.changePassword, icon: ICONS.changePassword },
       { title: 'Logout', path: PATH_AUTH.login, icon: ICONS.logout }
     ],
   }
 ];
+
+// ----------------------------------------------------------------------
+// Error NavConfig
 
 const BugNavConfig = [
   {

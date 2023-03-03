@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { Container } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -24,7 +24,7 @@ export default function RegistrationRequestStatusPage() {
                     links={[
                         {
                             name: 'Course Registration',
-                            href: PATH_DASHBOARD.courseRegistration.root,
+                            href: PATH_REGISTRATION.epRequestStatus,
                         },
                         { name: 'Request status' },
                     ]}
