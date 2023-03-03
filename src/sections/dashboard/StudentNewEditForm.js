@@ -568,7 +568,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 multiple
                                 thumbnail
                                 name="studentAdditionalFiles"
-                                maxSize={3145728}
+                                maxSize={4e+7}
                                 onDrop={handleDropFiles}
                                 onRemove={handleRemoveFile}
                                 onRemoveAll={handleRemoveAllFiles}
