@@ -89,7 +89,7 @@ export default function ViewStudentPage() {
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
                     action={
-                        <Button component={Link} to={`/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+                        <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
                     }
                 />
 
