@@ -178,7 +178,7 @@ export default function StudentList() {
                   hover
                   key={row.id}
                   component={Link}
-                  to={`/dashboard/student-management/search-student/${parseInt(row.id, 10)}`}
+                  to={`/account/student-management/student/${parseInt(row.id, 10)}`}
                   sx={{textDecoration: 'none'}}
                 >
                     <TableCell align="left" > S{row.studentId} </TableCell>
