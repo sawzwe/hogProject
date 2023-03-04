@@ -273,7 +273,7 @@ export default function StaffRequestStatusList() {
                 <TableHeadCustom
                   headLabel={TABLE_HEAD_REQUESTS}
                 />
-
+                  
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                     <TableRow
