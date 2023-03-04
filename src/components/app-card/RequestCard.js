@@ -47,7 +47,7 @@ function StudentRequestCard({ studentRole, studentCourse }) {
         status,
     } = studentCourse
 
-    const completeLink = (studentRole === 'student' ? `/dashboard/student-inbox/${id}` : `/dashboard/teacher-inbox/${id}`)
+    const completeLink = (studentRole === 'student' ? `/student-inbox/${id}` : `/teacher-inbox/${id}`)
 
     return (
         <Grid container sx={{ my: 2 }}>
@@ -93,7 +93,7 @@ function TeacherRequestCard({ teacherRole, teacherCourse }) {
         leaveType,
     } = teacherCourse
 
-    const completeLink = (teacherRole === 'student' ? `/dashboard/student-inbox/${id}` : `/dashboard/teacher-inbox/${id}`)
+    const completeLink = (teacherRole === 'student' ? `/student-inbox/${id}` : `/teacher-inbox/${id}`)
 
     return (
         <Grid container sx={{ my: 2 }}>

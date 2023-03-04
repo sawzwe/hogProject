@@ -56,8 +56,8 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
         )
     }
 
-    const groupClassLink = (accountRole === 'teacher' && `/dashboard/teacher-course/group-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
-    const privateClassLink = (accountRole === 'teacher' && `/dashboard/teacher-course/private-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
+    const groupClassLink = (accountRole === 'teacher' && `/teacher-course/group-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
+    const privateClassLink = (accountRole === 'teacher' && `/teacher-course/private-course/${eachClass.course.id}/check-attendance/${eachClass.id}`)
 
     return (
         <Grid container sx={{ my: 2 }}>

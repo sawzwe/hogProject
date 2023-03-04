@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,6 +17,8 @@ import FormProvider, { RHFTextField } from '../../components/hook-form';
 
 export default function AuthLoginForm() {
   const { login } = useAuthContext();
+  const navigate = useNavigate();
+
 
   const [showPassword, setShowPassword] = useState(false);
 

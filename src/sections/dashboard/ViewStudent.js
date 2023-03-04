@@ -370,33 +370,35 @@ export function AdditionalFiles({ student, filesURL }) {
                 }}>
                 Additional Files
             </Typography>
-            {filesURL.map((file) => {
-                return (
-                    <Stack
-                        key={file.name}
-                        component={'div'}
-                        alignItems="center"
-                        display="inline-flex"
-                        justifyContent="center"
-                        sx={{
-                            m: 0.5,
-                            width: 80,
-                            height: 80,
-                            borderRadius: 1.25,
-                            overflow: 'hidden',
-                            position: 'relative',
-                            border: (theme) => `solid 1px ${theme.palette.divider}`,
-                        }}
-                    >
-                        <FileThumbnail
-                            tooltip
-                            imageView
-                            file={file}
-                            onDownload={() => window.open(`${file.preview}`)}
-                        />
-                    </Stack>
-                )
-            })}
+            <Stack direction="row">
+                {filesURL.map((file) => {
+                    return (
+                        <Stack
+                            key={file.name}
+                            component={'div'}
+                            alignItems="center"
+                            display="inline-flex"
+                            justifyContent="center"
+                            sx={{
+                                m: 0.5,
+                                width: 80,
+                                height: 80,
+                                borderRadius: 1.25,
+                                overflow: 'hidden',
+                                position: 'relative',
+                                border: (theme) => `solid 1px ${theme.palette.divider}`,
+                            }}
+                        >
+                            <FileThumbnail
+                                tooltip
+                                imageView
+                                file={file}
+                                onDownload={() => window.open(`${file.preview}`)}
+                            />
+                        </Stack>
+                    )
+                })}
+            </Stack>
         </Card>
     )
 }

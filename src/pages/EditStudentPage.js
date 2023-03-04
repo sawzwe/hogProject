@@ -8,7 +8,7 @@ import { Container } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_ACCOUNT } from '../routes/paths';
 // components
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
@@ -86,7 +86,7 @@ export default function EditStudentPage() {
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.studentManagement.searchStudent,
+                            href: PATH_ACCOUNT.studentManagement.searchStudent,
                         },
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}

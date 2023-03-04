@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 // mui
 import { Container } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_COURSE_TRANSFER } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -27,7 +27,7 @@ export default function CourseTransferRequestPage() {
                     links={[
                         {
                             name: 'Course transferring',
-                            href: PATH_DASHBOARD.courseTransferring.root,
+                            href: PATH_COURSE_TRANSFER.epCourseTransferRequest,
                         },
                         { name: 'Request status' },
                     ]}

@@ -210,7 +210,7 @@ export function TimeSlotDialog({ open, onClose, course, currentClass, selectedTi
     };
 
     const handleCloseConfirmDialog = () => {
-        navigate('/dashboard/student-calendar')
+        navigate('/student-calendar')
         console.log("Navigate to another page!");
     };
 
@@ -305,7 +305,7 @@ export function TimeSlots({ options, onSelect, currentClass }) {
             </Typography>
             <Stack direction="row" justifyContent="flex-start" sx={{ mx: 1, mt: 1 }}>
                 <Button
-                    to={`/dashboard/student-course/private-course/${currentClass.course.id}/makeup-class/${currentClass.id}/request`}
+                    to={`/student-course/private-course/${currentClass.course.id}/makeup-class/${currentClass.id}/request`}
                     component={RouterLink}
                     fullWidth
                     size="large"

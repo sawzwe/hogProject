@@ -21,8 +21,8 @@ export default function CalendarClassCard({ accountRole, eachClass }) {
         section
     } = eachClass
 
-    const groupCourseLink = (accountRole === 'student') ? `/dashboard/student-course/group-course/${course.id}` : `/dashboard/teacher-course/group-course/${course.id}`
-    const privateCourseLink = (accountRole === 'student') ? `/dashboard/student-course/private-course/${course.id}` : `/dashboard/teacher-course/private-course/${course.id}`
+    const groupCourseLink = (accountRole === 'student') ? `/student-course/group-course/${course.id}` : `/teacher-course/group-course/${course.id}`
+    const privateCourseLink = (accountRole === 'student') ? `/student-course/private-course/${course.id}` : `/teacher-course/private-course/${course.id}`
 
     return (
         <Grid container sx={{ my: 2 }}>

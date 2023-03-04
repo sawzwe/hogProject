@@ -1,12 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { Container, Typography } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
-import NewStaffRequest from '../../sections/dashboard/oa-new-account/NewStaffRequest';
+import NewStaffAccountForm from '../../sections/dashboard/oa-new-account/NewStaffAccountForm';
 
 // ----------------------------------------------------------------------
 
@@ -23,12 +22,11 @@ export default function NewAccountPage() {
                 <CustomBreadcrumbs
                     heading="New Account"
                     links={[
-                        { name: 'Account Management', href: PATH_DASHBOARD.newAccount },
-                        { name: 'New Account' }
+                        { name: 'Create new account' }
                     ]}
                 />
 
-                <NewStaffRequest />
+                <NewStaffAccountForm />
             </Container>
         </>
     );

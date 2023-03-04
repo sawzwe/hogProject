@@ -20,8 +20,8 @@ export default function CourseCard({ accountRole, eachCourse }) {
         type,
     } = eachCourse
 
-    const privateCourseLink = (accountRole === 'student' ? `/dashboard/student-course/private-course/${id}` : `/dashboard/teacher-course/private-course/${id}`)
-    const groupCourseLink = (accountRole === 'student' ? `/dashboard/student-course/group-course/${id}` : `/dashboard/teacher-course/group-course/${id}`)
+    const privateCourseLink = (accountRole === 'student' ? `/student-course/private-course/${id}` : `/teacher-course/private-course/${id}`)
+    const groupCourseLink = (accountRole === 'student' ? `/student-course/group-course/${id}` : `/teacher-course/group-course/${id}`)
 
     return (
         <Grid container sx={{ my: 2 }}>

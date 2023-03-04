@@ -14,7 +14,6 @@ const Loadable = (Component) => (props) =>
 // ----------------------------------------------------------------------
 
 export const LoginPage = Loadable(lazy(() => import('../pages/LoginPage')));
-export const RegisterPage = Loadable(lazy(() => import('../pages/RegisterPage')));
 
 export const PageViewStudent = Loadable(lazy(() => import('../pages/ViewStudentPage')));
 export const PageEditStudent = Loadable(lazy(() => import('../pages/EditStudentPage')));
@@ -54,7 +53,7 @@ export const PageCourseTransferDetailsEA = Loadable(lazy(() => import('../pages/
 
 // OA ----------------------------------------------------------------------
 // New Account
-export const PageNewAccount = Loadable(lazy(() => import('../pages/OA/NewAccountPage')));
+export const PageNewStaffAccount = Loadable(lazy(() => import('../pages/OA/NewStaffAccountPage')));
 export const PageRegistrationRequestOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestPage')));
 export const PageLeavingRequestOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestPage')));
 export const PageRegistrationRequestDetailOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestDetailPage')));

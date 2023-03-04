@@ -197,7 +197,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             if (isEdit) {
                 await updateStudent(currentStudent, data)
                     .then(() => enqueueSnackbar('Update successfully!'))
-                    .then(() => navigate(`/dashboard/student-management/search-student/${currentStudent.id}`))
+                    .then(() => navigate(`/account/student-management/student/${currentStudent.id}`))
                     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             } else {
                 await registerStudent(data)
@@ -568,7 +568,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 multiple
                                 thumbnail
                                 name="studentAdditionalFiles"
-                                maxSize={3145728}
+                                maxSize={4e+7}
                                 onDrop={handleDropFiles}
                                 onRemove={handleRemoveFile}
                                 onRemoveAll={handleRemoveAllFiles}

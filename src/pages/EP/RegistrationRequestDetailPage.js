@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 // @mui
 import { Container } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -107,7 +107,7 @@ export default function RegistrationRequestDetailPage() {
                 <CustomBreadcrumbs
                     heading="Course Registration Request"
                     links={[
-                        { name: 'Request Status', href: PATH_DASHBOARD.courseRegistration.requestStatus },
+                        { name: 'Request Status', href: PATH_REGISTRATION.epRequestStatus },
                         { name: 'Request Detail ' }
                     ]}
                 />

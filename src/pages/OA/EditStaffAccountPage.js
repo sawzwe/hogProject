@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 // @mui
 import { Container, Typography } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_ACCOUNT } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -24,7 +24,7 @@ export default function NewAccountPage() {
                 <CustomBreadcrumbs
                     heading="Edit Account"
                     links={[
-                        { name: 'Account Management', href: PATH_DASHBOARD.newAccount },
+                        { name: 'Account Management', href: PATH_ACCOUNT.staffManagement.searchStaff },
                         { name: 'Edit Account' }
                     ]}
                 />
