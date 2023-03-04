@@ -225,7 +225,7 @@ export function AuthProvider({ children }) {
                             nickname: data.studentNickname,
                             profilePicture: data.studentImageURL.name,
                             additionalFiles: nameAdditionalFiles || [],
-                            dob: data.studentDateOfBirth,
+                            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
                             phone: data.studentPhoneNo,
                             line: data.studentLineId,
                             email: data.studentEmail,
@@ -303,6 +303,7 @@ export function AuthProvider({ children }) {
             return null;
         })
 
+
         // Axios to Azure
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         await axios.put(`${HOG_API}/api/Student/Put`, {
@@ -314,7 +315,7 @@ export function AuthProvider({ children }) {
             nickname: data.studentNickname,
             profilePicture: data.studentImageURL.name,
             additionalFiles: nameAdditionalFiles || [],
-            dob: fDate(data.studentDateOfBirth, 'dd MMMM yyyy'),
+            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
             phone: data.studentPhoneNo,
             line: data.studentLineId,
             email: data.studentEmail,
