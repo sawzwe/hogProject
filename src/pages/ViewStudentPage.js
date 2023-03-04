@@ -8,7 +8,7 @@ import { Container, Button } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_ACCOUNT } from '../routes/paths';
 // components
 import LoadingScreen from '../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../components/settings';
@@ -84,12 +84,12 @@ export default function ViewStudentPage() {
                     links={[
                         {
                             name: 'All students',
-                            href: PATH_DASHBOARD.allStudents,
+                            href: PATH_ACCOUNT.studentManagement.searchStudent,
                         },
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
                     action={
-                        <Button component={Link} to={`/dashboard/student-management/search-student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+                        <Button component={Link} to={`/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
                     }
                 />
 

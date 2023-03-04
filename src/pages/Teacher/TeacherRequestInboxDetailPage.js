@@ -4,8 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Typography, Stack, } from '@mui/material';
 //
 import { Icon } from '@iconify/react';
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
 // components
 import { useSettingsContext } from '../../components/settings';
 import TeacherRequestInboxEach from '../../sections/dashboard/teacher/TeacherRequestInboxEach'

@@ -5,7 +5,7 @@ import { Card, Container, Stack } from '@mui/material';
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // routes
-import { PATH_DASHBOARD } from '../routes/paths';
+import { PATH_ACCOUNT } from '../routes/paths';
 // Table
 import {StudentCourseList} from '../sections/dashboard/all-students-list';
 
@@ -25,7 +25,7 @@ export default function SearchCourseStudentPage() {
                     links={[
                         {
                             name: 'Student management',
-                            href: PATH_DASHBOARD.studentManagement.root,
+                            href: PATH_ACCOUNT.studentManagement.searchCourseStudent
                         },
                         { name: 'Search student course' },
                     ]}

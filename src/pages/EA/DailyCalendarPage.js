@@ -86,6 +86,8 @@ export default function DailyCalendarPage() {
 
     // }, [])
 
+    
+
     const { themeStretch } = useSettingsContext();
     const [data, setData] = useState([])
 

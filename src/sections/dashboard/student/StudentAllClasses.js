@@ -55,7 +55,7 @@ export function ClassDialog({ open, onClose, selectedClass }) {
     const navigate = useNavigate();
 
     const handleClickMakeup = () => {
-        navigate(`/dashboard/student-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
+        navigate(`/student-course/private-course/${selectedClass.course.id}/makeup-class/${selectedClass.id}`)
     }
 
     return (

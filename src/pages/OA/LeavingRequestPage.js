@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { Container } from '@mui/material';
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_SCHEDULE_CHANGING } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -25,7 +25,7 @@ export default function RegistrationRequestStatusPage() {
                     links={[
                         {
                             name: 'Leaving Request',
-                            href: PATH_DASHBOARD.leavingRequestOA.root,
+                            href: PATH_SCHEDULE_CHANGING.oaLeavingRequest,
                         },
                         { name: 'Request status' },
                     ]}
