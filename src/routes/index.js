@@ -39,7 +39,6 @@ import {
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
   PageLeavingRequestDetailOA,
-  EditStaffAccount,
   // Student
   PageStudentCalendar,
   PageStudentCourse,
@@ -60,7 +59,9 @@ import {
   PageTeacherGroupCourseDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance,
-  ViewEditStudentCoursePage
+  ViewEditStudentCoursePage,
+  PageEditTeacher,
+  PageViewTeacher
 }
   from './elements';
 
@@ -159,16 +160,14 @@ export default function Router() {
             {
               path: 'teacher-management/teacher/:id', element: (
                 <RoleBasedGuard roles={['Education Admin', 'Office Admin']} hasContent>
-                  {/* page view teacher */}
-                  <PageEditStudent />
+                  <PageViewTeacher />
                 </RoleBasedGuard>
               )
             },
             {
               path: 'teacher-management/teacher/:id/edit', element: (
                 <RoleBasedGuard roles={['Education Admin', 'Office Admin']} hasContent>
-                  {/* page edit teacher */}
-                  <PageEditStudent />
+                  <PageEditTeacher />
                 </RoleBasedGuard>
               )
             },

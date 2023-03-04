@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import * as Yup from 'yup';
 import moment from 'moment';
+import { useNavigate } from 'react-router';
 // form
 import { useForm, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,8 +14,12 @@ import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../components/hook-form';
 
 // ----------------------------------------------------------------------
+EditTeacher.propTypes = {
+    currentTeacher: PropTypes.object
+}
 
-export default function TeacherForm() {
+export default function EditTeacher({ currentTeacher }) {
+    const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
 
 
@@ -122,19 +127,19 @@ export default function TeacherForm() {
 
     const defaultValues = {
         role: 'Teacher',
-        fName: '',
-        lName: '',
-        nickname: '',
-        phone: '',
-        line: '',
-        email: '',
-        monday: { isSelected: false, fromTime: '', toTime: '' },
-        tuesday: { isSelected: false, fromTime: '', toTime: '' },
-        wednesday: { isSelected: false, fromTime: '', toTime: '' },
-        thursday: { isSelected: false, fromTime: '', toTime: '' },
-        friday: { isSelected: false, fromTime: '', toTime: '' },
-        saturday: { isSelected: false, fromTime: '', toTime: '' },
-        sunday: { isSelected: false, fromTime: '', toTime: '' }
+        fName: currentTeacher?.fName || '',
+        lName: currentTeacher?.lName || '',
+        nickname: currentTeacher?.nickname || '',
+        phone: currentTeacher?.phone || '',
+        line: currentTeacher?.line || '',
+        email: currentTeacher?.email || '',
+        monday: currentTeacher.monday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.monday.fromTime, toTime: currentTeacher.monday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        tuesday: currentTeacher.tuesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.tuesday.fromTime, toTime: currentTeacher.tuesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        wednesday: currentTeacher.wednesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.wednesday.fromTime, toTime: currentTeacher.wednesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        thursday: currentTeacher.thursday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.thursday.fromTime, toTime: currentTeacher.thursday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        friday: currentTeacher.friday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.friday.fromTime, toTime: currentTeacher.friday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        saturday: currentTeacher.saturday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.saturday.fromTime, toTime: currentTeacher.saturday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        sunday: currentTeacher.sunday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.sunday.fromTime, toTime: currentTeacher.sunday.toTime } : { isSelected: false, fromTime: '', toTime: '' }
     };
 
     const methods = useForm({
@@ -152,7 +157,7 @@ export default function TeacherForm() {
     const onSubmit = async (data) => {
         try {
             console.log(data)
-            enqueueSnackbar("The account has been created!", { variant: 'success' });
+            enqueueSnackbar("The account has been editted!", { variant: 'success' });
             reset(defaultValues);
             setTimeout(() => {
                 setOpenConfirmDialog(false);
@@ -177,6 +182,10 @@ export default function TeacherForm() {
         }
     };
 
+    const handleCancelEdit = () => {
+        navigate(`/account/teacher-management/teacher/${currentTeacher.id}`);
+    };
+
     return (
         <FormProvider methods={methods}>
             <Card sx={{ p: 3 }}>
@@ -186,7 +195,7 @@ export default function TeacherForm() {
                         display: 'block',
                     }}
                 >
-                    {`Create Account Form (Teacher)`}
+                    Teacher detail
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>
@@ -234,13 +243,20 @@ export default function TeacherForm() {
 
 
                     <Grid item xs={12} md={12}>
-                        <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1}>
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                onClick={handleCancelEdit}
+                            >
+                                Cancel
+                            </Button>
                             <Button
                                 variant="contained"
                                 color="primary"
                                 onClick={() => setOpenConfirmDialog(true)}
                             >
-                                Create
+                                Save changes
                             </Button>
                         </Stack>
                     </Grid>
@@ -250,11 +266,11 @@ export default function TeacherForm() {
             <Dialog maxWidth="md" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
                 <DialogTitle>
                     <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
-                        <Typography variant='h4'>Create Account</Typography>
+                        <Typography variant='h4'>Edit Account?</Typography>
                     </Stack>
                 </DialogTitle>
                 <DialogContent>
-                    The account will be created according to this information once the form is submitted.
+                    The account will be editted according to this information once submitted.
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -271,7 +287,7 @@ export default function TeacherForm() {
                         loading={isSubmitting}
                         onClick={handleSubmit(onSubmit, onError)}
                     >
-                        Submit
+                        Save Changes
                     </LoadingButton>
                 </DialogActions>
             </Dialog>
@@ -295,7 +311,6 @@ export function WorkingDay({ day }) {
     } = useFormContext();
 
     const values = watch();
-
 
     const handleClickDay = () => {
         if (values[day].isSelected) {
