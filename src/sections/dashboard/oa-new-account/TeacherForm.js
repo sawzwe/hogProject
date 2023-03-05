@@ -23,7 +23,7 @@ export default function TeacherForm() {
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
-        phone: Yup.string().required('Phone number is required'),
+        phone: Yup.number().typeError('Phone must contain only number').required('Phone number is required'),
         line: Yup.string().required('Line ID is required'),
         email: Yup.string().email('Email is invalid').required('Email is required'),
         monday: Yup.object().shape({
@@ -149,15 +149,11 @@ export default function TeacherForm() {
         formState: { isSubmitting },
     } = methods;
 
+    const [createdData, setCreatedData] = useState({});
     const onSubmit = async (data) => {
         try {
-            console.log(data)
-            enqueueSnackbar("The account has been created!", { variant: 'success' });
-            reset(defaultValues);
-            setTimeout(() => {
-                setOpenConfirmDialog(false);
-            }, 700)
-            setOpenConfirmDialog(false);
+            setCreatedData(data)
+            setOpenConfirmDialog(true);
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
 
@@ -168,17 +164,21 @@ export default function TeacherForm() {
         }
     };
 
-    const onError = (error) => {
+    const handleCreateAccount = () => {
+        console.log(createdData);
+        enqueueSnackbar("Account has been created!", { variant: 'success' });
+        reset(defaultValues);
         setOpenConfirmDialog(false);
+    }
+
+    const onError = (error) => {
         if (error.workingDaySlot) {
             enqueueSnackbar("At least one working day is required!", { variant: 'error' });
-        } else {
-            enqueueSnackbar("Form has not been filled correctly!", { variant: 'error' });
-        }
+        } 
     };
 
     return (
-        <FormProvider methods={methods}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
             <Card sx={{ p: 3 }}>
                 <Typography variant="h6"
                     sx={{
@@ -238,7 +238,7 @@ export default function TeacherForm() {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => setOpenConfirmDialog(true)}
+                                type="submit"
                             >
                                 Create
                             </Button>
@@ -269,7 +269,7 @@ export default function TeacherForm() {
                         variant="contained"
                         color="primary"
                         loading={isSubmitting}
-                        onClick={handleSubmit(onSubmit, onError)}
+                        onClick={handleCreateAccount}
                     >
                         Submit
                     </LoadingButton>

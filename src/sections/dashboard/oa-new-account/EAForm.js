@@ -20,7 +20,7 @@ export default function EAForm() {
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
-        phone: Yup.string().required('Phone number is required'),
+        phone: Yup.number().typeError('Phone must contain only number').required('Phone number is required'),
         line: Yup.string().required('Line ID is required'),
         email: Yup.string().email('Email is invalid').required('Email is required'),
     });
@@ -49,15 +49,11 @@ export default function EAForm() {
         formState: { isSubmitting },
     } = methods;
 
+    const [createdData, setCreatedData] = useState({});
     const onSubmit = async (data) => {
         try {
-            console.log(data)
-            enqueueSnackbar("The account has been created!", { variant: 'success' });
-            reset(defaultValues);
-            setTimeout(() => {
-                setOpenConfirmDialog(false);
-            }, 700)
-            setOpenConfirmDialog(false);
+            setCreatedData(data)
+            setOpenConfirmDialog(true);
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
 
@@ -68,13 +64,15 @@ export default function EAForm() {
         }
     };
 
-    const onError = () => {
+    const handleCreateAccount = () => {
+        console.log(createdData);
+        enqueueSnackbar("Account has been created!", { variant: 'success' });
+        reset(defaultValues);
         setOpenConfirmDialog(false);
-        enqueueSnackbar("Form has not been filled correctly!", { variant: 'error' });
-    };
+    }
 
     return (
-        <FormProvider methods={methods}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Card sx={{ p: 3 }}>
                 <Typography variant="h6"
                     sx={{
@@ -110,7 +108,7 @@ export default function EAForm() {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => setOpenConfirmDialog(true)}
+                                type="submit"
                             >
                                 Create
                             </Button>
@@ -141,7 +139,7 @@ export default function EAForm() {
                         variant="contained"
                         color="primary"
                         loading={isSubmitting}
-                        onClick={handleSubmit(onSubmit, onError)}
+                        onClick={handleCreateAccount}
                     >
                         Submit
                     </LoadingButton>
