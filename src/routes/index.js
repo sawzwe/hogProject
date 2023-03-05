@@ -39,7 +39,6 @@ import {
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
   PageLeavingRequestDetailOA,
-  EditStaffAccount,
   // Student
   PageStudentCalendar,
   PageStudentCourse,
@@ -60,7 +59,11 @@ import {
   PageTeacherGroupCourseDetail,
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance,
-  ViewEditStudentCoursePage
+  ViewEditStudentCoursePage,
+  PageEditTeacher,
+  PageViewTeacher,
+  PageViewStaff,
+  PageEditStaff
 }
   from './elements';
 
@@ -159,16 +162,14 @@ export default function Router() {
             {
               path: 'teacher-management/teacher/:id', element: (
                 <RoleBasedGuard roles={['Education Admin', 'Office Admin']} hasContent>
-                  {/* page view teacher */}
-                  <PageEditStudent />
+                  <PageViewTeacher />
                 </RoleBasedGuard>
               )
             },
             {
               path: 'teacher-management/teacher/:id/edit', element: (
                 <RoleBasedGuard roles={['Education Admin', 'Office Admin']} hasContent>
-                  {/* page edit teacher */}
-                  <PageEditStudent />
+                  <PageEditTeacher />
                 </RoleBasedGuard>
               )
             },
@@ -195,13 +196,20 @@ export default function Router() {
             //     </RoleBasedGuard>
             //   )
             // },
-            // {
-            //   path: 'staff-management/staff/:id', element: (
-            //     <RoleBasedGuard roles={['Office Admin']} hasContent>
-            // Add staff's edit page
-            //     </RoleBasedGuard>
-            //   )
-            // }
+            {
+              path: 'staff-management/staff/:id', element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageViewStaff />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'staff-management/staff/:id/edit', element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageEditStaff />
+                </RoleBasedGuard>
+              )
+            }
           ]
         },
 

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext, useEffect, useReducer, useCallback, useState } from 'react';
+import { createContext, useEffect, useReducer, useCallback } from 'react';
 import { initializeApp } from 'firebase/app';
 import {
     getAuth,
@@ -7,15 +7,12 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    setPersistence,
-    updatePassword,
-    browserLocalPersistence
+    updatePassword
 } from 'firebase/auth';
 
-import { getFirestore, collection, doc, getDoc, setDoc, clearIndexedDbPersistence, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, deleteObject, listAll, getBlob } from "firebase/storage"
+import { getFirestore, collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, deleteObject, listAll } from "firebase/storage"
 import axios from 'axios';
-import _ from 'lodash';
 // utils
 import { fDate } from '../utils/formatTime';
 // config
