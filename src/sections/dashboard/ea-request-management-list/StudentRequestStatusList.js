@@ -307,7 +307,7 @@ export default function StaffRequestStatusList() {
             content="Once the request is taken, only you can see the request and proceed it."
             action={
               <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
-                <Link to= {`/dashboard/registration-request/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
+                <Link to= {`/course-registration/ea-request-status/${parseInt(currentId,10)}`} style={{ textDecoration: 'none' ,color:'white'}}>
                 Take Request
                 </Link>
               </Button>
