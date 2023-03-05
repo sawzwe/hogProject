@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -15,6 +15,7 @@ export default function NewAccountPage() {
 
     const DUMMY_TEACHER = {
         id: '1',
+        role: 'Teacher',
         fName: 'Piyaphon',
         lName: 'Wu',
         nickname: 'Hong',

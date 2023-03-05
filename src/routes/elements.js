@@ -60,6 +60,9 @@ export const PageLeavingRequestDetailOA = Loadable(lazy(() => import('../pages/O
 // export const EditStaffAccount = Loadable(lazy(() => import('../pages/OA/EditTeacherAccountPage')));
 export const PageEditTeacher = Loadable(lazy(() => import('../pages/OA/EditTeacherPage')));
 export const PageViewTeacher = Loadable(lazy(() => import('../pages/OA/ViewTeacherPage')));
+export const PageViewStaff = Loadable(lazy(() => import('../pages/OA/ViewStaffPage')));
+export const PageEditStaff = Loadable(lazy(() => import('../pages/OA/EditStaffPage')));
+
 
 // Student ----------------------------------------------------------------------
 export const PageStudentCalendar = Loadable(lazy(() => import('../pages/Student/StudentCalendarPage')));

@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router';
 // form
 import { useForm, useFormContext } from 'react-hook-form';
 // @mui
-import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Stack, Typography, Dialog, Button, DialogTitle, DialogContent, DialogActions, MenuItem } from '@mui/material';
+import { Box, Card, Grid, Stack, Typography, Button, MenuItem } from '@mui/material';
 // components
-import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../components/hook-form';
+//
+import ResetPasswordDialog from './ResetPasswordDialog';
+import DeleteAccountDialog from './DeleteAccountDialog';
 
 // ----------------------------------------------------------------------
 ViewTeacher.propTypes = {
@@ -20,6 +21,7 @@ export default function ViewTeacher({ currentTeacher }) {
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
+    const [openDeleteAccountDialog, setOpenDeleteAccountDialog] = useState(false);
 
     const defaultValues = {
         role: 'Teacher',
@@ -42,17 +44,9 @@ export default function ViewTeacher({ currentTeacher }) {
         defaultValues,
     });
 
-    const {
-        formState: { isSubmitting },
-    } = methods;
-
     const handleClickEdit = () => {
         navigate(`/account/teacher-management/teacher/${currentTeacher.id}/edit`);
     };
-
-    const handleResetPassword = () => {
-        console.log("Reset password is coming soon!");
-    }
 
     return (
         <FormProvider methods={methods}>
@@ -110,54 +104,49 @@ export default function ViewTeacher({ currentTeacher }) {
                     </Grid>
 
 
-                    <Grid item xs={12} md={12}>
-                        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1}>
-                            <Button
-                                variant="outlined"
-                                color="inherit"
-                                onClick={() => setOpenResetPasswordDialog(true)}
-                            >
-                                Reset password
-                            </Button>
+                    <Grid item xs={12} md={12} sx={{ mt: 2 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Button
                                 variant="contained"
-                                color="primary"
-                                onClick={handleClickEdit}
+                                color="error"
+                                onClick={() => setOpenDeleteAccountDialog(true)}
                             >
-                                Edit
+                                Delete account
                             </Button>
+                            <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1}>
+                                <Button
+                                    variant="outlined"
+                                    color="inherit"
+                                    onClick={() => setOpenResetPasswordDialog(true)}
+                                >
+                                    Reset password
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleClickEdit}
+                                >
+                                    Edit
+                                </Button>
+                            </Stack>
                         </Stack>
                     </Grid>
                 </Grid>
             </Card>
 
-            <Dialog fullWidth maxWidth="sm" open={openResetPasswordDialog} onClose={() => setOpenResetPasswordDialog(false)}>
-                <DialogTitle>
-                    <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
-                        <Typography variant='h4'>Reset Password?</Typography>
-                    </Stack>
-                </DialogTitle>
-                <DialogContent>
-                    {`The password will be reset to default (Teacher's line ID).`}
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        variant="outlined"
-                        color="inherit"
-                        onClick={() => setOpenResetPasswordDialog(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <LoadingButton
-                        variant="contained"
-                        color="primary"
-                        loading={isSubmitting}
-                        onClick={handleResetPassword}
-                    >
-                        Reset
-                    </LoadingButton>
-                </DialogActions>
-            </Dialog>
+            <ResetPasswordDialog
+                open={openResetPasswordDialog}
+                onClose={() => setOpenResetPasswordDialog(false)}
+                defaultPassword="Teacher's Line ID"
+            />
+
+            <DeleteAccountDialog
+                accountId={currentTeacher.id}
+                accountRole={currentTeacher.role}
+                accountName={currentTeacher.fName}
+                open={openDeleteAccountDialog}
+                onClose={() => setOpenDeleteAccountDialog(false)}
+            />
         </FormProvider >
     )
 }

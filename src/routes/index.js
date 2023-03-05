@@ -61,7 +61,9 @@ import {
   PageTeacherCheckPrivateAttendance,
   ViewEditStudentCoursePage,
   PageEditTeacher,
-  PageViewTeacher
+  PageViewTeacher,
+  PageViewStaff,
+  PageEditStaff
 }
   from './elements';
 
@@ -194,13 +196,20 @@ export default function Router() {
             //     </RoleBasedGuard>
             //   )
             // },
-            // {
-            //   path: 'staff-management/staff/:id', element: (
-            //     <RoleBasedGuard roles={['Office Admin']} hasContent>
-            // Add staff's edit page
-            //     </RoleBasedGuard>
-            //   )
-            // }
+            {
+              path: 'staff-management/staff/:id', element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageViewStaff />
+                </RoleBasedGuard>
+              )
+            },
+            {
+              path: 'staff-management/staff/:id/edit', element: (
+                <RoleBasedGuard roles={['Office Admin']} hasContent>
+                  <PageEditStaff />
+                </RoleBasedGuard>
+              )
+            }
           ]
         },
 

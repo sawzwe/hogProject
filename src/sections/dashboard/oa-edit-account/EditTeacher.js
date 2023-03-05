@@ -7,11 +7,12 @@ import { useNavigate } from 'react-router';
 import { useForm, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { LoadingButton } from '@mui/lab';
-import { Box, Card, Grid, Stack, Typography, Dialog, Button, DialogTitle, DialogContent, DialogActions, MenuItem } from '@mui/material';
+import { Box, Card, Grid, Stack, Typography, Button, MenuItem } from '@mui/material';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../components/hook-form';
+//
+import SaveChangesDialog from './SaveChangesDialog';
 
 // ----------------------------------------------------------------------
 EditTeacher.propTypes = {
@@ -123,7 +124,7 @@ export default function EditTeacher({ currentTeacher }) {
             })
     });
 
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [openSaveChangesDialog, setOpenSaveChangesDialog] = useState(false);
 
     const defaultValues = {
         role: 'Teacher',
@@ -149,23 +150,18 @@ export default function EditTeacher({ currentTeacher }) {
 
     const {
         setError,
-        reset,
         handleSubmit,
         formState: { isSubmitting },
     } = methods;
 
+    const [savedData, setSavedData] = useState({});
+
     const onSubmit = async (data) => {
         try {
-            console.log(data)
-            enqueueSnackbar("The account has been editted!", { variant: 'success' });
-            reset(defaultValues);
-            setTimeout(() => {
-                setOpenConfirmDialog(false);
-            }, 700)
-            setOpenConfirmDialog(false);
+            await setSavedData(data);
+            await setOpenSaveChangesDialog(true);
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
-
             setError('afterSubmit', {
                 ...error,
                 message: error.message
@@ -174,7 +170,6 @@ export default function EditTeacher({ currentTeacher }) {
     };
 
     const onError = (error) => {
-        setOpenConfirmDialog(false);
         if (error.workingDaySlot) {
             enqueueSnackbar("At least one working day is required!", { variant: 'error' });
         } else {
@@ -187,7 +182,7 @@ export default function EditTeacher({ currentTeacher }) {
     };
 
     return (
-        <FormProvider methods={methods}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
             <Card sx={{ p: 3 }}>
                 <Typography variant="h6"
                     sx={{
@@ -254,7 +249,7 @@ export default function EditTeacher({ currentTeacher }) {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => setOpenConfirmDialog(true)}
+                                type="submit"
                             >
                                 Save changes
                             </Button>
@@ -263,34 +258,11 @@ export default function EditTeacher({ currentTeacher }) {
                 </Grid>
             </Card>
 
-            <Dialog maxWidth="md" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-                <DialogTitle>
-                    <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
-                        <Typography variant='h4'>Edit Account?</Typography>
-                    </Stack>
-                </DialogTitle>
-                <DialogContent>
-                    The account will be editted according to this information once submitted.
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        variant="outlined"
-                        color="inherit"
-                        onClick={() => setOpenConfirmDialog(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <LoadingButton
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        loading={isSubmitting}
-                        onClick={handleSubmit(onSubmit, onError)}
-                    >
-                        Save Changes
-                    </LoadingButton>
-                </DialogActions>
-            </Dialog>
+            <SaveChangesDialog
+                open={openSaveChangesDialog}
+                onClose={() => setOpenSaveChangesDialog(false)}
+                data={savedData}
+            />
         </FormProvider >
     )
 }
@@ -307,14 +279,15 @@ export function WorkingDay({ day }) {
     const {
         watch,
         setValue,
-        resetField,
     } = useFormContext();
 
     const values = watch();
 
     const handleClickDay = () => {
         if (values[day].isSelected) {
-            resetField(`${day}`)
+            setValue(`${day}`, false)
+            setValue(`${day}.fromTime`, "")
+            setValue(`${day}.toTime`, "")
         } else {
             setValue(`${day}.isSelected`, false)
         }
