@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -16,29 +18,23 @@ import ToolbarStudentSearchCourse from './ToolbarStudentSearchCourse';
 
 // ----------------------------------------------------------------------
 
-function createData(id, fullname, nickname) {
-  return { id, fullname, nickname };
+function createData(id, fullname, nickname,ongoing) {
+  return { id, fullname, nickname, ongoing };
 }
 
 const TABLE_DATA = [
-  createData(12, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(15, 'Siwach Toprasert', 'Pan'),
-  createData(879, 'Piyaphon Wu', 'Hong'),
-  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(2, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(272, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(662, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(85, 'Siwach Toprasert', 'Pan'),
-  createData(52, 'Piyaphon Wu', 'Hong'),
-  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(422, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(984, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(155, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(468, 'Siwach Toprasert', 'Pan'),
-  createData(777, 'Piyaphon Wu', 'Hong'),
-  createData(666, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(333, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(222, 'Zain Ijaz Janpatiew', 'Zain'),
+  createData(12, 'Saw Zwe Wai Yan', 'Saw',2),
+  createData(15, 'Siwach Toprasert', 'Pan',1),
+  createData(879, 'Piyaphon Wu', 'Hong',2),
+  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff',1),
+  createData(2, 'Thanatuch Lertritsirikul', 'Tar',3),
+  createData(272, 'Zain Ijaz Janpatiew', 'Zain',1),
+  createData(662, 'Saw Zwe Wai Yan', 'Saw',2),
+  createData(85, 'Siwach Toprasert', 'Pan',1),
+  createData(52, 'Piyaphon Wu', 'Hong',1),
+  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff',2),
+  createData(422, 'Thanatuch Lertritsirikul', 'Tar',1),
+  createData(984, 'Zain Ijaz Janpatiew', 'Zain',5),
 
 ];
 
@@ -46,12 +42,17 @@ const TABLE_HEAD = [
   { id: 'id', label: 'Student ID', align: 'left' },
   { id: 'fullname', label: 'Fullname  ', align: 'left' },
   { id: 'nickname', label: 'Nickname  ', align: 'left' },
+  { id: 'ongoing', label: 'Ongoing Courses', align: 'center' },
   { id: 'details', label: ' ', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
+StudentCourseList.propTypes = {
+  studentCourseData: PropTypes.array,
+}
 
-export default function StudentCourseList() {
+export default function StudentCourseList({studentCourseData}) {
+  const navigate = useNavigate();
   const {
     dense,
     page,
@@ -66,11 +67,11 @@ export default function StudentCourseList() {
     defaultOrderBy: 'id',
   });
 
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(studentCourseData);
 
-  useEffect(() => {
-    setTableData(TABLE_DATA);
-  }, []);
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA);
+  // }, []);
 
   // Search
   const [filterValue, setFilterValue] = useState('');
@@ -150,18 +151,17 @@ export default function StudentCourseList() {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                 hover
+                hover
                 key={row.id}
+                sx={{cursor: "pointer"}}
+                onClick={() => navigate(`/account/student-management/student-course/${row.id}`)}
                 >
-                  <TableCell align="left" > S{row.id} </TableCell>
-                  <TableCell align="left">{row.fullname}</TableCell>
+                  <TableCell align="left" > {row.studentId} </TableCell>
+                  <TableCell align="left">{row.fullName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
+                  <TableCell align="center">{row.courseCount}</TableCell>
                   <TableCell>
-                    <Tooltip title="More Info">
-                      <IconButton>
                         <Iconify icon="ic:chevron-right" />
-                      </IconButton>
-                    </Tooltip>
                   </TableCell>
 
                 </TableRow>
@@ -202,7 +202,13 @@ function applyFilter({ inputData, comparator,filterValue }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
+    // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
+    inputData = inputData.filter((user) => 
+    user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
+    user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  
+    user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+
+
 }
 
   return inputData;

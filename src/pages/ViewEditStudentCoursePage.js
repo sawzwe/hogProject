@@ -24,17 +24,20 @@ export default function ViewStudentPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    // const passedID = id
+
     // const dataFetchedRef = useRef(false);
 
-    // const [student, setStudent] = useState();
+    // const [students, setStudent] = useState();
 
 
     // const fetchData = async () => {
-    //     return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+    //     return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Info/Get`)
     //         .then((res) => {
     //             console.log('res', res);
     //             const data = res.data.data
     //             setStudent(data)
+    //             console.log('data', data)
     //         })
     //         .catch((error) => navigate('*', { replace: false }))
     // }
@@ -47,6 +50,13 @@ export default function ViewStudentPage() {
 
     // if (!dataFetchedRef.current) {
     //     return <LoadingScreen />;
+    // }
+
+    // const details = students.filter(element => element.id === id);
+    // console.log(details);
+    // const DUMMY_STAFF = {
+    //     id: student.id,
+    //     fName: student.fullName,
     // }
 
     return (
@@ -64,7 +74,7 @@ export default function ViewStudentPage() {
                             name: 'All students',
                             href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
                         },
-                        // { name: student?.fName.concat(' ', student?.lName) },
+                        // { name: `${DUMMY_STAFF.fName}` },
                     ]}
                 />
                 <Stack spacing={3}>
