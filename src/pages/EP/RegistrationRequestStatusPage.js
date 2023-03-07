@@ -20,7 +20,7 @@ export default function RegistrationRequestStatusPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
-                    heading="Course Registration Request Status"
+                    heading="All Requests"
                     links={[
                         {
                             name: 'Course Registration',
