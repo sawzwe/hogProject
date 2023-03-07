@@ -57,6 +57,8 @@ export const PageRegistrationRequestOA = Loadable(lazy(() => import('../pages/OA
 export const PageLeavingRequestOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestPage')));
 export const PageRegistrationRequestDetailOA = Loadable(lazy(() => import('../pages/OA/RegistrationRequestDetailPage')));
 export const PageLeavingRequestDetailOA = Loadable(lazy(() => import('../pages/OA/LeavingRequestDetailPage')));
+export const PageStaffListOA = Loadable(lazy(() => import('../pages/OA/SearchStaffPage')));
+
 // export const EditStaffAccount = Loadable(lazy(() => import('../pages/OA/EditTeacherAccountPage')));
 export const PageEditTeacher = Loadable(lazy(() => import('../pages/OA/EditTeacherPage')));
 export const PageViewTeacher = Loadable(lazy(() => import('../pages/OA/ViewTeacherPage')));

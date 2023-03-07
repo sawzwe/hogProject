@@ -144,9 +144,9 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'pendingEA', label: 'Pending for EA', color: 'warning', count: getLengthByStatus('pendingEA') },
+    { value: 'pendingEA', label: 'Pending for EA',  count: getLengthByStatus('pendingEA') },
     { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA', color: 'warning', count: getLengthByStatus('pendingOA') },
+    { value: 'pendingOA', label: 'Pending for OA',  count: getLengthByStatus('pendingOA') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];

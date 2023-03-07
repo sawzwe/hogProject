@@ -4,19 +4,19 @@ import { useState, useEffect,useRef } from 'react';
 import { Card, Container, Stack } from '@mui/material';
 // components
 import axios from 'axios';
-import { useSettingsContext } from '../components/settings';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import LoadingScreen from '../components/loading-screen/LoadingScreen';
+import { useSettingsContext } from '../../components/settings';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import LoadingScreen from '../../components/loading-screen/LoadingScreen';
 // routes
-import { PATH_ACCOUNT } from '../routes/paths';
+import { PATH_ACCOUNT } from '../../routes/paths';
 // Table
-import {TeacherList} from '../sections/dashboard/all-students-list';
+import StaffList from '../../sections/dashboard/oa-all-staff-list/StaffList';
 // API
-import { HOG_API } from '../config';
+import { HOG_API } from '../../config';
 
 // ----------------------------------------------------------------------
 
-export default function SearchTeacherPage() {
+export default function SearchStaffPage() {
     const { themeStretch } = useSettingsContext();
 
     const dataFetchedRef = useRef(false);
@@ -56,19 +56,17 @@ export default function SearchTeacherPage() {
                 <title>Teacher List Table</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                <CustomBreadcrumbs
-                    heading="All Teachers List"
+            <CustomBreadcrumbs
+                    heading="All Staff"
                     links={[
-                        {
-                            name: 'Teacher management',
-                            href: PATH_ACCOUNT.teacherManagement.searchTeacher,
-                        },
-                        { name: 'Search teacher' },
+                        { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff },
+                        { name: 'Edit Account' }
                     ]}
                 />
                 <Stack spacing={3}>
                     <Card>
-                        <TeacherList teacherTableData={teacherTableData} />
+                        <StaffList/>
+                        {/* <StaffList teacherTableData={teacherTableData} /> */}
                     </Card>
                 </Stack>
             </Container>
