@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
@@ -18,34 +19,9 @@ import ToolbarTeacherSearch from './ToolbarTeacherSearch';
 
 // ----------------------------------------------------------------------
 
-function createData(id, fullname, nickname) {
-  return { id, fullname, nickname };
-}
-
-const TABLE_DATA = [
-  createData(12, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(15, 'Siwach Toprasert', 'Pan'),
-  createData(879, 'Piyaphon Wu', 'Hong'),
-  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(2, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(272, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(662, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(85, 'Siwach Toprasert', 'Pan'),
-  createData(52, 'Piyaphon Wu', 'Hong'),
-  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(422, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(984, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(155, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(468, 'Siwach Toprasert', 'Pan'),
-  createData(777, 'Piyaphon Wu', 'Hong'),
-  createData(666, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(333, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(222, 'Zain Ijaz Janpatiew', 'Zain'),
-
-];
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Student ID', align: 'left' },
+  { id: 'id', label: 'Teacher ID', align: 'left' },
   { id: 'fullname', label: 'Fullname  ', align: 'left' },
   { id: 'nickname', label: 'Nickname  ', align: 'left' },
   { id: 'details', label: ' ', align: 'left' },
@@ -53,7 +29,10 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function TeacherList() {
+TeacherList.propTypes = {
+  teacherTableData: PropTypes.array,
+}
+export default function TeacherList({teacherTableData}) {
   const {
     dense,
     page,
@@ -68,13 +47,15 @@ export default function TeacherList() {
     defaultOrderBy: 'id',
   });
 
-  const [tableData, setTableData] = useState([]);
+  const navigate = useNavigate();
+
+  const [tableData, setTableData] = useState(teacherTableData);
   const [openConfirm, setOpenConfirm] = useState(false);
 
 
-  useEffect(() => {
-    setTableData(TABLE_DATA);
-  }, []);
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA);
+  // }, []);
 
   // Search
   const [filterValue, setFilterValue] = useState('');
@@ -160,18 +141,13 @@ export default function TeacherList() {
                 <TableRow
                   hover
                   key={row.id}
+                  onClick={() => navigate(`/account/teacher-management/teacher/${parseInt(row.id, 10)}`)}
                 >
-                  <TableCell align="left" > T{row.id} </TableCell>
-                  <TableCell align="left">{row.fullname}</TableCell>
+                  <TableCell align="left" > {row.id} </TableCell>
+                  <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
-                    <Tooltip title="More Info">
-                      <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
-                        <Link to={`/account/teacher-management/teacher/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
-                          <Iconify icon="ic:chevron-right" />
-                        </Link>
-                      </IconButton>
-                    </Tooltip>
+                    <Iconify icon="ic:chevron-right" />
                   </TableCell>
 
                 </TableRow>
@@ -188,9 +164,6 @@ export default function TeacherList() {
         rowsPerPage={rowsPerPage}
         onPageChange={onChangePage}
         onRowsPerPageChange={onChangeRowsPerPage}
-      //
-      // dense={dense}
-      // onChangeDense={onChangeDense}
       />
     </div>
   );
@@ -212,7 +185,7 @@ function applyFilter({ inputData, comparator, filterValue }) {
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
   }
 
   return inputData;

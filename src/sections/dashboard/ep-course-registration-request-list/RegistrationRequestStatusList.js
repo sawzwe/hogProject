@@ -18,7 +18,8 @@ import {
   TableContainer,
   TableRow,
   TableCell, createTheme, ThemeProvider,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
 // utils
 import { fTimestamp } from '../../../utils/formatTime';
@@ -50,7 +51,7 @@ const TABLE_HEAD_REQUESTS = [
   { id: 'requestDate', label: 'Request Date', align: 'left' },
   { id: 'courseType', label: 'Course Type', align: 'left' },
   { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: 200 },
   { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
   { id: 'incomplete' },
   { id: 'moreInfo' },
@@ -144,9 +145,9 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'pendingEA', label: 'Pending for EA', color: 'warning', count: getLengthByStatus('pendingEA') },
+    { value: 'pendingEA', label: 'Pending for EA',  count: getLengthByStatus('pendingEA') },
     { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA', color: 'warning', count: getLengthByStatus('pendingOA') },
+    { value: 'pendingOA', label: 'Pending for OA',  count: getLengthByStatus('pendingOA') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
@@ -268,7 +269,6 @@ export default function RegistrationRequestStatusList() {
 
           <RegistrationTableToolbar
             filterName={filterName}
-            isFiltered={isFiltered}
             onFilterName={handleFilterName}
             onResetFilter={handleResetFilter}
           />
@@ -285,8 +285,9 @@ export default function RegistrationRequestStatusList() {
                     <TableRow
                       hover
                       key={row.id}
-                    >
-                      <TableCell align="left" > R{row.id} </TableCell>
+                      onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}          
+                      sx={{cursor: "pointer"}}          >
+                      <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
@@ -296,11 +297,9 @@ export default function RegistrationRequestStatusList() {
                       {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
-                            <Tooltip title="Incomplete Reciept">
                               <IconButton color='primary'>
                                 <Iconify icon="ic:error" />
                               </IconButton>
-                            </Tooltip>
                           </TableCell>
                         </ThemeProvider>
                       ) :
@@ -308,11 +307,7 @@ export default function RegistrationRequestStatusList() {
                       }
 
                       <TableCell>
-                        <Tooltip title="More Info">
-                          <IconButton>
                             <Iconify icon="ic:chevron-right" />
-                          </IconButton>
-                        </Tooltip>
                       </TableCell>
 
                     </TableRow>
@@ -365,19 +360,16 @@ function applyFilter({
   //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   // }
   if (filterName) {
-    inputData = inputData.filter((request) => request.id === parseInt(filterName, 10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) => 
+    request.id === parseInt(filterName, 10) || 
+    request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
   }
 
-  // if (filterStatus !== 'completed') {
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
-  // else if (filterRole === 'rejected' || filterRole ==='completed'){
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
+
 
   return inputData;
 }
