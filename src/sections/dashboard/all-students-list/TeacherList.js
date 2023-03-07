@@ -167,7 +167,7 @@ export default function TeacherList() {
                   <TableCell>
                     <Tooltip title="More Info">
                       <IconButton variant="contained" color="success" onClick={() => acceptRequest(row.id)}>
-                        <Link to={`/dashboard/edit-account/teacher/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
+                        <Link to={`/account/teacher-management/teacher/${parseInt(row.id, 10)}`} style={{ textDecoration: 'none', color: 'black' }}>
                           <Iconify icon="ic:chevron-right" />
                         </Link>
                       </IconButton>

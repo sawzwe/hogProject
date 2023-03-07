@@ -181,7 +181,7 @@ export default function StudentList() {
                   to={`/account/student-management/student/${parseInt(row.id, 10)}`}
                   sx={{textDecoration: 'none'}}
                 >
-                    <TableCell align="left" > S{row.studentId} </TableCell>
+                    <TableCell align="left" > {row.studentId} </TableCell>
                     <TableCell align="left">{row.fullName}</TableCell>
                     <TableCell align="left">{row.nickname}</TableCell>
                     <TableCell>

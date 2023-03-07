@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router';
 // firebase
 import { getStorage, listAll, ref, deleteObject, uploadBytes } from "firebase/storage";
 // form
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
-import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem } from '@mui/material';
+import { Box, Card, Chip, Grid, Stack, Typography, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import axios from 'axios';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
@@ -99,7 +99,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         studentLastName: Yup.string().required('Lastname is required'),
         studentNickname: Yup.string().required('Nickname is required'),
         studentDateOfBirth: Yup.string().nullable().required('Date of birth is required'),
-        studentPhoneNo: Yup.string().required('Phone number is required'),
+        studentPhoneNo: Yup.number().typeError('Phone must be number').required('Phone number is required'),
         studentLineId: Yup.string().required('Line ID is required'),
         studentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         schoolName: Yup.string().required('School name is required'),
@@ -108,10 +108,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         targetUniversity: Yup.string(),
         targetScore: Yup.string(),
         studyProgram: Yup.string().required('Study program is required'),
-        otherStudyProgram: Yup.string().when("showOtherStudyProgram", {
-            is: true,
-            then: Yup.string().required('Other study program is required')
-        }),
         address: Yup.string().required('Address is required'),
         subDistrict: Yup.string().required('Sub-District is required'),
         district: Yup.string().required('District is required'),
@@ -120,7 +116,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         parentFirstName: Yup.string().required('Firstname is required'),
         parentLastName: Yup.string().required('Lastname is required'),
         parentRelationships: Yup.string().required('Relationships is required'),
-        parentPhoneNo: Yup.string().required('Phone number is required'),
+        parentPhoneNo: Yup.number().typeError('Phone must be number').required('Phone number is required'),
         parentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         parentLineId: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
@@ -138,7 +134,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             studentLastName: currentStudent?.lName || 'Wu',
             studentNickname: currentStudent?.nickname || 'Hong',
             studentDateOfBirth: currentStudent?.dob || '1-May-2002',
-            studentPhoneNo: currentStudent?.phone || '098-xxx-xxxx',
+            studentPhoneNo: currentStudent?.phone || '09846512',
             studentLineId: currentStudent?.line || 'pnw029',
             studentEmail: currentStudent?.email || 'hong@gmail.com',
             schoolName: currentStudent?.school || 'Assumption College Rayong',
@@ -147,7 +143,6 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             targetUniversity: currentStudent?.targetUni || 'Assumption University',
             targetScore: currentStudent?.targetScore || 'IELTS 9.0',
             studyProgram: currentStudent?.program || STUDY_PROGRAM_OPTIONS[2].value,
-            otherStudyProgram: currentStudent?.otherStudyProgram || '',
             address: currentStudent?.address.address || '2/18 Moo 2 Rd.Sukhumwit',
             subDistrict: currentStudent?.address.subdistrict || 'Nernpra',
             district: currentStudent?.address.district || 'Mueng Rayong',
@@ -156,7 +151,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             parentFirstName: currentStudent?.parent.fName || 'dadFirstname',
             parentLastName: currentStudent?.parent.lName || 'dadLastname',
             parentRelationships: currentStudent?.parent.relationship || 'Father',
-            parentPhoneNo: currentStudent?.parent.phone || '097-xxx-xxxx',
+            parentPhoneNo: currentStudent?.parent.phone || '097485612',
             parentEmail: currentStudent?.parent.email || 'dad@gmail.com',
             parentLineId: currentStudent?.parent.line || 'dad@line',
             studentHealthInfo: currentStudent?.healthInfo || 'Seafood allergy',
@@ -192,31 +187,47 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         }
     }, [isEdit, currentStudent, currentAvatar, currentFiles]);
 
-    const onSubmit = async (data) => {
+    // Confirm Dialog
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+
+    const handleSubmitConfirmDialog = async (data) => {
         try {
             if (isEdit) {
                 await updateStudent(currentStudent, data)
+                    .then(() => setOpenConfirmDialog(false))
                     .then(() => enqueueSnackbar('Update successfully!'))
+                    .then(() => reset())
                     .then(() => navigate(`/account/student-management/student/${currentStudent.id}`))
                     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             } else {
                 await registerStudent(data)
+                    .then(() => setOpenConfirmDialog(false))
                     .then(() => enqueueSnackbar('Successfully created!'))
+                    .then(() => reset())
                     .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
             }
         } catch (error) {
             enqueueSnackbar(`${error.message}`, { variant: 'error' });
         }
-    };
+    }
+
+    const onConfirm = () => {
+        try {
+            setOpenConfirmDialog(true)
+        } catch (error) {
+            enqueueSnackbar(`${error.message}`, { variant: 'error' });
+        }
+    }
 
     // Other Study Program
     const [showOtherStudyProgram, setShowOtherStudyProgram] = useState(false);
 
-    const handleClickOther = (data) => {
+    const handleChangeOther = (data) => {
         if (data.target.value === "Other") {
-            setShowOtherStudyProgram(true)
+            setValue("studyProgram", '')
+            setShowOtherStudyProgram(current => !current)
         } else {
-            setValue("otherStudyProgram", "");
+            setValue("studyProgram", '');
             setShowOtherStudyProgram(false)
         };
     };
@@ -261,7 +272,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
     };
 
     return (
-        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onConfirm)}>
             {/* Student Image */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
@@ -447,8 +458,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                             </RHFSelect>
                             <RHFTextField name="targetUniversity" label="Target University" />
                             <RHFTextField name="targetScore" label="Target Score" />
-                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleClickOther} />
-                            {showOtherStudyProgram ? <RHFTextField name="otherStudyProgram" label="Other" required /> : null}
+                            <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleChangeOther} />
+                            {showOtherStudyProgram && <RHFTextField name="studyProgram" label="Study Program" required />}
                         </Box>
                     </Card>
                 </Grid>
@@ -579,13 +590,51 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                        <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
+                        <Button type="submit" variant="contained" sx={{ height: '3em' }}>
                             {!isEdit ? 'Create Student' : 'Save Changes'}
-                        </LoadingButton>
+                        </Button>
                     </Stack>
                 </Grid>
             </Grid>
 
+            <ConfirmDialog
+                open={openConfirmDialog}
+                onClose={() => setOpenConfirmDialog(false)}
+                isEdit={isEdit}
+                onSubmit={handleSubmit(handleSubmitConfirmDialog)}
+            />
+
         </FormProvider>
     );
+}
+
+// ----------------------------------------------------------------
+
+ConfirmDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSubmit: PropTypes.func,
+    isEdit: PropTypes.bool,
+}
+
+export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
+
+    const {
+        formState: { isSubmitting },
+    } = useFormContext();
+
+    return (
+        <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
+            <DialogTitle>
+                {isEdit ? 'Edit Student?' : 'Create Student?'}
+            </DialogTitle>
+            <DialogContent>
+                {isEdit ? 'Once editted, student information will be saved.' : 'Once submitted, student account will be created to the system.'}
+            </DialogContent>
+            <DialogActions>
+                <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
+                <LoadingButton variant="contained" onClick={onSubmit} loading={isSubmitting}>Submit</LoadingButton>
+            </DialogActions>
+        </Dialog>
+    )
 }
