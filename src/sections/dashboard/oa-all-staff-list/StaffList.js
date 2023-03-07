@@ -4,9 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 
 // @mui
-import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer, Box } from '@mui/material';
+import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
-import axios from 'axios';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import {
@@ -16,16 +15,19 @@ import {
   TablePaginationCustom,
 } from '../../../components/table';
 //
-import { HOG_API } from '../../../config';
-
-import ToolbarStudentSearch from './ToolbarStudentSearch';
+import ToolbarStaffSearch from './ToolbarStaffSearch';
 
 // ----------------------------------------------------------------------
-
 function createData(id, fullname, nickname) {
   return { id, fullname, nickname };
 }
 
+const TABLE_HEAD = [
+  { id: 'id', label: 'Teacher ID', align: 'left' },
+  { id: 'fullname', label: 'Fullname  ', align: 'left' },
+  { id: 'nickname', label: 'Nickname  ', align: 'left' },
+  { id: 'details', label: ' ', align: 'left' },
+];
 
 const TABLE_DATA = [
   createData(12, 'Saw Zwe Wai Yan', 'Saw'),
@@ -49,20 +51,13 @@ const TABLE_DATA = [
 
 ];
 
-const TABLE_HEAD = [
-  { id: 'id', label: 'Student ID', align: 'left' },
-  { id: 'fullname', label: 'Fullname  ', align: 'left' },
-  { id: 'nickname', label: 'Nickname  ', align: 'left' },
-  { id: 'details', label: ' ', align: 'left' },
-];
-
 // ----------------------------------------------------------------------
-StudentList.propTypes = {
-  studentTableData: PropTypes.array,
-}
 
-export default function StudentList({ studentTableData }) {
-  const navigate = useNavigate();
+// StaffList.propTypes = {
+//   teacherTableData: PropTypes.array,
+// }
+// export default function StaffList({teacherTableData}) {
+export default function StaffList() {
   const {
     dense,
     page,
@@ -77,11 +72,19 @@ export default function StudentList({ studentTableData }) {
     defaultOrderBy: 'id',
   });
 
-  const [tableData, setTableData] = useState(studentTableData);
+  const navigate = useNavigate();
 
-  const [filterValue, setFilterValue] = useState('');
-
+  // const [tableData, setTableData] = useState(teacherTableData);
+  const [tableData, setTableData] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
+
+
+  useEffect(() => {
+    setTableData(TABLE_DATA);
+  }, []);
+
+  // Search
+  const [filterValue, setFilterValue] = useState('');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -133,10 +136,14 @@ export default function StudentList({ studentTableData }) {
     setFilterValue(event.target.value);
   };
 
+  const acceptRequest = (currentId) => {
+    setOpenConfirm(false);
+  };
+
 
   return (
     <div>
-      <ToolbarStudentSearch
+      <ToolbarStaffSearch
         isFiltered={isFiltered}
         filterValue={filterValue}
         onFilterValue={handleFilterValue}
@@ -154,37 +161,22 @@ export default function StudentList({ studentTableData }) {
             <TableHeadCustom
               headLabel={TABLE_HEAD}
             />
+
             <TableBody>
-              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => (
+              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
                   hover
-                  key={index}
-                  onClick={() => navigate(`/account/student-management/student/${row.id}`)}
-                  sx={{cursor: "pointer"}}
-                  
+                  key={row.id}
+                  onClick={() => navigate(`/account/staff-management/staff/${parseInt(row.id, 10)}`)}
                 >
-                  <TableCell
-                    align="left"
-                  >
-                      {row.studentId}
-                  </TableCell>
-                  <TableCell
-                    align="left"
-                  >
-                      {row.fullName}
-                  </TableCell>
-
-                  <TableCell
-                    align="left"
-                  >
-                      {row.nickname}
-                  </TableCell>
-
+                  <TableCell align="left" > {row.id} </TableCell>
+                  <TableCell align="left">{row.fullname}</TableCell>
+                  <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
-                      <Iconify icon="ic:chevron-right" />
+                    <Iconify icon="ic:chevron-right" />
                   </TableCell>
-                </TableRow>
 
+                </TableRow>
               ))}
 
             </TableBody>
@@ -207,7 +199,6 @@ export default function StudentList({ studentTableData }) {
 
 function applyFilter({ inputData, comparator, filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
-  // console.log('inputData', inputData)
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -217,18 +208,10 @@ function applyFilter({ inputData, comparator, filterValue }) {
     return a[1] - b[1];
   });
 
-
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterValue) {
-
-    inputData = inputData.filter((user) => {
-      return (
-        user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
-        user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
-        user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1
-      );
-    });
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
   }
 
   return inputData;
