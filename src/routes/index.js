@@ -39,6 +39,7 @@ import {
   PageLeavingRequestOA,
   PageRegistrationRequestDetailOA,
   PageLeavingRequestDetailOA,
+  PageStaffListOA,
   // Student
   PageStudentCalendar,
   PageStudentCourse,
@@ -349,6 +350,13 @@ export default function Router() {
           path: 'schedule-changing/leaving-request/:id', element: (
             <RoleBasedGuard roles={['Office Admin']} hasContent>
               <PageLeavingRequestDetailOA />
+            </RoleBasedGuard>
+          )
+        },
+        {
+          path: 'account/staff-management/staff', element: (
+            <RoleBasedGuard roles={['Office Admin']} hasContent>
+              <PageStaffListOA />
             </RoleBasedGuard>
           )
         },

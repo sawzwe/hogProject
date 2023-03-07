@@ -273,7 +273,7 @@ export default function StaffRequestStatusList() {
                 <TableHeadCustom
                   headLabel={TABLE_HEAD_REQUESTS}
                 />
-
+                  
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                     <TableRow
@@ -282,7 +282,7 @@ export default function StaffRequestStatusList() {
                       onClick={() => handleClickRequest(row.id, row.requestType, row.role)}
                       sx={{ textDecoration: 'none' }}
                     >
-                      <TableCell align="left" > Q{row.id} </TableCell>
+                      <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.requestType}</TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>
