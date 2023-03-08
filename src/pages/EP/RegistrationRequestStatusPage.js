@@ -23,10 +23,10 @@ export default function RegistrationRequestStatusPage() {
                     heading="All Requests"
                     links={[
                         {
-                            name: 'Course Registration',
+                            name: 'All Requests',
                             href: PATH_REGISTRATION.epRequestStatus,
                         },
-                        { name: 'Request status' },
+                        
                     ]}
                 />
                 <RegistrationRequestStatusList />
