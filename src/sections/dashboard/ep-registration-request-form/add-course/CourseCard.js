@@ -37,7 +37,7 @@ export default function CourseCard({ courseIndex, courseInfo, onRemove, onEdit }
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
     return (
-        <Paper elevation={2} sx={{ mt: 2, p: 3 }}>
+        <Paper variant="outlined" sx={{ mt: 2, p: 3 }}>
 
             <Grid container direction="row" spacing={1} sx={{ mt: 1, mb: 2 }}>
                 <Grid item xs={12} md={4}>
