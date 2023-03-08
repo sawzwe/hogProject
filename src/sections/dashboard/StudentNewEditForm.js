@@ -99,7 +99,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         studentLastName: Yup.string().required('Lastname is required'),
         studentNickname: Yup.string().required('Nickname is required'),
         studentDateOfBirth: Yup.string().nullable().required('Date of birth is required'),
-        studentPhoneNo: Yup.number().typeError('Phone must be number').required('Phone number is required'),
+        studentPhoneNo: Yup.string().required('Phone number is required'),
         studentLineId: Yup.string().required('Line ID is required'),
         studentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         schoolName: Yup.string().required('School name is required'),
@@ -108,6 +108,11 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         targetUniversity: Yup.string(),
         targetScore: Yup.string(),
         studyProgram: Yup.string().required('Study program is required'),
+        otherProgram: Yup.string()
+            .when('studyProgram', {
+                is: 'Other',
+                then: Yup.string().required('Other program is required')
+            }),
         address: Yup.string().required('Address is required'),
         subDistrict: Yup.string().required('Sub-District is required'),
         district: Yup.string().required('District is required'),
@@ -116,7 +121,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         parentFirstName: Yup.string().required('Firstname is required'),
         parentLastName: Yup.string().required('Lastname is required'),
         parentRelationships: Yup.string().required('Relationships is required'),
-        parentPhoneNo: Yup.number().typeError('Phone must be number').required('Phone number is required'),
+        parentPhoneNo: Yup.string().required('Phone number is required'),
         parentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         parentLineId: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
@@ -126,6 +131,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             .test('fileSize', 'The file is too large', (file) => file && file.size <= MAX_FILE_SIZE)
             .test('fileFormat', 'Unsupported Format', (file) => file && (FILE_FORMATS.includes(file.type)))
     });
+
+    const allStudyOptions = Object.values(STUDY_PROGRAM_OPTIONS);
 
     const defaultValues = useMemo(
         () => ({
@@ -142,7 +149,8 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             levelOfStudy: currentStudent?.levelOfStudy || 'Matthayom 6',
             targetUniversity: currentStudent?.targetUni || 'Assumption University',
             targetScore: currentStudent?.targetScore || 'IELTS 9.0',
-            studyProgram: currentStudent?.program || STUDY_PROGRAM_OPTIONS[2].value,
+            studyProgram: !!currentStudent?.program ? currentStudent.program !== "International Program" && currentStudent.program!== 'Bilingual/EP Program' && currentStudent.program!== 'Thai Program' && currentStudent.program!== 'Gifted Program' && currentStudent.program!== 'Homeschool' ? 'Other' : currentStudent?.program : STUDY_PROGRAM_OPTIONS[2].value,
+            otherProgram: currentStudent?.program || '',
             address: currentStudent?.address.address || '2/18 Moo 2 Rd.Sukhumwit',
             subDistrict: currentStudent?.address.subdistrict || 'Nernpra',
             district: currentStudent?.address.district || 'Mueng Rayong',
@@ -178,20 +186,15 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
     const values = watch();
 
-    useEffect(() => {
-        if (isEdit && currentStudent) {
-            reset(defaultValues);
-        }
-        if (!isEdit) {
-            reset(defaultValues);
-        }
-    }, [isEdit, currentStudent, currentAvatar, currentFiles]);
-
     // Confirm Dialog
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
 
     const handleSubmitConfirmDialog = async (data) => {
         try {
+            if (data.studyProgram === 'Other') {
+                data.studyProgram = data.otherProgram;
+            }
+
             if (isEdit) {
                 await updateStudent(currentStudent, data)
                     .then(() => setOpenConfirmDialog(false))
@@ -224,10 +227,10 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
     const handleChangeOther = (data) => {
         if (data.target.value === "Other") {
-            setValue("studyProgram", '')
+            setValue("otherProgram", '')
             setShowOtherStudyProgram(current => !current)
         } else {
-            setValue("studyProgram", '');
+            setValue("otherProgram", '');
             setShowOtherStudyProgram(false)
         };
     };
@@ -270,6 +273,23 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
     const handleRemoveAllFiles = () => {
         setValue('studentAdditionalFiles', []);
     };
+
+    useEffect(() => {
+        if (isEdit && currentStudent) {
+            if (currentStudent.program !== "International Program" && currentStudent.program!== 'Bilingual/EP Program' && currentStudent.program!== 'Thai Program' && currentStudent.program!== 'Gifted Program' && currentStudent.program!== 'Homeschool') {
+                // reset(defaultValues);
+                setShowOtherStudyProgram(true)
+                setValue("studyProgram", "Other");
+                setValue("otherProgram", currentStudent.program);
+            } else {
+                reset(defaultValues);
+            }
+            reset(defaultValues);
+        }
+        if (!isEdit) {
+            reset(defaultValues);
+        }
+    }, [isEdit, currentStudent, currentAvatar, currentFiles]);
 
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onConfirm)}>
@@ -459,7 +479,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                             <RHFTextField name="targetUniversity" label="Target University" />
                             <RHFTextField name="targetScore" label="Target Score" />
                             <RHFRadioGroup name="studyProgram" options={STUDY_PROGRAM_OPTIONS} label="Study Program" onClick={handleChangeOther} />
-                            {showOtherStudyProgram && <RHFTextField name="studyProgram" label="Study Program" required />}
+                            {showOtherStudyProgram && <RHFTextField name="otherProgram" label="Study Program" required />}
                         </Box>
                     </Card>
                 </Grid>
