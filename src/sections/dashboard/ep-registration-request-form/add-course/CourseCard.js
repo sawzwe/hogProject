@@ -16,14 +16,14 @@ CourseCard.propTypes = {
 export default function CourseCard({ courseIndex, courseInfo, onRemove, onEdit }) {
 
     const {
-        courseName,
+        course,
         subject,
         level,
         method,
         hourPerClass,
         totalHour,
-        startDate,
-        endDate,
+        fromDate,
+        toDate,
         monday,
         tuesday,
         wednesday,
@@ -41,25 +41,13 @@ export default function CourseCard({ courseIndex, courseInfo, onRemove, onEdit }
 
             <Grid container direction="row" spacing={1} sx={{ mt: 1, mb: 2 }}>
                 <Grid item xs={12} md={4}>
-                    <TextField fullWidth disabled label="Course" value={courseName} />
+                    <TextField fullWidth variant="standard" disabled label="Course name" value={`${course} ${subject} ${level}`} />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <TextField fullWidth disabled label="Subject" value={subject} />
+                    <TextField fullWidth variant="standard" disabled label="Start Date" value={fDate(fromDate, 'dd-MMM-yyyy')} />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <TextField fullWidth disabled label="Level" value={level} />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <TextField fullWidth disabled label="Start Date" value={fDate(startDate, 'dd-MMM-yyyy')} />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <TextField fullWidth disabled label="End Date" value={fDate(endDate, 'dd-MMM-yyyy')} />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                    <TextField fullWidth disabled label="Learning Method" value={method} />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                    <TextField fullWidth disabled label="Total Hours" value={totalHour} />
+                    <TextField fullWidth variant="standard" disabled label="End Date" value={fDate(toDate, 'dd-MMM-yyyy')} />
                 </Grid>
             </Grid>
 

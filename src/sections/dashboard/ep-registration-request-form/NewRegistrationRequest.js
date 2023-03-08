@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import moment from 'moment';
+import axios from 'axios';
+import { useNavigate } from 'react-router';
 // form
 import { useForm, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -33,7 +35,6 @@ import {
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFSelect, RHFUpload, RHFTextField, RHFRadioGroup, RHFCheckbox } from '../../../components/hook-form';
@@ -44,6 +45,10 @@ import SearchNotFound from '../../../components/search-not-found/SearchNotFound'
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import { AddStudentForm, AddCourseForm } from '.';
 import { privateCourses } from './_mockupData';
+// utils
+import { fDate } from '../../../utils/formatTime';
+//
+import { HOG_API } from '../../../config';
 
 
 // ----------------------------------------------------------------------
@@ -174,12 +179,12 @@ NewPrivateRequestForm.propTypes = {
 
 export function NewPrivateRequestForm({ studentList }) {
     const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     const NewRequestSchema = Yup.object().shape({
         courseType: Yup.string().required('Course type is required'),
-        selectedStudent: Yup.array().min(1, "At least 1 student is required").required('At least one student is required'),
-        courses: Yup.array().min(1, "At least 1 course is required").required('At least one course is required'),
-        // paymentAttachmentFiles: Yup.array().required('At least one payment attachment file is required'),
+        selectedStudent: Yup.array().min(1, "At least one student is required").required('At least one student is required'),
+        courses: Yup.array().min(1, "At least one course is required").required('At least one course is required'),
         additionalComment: Yup.string(),
     });
 
@@ -188,24 +193,6 @@ export function NewPrivateRequestForm({ studentList }) {
         selectedStudent: [],
         courses: [],
         additionalComment: '',
-        // Private or Semi Private
-        // newCourseType: 'Existing Course',
-        // section: '',
-        // newCourse: '',
-        // newSubject: '',
-        // newLevel: '',
-        // newHoursPerClass: '2',
-        // newHour: '',
-        // newLearningMethod: 'Onsite',
-        // newStartDate: new Date(),
-        // newEndDate: new Date(),
-        // monday: { isSelected: false, fromTime: '', toTime: '' },
-        // tuesday: { isSelected: false, fromTime: '', toTime: '' },
-        // wednesday: { isSelected: false, fromTime: '', toTime: '' },
-        // thursday: { isSelected: false, fromTime: '', toTime: '' },
-        // friday: { isSelected: false, fromTime: '', toTime: '' },
-        // saturday: { isSelected: false, fromTime: '', toTime: '' },
-        // sunday: { isSelected: false, fromTime: '', toTime: '' }
     };
 
     const methods = useForm({
@@ -231,7 +218,6 @@ export function NewPrivateRequestForm({ studentList }) {
             enqueueSnackbar('Number of student exceeds!', { variant: 'error' })
         } else {
             setValue('selectedStudent', [...selectedStudent, newStudent]);
-            enqueueSnackbar('Successfully added student', { variant: 'success' })
         }
     };
 
@@ -274,7 +260,60 @@ export function NewPrivateRequestForm({ studentList }) {
 
     const onSubmit = async (data) => {
         try {
-            console.log(data);
+
+            // Clean up the data
+            const {
+                selectedStudent,
+                courses,
+                additionalComment
+            } = data;
+
+            const studentIds = selectedStudent.map((student) => student.id);
+
+            const request = {
+                status: 'PendingEA',
+                eaStatus: "InProgress",
+                paymentStatus: "None",
+                epRemark1: additionalComment,
+                takenByEPId: 1,
+            }
+
+            const information = courses.map((eachCourse) => {
+                const section = selectedStudent[0].nickname
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                const allPreferredDays = [eachCourse.monday, eachCourse.tuesday, eachCourse.wednesday, eachCourse.thursday, eachCourse.friday, eachCourse.saturday, eachCourse.sunday]
+                allPreferredDays.forEach((eachDay, index) => { eachDay.day = days[index] })
+                const filteredPerferredDays = allPreferredDays.filter((eachDay) => eachDay.isSelected)
+                return {
+                    course: eachCourse.course,
+                    subject: eachCourse.subject,
+                    level: eachCourse.level,
+                    section,
+                    totalHour: eachCourse.totalHour,
+                    method: eachCourse.method,
+                    hourPerClass: eachCourse.hourPerClass,
+                    fromDate: fDate(eachCourse.fromDate, 'dd-MMM-yyyy'),
+                    toDate: fDate(eachCourse.toDate, 'dd-MMM-yyyy'),
+                    preferredDays: filteredPerferredDays.map((eachDay) => eachDay.isSelected && { day: eachDay.day, fromTime: eachDay.fromTime, toTime: eachDay.toTime })
+                }
+            })
+
+            axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Request/Post`, {
+                studentIds,
+                request,
+                information,
+            })
+                // .then((res) => {
+                //     console.log(res.data)
+                // })
+                .then(() => enqueueSnackbar('The request is successfully created', { variant: 'success' }))
+                .then(() => navigate('/course-registration/ep-request-status'))
+                .catch((error) => {
+                    console.error(error)
+                    return enqueueSnackbar(error.message, { variant: 'error' })
+                })
+
+            // console.log(data);
             enqueueSnackbar('The request is successfully created', { variant: 'success' })
         } catch (error) {
             console.log(error)
@@ -283,13 +322,14 @@ export function NewPrivateRequestForm({ studentList }) {
     }
 
     const onError = (error) => {
+        console.log(error)
         const errors = Object.values(error)
         enqueueSnackbar(errors[0].message, { variant: 'error' })
     }
 
     return (
         <>
-            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
+            <FormProvider methods={methods}>
                 <Grid container spacing={3} sx={{ mt: 1 }}>
                     <Grid item xs={12} md={12}>
                         <AddStudentCard
@@ -336,7 +376,13 @@ export function NewPrivateRequestForm({ studentList }) {
                     {/* Submit Button */}
                     <Grid item xs={12} md={12}>
                         <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                            <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
+                            <LoadingButton
+                                type="submit"
+                                variant="contained"
+                                loading={isSubmitting}
+                                onClick={handleSubmit(onSubmit, onError)}
+                                sx={{ height: '3em' }}
+                            >
                                 Send request
                             </LoadingButton>
                         </Stack>
@@ -369,36 +415,18 @@ export function NewSemiPrivateRequestForm({ studentList }) {
 
     const NewRequestSchema = Yup.object().shape({
         courseType: Yup.string().required('Course type is required'),
-        students: Yup.array().required('At least one student is required'),
-        courses: Yup.array().required('At least one course is required'),
-        paymentAttachmentFiles: Yup.array().required('At least one payment attachment file is required'),
-        paymentType: Yup.string().required('Payment type is required'),
+        section: Yup.string().required('Section name is required'),
+        selectedStudent: Yup.array().min(1, "At least one student is required").required('At least one student is required'),
+        courses: Yup.array().min(1, "At least one course is required").required('At least one course is required'),
         additionalComment: Yup.string(),
     });
 
     const defaultValues = {
         courseType: 'Semi Private',
         selectedStudent: [],
+        section: '',
         courses: [],
         additionalComment: '',
-        // Private or Semi Private
-        newCourseType: 'Existing Course',
-        section: '',
-        newCourse: '',
-        newSubject: '',
-        newLevel: '',
-        newHoursPerClass: '2',
-        newHour: '',
-        newLearningMethod: 'Onsite',
-        newStartDate: new Date(),
-        newEndDate: new Date(),
-        monday: { isSelected: false, fromTime: '', toTime: '' },
-        tuesday: { isSelected: false, fromTime: '', toTime: '' },
-        wednesday: { isSelected: false, fromTime: '', toTime: '' },
-        thursday: { isSelected: false, fromTime: '', toTime: '' },
-        friday: { isSelected: false, fromTime: '', toTime: '' },
-        saturday: { isSelected: false, fromTime: '', toTime: '' },
-        sunday: { isSelected: false, fromTime: '', toTime: '' }
     };
 
     const methods = useForm({
@@ -411,6 +439,7 @@ export function NewSemiPrivateRequestForm({ studentList }) {
         watch,
         setValue,
         handleSubmit,
+        setError,
         formState: { isSubmitting },
     } = methods;
 
@@ -423,7 +452,6 @@ export function NewSemiPrivateRequestForm({ studentList }) {
             enqueueSnackbar('Number of student exceeds!', { variant: 'error' })
         } else {
             setValue('selectedStudent', [...selectedStudent, newStudent]);
-            enqueueSnackbar('Successfully added student', { variant: 'success' })
         }
     };
 
@@ -432,60 +460,164 @@ export function NewSemiPrivateRequestForm({ studentList }) {
         setValue('selectedStudent', newSelectedStudent);
     };
 
+    const handleAddCourse = (newCourse) => {
+        setValue('courses', [...courses, newCourse])
+    };
+
+    const handleRemoveCourse = (courseIndex) => {
+        const tempCourses = courses
+        tempCourses.splice(courseIndex, 1)
+        setValue('courses', tempCourses);
+    };
+
+    const [openEditCourseDialog, setOpenEditCourseDialog] = useState(false);
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [selectedCourseIndex, setSelectedCourseIndex] = useState();
+
+    const handleClickEditCourse = (courseIndex) => {
+        setSelectedCourseIndex(courseIndex);
+        setSelectedCourse(courses[courseIndex]);
+        setOpenEditCourseDialog(true);
+    };
+
+    const handleEditCourse = (data, index) => {
+        const tempCourses = courses;
+        tempCourses[index] = data;
+        setValue('courses', tempCourses);
+    };
+
+    const handleCloseEditCourseDialog = () => {
+        setSelectedCourse({});
+        setSelectedCourseIndex();
+        setOpenEditCourseDialog(false);
+    };
+
+    const onSubmit = async (data) => {
+        try {
+
+            // Clean up the data
+            const {
+                selectedStudent,
+                courses,
+                section
+            } = data;
+            const studentIds = selectedStudent.map((student) => student.id);
+
+            const information = courses.map((eachCourse) => {
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                const allPreferredDays = [eachCourse.monday, eachCourse.tuesday, eachCourse.wednesday, eachCourse.thursday, eachCourse.friday, eachCourse.saturday, eachCourse.sunday]
+                allPreferredDays.forEach((eachDay, index) => { eachDay.day = days[index] })
+                const filteredPerferredDays = allPreferredDays.filter((eachDay) => eachDay.isSelected)
+                return {
+                    course: eachCourse.course,
+                    subject: eachCourse.subject,
+                    section,
+                    level: eachCourse.level,
+                    totalHour: eachCourse.totalHour,
+                    method: eachCourse.method,
+                    hourPerClass: eachCourse.hourPerClass,
+                    fromDate: fDate(eachCourse.fromDate, 'dd-MMM-yyyy'),
+                    toDate: fDate(eachCourse.toDate, 'dd-MMM-yyyy'),
+                    preferredDays: filteredPerferredDays.map((eachDay) => eachDay.isSelected && { day: eachDay.day, fromTime: eachDay.fromTime, toTime: eachDay.toTime })
+                }
+            })
+
+            console.log(studentIds);
+            console.log(information);
+
+            // console.log(data);
+            enqueueSnackbar('The request is successfully created', { variant: 'success' })
+        } catch (error) {
+            console.log(error)
+            enqueueSnackbar(error.message, { variant: 'error' })
+        }
+    }
+
+    const onError = (error) => {
+        console.log(error)
+        const errors = Object.values(error)
+        enqueueSnackbar(errors[0].message, { variant: 'error' })
+    }
+
     return (
-        <FormProvider methods={methods} >
-            <Grid container spacing={3} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={12}>
-                    <AddStudentCard
-                        courseType="Semi Private"
-                        onAdd={handleAddStudent}
-                        onRemove={handleRemoveStudent}
-                        selectedStudent={selectedStudent}
-                        studentList={studentList}
-                    />
-                </Grid>
+        <>
+            <FormProvider methods={methods}>
+                <Grid container spacing={3} sx={{ mt: 1 }}>
 
-                {/* Add Course */}
-                {/* <Grid item xs={12} md={12}>
-                    <AddCourseForm
-                        onAddCourse={handleAddCourse}
-                        onRemoveCourse={handleRemoveCourse}
-                        onRemovePrivateCourse={handleRemovePrivateCourse}
-                    />
-                </Grid> */}
+                    <Grid item xs={12} md={5}>
+                        <RHFTextField fullWidth label="Section name" name="section" required />
+                    </Grid>
 
-                {/* Additional Comment */}
-                <Grid item xs={12} md={12}>
-                    <Card sx={{ p: 3 }}>
-                        <Typography variant="h5"
-                            sx={{
-                                mb: 2,
-                                display: 'block',
-                            }}>Additional Comment</Typography>
-                        <Box
-                            rowGap={3}
-                            columnGap={2}
-                            display="grid"
-                            gridTemplateColumns={{
-                                xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(1, 1fr)',
-                            }}
-                        >
-                            <RHFTextField name="additionalComment" label="Add comment here" />
-                        </Box>
-                    </Card>
-                </Grid>
+                    <Grid item xs={12} md={12}>
+                        <AddStudentCard
+                            courseType="Semi Private"
+                            onAdd={handleAddStudent}
+                            onRemove={handleRemoveStudent}
+                            selectedStudent={selectedStudent}
+                            studentList={studentList}
+                        />
+                    </Grid>
 
-                {/* Submit Button */}
-                <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                        <LoadingButton type="submit" variant="contained" loading={isSubmitting} sx={{ height: '3em' }}>
-                            Send request
-                        </LoadingButton>
-                    </Stack>
+                    {/* Add Course */}
+                    <Grid item xs={12} md={12}>
+                        <AddCourseCard
+                            onAdd={handleAddCourse}
+                            onEdit={handleClickEditCourse}
+                            onRemove={handleRemoveCourse}
+                            createdCourse={courses}
+                        />
+                    </Grid>
+
+                    {/* Additional Comment */}
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}>Additional Comment</Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <RHFTextField name="additionalComment" label="Add comment here" />
+                            </Box>
+                        </Card>
+                    </Grid>
+
+                    {/* Submit Button */}
+                    <Grid item xs={12} md={12}>
+                        <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                            <LoadingButton
+                                type="submit"
+                                variant="contained"
+                                loading={isSubmitting}
+                                onClick={handleSubmit(onSubmit, onError)}
+                                sx={{ height: '3em' }}
+                            >
+                                Send request
+                            </LoadingButton>
+                        </Stack>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </FormProvider>
+            </FormProvider>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <AddCourseDialog
+                    open={openEditCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    onEdit={handleEditCourse}
+                    isEdit
+                    selectedCourse={selectedCourse}
+                    selectedCourseIndex={selectedCourseIndex}
+                />
+            )}
+        </>
     )
 }
 
@@ -724,14 +856,14 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const NewCourseSchema = Yup.object().shape({
         newCourseType: Yup.string().required('At least one type must be selected'),
-        courseName: Yup.string().required('Course name is required'),
+        course: Yup.string().required('Course name is required'),
         subject: Yup.string().required('Subject is required'),
         level: Yup.string().required('Level is required'),
         totalHour: Yup.number().typeError('Total hours must be number').required('Total hours is required'),
         hourPerClass: Yup.number().typeError('Hours per class must be number').required('Hours per class is required'),
         method: Yup.string().required('Learning method is required'),
-        startDate: Yup.string().required('Start date is required'),
-        endDate: Yup.string().required('End date is required'),
+        fromDate: Yup.string().required('Start date is required'),
+        toDate: Yup.string().required('End date is required'),
         monday: Yup.object().shape({
             fromTime: Yup.string()
                 .when('isSelected', {
@@ -831,14 +963,14 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const defaultValues = {
         newCourseType: selectedCourse?.newCourseType || 'Existing Course',
-        courseName: selectedCourse?.courseName || '',
+        course: selectedCourse?.course || '',
         subject: selectedCourse?.subject || '',
         level: selectedCourse?.level || '',
         totalHour: selectedCourse?.totalHour || '',
         hourPerClass: selectedCourse?.hourPerClass || '',
         method: selectedCourse?.method || '',
-        startDate: selectedCourse?.startDate || today,
-        endDate: selectedCourse?.endDate || tomorrow,
+        fromDate: selectedCourse?.fromDate || today,
+        toDate: selectedCourse?.toDate || tomorrow,
         monday: selectedCourse?.monday || { isSelected: false, fromTime: '', toTime: '' },
         tuesday: selectedCourse?.tuesday || { isSelected: false, fromTime: '', toTime: '' },
         wednesday: selectedCourse?.wednesday || { isSelected: false, fromTime: '', toTime: '' },
@@ -867,14 +999,14 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const {
         newCourseType,
-        courseName,
+        course,
         subject,
         level,
         totalHour,
         hourPerClass,
         method,
-        startDate,
-        endDate,
+        fromDate,
+        toDate,
         monday,
         tuesday,
         wednesday,
@@ -901,7 +1033,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     useEffect(() => {
         if (isEdit && newCourseType === 'Existing Course') {
-            const targetCourse = COURSE_OPTIONS.find((option) => option.course === courseName)
+            const targetCourse = COURSE_OPTIONS.find((option) => option.course === course)
             setPrivateSubjects(targetCourse.subjects)
             setPrivateLevels(targetCourse.level)
             setValue('subject', selectedCourse.subject)
@@ -914,14 +1046,14 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const handleChangeCourseType = (event) => {
         reset(defaultValues);
-        setValue('courseName', '')
+        setValue('course', '')
         setValue('subject', '')
         setValue('level', '')
         setValue('newCourseType', event.target.value);
     };
 
     const handleChangeCourse = (event) => {
-        setValue('courseName', event.target.value);
+        setValue('course', event.target.value);
         setValue('subject', '')
         setValue('level', '')
 
@@ -930,7 +1062,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
         setPrivateLevels(targetCourse.level)
     }
 
-    const onSubmit = async (data) => {
+    const onSubmitCourse = async (data) => {
         try {
             if (isEdit) {
                 onEdit(data, selectedCourseIndex);
@@ -951,11 +1083,9 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
         }
     }
 
-    const onError = (error) => {
+    const onErrorCourse = (error) => {
         if (error.preferredDaySlot) {
             enqueueSnackbar("At least one perferred day is required!", { variant: 'error' });
-        } else {
-            enqueueSnackbar("Form has not been filled correctly!", { variant: 'error' });
         }
     };
 
@@ -967,7 +1097,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                 }
             }} >
 
-            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmitCourse, onErrorCourse)}>
                 <Grid container direction="row" sx={{ p: 3, pb: 0 }} spacing={2} >
                     <Grid container item xs={12} md={12} justifyContent="space-between">
                         <Typography variant="h6"> New Course </Typography>
@@ -1000,7 +1130,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                     <>
                                         <Grid item xs={12} md={6}>
                                             <RHFSelect
-                                                name="courseName"
+                                                name="course"
                                                 label="Course"
                                                 SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                                                 onChange={(event) => handleChangeCourse(event)}
@@ -1031,7 +1161,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                                 <RHFSelect
                                                     name="subject"
                                                     label="Subject"
-                                                    disabled={!courseName}
+                                                    disabled={!course}
                                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                                                     required>
                                                     {privateSubjects.map((option) => (
@@ -1064,7 +1194,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                                 <RHFSelect
                                                     name="level"
                                                     label="Level"
-                                                    disabled={!courseName}
+                                                    disabled={!course}
                                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                                                     required>
                                                     {privateLevels.map((option) => (
@@ -1094,7 +1224,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                     <>
                                         {/* Custom Course */}
                                         <Grid item xs={6} md={6}>
-                                            <RHFTextField name="courseName" label="Course" required />
+                                            <RHFTextField name="course" label="Course" required />
                                         </Grid>
                                         <Grid item xs={6} md={6}>
                                             <RHFTextField name="subject" label="Subject" required />
@@ -1151,9 +1281,9 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                         fullWidth
                                         label="Start Date"
                                         minDate={today}
-                                        value={startDate}
+                                        value={fromDate}
                                         onChange={(newValue) => {
-                                            setValue('startDate', newValue);
+                                            setValue('fromDate', newValue);
                                         }}
                                         renderInput={(params) => (
                                             <TextField
@@ -1172,10 +1302,10 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                     <DatePicker
                                         fullWidth
                                         label="End Date"
-                                        minDate={startDate}
-                                        value={endDate}
+                                        minDate={fromDate}
+                                        value={toDate}
                                         onChange={(newValue) => {
-                                            setValue('endDate', newValue);
+                                            setValue('toDate', newValue);
                                         }}
                                         renderInput={(params) => (
                                             <TextField
