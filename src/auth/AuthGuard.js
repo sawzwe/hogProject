@@ -19,8 +19,6 @@ export default function AuthGuard({ children }) {
 
   const [requestedLocation, setRequestedLocation] = useState(null);
 
-  console.log('user', user)
-
   if (!isInitialized) {
     return <LoadingScreen />;
   }
