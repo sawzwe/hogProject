@@ -17,17 +17,15 @@ export default function RegistrationRequestPage() {
             <Helmet>
                 <title> EA | Registration Request</title>
             </Helmet>
-            <CustomBreadcrumbs
-                heading="Course Registration Request Status"
-                links={[
-                    {
-                        name: 'Course Registration',
-                        href: PATH_REGISTRATION.eaRequestStatus,
-                    },
-                    { name: 'Request status' },
-                ]}
-            />
             <Container maxWidth={themeStretch ? false : 'xl'}>
+                <CustomBreadcrumbs
+                    heading="Course Registration Requests"
+                    links={[
+                        {
+                            name: 'All requests',
+                        },
+                    ]}
+                />
                 <RegistrationRequestStatusList />
             </Container>
         </>

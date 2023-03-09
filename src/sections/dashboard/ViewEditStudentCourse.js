@@ -284,14 +284,7 @@ export function ViewEditScheduleDialog({ selectedCourse, open, onClose, role }) 
     };
 
     return (
-        <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}
-            // PaperProps={{
-            //     sx: {
-            //         '&::-webkit-scrollbar': { display: 'none' },
-            //     }
-            // }}
-        >
-
+        <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
             {currentSchedule !== undefined && (
                 <Grid container direction="row" alignItems="flex-start" sx={{ px: 3, pt: 3 }} spacing={2}>
                     <CourseInfo selectedCourse={selectedCourse} />
@@ -492,7 +485,6 @@ export function CourseInfo({ selectedCourse }) {
                     />
                 </Grid>
             </Stack>
-
         </Grid>
     )
 }
@@ -1024,7 +1016,7 @@ export function EditClassDialog({ selectedClass, selectedClassIndex, open, onClo
 
                     </Grid>
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: "space-between"}}>
+                <DialogActions sx={{ justifyContent: "space-between" }}>
                     <Button variant="contained" color="error" onClick={handleDeleteClass}>
                         Delete
                     </Button>

@@ -49,7 +49,6 @@ function createData(id, requestDate, courseType, section, registeredCourses, req
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'courseType', label: 'Course Type', align: 'left' },
   { id: 'section ', label: 'Section', align: 'left', width: 200 },
   { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: 200 },
   { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
@@ -289,7 +288,6 @@ export default function RegistrationRequestStatusList() {
                       sx={{cursor: "pointer"}}          >
                       <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
                       <TableCell align="center">{row.registeredCourses}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
@@ -297,9 +295,7 @@ export default function RegistrationRequestStatusList() {
                       {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
-                              <IconButton color='primary'>
-                                <Iconify icon="ic:error" />
-                              </IconButton>
+                          <Iconify icon="ic:error" color="red" />
                           </TableCell>
                         </ThemeProvider>
                       ) :

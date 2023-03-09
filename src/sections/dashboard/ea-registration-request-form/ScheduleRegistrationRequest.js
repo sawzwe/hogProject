@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import _ from 'lodash';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
@@ -33,6 +34,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // utils
 import { fDate } from '../../../utils/formatTime'
@@ -42,10 +44,10 @@ import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import FormProvider, { RHFSelect } from '../../../components/hook-form';
 
 ScheduleRegistrationRequest.propTypes = {
-    request: PropTypes.object,
+    currentRequest: PropTypes.object,
 }
 
-export default function ScheduleRegistrationRequest({ request }) {
+export default function ScheduleRegistrationRequest({ currentRequest }) {
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -57,18 +59,24 @@ export default function ScheduleRegistrationRequest({ request }) {
 
     const [rejectedReasonMessage, setRejectedReasonMessage] = useState('');
 
-    if (!request) {
+    if (!currentRequest) {
         return null;
     }
 
     const {
-        regRequestId,
-        courseType,
-        students,
-        courses,
-        additionalComment,
-        status
-    } = request;
+        request,
+        information,
+        studentIds,
+    } = currentRequest;
+
+    const students = [
+        { id: 1, studentId: 230001, fName: "Piyaphon", lName: "Wu", nickname: "Hong" },
+        { id: 2, studentId: 230002, fName: "Siwaach", lName: "Topraset", nickname: "Pan" },
+        { id: 3, studentId: 230003, fName: "Saw Zwe Wai", lName: "Yan", nickname: "Saw" },
+        { id: 4, studentId: 230004, fName: "Thanatuch", lName: "Lertritsirikul", nickname: "Tar" },
+    ]
+
+    const courseType = 'Private';
 
     const handleCreateCourse = (createdCourse) => {
         setCreatedCourses([...createdCourses, createdCourse]);
@@ -86,15 +94,15 @@ export default function ScheduleRegistrationRequest({ request }) {
 
     const onSubmit = async () => {
         try {
-            const completedRequest = {
-                regRequestId,
-                courseType,
-                students,
-                courses: createdCourses,
-                additionalComment,
-                status: 'Pending Payment'
-            }
-            console.log(completedRequest);
+            // const completedRequest = {
+            //     regRequestId,
+            //     courseType,
+            //     students,
+            //     createdCourses,
+            //     additionalComment,
+            //     status: 'Pending Payment'
+            // }
+            console.log(createdCourses);
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
         }
@@ -105,15 +113,7 @@ export default function ScheduleRegistrationRequest({ request }) {
             if (rejectedReasonMessage === '') {
                 enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
             } else {
-                const rejectedRequest = {
-                    regRequestId,
-                    courseType,
-                    students,
-                    courses: [],
-                    additionalComment,
-                    rejectedReason: rejectedReasonMessage
-                }
-                console.log(rejectedRequest);
+                console.log(createdCourses);
             }
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
@@ -131,18 +131,15 @@ export default function ScheduleRegistrationRequest({ request }) {
 
     return (
         <Grid container spacing={3}>
-            <Grid item xs={12} md={5}>
-                <Typography variant="h5">{courseType} Request</Typography>
+            <Grid item xs={12} md={12}>
+                <StudentSection students={students} />
             </Grid>
             <Grid item xs={12} md={12}>
-                <StudentSection courseType={courseType} students={students} />
-            </Grid>
-            <Grid item xs={12} md={12}>
-                <CourseSection courseType={courseType} courses={courses} onCreate={handleCreateCourse} />
+                <CourseSection courseType={courseType} courses={information} onCreate={handleCreateCourse} />
             </Grid>
 
             <Grid item xs={12} md={12}>
-                <AdditionalCommentSection message={additionalComment} />
+                <AdditionalCommentSection message={request.epRemark1} />
             </Grid>
 
             <Grid item xs={12} md={12}>
@@ -150,13 +147,12 @@ export default function ScheduleRegistrationRequest({ request }) {
                     <Button variant="contained" color="error" sx={{ height: '3em' }} onClick={handleClickRejectOpen}>
                         Reject
                     </Button>
-                    <Button variant="contained" disabled={courses.length !== createdCourses.length} color="primary" sx={{ height: '3em' }} onClick={handleClickSubmitOpen}>
+                    <Button variant="contained" disabled={information.length !== createdCourses.length} color="primary" sx={{ height: '3em' }} onClick={handleClickSubmitOpen}>
                         Submit
                     </Button>
                 </Stack>
             </Grid>
 
-            {/* Submit Dialog */}
             <Dialog
                 open={submitDialogOpen}
                 onClose={handleSubmitClose}
@@ -181,7 +177,6 @@ export default function ScheduleRegistrationRequest({ request }) {
                 </DialogActions>
             </Dialog>
 
-            {/* Reject Dialog */}
             <Dialog
                 open={rejectDialogOpen}
                 onClose={handleRejectClose}
@@ -230,16 +225,18 @@ export function StudentSection({ courseType, students }) {
                 </Grid>
             </Grid>
 
-            {students.map((student, index) => (
-                <Stack key={index} flexDirection="row" alignItems="center" mt={2} >
-                    <TextField
-                        disabled
-                        variant="standard"
-                        sx={{ width: 320 }}
-                        value={`${student.fName} ${student.lName} (${student.nickname})`}
-                    />
-                </Stack>
-            ))}
+            <Grid container direction="row" spacing={1} sx={{ mt: 1 }}>
+                {students.map((student, index) => (
+                    <Grid item xs={12} md={4} key={student.studentId}>
+                        <TextField
+                            disabled
+                            variant="standard"
+                            sx={{ width: 320 }}
+                            value={`${student.fName} ${student.lName} (${student.nickname})`}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
 
         </Card>
     )
@@ -272,8 +269,8 @@ export function CourseSection({ courseType, courses, onCreate }) {
         setIsView(false);
     }
 
-    const handleCreate = (schedules, selectedTeacher) => {
-        const createdCourse = { ...selectedCourse, schedules, selectedTeacher };
+    const handleCreate = (schedules) => {
+        const createdCourse = { ...selectedCourse, schedules };
         setCompleteCourses([...completeCourses, createdCourse]);
         onCreate(createdCourse);
     };
@@ -298,54 +295,31 @@ export function CourseSection({ courseType, courses, onCreate }) {
                         <Typography variant="h6">{`New Course(s)`}</Typography>
                     </Grid>
                 </Grid>
-                {courses.map((course, index) => (
+                {courses.map((eachCourse, index) => (
                     <Paper key={index} elevation={2} sx={{ mt: 2, p: 3 }}>
-                        <Grid container
-                            direction="column"
-                            spacing={2}
-                            justifyContent="space-between"
-                            alignItems="flex-start">
-                            <Grid container item xs={12} md={12}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{course.course} {course.subject} {course.level} ({courseType.toUpperCase()})</Typography>
-                            </Grid>
-                        </Grid>
 
                         <Grid container direction="row" spacing={2} sx={{ mt: 1, mb: 2 }}>
-                            <Grid item xs={6} md={3}>
-                                <TextField fullWidth disabled label="Start Date" value={course.startDate} />
+                            <Grid item xs={6} md={4}>
+                                <TextField fullWidth disabled variant="standard" label="Course" value={`${eachCourse.course} ${eachCourse.subject} ${eachCourse.level}`} />
                             </Grid>
-                            <Grid item xs={6} md={3}>
-                                <TextField fullWidth disabled label="End Date" value={course.endDate} />
+                            <Grid item xs={6} md={4}>
+                                <TextField fullWidth disabled variant="standard" label="Start Date" value={fDate(eachCourse.fromDate, 'dd-MMM-yyyy')} />
                             </Grid>
-                            <Grid item xs={12} md={2}>
-                                <TextField fullWidth disabled label="Total Hours" value={course.totalHours} />
+                            <Grid item xs={6} md={4}>
+                                <TextField fullWidth disabled variant="standard" label="End Date" value={fDate(eachCourse.toDate, 'dd-MMM-yyyy')} />
                             </Grid>
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth disabled label="Learning Method" value={course.method} />
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth disabled label="Hours/Class" value={course.hoursPerClass} />
-                            </Grid>
-                        </Grid>
-                        <Typography variant="inherit" sx={{ color: 'text.disabled', mt: 2, mb: 2, ml: 0.5 }}>Available Days</Typography>
-                        <Grid container direction="row" spacing={2}>
-                            {course.availableDays.map((eachDay, index) => (
-                                <Grid item xs={6} md={2.4} key={index}>
-                                    <TextField fullWidth label={eachDay.day} value={`${eachDay.from} - ${eachDay.to}`} disabled />
-                                </Grid>
-                            ))}
                         </Grid>
 
                         <Grid container direction="row" sx={{ mt: 2 }} justifyContent="flex-end">
-                            {checkAlreadyCreated(completeCourses, course) ? (
+                            {checkAlreadyCreated(completeCourses, eachCourse) ? (
                                 <Button variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => {
-                                    handleOpenDialog(course)
+                                    handleOpenDialog(eachCourse)
                                     setIsView(true)
                                 }}>
                                     <InfoIcon sx={{ mr: 0.5 }} /> Successfully created
                                 </Button>
                             ) : (
-                                <Button variant="contained" disabled={checkAlreadyCreated(completeCourses, course)} color="primary" sx={{ height: '3em' }} onClick={() => handleOpenDialog(course)}>
+                                <Button variant="contained" disabled={checkAlreadyCreated(completeCourses, eachCourse)} color="primary" sx={{ height: '3em' }} onClick={() => handleOpenDialog(eachCourse)}>
                                     Create Class
                                 </Button>
                             )}
@@ -362,6 +336,7 @@ export function CourseSection({ courseType, courses, onCreate }) {
                         open={open}
                         close={handleCloseDialog}
                         courseType={courseType}
+                        hourPerClass={selectedCourse.hourPerClass}
                         selectedCourse={selectedCourse}
                         onCreate={handleCreate}
                         isView={isView}
@@ -380,94 +355,26 @@ CreateScheduleDialog.propTypes = {
     open: PropTypes.bool,
     close: PropTypes.func,
     selectedCourse: PropTypes.object,
+    hourPerClass: PropTypes.number,
     onCreate: PropTypes.func,
     isView: PropTypes.bool,
     completeCourses: PropTypes.array,
 }
 
-export function CreateScheduleDialog({ open, close, courseType, selectedCourse, onCreate, isView, completeCourses }) {
-
-    const TEACHER_OPTIONS = [
-        { id: 1, fName: 'John', lName: 'Smith', nickname: 'Tar' },
-        { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' },
-        { id: 3, fName: 'Jane', lName: 'Smoke', nickname: 'Kwan' }
-    ]
-
+export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, isView, completeCourses }) {
     const { enqueueSnackbar } = useSnackbar();
-
-    const methods = useForm({
-        defaultValues: { selectedTeacher: 1 },
-    });
-
-    const {
-        watch,
-        setValue,
-    } = methods;
-
-    const values = watch();
-    const { selectedTeacher } = values;
-
-    // Tables ---------------------------------------------------------------------------------
-    const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-            backgroundColor: theme.palette.divider,
-            color: theme.palette.common.black,
-            fontSize: '0.7rem',
-            border: `1px solid ${theme.palette.divider}`,
-        },
-        [`&.${tableCellClasses.body}`]: {
-            fontSize: '0.7rem',
-            padding: 5,
-            border: `1px solid ${theme.palette.divider}`,
-
-        },
-    }));
-
-    const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        // hide last border
-        '&:last-child td, &:last-child th': {
-            backgroundColor: theme.palette.divider,
-            padding: 16,
-            fontWeight: 600,
-            border: `1px solid ${theme.palette.divider}`,
-        },
-    }));
-
-    function createData(date, time, hoursPerClass, teacher, method, room) {
-        return { date, time, hoursPerClass, teacher, method, room };
-    }
-
-    const rows = [
-        createData(new Date('1-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('3-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: 'OT' }, 'Onsite', '-'),
-        createData(new Date('8-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('10-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('15-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('17-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('19-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: 'SP' }, 'Onsite', '-'),
-        createData(new Date('21-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('22-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-        createData(new Date('24-Nov-2022'), '10:00-12:00', '2', { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen', workTimeType: '' }, 'Onsite', '-'),
-    ];
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     // Generate Schedules -------------------------------------------------------------------
     const [schedules, setSchedules] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
-    const [isGenerated, setIsGenerated] = useState(false)
 
     // Fetch generated schedules
     const getGeneratedSchedules = async () => {
         try {
-            setIsLoading(true); // Set loading before sending API request
             await axios.get('https://api.sampleapis.com/wines/reds')
                 .then((res) => console.log(res.data)) // Response received
-            setSchedules(rows)
-            setIsGenerated(true)
-            setIsLoading(false); // Stop loading
         } catch (error) {
-            setIsLoading(false); // Stop loading in case of error
             console.error(error);
         }
     };
@@ -487,7 +394,6 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         if (!!Object.keys(selectedCourse).length && checkAlreadyCreated(completeCourses, selectedCourse)) {
             const targetCourse = completeCourses.find((eachCourse) => (eachCourse.course === selectedCourse.course && eachCourse.subject === selectedCourse.subject && eachCourse.level === selectedCourse.level));
             setSchedules(targetCourse.schedules);
-            setValue('selectedTeacher', targetCourse.selectedTeacher);
         }
     }, [selectedCourse])
 
@@ -505,11 +411,17 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         setOpenEditClass(false);
     }
 
-    const handleEditClass = (schedule) => {
+    const handleEditClass = (newClass) => {
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
-        const updatedSchedules = [...filteredSchedules, schedule]
+        const updatedSchedules = [...filteredSchedules, newClass]
         //  shallow copy the array
-        setSchedules(updatedSchedules.sort((schedule1, schedule2) => schedule1.date - schedule2.date));
+        setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+    }
+
+    const handleDeleteClass = (deletedClass) => {
+        const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== deletedClass)
+        //  shallow copy the array
+        setSchedules(filteredSchedules.sort((class1, class2) => class1.date - class2.date));
     }
 
     let displayAccumulatedHours = 0;
@@ -517,34 +429,64 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     function accumulatedHours() {
         let HoursCount = 0;
         schedules.forEach((eachSchedule) => {
-            HoursCount += parseInt(eachSchedule.hoursPerClass, 10)
+            HoursCount += parseInt(eachSchedule.hourPerClass, 10)
         })
         return HoursCount;
     }
 
+    const [openAddClassDialog, setOpenAddClassDialog] = useState(false);
+
+    const handleAddClass = (newClass) => {
+        const updatedSchedules = [...schedules, newClass]
+        setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+    }
 
     const handleCreate = () => {
-        if (parseInt(selectedCourse.totalHours, 10) !== accumulatedHours()) {
+        if (parseInt(selectedCourse.totalHour, 10) !== accumulatedHours()) {
             enqueueSnackbar('Total hours are not match!', { variant: 'error' })
         } else {
-            onCreate(schedules, selectedTeacher);
+            onCreate(schedules);
             setSchedules([]);
-            setIsGenerated(false);
             close();
         }
     }
 
+    const customTextFieldStyle = {
+        fontSize: '0.9rem'
+    }
+
+    console.log(schedules)
+
+    // Tables ---------------------------------------------------------------------------------
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+            backgroundColor: theme.palette.divider,
+            color: theme.palette.common.black,
+            fontSize: '0.7rem',
+            border: `1px solid ${theme.palette.divider}`,
+        },
+        [`&.${tableCellClasses.body}`]: {
+            fontSize: '0.7rem',
+            padding: (!isView ? 5 : 16),
+            border: `1px solid ${theme.palette.divider}`,
+
+        },
+    }));
+
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:last-child td, &:last-child th': {
+            backgroundColor: theme.palette.divider,
+            padding: 16,
+            fontWeight: 600,
+            border: `1px solid ${theme.palette.divider}`,
+        },
+    }));
+
     return (
-        <Dialog fullWidth maxWidth="xl" open={open} onClose={close}
-            PaperProps={{
-                sx: {
-                    '&::-webkit-scrollbar': { display: 'none' }
-                }
-            }}
-        >
+        <Dialog fullWidth maxWidth="xl" open={open} onClose={close}>
 
             <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
-                <Grid container item xs={12} md={12} justifyContent="space-between">
+                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
                     <Typography variant="h6"> Create Class </Typography>
                     <IconButton variant="h6" onClick={close}> <CloseIcon /> </IconButton>
                 </Grid>
@@ -563,19 +505,24 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={courseType.toUpperCase()}
-                                    label="Course Type"
+                                    value={selectedCourse.course.concat(' ', selectedCourse.subject, ' ', selectedCourse.level)}
+                                    label="Course"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
-
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={selectedCourse.course.concat(' ', selectedCourse.subject, ' ', selectedCourse.level)}
-                                    label="Course"
+                                    value={courseType.toUpperCase()}
+                                    label="Course Type"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
                         </Grid>
@@ -590,24 +537,33 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                     value={selectedCourse.method}
                                     label="Learning Method"
                                     disabled
+                                    inputProps={{
+                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={selectedCourse.totalHours}
+                                    value={selectedCourse.totalHour}
                                     label="Total Hours"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={selectedCourse.hoursPerClass}
+                                    value={selectedCourse.hourPerClass}
                                     label="Hours/Class"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
                         </Grid>
@@ -619,107 +575,68 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={selectedCourse.startDate}
+                                    value={fDate(selectedCourse.fromDate, 'dd-MMM-yyyy')}
                                     label="Start Date"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value={selectedCourse.endDate}
+                                    value={fDate(selectedCourse.toDate, 'dd-MMM-yyyy')}
                                     label="End Date"
                                     disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
                                 />
                             </Grid>
                         </Grid>
                     </Stack>
 
                     <Grid item xs={12} md={12} sx={{ mb: 1 }}>
-                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>Available Days</Typography>
+                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
+                            Preferred Days
+                        </Typography>
                     </Grid>
 
                     <Stack direction="row" sx={{ pb: 3 }}>
                         <Grid container direction="row" spacing={2}>
-                            {selectedCourse.availableDays.map((eachDay, index) => (
+                            {selectedCourse.preferredDays.map((eachDay, index) => (
                                 <Grid item xs={6} md={3} key={index}>
                                     <TextField
                                         fullWidth
                                         label={eachDay.day}
-                                        value={`${eachDay.from} - ${eachDay.to}`}
+                                        value={`${eachDay.fromTime} - ${eachDay.toTime}`}
                                         InputProps={{
-                                            style: {
-                                                fontSize: '1vw'
-                                            }
+                                            style: { fontSize: '0.8rem' }
                                         }}
                                         disabled />
                                 </Grid>
                             ))}
                         </Grid>
                     </Stack>
-
-                    <Stack direction="row" sx={{ pb: 2 }}>
-                        <Grid container direction="row" spacing={2}>
-                            {isView ? (
-                                <Grid item xs={12} md={12} sx={{ mb: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        value={`${TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === selectedTeacher).nickname} (${TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === selectedTeacher).fName} ${TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === selectedTeacher).lName})`}
-                                        label="Primary Teacher"
-                                        SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                                        disabled
-                                        required />
-                                </Grid>
-                            ) : (
-                                <>
-                                    <Grid item xs={12} md={8}>
-                                        <FormProvider methods={methods}>
-                                            <RHFSelect
-                                                fullWidth
-                                                name="selectedTeacher"
-                                                label="Primary Teacher"
-                                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                                                disabled={isView}
-                                                required>
-                                                {TEACHER_OPTIONS.map((eachTeacher, index) => (
-                                                    <MenuItem
-                                                        key={index}
-                                                        value={eachTeacher.id}
-                                                        sx={{
-                                                            mx: 1,
-                                                            my: 0.5,
-                                                            borderRadius: 0.75,
-                                                            typography: 'body2',
-                                                            textTransform: 'capitalize',
-                                                            '&:first-of-type': { mt: 0 },
-                                                            '&:last-of-type': { mb: 0 },
-                                                        }}
-                                                    >
-                                                        {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fName} ${eachTeacher.lName})`}
-                                                    </MenuItem>
-                                                ))}
-                                            </RHFSelect>
-                                        </FormProvider>
-                                    </Grid>
-
-                                    <Grid item xs={12} md={4}>
-                                        <LoadingButton fullWidth variant="contained" size="large" loading={isLoading} sx={{ height: '56px' }} color="primary" onClick={handleGenerate}>
-                                            <Typography variant="button">Generate Schedules</Typography>
-                                        </LoadingButton>
-                                    </Grid>
-                                </>
-                            )}
-                        </Grid>
-                    </Stack>
                 </Grid>
 
                 <Grid item xs={12} md={7}>
-                    <Scrollbar sx={(selectedCourse.availableDays.length > 4 ? { maxHeight: 80 * 6.27, pr: 1.5 } : { maxHeight: 80 * 5.35, pr: 1.5 })}>
-                        <Typography variant="h6" sx={{ mb: 2 }}> Classes & Schedules </Typography>
+                    <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: (!isView ? 1 : 2) }}>
+                            <Typography variant="h6">
+                                Classes & Schedules
+                            </Typography>
+                            {!isView && (
+                                <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
+                                    <AddIcon sx={{ mr: 0.5 }} /> Add Class
+                                </Button>
+                            )}
+                        </Stack>
                         {!!schedules.length && (
                             <TableContainer component={Paper} >
-                                <Table sx={{ minWidth: 800 }}>
+                                <Table sx={{ width: '100%' }}>
                                     <TableHead>
                                         <TableRow>
                                             <StyledTableCell align="center">No.</StyledTableCell>
@@ -729,53 +646,67 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                             <StyledTableCell align="center">Method</StyledTableCell>
                                             <StyledTableCell align="center">Teacher</StyledTableCell>
                                             <StyledTableCell align="center">Hours</StyledTableCell>
-                                            <StyledTableCell align="center" />
+                                            {!isView && <StyledTableCell align="center" />}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {schedules.map((row, index) => {
-                                            displayAccumulatedHours += parseInt(row.hoursPerClass, 10);
+                                        {schedules.map((eachClass, index) => {
+                                            displayAccumulatedHours += parseInt(eachClass.hourPerClass, 10);
                                             return (
                                                 <StyledTableRow key={index}>
                                                     <StyledTableCell component="th" scope="row" align="center">
                                                         {(index + 1).toString()}
                                                     </StyledTableCell>
-                                                    <StyledTableCell align="center"> {weekdays[row.date.getDay()].slice(0, 3)} </StyledTableCell>
-                                                    <StyledTableCell align="center">{fDate(row.date)}</StyledTableCell>
-                                                    <StyledTableCell align="center">{row.time}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '8%' }} align="center">{row.hoursPerClass}</StyledTableCell>
-                                                    <StyledTableCell align="center">{row.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${row.teacher.nickname.toUpperCase()}`} {!!row.teacher.workTimeType && `(${row.teacher.workTimeType})`}</StyledTableCell>
+                                                    <StyledTableCell align="center"> {eachClass.day.slice(0, 3)} </StyledTableCell>
+                                                    <StyledTableCell align="center">{fDate(eachClass.date)}</StyledTableCell>
+                                                    <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
+                                                    <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.toUpperCase()}`}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                                    <StyledTableCell align="center" > {!isView && (
-                                                        <IconButton onClick={() => handleOpenEditDialog(row)}>
+                                                    {!isView && (<StyledTableCell align="center" > {
+                                                        <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
-                                                    )} </StyledTableCell>
+                                                    }
+                                                    </StyledTableCell>
+                                                    )}
                                                 </StyledTableRow>
                                             )
                                         })}
                                         <StyledTableRow>
                                             <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
                                             <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
-                                            <StyledTableCell />
+                                            {!isView && <StyledTableCell />}
                                         </StyledTableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         )}
                     </Scrollbar>
-                    <EditClassDialog
-                        open={openEditClass}
-                        close={handleCloseEditDialog}
-                        schedule={selectedSchedule}
-                        onEdit={handleEditClass}
-                    />
                 </Grid>
             </Grid>
+            {Object.keys(selectedSchedule).length > 0 &&
+                <EditClassDialog
+                    open={openEditClass}
+                    close={handleCloseEditDialog}
+                    schedule={selectedSchedule}
+                    onEdit={handleEditClass}
+                    onDelete={handleDeleteClass}
+                    hourPerClass={selectedCourse.hourPerClass}
+                />
+            }
+
+            <AddClassDialog
+                open={openAddClassDialog}
+                onClose={() => setOpenAddClassDialog(false)}
+                onAdd={handleAddClass}
+                hourPerClass={selectedCourse.hourPerClass}
+            />
+
             {!isView && (
                 <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
-                    <Button variant="contained" size="large" disabled={!isGenerated} onClick={handleCreate}>
+                    <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
                         Create
                     </Button>
                 </Grid>
@@ -790,43 +721,47 @@ EditClassDialog.propTypes = {
     open: PropTypes.bool,
     close: PropTypes.func,
     schedule: PropTypes.object,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func,
+    hourPerClass: PropTypes.number
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [
-        { id: 1, fName: 'John', lName: 'Smith', nickname: 'Tar' },
-        { id: 2, fName: 'John', lName: 'Smite', nickname: 'Keen' },
-        { id: 3, fName: 'Jane', lName: 'Smoke', nickname: 'Kwan' }
-    ]
+        { fullName: 'John Smith', nickname: 'Tar' },
+        { fullName: 'John Smite', nickname: 'Keen' },
+        { fullName: 'Jane Smoke', nickname: 'Kwan' }
+    ];
 
     // fetch available time of specific teacher
-    const TEACHER_AVAILABLE_TIME_OPTIONS = [
+    const TIME_OPTIONS = [
         '10:00-12:00', '13:00-15:00', '16:00-18:00'
-    ]
+    ];
 
     // don't fetch
     const LEARNING_METHOD_OPTIONS = [
         'Onsite', 'Online'
-    ]
+    ];
 
     const {
         date,
-        time,
-        hoursPerClass,
+        fromTime,
+        toTime,
         teacher,
         method,
-    } = schedule
+    } = schedule;
+
+    const defaultValues = {
+        scheduleDate: date,
+        scheduleTime: fromTime.concat('-', toTime),
+        scheduleTeacher: _.capitalize(teacher),
+        scheduleMethod: method
+    };
 
     const methods = useForm({
-        defaultValues: {
-            scheduleDate: date,
-            scheduleTeacher: 1,
-            teacherAvailableTime: '',
-            scheduleMethod: 'Onsite'
-        }
+        defaultValues
     });
 
     const {
@@ -837,13 +772,14 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
     } = methods;
 
     const values = watch();
-    const { scheduleDate, scheduleTeacher, teacherAvailableTime, scheduleMethod } = values;
+    const { scheduleDate, scheduleTeacher, scheduleFromTime, scheduleToTime, scheduleMethod } = values;
 
     useEffect(() => {
         if (Object.keys(schedule).length) {
             setValue('scheduleDate', date);
             setValue('scheduleTeacher', teacher.id);
-            setValue('teacherAvailableTime', time);
+            setValue('scheduleFromTime', fromTime);
+            setValue('scheduleToTime', fromTime);
             setValue('scheduleMethod', method);
         }
     }, [schedule])
@@ -851,8 +787,21 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     const handleSaveChange = () => {
-        const newSchedule = { day: weekday[new Date(scheduleDate).getDay()].slice(0, 3), date: scheduleDate, hoursPerClass, teacher: TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === scheduleTeacher), time: teacherAvailableTime, method: scheduleMethod, room: '-' };
+        const newSchedule = {
+            day: weekday[new Date(scheduleDate).getDay()].slice(0, 3),
+            date: scheduleDate,
+            hourPerClass,
+            teacher: TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === scheduleTeacher),
+            fromTime: scheduleFromTime.slice(0, 5),
+            toTime: scheduleToTime.slice(6, 11),
+            method: scheduleMethod
+        };
         onEdit(newSchedule);
+        handleClose();
+    }
+
+    const handleDelete = () => {
+        onDelete(schedule);
         handleClose();
     }
 
@@ -861,9 +810,7 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
         setTimeout(() => {
             reset();
         }, 200);
-
     }
-
 
     return (
         <Dialog fullWidth maxWidth="lg" open={open} onClose={close}>
@@ -899,11 +846,11 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
                     <Grid item xs={12} md={3}>
                         <RHFSelect
                             fullWidth
-                            name="teacherAvailableTime"
-                            label="Available Time"
+                            name="scheduleTime"
+                            label="Time"
                             SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                             required>
-                            {TEACHER_AVAILABLE_TIME_OPTIONS.map((eachTime, index) => (
+                            {TIME_OPTIONS.map((eachTime, index) => (
                                 <MenuItem
                                     key={index}
                                     value={eachTime}
@@ -933,7 +880,7 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
                             {TEACHER_OPTIONS.map((eachTeacher, index) => (
                                 <MenuItem
                                     key={index}
-                                    value={eachTeacher.id}
+                                    value={eachTeacher.nickname}
                                     sx={{
                                         mx: 1,
                                         my: 0.5,
@@ -944,7 +891,7 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
                                         '&:last-of-type': { mb: 0 },
                                     }}
                                 >
-                                    {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fName} ${eachTeacher.lName})`}
+                                    {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
                                 </MenuItem>
                             ))}
                         </RHFSelect>
@@ -978,18 +925,216 @@ export function EditClassDialog({ open, close, schedule, onEdit }) {
                     </Grid>
                 </Grid>
 
-                <Grid container justifyContent="flex-end" sx={{ px: 3, pb: 3 }} spacing={1.5}>
-                    <Grid item>
-                        <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>
-                            Close
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button variant="contained" size="medium" onClick={handleSaveChange}>
-                            Save Change
-                        </Button>
-                    </Grid>
+                <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, pb: 3 }} spacing={1.5}>
+                    <Stack direction="row" sx={{ ml: 1.5 }}>
+                        <Grid item>
+                            <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </Grid>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                        <Grid item>
+                            <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>
+                                Close
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="contained" size="medium" onClick={handleSaveChange}>
+                                Save Change
+                            </Button>
+                        </Grid>
+                    </Stack>
                 </Grid>
+            </FormProvider>
+        </Dialog>
+    )
+}
+
+// ----------------------------------------------------------------
+
+AddClassDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onAdd: PropTypes.func,
+    hourPerClass: PropTypes.number,
+}
+
+export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
+
+    // fetch all teachers
+    const TEACHER_OPTIONS = [
+        { fullName: 'John Smith', nickname: 'Tar' },
+        { fullName: 'John Smite', nickname: 'Keen' },
+        { fullName: 'Jane Smoke', nickname: 'Kwan' }
+    ];
+
+    // fetch available time of specific teacher
+    const TIME_OPTIONS = [
+        '10:00-12:00', '13:00-15:00', '16:00-18:00'
+    ];
+
+    // don't fetch
+    const METHOD_OPTIONS = [
+        'Onsite', 'Online'
+    ];
+
+    const defaultValues = {
+        classDate: '',
+        classTime: '',
+        classTeacher: '',
+        classMethod: 'Onsite'
+    };
+
+    const methods = useForm({
+        defaultValues
+    });
+
+    const {
+        control,
+        reset,
+        handleSubmit
+    } = methods;
+
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const onSubmit = (data) => {
+        const newClass = {
+            day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
+            date: fDate(data.classDate),
+            hourPerClass,
+            fromTime: data.classTime.slice(0, 5),
+            toTime: data.classTime.slice(6, 11),
+            method: data.classMethod,
+            teacher: data.classTeacher.toUpperCase()
+        };
+
+        onAdd(newClass);
+        onClose();
+        setTimeout(() => {
+            reset(defaultValues);
+        }, 200)
+    }
+
+    return (
+        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+                <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
+                <DialogContent>
+                    <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
+
+                        <Grid item xs={12} md={3}>
+                            <Controller
+                                name="classDate"
+                                control={control}
+                                render={({ field, fieldState: { error } }) => (
+                                    <DatePicker
+                                        label="Date"
+                                        value={field.value}
+                                        onChange={(newValue) => {
+                                            field.onChange(newValue);
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField {...params} fullWidth error={!!error} helperText={error?.message} required />
+                                        )}
+                                        disableMaskedInput
+                                        inputFormat="dd-MMM-yyyy"
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classTime"
+                                label="Time"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {TIME_OPTIONS.map((eachTime, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachTime}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachTime}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classTeacher"
+                                label="Teacher"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {TEACHER_OPTIONS.map((eachTeacher, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachTeacher.nickname}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                            <RHFSelect
+                                fullWidth
+                                name="classMethod"
+                                label="Learning Method"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                required>
+                                {METHOD_OPTIONS.map((eachMethod, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachMethod}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachMethod}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="inherit" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="contained" color="primary">
+                        Add
+                    </Button>
+                </DialogActions>
             </FormProvider>
         </Dialog>
     )

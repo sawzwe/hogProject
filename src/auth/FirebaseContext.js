@@ -30,6 +30,7 @@ const initialState = {
     isInitialized: false,
     isAuthenticated: false,
     user: null,
+    userAccessToken: null
 };
 
 const reducer = (state, action) => {
@@ -38,6 +39,7 @@ const reducer = (state, action) => {
             isInitialized: true,
             isAuthenticated: action.payload.isAuthenticated,
             user: action.payload.user,
+            userAccessToken: action.payload.user.accessToken
         };
     }
 
@@ -128,6 +130,7 @@ export function AuthProvider({ children }) {
                                         ...profile,
                                         // role: 'admin',
                                     },
+                                    userAccessToken: user.accessToken
                                 },
                             });
                         } else {
@@ -148,6 +151,7 @@ export function AuthProvider({ children }) {
                                                 ...profile,
                                                 // role: 'admin',
                                             },
+                                            userAccessToken: user.accessToken
                                         },
                                     });
                                 } else {
@@ -156,6 +160,7 @@ export function AuthProvider({ children }) {
                                         payload: {
                                             isAuthenticated: false,
                                             user: null,
+                                            userAccessToken: user.accessToken
                                         },
                                     });
                                 }

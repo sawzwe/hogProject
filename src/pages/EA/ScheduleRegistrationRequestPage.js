@@ -1,12 +1,19 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Container, Typography } from '@mui/material';
 import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import LoadingScreen from '../../components/loading-screen';
+// sections
+import Page404 from '../Page404';
 import ScheduleRegistrationRequest from '../../sections/dashboard/ea-registration-request-form/ScheduleRegistrationRequest'
+//
+import { HOG_API } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -86,13 +93,36 @@ const MOCKUP_PRIVATE_REQUEST = {
 
 export default function StaffRequestPage() {
     const { themeStretch } = useSettingsContext();
+    const navigate = useNavigate();
+    const { id } = useParams();
 
-        // Request ID
-        const { id } = useParams();
+    const [currentRequest, setCurrentRequest] = useState();
+    const dataFetchedRef = useRef(false);
 
-        // const currentRequest = _regRequests.find((request) => request.id === requestId);
-        // const currentRequest = MOCKUP_GROUP_REQUEST;
-        const currentRequest = MOCKUP_PRIVATE_REQUEST;
+    const fetchRequest = () => {
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get/${id}`)
+        .then((res) => setCurrentRequest(res.data.data))
+        .catch((error) => {
+            if (error.response.status === 404) {
+                navigate('/404')
+            }
+        })
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchRequest();
+    }, [])
+
+    if (currentRequest === undefined) {
+        return <LoadingScreen />;
+    }
+
+    // const currentRequest = _regRequests.find((request) => request.id === requestId);
+    // const currentRequest = MOCKUP_GROUP_REQUEST;
+    // const currentRequest = MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>
@@ -102,16 +132,16 @@ export default function StaffRequestPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
-                    heading="Course Registration Request"
+                    heading="Request Information"
                     links={[
                         {
-                            name: 'Course Registration',
+                            name: 'All requests',
                             href: PATH_REGISTRATION.eaRequestStatus,
                         },
                         { name: 'Request detail' },
                     ]}
                 />
-                <ScheduleRegistrationRequest request={currentRequest} />
+                <ScheduleRegistrationRequest currentRequest={currentRequest} />
             </Container>
         </>
     );
