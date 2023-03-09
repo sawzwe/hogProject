@@ -53,17 +53,16 @@ export default function SearchTeacherPage() {
     return (
         <>
             <Helmet>
-                <title>Teacher List Table</title>
+                <title>All Teachers</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="All Teachers List"
+                    heading="All Teachers"
                     links={[
                         {
-                            name: 'Teacher management',
+                            name: 'All Teachers',
                             href: PATH_ACCOUNT.teacherManagement.searchTeacher,
                         },
-                        { name: 'Search teacher' },
                     ]}
                 />
                 <Stack spacing={3}>
