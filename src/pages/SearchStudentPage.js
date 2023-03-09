@@ -19,7 +19,8 @@ import { HOG_API } from '../config';
 // ----------------------------------------------------------------------
 
 export default function SearchStudentPage() {
-    const { userAccessToken } = useAuthContext()
+    const { userAccessToken, user } = useAuthContext()
+    // console.log(userAccessToken, user.role)
     const { themeStretch } = useSettingsContext();
     // console.log(HOG_API)
 
@@ -29,7 +30,13 @@ export default function SearchStudentPage() {
     const fetchData = async () => {
         return axios.get(
             `${HOG_API}/api/Student/Get`,
-            { headers: { Authorization: `Bearer ${userAccessToken}` } }
+            {
+                headers:
+                {
+                    Authorization: `Bearer ${userAccessToken}`,
+                    Role: `${user.role}`
+                }
+            }
         )
             .then(response => {
                 // console.log(response.data.data)
