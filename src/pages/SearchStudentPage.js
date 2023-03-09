@@ -1,12 +1,14 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect,useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Card, Container, Stack } from '@mui/material';
 // components
-import axios from 'axios';
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import LoadingScreen from '../components/loading-screen/LoadingScreen';
+// auth
+import { useAuthContext } from '../auth/useAuthContext';
 // routes
 import { PATH_ACCOUNT } from '../routes/paths';
 // Table
@@ -14,12 +16,10 @@ import { StudentList } from '../sections/dashboard/all-students-list';
 // API
 import { HOG_API } from '../config';
 
-
-
-
 // ----------------------------------------------------------------------
 
 export default function SearchStudentPage() {
+    const { userAccessToken } = useAuthContext()
     const { themeStretch } = useSettingsContext();
     // console.log(HOG_API)
 
@@ -27,7 +27,10 @@ export default function SearchStudentPage() {
     const [studentTableData, setStudentTableData] = useState();
 
     const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/Student/Get`)
+        return axios.get(
+            `${HOG_API}/api/Student/Get`,
+            { headers: { Authorization: `Bearer ${userAccessToken}` } }
+        )
             .then(response => {
                 // console.log(response.data.data)
                 setStudentTableData(response.data.data);
