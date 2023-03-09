@@ -42,6 +42,7 @@ import { fDate } from '../../../utils/formatTime'
 import { useSnackbar } from '../../../components/snackbar';
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import FormProvider, { RHFSelect } from '../../../components/hook-form';
+import { HOG_API } from '../../../config';
 
 ScheduleRegistrationRequest.propTypes = {
     currentRequest: PropTypes.object,
@@ -66,15 +67,8 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
     const {
         request,
         information,
-        studentIds,
+        students,
     } = currentRequest;
-
-    const students = [
-        { id: 1, studentId: 230001, fName: "Piyaphon", lName: "Wu", nickname: "Hong" },
-        { id: 2, studentId: 230002, fName: "Siwaach", lName: "Topraset", nickname: "Pan" },
-        { id: 3, studentId: 230003, fName: "Saw Zwe Wai", lName: "Yan", nickname: "Saw" },
-        { id: 4, studentId: 230004, fName: "Thanatuch", lName: "Lertritsirikul", nickname: "Tar" },
-    ]
 
     const courseType = 'Private';
 
@@ -92,22 +86,68 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
         setSubmitDialogOpen(false);
     };
 
+    const addCourseToDatabase = () => {
+        createdCourses.forEach((eachCourse) => {
+            const formattedSchedule = {
+                reqId: request.id,
+                course: eachCourse.course,
+                subject: eachCourse.subject,
+                level: eachCourse.level,
+                method: eachCourse.method,
+                totalHour: eachCourse.totalHour,
+                hourPerClass: eachCourse.hourPerClass,
+                fromDate: fDate(new Date(eachCourse.fromDate), 'dd-MMMM-yyyy'),
+                toDate: fDate(new Date(eachCourse.toDate), 'dd-MMMM-yyyy'),
+                privateClasses: eachCourse.schedules.map((eachClass) => (
+                    {
+                        room: '',
+                        method: eachClass.method,
+                        date: eachClass.date,
+                        fromTime: eachClass.fromTime,
+                        toTime: eachClass.toTime,
+                        studentPrivateClasses: students.map((eachStudent) => (
+                            {
+                                studentId: eachStudent.id,
+                                attendance: 'None'
+                            }
+                        )),
+                        teacherPrivateClass: {
+                            teacherId: 1,
+                            status: 'Incomplete'
+                        }
+                    }
+                ))
+            }
+
+            return axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Schedule/Post`, formattedSchedule)
+        })
+    }
+
     const onSubmit = async () => {
         try {
-            // const completedRequest = {
-            //     regRequestId,
-            //     courseType,
-            //     students,
-            //     createdCourses,
-            //     additionalComment,
-            //     status: 'Pending Payment'
-            // }
-            console.log(createdCourses);
+            await addCourseToDatabase();
+            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Request/Put`, {
+                request: {
+                    id: request.id,
+                    status: "PendingEP",
+                    eaStatus: "Complete",
+                    paymentStatus: "Pending",
+                    epRemark1: request.epRemark1,
+                    epRemark2: request.epRemark2,
+                    eaRemark: request.eaRemark,
+                    oaRemark: request.oaRemark,
+                    takenByEPId: request.takenByEPId,
+                    takenByEAId: 1,
+                    takenByOAId: 0
+                }
+            })
+                .then((res) => enqueueSnackbar('Schedules are submitted successfully', { variant: 'success' }))
+                .catch((error) => console.error(error))
+
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
         }
     };
-
     const onReject = async () => {
         try {
             if (rejectedReasonMessage === '') {
@@ -227,12 +267,12 @@ export function StudentSection({ courseType, students }) {
 
             <Grid container direction="row" spacing={1} sx={{ mt: 1 }}>
                 {students.map((student, index) => (
-                    <Grid item xs={12} md={4} key={student.studentId}>
+                    <Grid item xs={12} md={4} key={student.id}>
                         <TextField
                             disabled
                             variant="standard"
                             sx={{ width: 320 }}
-                            value={`${student.fName} ${student.lName} (${student.nickname})`}
+                            value={`${student.fullName} (${student.nickname})`}
                         />
                     </Grid>
                 ))}
@@ -256,7 +296,6 @@ export function CourseSection({ courseType, courses, onCreate }) {
     const [open, setOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({});
     const [completeCourses, setCompleteCourses] = useState([]);
-    const [isView, setIsView] = useState(false)
 
     const handleOpenDialog = (course) => {
         setSelectedCourse(course);
@@ -266,7 +305,6 @@ export function CourseSection({ courseType, courses, onCreate }) {
     const handleCloseDialog = () => {
         setSelectedCourse({})
         setOpen(false);
-        setIsView(false);
     }
 
     const handleCreate = (schedules) => {
@@ -277,13 +315,6 @@ export function CourseSection({ courseType, courses, onCreate }) {
 
     const checkAlreadyCreated = (completeCourses, course) =>
         completeCourses.some((eachCourse) => (eachCourse.course === course.course && eachCourse.subject === course.subject && eachCourse.level === course.level));
-
-
-    useEffect(() => {
-        if (!open) {
-            setIsView(false);
-        }
-    }, [open]);
 
     return (
         <>
@@ -314,9 +345,8 @@ export function CourseSection({ courseType, courses, onCreate }) {
                             {checkAlreadyCreated(completeCourses, eachCourse) ? (
                                 <Button variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => {
                                     handleOpenDialog(eachCourse)
-                                    setIsView(true)
                                 }}>
-                                    <InfoIcon sx={{ mr: 0.5 }} /> Successfully created
+                                    <EditIcon sx={{ mr: 0.5 }} /> Edit schedule
                                 </Button>
                             ) : (
                                 <Button variant="contained" disabled={checkAlreadyCreated(completeCourses, eachCourse)} color="primary" sx={{ height: '3em' }} onClick={() => handleOpenDialog(eachCourse)}>
@@ -339,7 +369,6 @@ export function CourseSection({ courseType, courses, onCreate }) {
                         hourPerClass={selectedCourse.hourPerClass}
                         selectedCourse={selectedCourse}
                         onCreate={handleCreate}
-                        isView={isView}
                         completeCourses={completeCourses}
                     />
                 )
@@ -357,11 +386,10 @@ CreateScheduleDialog.propTypes = {
     selectedCourse: PropTypes.object,
     hourPerClass: PropTypes.number,
     onCreate: PropTypes.func,
-    isView: PropTypes.bool,
     completeCourses: PropTypes.array,
 }
 
-export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, isView, completeCourses }) {
+export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, completeCourses }) {
     const { enqueueSnackbar } = useSnackbar();
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -467,7 +495,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         },
         [`&.${tableCellClasses.body}`]: {
             fontSize: '0.7rem',
-            padding: (!isView ? 5 : 16),
+            padding: 5,
             border: `1px solid ${theme.palette.divider}`,
 
         },
@@ -624,15 +652,15 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
                 <Grid item xs={12} md={7}>
                     <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: (!isView ? 1 : 2) }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                             <Typography variant="h6">
                                 Classes & Schedules
                             </Typography>
-                            {!isView && (
-                                <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
-                                    <AddIcon sx={{ mr: 0.5 }} /> Add Class
-                                </Button>
-                            )}
+
+                            <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
+                                <AddIcon sx={{ mr: 0.5 }} /> Add Class
+                            </Button>
+
                         </Stack>
                         {!!schedules.length && (
                             <TableContainer component={Paper} >
@@ -646,7 +674,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                             <StyledTableCell align="center">Method</StyledTableCell>
                                             <StyledTableCell align="center">Teacher</StyledTableCell>
                                             <StyledTableCell align="center">Hours</StyledTableCell>
-                                            {!isView && <StyledTableCell align="center" />}
+                                            <StyledTableCell align="center" />
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -664,20 +692,19 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                                     <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.toUpperCase()}`}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                                    {!isView && (<StyledTableCell align="center" > {
+                                                    <StyledTableCell align="center" > {
                                                         <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
                                                     }
                                                     </StyledTableCell>
-                                                    )}
                                                 </StyledTableRow>
                                             )
                                         })}
                                         <StyledTableRow>
                                             <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
                                             <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
-                                            {!isView && <StyledTableCell />}
+                                            <StyledTableCell />
                                         </StyledTableRow>
                                     </TableBody>
                                 </Table>
@@ -704,13 +731,11 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 hourPerClass={selectedCourse.hourPerClass}
             />
 
-            {!isView && (
-                <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
-                    <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
-                        Create
-                    </Button>
-                </Grid>
-            )}
+            <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
+                <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
+                    Create
+                </Button>
+            </Grid>
         </Dialog>
     )
 }
