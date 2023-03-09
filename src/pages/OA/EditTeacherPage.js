@@ -1,11 +1,14 @@
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 // @mui
+import axios from 'axios';
 import { Container } from '@mui/material';
 import { PATH_ACCOUNT } from '../../routes/paths';
 // components
-import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import LoadingScreen from '../../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../../components/settings';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
 import EditTeacher from '../../sections/dashboard/oa-edit-account/EditTeacher';
 
@@ -13,7 +16,31 @@ import EditTeacher from '../../sections/dashboard/oa-edit-account/EditTeacher';
 
 export default function NewAccountPage() {
     const { themeStretch } = useSettingsContext();
+    const navigate = useNavigate();
     const { id } = useParams();
+
+
+    const dataFetchedRef = useRef(false);
+
+    const [teacher, setTeacher] = useState();
+
+
+    const fetchData = async () => {
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${id}`)
+            .then((res) => {
+                console.log('res', res);
+                const data = res.data.data.fullName
+                setTeacher(data)
+                // console.log('data', data)
+            })
+            .catch((error) => navigate('*', { replace: false }))
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        fetchData();
+        dataFetchedRef.current = true;
+    }, [])
 
     const DUMMY_TEACHER = {
         id: '1',
@@ -44,7 +71,7 @@ export default function NewAccountPage() {
                     heading="Edit Teacher Account"
                     links={[
                         { name: 'All Teachers', href: PATH_ACCOUNT.teacherManagement.searchTeacher },
-                        { name: 'Teacher Name', href: `/account/teacher-management/teacher/${DUMMY_TEACHER.id}` },
+                        { name: `${teacher}` },
                         { name: 'Edit Account' }
                     ]}
                 />

@@ -21,13 +21,12 @@ export default function SearchTeacherCoursePage() {
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="All Teachers Courses"
+                    heading="All Teachers"
                     links={[
                         {
-                            name: 'Teacher management',
+                            name: 'All Teachers',
                             href: PATH_ACCOUNT.teacherManagement.searchCourseTeacher,
-                        },
-                        { name: 'Search teacher course' },
+                        },  
                     ]}
                 />
                 <Stack spacing={3}>
