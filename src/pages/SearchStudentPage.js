@@ -56,17 +56,17 @@ export default function SearchStudentPage() {
     return (
         <>
             <Helmet>
-                <title>Student List Table</title>
+                <title>All Students</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
                     heading="All Students List"
                     links={[
                         {
-                            name: 'Student management',
+                            name: 'All Students',
                             href: PATH_ACCOUNT.studentManagement.searchStudent,
                         },
-                        { name: 'Search student' },
+                        
                     ]}
                 />
                 <Stack spacing={3}>
