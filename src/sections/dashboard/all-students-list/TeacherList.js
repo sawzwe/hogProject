@@ -142,7 +142,8 @@ export default function TeacherList({teacherTableData}) {
                   hover
                   key={row.id}
                   onClick={() => navigate(`/account/teacher-management/teacher/${parseInt(row.id, 10)}`)}
-                >
+                  sx={{cursor: "pointer"}}
+                  >
                   <TableCell align="left" > {row.id} </TableCell>
                   <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>

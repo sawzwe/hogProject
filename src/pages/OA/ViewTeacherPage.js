@@ -46,39 +46,21 @@ export default function NewAccountPage() {
         return <LoadingScreen/>
     }
 
-    // const DUMMY_TEACHER = {
-    //     id: teacher.id,
-    //     role: 'Teacher',
-    //     fullname: teacher.fullName,
-    //     fName: teacher.fName,
-    //     lName: teacher.lName,
-    //     nickname: teacher.nickname,
-    //     phone: teacher.phone,
-    //     line: teacher.line,
-    //     email: teacher.email,
-    //     monday: {fromTime: '09:00', toTime: '18:00'},
-    //     tuesday: {fromTime: '09:00', toTime: '18:00'},
-    //     wednesday: {fromTime: '09:00', toTime: '18:00'},
-    //     thursday: {fromTime: '09:00', toTime: '18:00'},
-    //     friday: {fromTime: '09:00', toTime: '18:00'},
-    //     saturday: {fromTime: '', toTime: ''},
-    //     sunday: {fromTime: '', toTime: ''}
-    // }
-    const DUMMY_TEACHER = {
-        id: '1',
+    const TEACHER_DATA = {
+        id: teacher.id.toString(),
         role: 'Teacher',
         fullname: teacher.fullName,
-        fName: 'Piyaphon',
-        lName: 'Wu',
-        nickname: 'Hong',
-        phone: '0971478523',
-        line: 'hong1',
-        email: 'hong@hotmail.com',
-        monday: {fromTime: '09:00', toTime: '18:00'},
-        tuesday: {fromTime: '09:00', toTime: '18:00'},
-        wednesday: {fromTime: '09:00', toTime: '18:00'},
-        thursday: {fromTime: '09:00', toTime: '18:00'},
-        friday: {fromTime: '09:00', toTime: '18:00'},
+        fName: teacher.fName,
+        lName: teacher.lName,
+        nickname: teacher.nickname,
+        phone: teacher.phone,
+        line: teacher.line,
+        email: teacher.email,
+        monday: {fromTime: teacher.workTimes[0].fromTime, toTime: teacher.workTimes[0].toTime},
+        tuesday: {fromTime: teacher.workTimes[1].fromTime, toTime: teacher.workTimes[1].toTime},
+        wednesday: {fromTime: teacher.workTimes[2].fromTime, toTime: teacher.workTimes[2].toTime},
+        thursday: {fromTime: teacher.workTimes[3].fromTime, toTime: teacher.workTimes[3].toTime},
+        friday: {fromTime: teacher.workTimes[4].fromTime, toTime: teacher.workTimes[4].toTime},
         saturday: {fromTime: '', toTime: ''},
         sunday: {fromTime: '', toTime: ''}
     }
@@ -97,11 +79,11 @@ export default function NewAccountPage() {
                             name: 'All Teachers',
                             href: PATH_ACCOUNT.teacherManagement.searchTeacher,
                         },
-                        { name: `${DUMMY_TEACHER.fullname}` },
+                        { name: `${TEACHER_DATA.fullname}` },
                     ]}
                 />
 
-                <ViewTeacher currentTeacher={DUMMY_TEACHER} />
+                <ViewTeacher currentTeacher={TEACHER_DATA} />
             </Container>
         </>
     );

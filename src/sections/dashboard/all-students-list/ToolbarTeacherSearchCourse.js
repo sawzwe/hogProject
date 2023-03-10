@@ -45,7 +45,10 @@ export default function ToolbarTeacherSearchCourse({ filterValue, onFilterValue,
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
         <TextField value={filterValue}
-        onChange={onFilterValue} id="search-student" placeholder="Search TID or Teacher Fullname or Nickname..." variant="outlined" sx={{ width: 980 }}
+        onChange={onFilterValue} id="search-student" 
+        placeholder="Search ID or Teacher Fullname or Nickname..." 
+        variant="outlined" 
+        sx={{ width: "100%" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -53,63 +56,8 @@ export default function ToolbarTeacherSearchCourse({ filterValue, onFilterValue,
               </InputAdornment>
             ),
           }} />
-        <Tooltip title="Filter list">
-          <Button sx={{ p: 2, m: 2 }} variant='outlined' onClick={onOpen} endIcon={<Iconify icon="ic:round-filter-list" />}>
-            <Typography>Filter</Typography>
-          </Button>
-        </Tooltip>
       </Stack>
       
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={onClose}
-        BackdropProps={{
-          invisible: true,
-        }}
-      >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pl: 2, pr: 1, py: 2 }}>
-          <Typography variant="subtitle1">Filters</Typography>
-
-          <IconButton onClick={onClose}>
-            <Iconify icon="eva:close-fill" />
-          </IconButton>
-        </Stack>
-
-        <Divider />
-
-        <Scrollbar>
-          <Stack spacing={3} sx={{ p: 2.5 }}>
-            <Stack spacing={1}>
-              <Typography variant="subtitle1"> Gender </Typography>
-              {/* s<RHFMultiCheckbox name="gender" options={FILTER_GENDER_OPTIONS} sx={{ width: 1 }} /> */}
-            </Stack>
-          </Stack>
-        </Scrollbar>
-
-        <Box sx={{ p: 2.5 }}>
-          <Badge
-            color="error"
-            variant="dot"
-            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-            invisible={isDefault}
-            sx={{ width: 1 }}
-          >
-            <Button
-              fullWidth
-              size="large"
-              type="submit"
-              color="inherit"
-              variant="outlined"
-              onClick={onResetFilter}
-              startIcon={<Iconify icon="eva:trash-2-outline" />}
-            >
-              Clear
-            </Button>
-          </Badge>
-        </Box>
-      </Drawer>
-
 
     </>
 
