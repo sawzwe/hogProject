@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import * as Yup from 'yup';
 // form
 import { useForm } from 'react-hook-form';
@@ -6,6 +7,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import { Card, Grid, Stack, Typography, Dialog, Button, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
@@ -13,6 +16,7 @@ import FormProvider, { RHFTextField } from '../../../components/hook-form';
 // ----------------------------------------------------------------------
 
 export default function EPForm() {
+    const { registerEP } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
     const NewEASchema = Yup.object().shape({
@@ -20,7 +24,7 @@ export default function EPForm() {
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
-        phone: Yup.number().typeError('Phone must contain only number').required('Phone number is required'),
+        phone: Yup.string().required('Phone number is required'),
         line: Yup.string().required('Line ID is required'),
         email: Yup.string().email('Email is invalid').required('Email is required'),
     });
@@ -63,12 +67,21 @@ export default function EPForm() {
             });
         }
     };
-    
-    const handleCreateAccount = () => {
-        console.log(createdData);
-        enqueueSnackbar("Account has been created!", { variant: 'success' });
-        reset(defaultValues);
-        setOpenConfirmDialog(false);
+
+    const [createLoading, setCreateLoading] = useState(false);
+
+    const handleCreateAccount = async () => {
+        setCreateLoading(true)
+        try {
+            await registerEP(createdData);
+            reset(defaultValues);
+            setOpenConfirmDialog(false);
+            setCreateLoading(false);
+            enqueueSnackbar("Account has been created!", { variant: 'success' });
+        } catch (error) {
+            setCreateLoading(false);
+            enqueueSnackbar(error.message, { variant: 'error' });
+        }
     }
 
     return (
@@ -105,7 +118,7 @@ export default function EPForm() {
 
                     <Grid item xs={12} md={12}>
                         <Stack direction="row" justifyContent="flex-end" alignItems="center">
-                        <Button
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 type="submit"
@@ -138,7 +151,7 @@ export default function EPForm() {
                         type="submit"
                         variant="contained"
                         color="primary"
-                        loading={isSubmitting}
+                        loading={createLoading}
                         onClick={handleCreateAccount}
                     >
                         Submit

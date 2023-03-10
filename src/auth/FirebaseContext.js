@@ -30,7 +30,6 @@ const initialState = {
     isInitialized: false,
     isAuthenticated: false,
     user: null,
-    userAccessToken: null
 };
 
 const reducer = (state, action) => {
@@ -39,7 +38,6 @@ const reducer = (state, action) => {
             isInitialized: true,
             isAuthenticated: action.payload.isAuthenticated,
             user: action.payload.user,
-            userAccessToken: action.payload.user.accessToken
         };
     }
 
@@ -53,34 +51,8 @@ export const AuthContext = createContext(null);
 // ----------------------------------------------------------------------
 
 const firebaseApp = initializeApp(FIREBASE_API);
-
-const studentAppConfig = {
-    apiKey: "AIzaSyBtyBmAPXMLJSuE7Y8mSC9EVUiXqpOFJRI",
-    authDomain: "authen-hog-project.firebaseapp.com",
-    projectId: "authen-hog-project",
-    storageBucket: "authen-hog-project.appspot.com",
-    messagingSenderId: "121884697124",
-    appId: "1:121884697124:web:f39ec7fd70d1ac3fbcaeb1"
-}
-const studentApp = initializeApp(studentAppConfig, "studentApp");
-
-const adminAppConfig = {
-    apiKey: "AIzaSyCIVrYZVba_34k3M9mBA1JO_Knmw88RfU8",
-    authDomain: "houseofgriffin-admin-auth.firebaseapp.com",
-    projectId: "houseofgriffin-admin-auth",
-    storageBucket: "houseofgriffin-admin-auth.appspot.com",
-    messagingSenderId: "528572467703",
-    appId: "1:528572467703:web:b1393764b5ffc08b41c6f2"
-}
-
-const adminApp = initializeApp(adminAppConfig, "adminApp");
-
 const AUTH = getAuth(firebaseApp);
-const AUTH_STUDENT = getAuth(studentApp);
-const AUTH_ADMIN = getAuth(adminApp);
-
 const DB = getFirestore(firebaseApp);
-
 const storage = getStorage(firebaseApp);
 
 AuthProvider.propTypes = {
@@ -95,9 +67,7 @@ export function AuthProvider({ children }) {
             onAuthStateChanged(AUTH, async (user) => {
                 if (user) {
                     const userRef = doc(DB, 'users', user.uid);
-
                     const docSnap = await getDoc(userRef);
-
                     const profile = docSnap.data();
 
                     dispatch({
@@ -107,65 +77,16 @@ export function AuthProvider({ children }) {
                             user: {
                                 ...user,
                                 ...profile,
-                                // role: 'admin',
                             },
                         },
                     });
                 } else {
-                    onAuthStateChanged(AUTH_STUDENT, async (user) => {
-                        if (user) {
-
-                            const userRef = doc(DB, 'users', user.uid);
-
-                            const docSnap = await getDoc(userRef);
-
-                            const profile = docSnap.data();
-
-                            dispatch({
-                                type: 'INITIAL',
-                                payload: {
-                                    isAuthenticated: true,
-                                    user: {
-                                        ...user,
-                                        ...profile,
-                                        // role: 'admin',
-                                    },
-                                    userAccessToken: user.accessToken
-                                },
-                            });
-                        } else {
-                            onAuthStateChanged(AUTH_ADMIN, async (user) => {
-                                if (user) {
-                                    const userRef = doc(DB, 'users', user.uid);
-
-                                    const docSnap = await getDoc(userRef);
-
-                                    const profile = docSnap.data();
-
-                                    dispatch({
-                                        type: 'INITIAL',
-                                        payload: {
-                                            isAuthenticated: true,
-                                            user: {
-                                                ...user,
-                                                ...profile,
-                                                // role: 'admin',
-                                            },
-                                            userAccessToken: user.accessToken
-                                        },
-                                    });
-                                } else {
-                                    dispatch({
-                                        type: 'INITIAL',
-                                        payload: {
-                                            isAuthenticated: false,
-                                            user: null,
-                                            userAccessToken: user.accessToken
-                                        },
-                                    });
-                                }
-                            })
-                        }
+                    dispatch({
+                        type: 'INITIAL',
+                        payload: {
+                            isAuthenticated: false,
+                            user: null,
+                        },
                     });
                 }
             });
@@ -182,19 +103,84 @@ export function AuthProvider({ children }) {
     const changePassword = (newPassword) => updatePassword(AUTH.currentUser, newPassword);
 
     // LOGIN
-    const login = async (email, password) => (
-        signInWithEmailAndPassword(AUTH_ADMIN, email, password)
-            .catch(() => signInWithEmailAndPassword(AUTH, email, password)
-                .catch(() => signInWithEmailAndPassword(AUTH_STUDENT, email, password)))
-    )
+    const login = async (email, password) => (signInWithEmailAndPassword(AUTH, email, password))
 
     // REGISTER STUDENT
-    const registerStudent = async (data) =>
-        createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
+    // const registerStudent = async (data) =>
+    //     createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
+    //         .then(async (res) => {
+    //             const userRef = doc(collection(DB, 'users'), res.user?.uid);
+    //             return setDoc(userRef, {
+    //                 uid: res.user?.uid,
+    //                 email: data.studentEmail,
+    //                 displayName: `${data.studentFirstName} ${data.studentLastName}`,
+    //                 role: "Student"
+    //             })
+    //                 .catch((error) => console.error(error))
+    //                 .then(() => {
+    //                     const file = data.studentImageURL
+    //                     const storageProfileRef = ref(storage, `users/students/${res.user?.uid}/Avatar/${file.name}`);
+    //                     uploadBytes(storageProfileRef, file)
+    //                         .then((snapshot) => { console.log("uploaded!") })
+    //                         .catch((error) => console.error(error));
+    //                 })
+    //                 .catch((error) => console.error(error))
+    //                 .then(() => {
+    //                     data.studentAdditionalFiles.map((file, index) => {
+    //                         const storageAdditionalFilesRef = ref(storage, `users/students/${res.user?.uid}/Files/${file.name}`);
+    //                         return uploadBytes(storageAdditionalFilesRef, file)
+    //                             .then((snapshot) => console.log("Additional File uploaded!"))
+    //                             .catch((error) => console.error(error));
+    //                     })
+    //                 })
+    //                 .then(() => signOut(AUTH_STUDENT))
+    //         })
+
+    const registerStudent = async (data) => {
+        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
+        const formattedData = {
+            title: data.studentTitle,
+            fName: data.studentFirstName,
+            lName: data.studentLastName,
+            nickname: data.studentNickname,
+            profilePicture: data.studentImageURL.name,
+            additionalFiles: nameAdditionalFiles || [],
+            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
+            phone: data.studentPhoneNo,
+            line: data.studentLineId,
+            email: data.studentEmail,
+            school: data.schoolName,
+            countryOfSchool: data.schoolCountry,
+            levelOfStudy: data.levelOfStudy,
+            program: data.studyProgram,
+            targetUni: data.targetUniversity,
+            targetScore: data.targetScore,
+            hogInfo: data.studentSource,
+            healthInfo: data.studentHealthInfo,
+            parent: {
+                fName: data.parentFirstName,
+                lName: data.parentLastName,
+                relationship: data.parentRelationships,
+                phone: data.parentPhoneNo,
+                email: data.parentEmail,
+                line: data.parentLineId,
+            },
+            address: {
+                address: data.address,
+                subdistrict: data.subDistrict,
+                district: data.district,
+                province: data.province,
+                zipcode: data.zipCode,
+            }
+        }
+
+        axios.post(`${HOG_API}/api/Student/Post`, formattedData)
             .then(async (res) => {
-                const userRef = doc(collection(DB, 'users'), res.user?.uid);
+                const uid = res.data.data.firebaseId;
+                const userRef = doc(collection(DB, 'users'), uid);
                 return setDoc(userRef, {
-                    uid: res.user?.uid,
+                    uid,
+                    id: res.data.data.id,
                     email: data.studentEmail,
                     displayName: `${data.studentFirstName} ${data.studentLastName}`,
                     role: "Student"
@@ -202,7 +188,7 @@ export function AuthProvider({ children }) {
                     .catch((error) => console.error(error))
                     .then(() => {
                         const file = data.studentImageURL
-                        const storageProfileRef = ref(storage, `users/students/${res.user?.uid}/Avatar/${file.name}`);
+                        const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
                         uploadBytes(storageProfileRef, file)
                             .then((snapshot) => { console.log("uploaded!") })
                             .catch((error) => console.error(error));
@@ -210,55 +196,15 @@ export function AuthProvider({ children }) {
                     .catch((error) => console.error(error))
                     .then(() => {
                         data.studentAdditionalFiles.map((file, index) => {
-                            const storageAdditionalFilesRef = ref(storage, `users/students/${res.user?.uid}/Files/${file.name}`);
+                            const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
                             return uploadBytes(storageAdditionalFilesRef, file)
                                 .then((snapshot) => console.log("Additional File uploaded!"))
                                 .catch((error) => console.error(error));
                         })
                     })
-                    .then(() => signOut(AUTH_STUDENT))
-                    .then(() => {
-                        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
-                        axios.post(`${HOG_API}/api/Student/Post`, {
-                            firebaseId: res.user?.uid,
-                            title: data.studentTitle,
-                            fName: data.studentFirstName,
-                            lName: data.studentLastName,
-                            nickname: data.studentNickname,
-                            profilePicture: data.studentImageURL.name,
-                            additionalFiles: nameAdditionalFiles || [],
-                            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
-                            phone: data.studentPhoneNo.toString(),
-                            line: data.studentLineId,
-                            email: data.studentEmail,
-                            school: data.schoolName,
-                            countryOfSchool: data.schoolCountry,
-                            levelOfStudy: data.levelOfStudy,
-                            program: data.studyProgram,
-                            targetUni: data.targetUniversity,
-                            targetScore: data.targetScore,
-                            hogInfo: data.studentSource,
-                            healthInfo: data.studentHealthInfo,
-                            parent: {
-                                fName: data.parentFirstName,
-                                lName: data.parentLastName,
-                                relationship: data.parentRelationships,
-                                phone: data.parentPhoneNo.toString(),
-                                email: data.parentEmail,
-                                line: data.parentLineId,
-                            },
-                            address: {
-                                address: data.address,
-                                subdistrict: data.subDistrict,
-                                district: data.district,
-                                province: data.province,
-                                zipcode: data.zipCode,
-                            }
-                        })
-                            .then((res) => console.log(res))
-                            .catch((error) => console.error(error))
-                    })
             })
+            .catch((error) => console.error(error))
+    }
 
     // UPDATE STUDENT
     const updateStudent = async (currentStudent, data) => {
@@ -270,7 +216,6 @@ export function AuthProvider({ children }) {
                 "displayName": `${data.studentFirstName} ${data.studentLastName}`
             })
         }
-
 
         // Delete old image and add new if user editted profile picture
         if (data.studentImageURL instanceof File) {
@@ -347,13 +292,81 @@ export function AuthProvider({ children }) {
         }).catch((error) => console.error(error))
     }
 
+    // CREATE TEACHER
+    const registerTeacher = async (data) => {
+        await axios.post(`${HOG_API}/api/Teacher/Post`, data)
+            .then((res) => {
+                const uid = res.data.data.firebaseId;
+                const databaseId = res.data.data.id;
+                const userRef = doc(collection(DB, 'users'), uid);
+                setDoc(userRef, {
+                    uid,
+                    id: databaseId,
+                    email: res.data.data.email,
+                    displayName: `${res.data.data.fName} ${res.data.data.lName}`,
+                    role: "Teacher"
+                })
+                .catch((error) => {
+                    throw error;
+                })
+            })
+            .catch((error) => {
+                throw error;
+            })
+    }
+
+    // CREATE EP
+    const registerEP = async (data) => {
+        await axios.post(`${HOG_API}/api/EP/Post`, data)
+            .then((res) => {
+                const uid = res.data.data.firebaseId;
+                const databaseId = res.data.data.id;
+                const userRef = doc(collection(DB, 'users'), uid);
+                setDoc(userRef, {
+                    uid,
+                    id: databaseId,
+                    email: res.data.data.email,
+                    displayName: `${res.data.data.fName} ${res.data.data.lName}`,
+                    role: "Education Planner"
+                })
+                    .catch((error) => {
+                        throw error;
+                    })
+            })
+            .catch((error) => {
+                throw error;
+            })
+    }
+
+    // CREATE EA
+    const registerEA = async (data) => {
+        await axios.post(`${HOG_API}/api/EA/Post`, data)
+            .then(async (res) => {
+                const uid = res.data.data.firebaseId;
+                const databaseId = res.data.data.id;
+                const userRef = doc(collection(DB, 'users'), uid);
+                setDoc(userRef, {
+                    uid,
+                    id: databaseId,
+                    email: res.data.data.email,
+                    displayName: `${res.data.data.fName} ${res.data.data.lName}`,
+                    role: "Education Admin"
+                })
+                    .then(() => 'Success')
+                    .catch((error) => {
+                        throw error;
+                    })
+            })
+            .catch((error) => {
+                throw error;
+            })
+    }
+
 
     // LOGOUT
     const logout = async () => {
         try {
-            await signOut(AUTH_STUDENT)
             await signOut(AUTH)
-            await signOut(AUTH_ADMIN)
         } catch (error) {
             console.log(error)
         }
@@ -367,6 +380,9 @@ export function AuthProvider({ children }) {
                 login,
                 registerStudent,
                 updateStudent,
+                registerEA,
+                registerEP,
+                registerTeacher,
                 logout,
                 changePassword,
             }}

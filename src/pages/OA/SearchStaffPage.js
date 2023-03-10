@@ -20,40 +20,51 @@ export default function SearchStaffPage() {
     const { themeStretch } = useSettingsContext();
 
     const dataFetchedRef = useRef(false);
-    const [teacherTableData, setTeacherTableData] = useState();
+    const [epStaff, setEpStaff] = useState();
+    const [eaStaff, setEaStaff] = useState();
+    const [allStaffs, setAllStaffs] = useState();
 
-    const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/Teacher/Get`)
+    const fetchDataEP = async () => {
+        return axios.get(`${HOG_API}/api/EP/Get`)
             .then(response => {
-                // console.log(response.data.data)
-                setTeacherTableData(response.data.data);
-                // console.log("API table" ,response.data.data);
+                return response.data.data;
             })
             .catch(error => {
                 console.log(error);
             });
     }
-
-
-
-
+    
+    const fetchDataEA = async () => {
+        return axios.get(`${HOG_API}/api/EA/Get`)
+            .then(response => {
+                return response.data.data;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    
     useEffect(() => {
-        if (dataFetchedRef.current) return;
-        dataFetchedRef.current = true;
+        Promise.all([fetchDataEP(), fetchDataEA()])
+            .then(([epStaff, eaStaff]) => {
+                setAllStaffs([...epStaff, ...eaStaff]);
+                setEpStaff(epStaff);
+                setEaStaff(eaStaff);
+                // console.log(allStaffs);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
-        fetchData();
-
-    }, [])
-
-    if (teacherTableData === undefined) {
+    if (epStaff === undefined || eaStaff === undefined) {
         return <LoadingScreen />;
     }
-
 
     return (
         <>
             <Helmet>
-                <title>Teacher List Table</title>
+                <title>All Staff</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
             <CustomBreadcrumbs
@@ -65,8 +76,8 @@ export default function SearchStaffPage() {
                 />
                 <Stack spacing={3}>
                     <Card>
-                        <StaffList/>
-                        {/* <StaffList teacherTableData={teacherTableData} /> */}
+                        {/* <StaffList/> */}
+                        <StaffList allStaffs={allStaffs} />
                     </Card>
                 </Stack>
             </Container>

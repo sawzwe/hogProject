@@ -23,7 +23,7 @@ function createData(id, fullname, nickname) {
 }
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Teacher ID', align: 'left' },
+  // { id: 'id', label: 'Teacher ID', align: 'left' },
   { id: 'fullname', label: 'Fullname  ', align: 'left' },
   { id: 'nickname', label: 'Nickname  ', align: 'left' },
   { id: 'details', label: ' ', align: 'left' },
@@ -53,11 +53,10 @@ const TABLE_DATA = [
 
 // ----------------------------------------------------------------------
 
-// StaffList.propTypes = {
-//   teacherTableData: PropTypes.array,
-// }
-// export default function StaffList({teacherTableData}) {
-export default function StaffList() {
+StaffList.propTypes = {
+  allStaffs: PropTypes.array,
+}
+export default function StaffList({allStaffs}) {
   const {
     dense,
     page,
@@ -74,14 +73,14 @@ export default function StaffList() {
 
   const navigate = useNavigate();
 
-  // const [tableData, setTableData] = useState(teacherTableData);
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(allStaffs);
+  // const [tableData, setTableData] = useState();
   const [openConfirm, setOpenConfirm] = useState(false);
 
 
-  useEffect(() => {
-    setTableData(TABLE_DATA);
-  }, []);
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA);
+  // }, []);
 
   // Search
   const [filterValue, setFilterValue] = useState('');
@@ -166,11 +165,11 @@ export default function StaffList() {
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
                   hover
-                  key={row.id}
+                  key={row.index}
                   onClick={() => navigate(`/account/staff-management/staff/${parseInt(row.id, 10)}`)}
                 >
-                  <TableCell align="left" > {row.id} </TableCell>
-                  <TableCell align="left">{row.fullname}</TableCell>
+                  {/* <TableCell align="left" > {row.id} </TableCell> */}
+                  <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>
                     <Iconify icon="ic:chevron-right" />
@@ -212,7 +211,8 @@ function applyFilter({ inputData, comparator, filterValue }) {
 
   if (filterValue) {
     // inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
-    inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
+    // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 );
 
   }
 

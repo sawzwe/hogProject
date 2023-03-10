@@ -260,13 +260,20 @@ export function NewPrivateRequestForm({ studentList }) {
 
     const onSubmit = async (data) => {
         try {
-
             // Clean up the data
             const {
                 selectedStudent,
                 courses,
                 additionalComment
             } = data;
+
+            if (selectedStudent.length === 0) {
+                enqueueSnackbar('At least one student must be selected', { variant: 'error' })
+            }
+
+            if (courses.length === 0) {
+                enqueueSnackbar('At least one course must be created', { variant: 'error' })
+            }
 
             const studentIds = selectedStudent.map((student) => student.id);
 
@@ -275,7 +282,7 @@ export function NewPrivateRequestForm({ studentList }) {
                 eaStatus: "InProgress",
                 paymentStatus: "None",
                 epRemark1: additionalComment,
-                takenByEPId: 1,
+                takenByEPId: 4,
             }
 
             const information = courses.map((eachCourse) => {
@@ -298,23 +305,17 @@ export function NewPrivateRequestForm({ studentList }) {
                 }
             })
 
-            axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Request/Post`, {
+            await axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Request/Post`, {
                 studentIds,
                 request,
                 information,
             })
-                // .then((res) => {
-                //     console.log(res.data)
-                // })
                 .then(() => enqueueSnackbar('The request is successfully created', { variant: 'success' }))
                 .then(() => navigate('/course-registration/ep-request-status'))
                 .catch((error) => {
                     console.error(error)
                     return enqueueSnackbar(error.message, { variant: 'error' })
                 })
-
-            // console.log(data);
-            enqueueSnackbar('The request is successfully created', { variant: 'success' })
         } catch (error) {
             console.log(error)
             enqueueSnackbar(error.message, { variant: 'error' })

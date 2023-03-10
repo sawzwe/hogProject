@@ -24,40 +24,28 @@ export default function ViewStudentPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    // const passedID = id
 
-    // const dataFetchedRef = useRef(false);
+    const dataFetchedRef = useRef(false);
 
-    // const [students, setStudent] = useState();
+    const [student, setStudent] = useState();
 
 
-    // const fetchData = async () => {
-    //     return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Info/Get`)
-    //         .then((res) => {
-    //             console.log('res', res);
-    //             const data = res.data.data
-    //             setStudent(data)
-    //             console.log('data', data)
-    //         })
-    //         .catch((error) => navigate('*', { replace: false }))
-    // }
+    const fetchData = async () => {
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+            .then((res) => {
+                console.log('res', res);
+                const data = res.data.data.fullName
+                setStudent(data)
+                // console.log('data', data)
+            })
+            .catch((error) => navigate('*', { replace: false }))
+    }
 
-    // useEffect(() => {
-    //     if (dataFetchedRef.current) return;
-    //     fetchData();
-    //     dataFetchedRef.current = true;
-    // }, [])
-
-    // if (!dataFetchedRef.current) {
-    //     return <LoadingScreen />;
-    // }
-
-    // const details = students.filter(element => element.id === id);
-    // console.log(details);
-    // const DUMMY_STAFF = {
-    //     id: student.id,
-    //     fName: student.fullName,
-    // }
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        fetchData();
+        dataFetchedRef.current = true;
+    }, [])
 
     return (
         <>
@@ -74,7 +62,7 @@ export default function ViewStudentPage() {
                             name: 'All students',
                             href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
                         },
-                        // { name: `${DUMMY_STAFF.fName}` },
+                        { name: `${student}` },
                     ]}
                 />
                 <Stack spacing={3}>

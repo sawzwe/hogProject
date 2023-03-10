@@ -316,6 +316,13 @@ export default function Router() {
             </RoleBasedGuard>
           )
         },
+        {
+          path: 'account/teacher-management/teacher-course/', element: (
+            <RoleBasedGuard roles={['Education Admin']} hasContent>
+              <  PageSearchCourseTeacher />
+            </RoleBasedGuard>
+          )
+        },
 
         // OA Content --------------------------------------------------------------
         {

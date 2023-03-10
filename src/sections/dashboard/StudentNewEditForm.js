@@ -410,7 +410,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 />
                             </Box>
                             <Box gridArea={"studentPhoneNumber"}>
-                                <RHFTextField name="studentPhoneNo" label="Phone Number" required />
+                                <RHFTextField type="number" name="studentPhoneNo" label="Phone Number" required />
                             </Box>
                             <Box gridArea={"studentLineId"}>
                                 <RHFTextField name="studentLineId" label="Line ID" required />
@@ -543,7 +543,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="parentRelationships" label="Relationships" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField name="parentPhoneNo" label="Phone Number" required />
+                                <RHFTextField type="number" name="parentPhoneNo" label="Phone Number" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentEmail" label="Email Address" />

@@ -2,12 +2,15 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import * as Yup from 'yup';
 import moment from 'moment';
+import axios from 'axios';
 // form
 import { useForm, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import { Box, Card, Grid, Stack, Typography, Dialog, Button, DialogTitle, DialogContent, DialogActions, MenuItem } from '@mui/material';
+// auth
+import { useAuthContext } from '../../../auth/useAuthContext';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../components/hook-form';
@@ -15,6 +18,7 @@ import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../com
 // ----------------------------------------------------------------------
 
 export default function TeacherForm() {
+    const { registerTeacher } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
 
@@ -23,7 +27,7 @@ export default function TeacherForm() {
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
-        phone: Yup.number().typeError('Phone must contain only number').required('Phone number is required'),
+        phone: Yup.string().required('Phone number is required'),
         line: Yup.string().required('Line ID is required'),
         email: Yup.string().email('Email is invalid').required('Email is required'),
         monday: Yup.object().shape({
@@ -164,17 +168,47 @@ export default function TeacherForm() {
         }
     };
 
-    const handleCreateAccount = () => {
-        console.log(createdData);
-        enqueueSnackbar("Account has been created!", { variant: 'success' });
-        reset(defaultValues);
-        setOpenConfirmDialog(false);
+    const [createLoading, setCreateLoading] = useState(false);
+
+    const handleCreateAccount = async () => {
+        setCreateLoading(true);
+
+        const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = createdData;
+        const preferredDays = [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+        const workTimes = []
+        preferredDays.forEach((day, index) => {
+            if (day.isSelected) {
+                workTimes.push({ day: weekdays[index], fromTime: day.fromTime, toTime: day.toTime })
+            }
+        })
+
+        const formattedData = {
+            fName: createdData.fName,
+            lName: createdData.lName,
+            nickname: createdData.nickname,
+            phone: createdData.phone,
+            email: createdData.email,
+            line: createdData.line,
+            workTimes
+        }
+
+        try {
+            await registerTeacher(formattedData)
+            reset(defaultValues);
+            setOpenConfirmDialog(false);
+            setCreateLoading(false);
+            enqueueSnackbar("Account has been created!", { variant: 'success' });
+        } catch (error) {
+            setCreateLoading(false);
+            enqueueSnackbar(error.message, { variant: 'error' });
+        }
     }
 
     const onError = (error) => {
         if (error.workingDaySlot) {
             enqueueSnackbar("At least one working day is required!", { variant: 'error' });
-        } 
+        }
     };
 
     return (
@@ -268,7 +302,7 @@ export default function TeacherForm() {
                         type="submit"
                         variant="contained"
                         color="primary"
-                        loading={isSubmitting}
+                        loading={createLoading}
                         onClick={handleCreateAccount}
                     >
                         Submit
