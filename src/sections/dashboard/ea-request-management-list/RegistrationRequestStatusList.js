@@ -24,6 +24,7 @@ import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import { useSettingsContext } from '../../../components/settings';
+import { fTimestamp, fDate } from '../../../utils/formatTime';
 import {
   useTable,
   getComparator,
@@ -95,7 +96,7 @@ RegistrationRequestStatusList.propTypes = {
 };
 
 export default function RegistrationRequestStatusList({ privateRegistrationRequest }) {
-  console.log('RegistrationRequestStatusList', privateRegistrationRequest);
+  // console.log('RegistrationRequestStatusList', privateRegistrationRequest);
   const { themeStretch } = useSettingsContext();
 
   const {
@@ -110,15 +111,29 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     onChangeRowsPerPage,
   } = useTable({ defaultOrderBy: 'createDate' });
 
-  // const [tableData, setTableData] = useState([]);
-  const [tableData, setTableData] = useState(privateRegistrationRequest);
-  // console.log(privateRegistrationRequest[0].request.id)
-  // console.log(privateRegistrationRequest[0].request.id)
+  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState(privateRegistrationRequest);
+  useEffect(() => {
+    const formattedData = privateRegistrationRequest.map((request) => {
+      return {
+        id: request.request.id,
+        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+        courseType: request.request?.courseType || 'Private',
+        section: request.information[0]?.section || '-',
+        registeredCourses: request.information.length,
+        requestedBy: request.request.takenByEPId,
+        eaStatus: request.request.eaStatus,
+        receipt: request.request.paymentStatus,
+      }
+    })
 
-
+    setTableData(formattedData);
+  }, []);
   // useEffect(() => {
   //   setTableData(TABLE_DATA_REQUESTS);
   // }, []);
+
+  // console.log(tableData);
   let eachEP;
 
   const [filterName, setFilterName] = useState('');
@@ -145,10 +160,10 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole);
 
-  const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
+  const getLengthByStatus = (eaStatus) => tableData.filter((item) => item.eaStatus === eaStatus).length;  
 
   const TABS = [
-    { value: 'InProgress', label: 'Available Requests', color: 'warning', count: getLengthByStatus('InProgress') },
+    { value: "InProgress", label: 'Available Requests', color: 'warning', count: getLengthByStatus("InProgress") },
     { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
@@ -188,8 +203,8 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     setTableData([...newTableData, newRow])
     setOpenConfirm(false);
   };
-
-  console.log(dataFiltered)
+  // console.log("tabledata",tableData)
+  // console.log("data",dataFiltered)
 
   return (
     <>
@@ -259,20 +274,19 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
 
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    console.log(row)
-                    // updateRequest === row.id ? <Request row={row} tableData={tableData} setTableData={setTableData}/> :
                     return (<TableRow
                       hover
-                      key={row.request.id}
+                      key={row.id}
+                      sx={{cursor:'pointer'}}
                     // onClick={() => handleOpenConfirm(row.id)}
                     >
-                      <TableCell align="left" > {row.request.id} </TableCell>
-                      {/* <TableCell align="left" > {row.id} </TableCell> */}
-                      <TableCell align="left">{row.request.dateCreated}</TableCell>
-                      {/* <TableCell align="left">{row.courseType}</TableCell> */}
-                      <TableCell align="left">{row.information.section}</TableCell>
-                      <TableCell align="center">{row.information.length}</TableCell>
-                      {
+                      <TableCell align="left" > {row.id} </TableCell>
+                      <TableCell align="left">{row.requestDate}</TableCell>
+                      <TableCell align="left">{row.section}</TableCell>
+                      <TableCell align="center">{row.registeredCourses}</TableCell>
+                      <TableCell align="center">{row.requestedBy}</TableCell>
+
+                      {/* {
                       
                       axios.get(`${HOG_API}/api/EP/Get`)
                         .then(response => {
@@ -285,7 +299,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
                           console.log(error);
                         }) &&
                       <TableCell align="left">{eachEP}</TableCell>
-                      }
+                      } */}
                       {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
@@ -343,9 +357,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          // dense={dense}
-          // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
@@ -365,7 +376,6 @@ function applyFilter({
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
-  console.log(inputData)
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -374,20 +384,23 @@ function applyFilter({
   });
 
   inputData = stabilizedThis.map((el) => el[0]);
+    // console.log("inut",inputData)
 
   if (filterName) {
     // console.log('filterName')
     inputData = inputData.filter((eachRequest) =>
-      eachRequest.request.id === parseInt(filterName, 10) ||
-      eachRequest.information.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      eachRequest.id === parseInt(filterName, 10) ||
+      eachRequest.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      eachRequest.requestDate.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
       // eachRequest.request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterRole !== '') {
-    console.log('filterRole')
-    inputData = inputData.filter((eachRequest) => eachRequest.request.eaStatus === filterRole);
+    // console.log('filterRole')
+    inputData = inputData.filter((eachRequest) => eachRequest.eaStatus === filterRole);
   }
 
   return inputData;
 }
+
