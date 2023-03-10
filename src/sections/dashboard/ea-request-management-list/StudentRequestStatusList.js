@@ -243,7 +243,7 @@ export default function StaffRequestStatusList() {
                       hover
                       key={row.id}
                     >
-                      <TableCell align="left" > Q{row.id} </TableCell>
+                      <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.requestType}</TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>

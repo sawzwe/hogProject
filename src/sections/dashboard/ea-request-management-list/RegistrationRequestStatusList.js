@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 // @mui
@@ -18,6 +19,7 @@ import {
   TableCell, createTheme, ThemeProvider,
 } from '@mui/material';
 // components
+import axios from 'axios';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
@@ -34,6 +36,8 @@ import {
 // sections
 import RegistrationTableToolbar from './RegistrationTableToolbar';
 import ConfirmDialog from '../../../components/confirm-dialog';
+import { HOG_API } from '../../../config';
+
 // import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
@@ -48,7 +52,7 @@ function createData(id, requestDate, courseType, section, registeredCourses, req
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'courseType', label: 'Course Type', align: 'left' },
+  // { id: 'courseType', label: 'Course Type', align: 'left' },
   { id: 'section ', label: 'Section', align: 'left', width: 200 },
   { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
   { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
@@ -85,8 +89,13 @@ const errorTheme = createTheme({
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestStatusList() {
 
+RegistrationRequestStatusList.propTypes = {
+  privateRegistrationRequest: PropTypes.array,
+};
+
+export default function RegistrationRequestStatusList({ privateRegistrationRequest }) {
+  console.log('RegistrationRequestStatusList', privateRegistrationRequest);
   const { themeStretch } = useSettingsContext();
 
   const {
@@ -101,15 +110,20 @@ export default function RegistrationRequestStatusList() {
     onChangeRowsPerPage,
   } = useTable({ defaultOrderBy: 'createDate' });
 
-  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(privateRegistrationRequest);
+  // console.log(privateRegistrationRequest[0].request.id)
+  // console.log(privateRegistrationRequest[0].request.id)
 
-  useEffect(() => {
-    setTableData(TABLE_DATA_REQUESTS);
-  }, []);
+
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA_REQUESTS);
+  // }, []);
+  let eachEP;
 
   const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('available');
+  const [filterRole, setFilterRole] = useState('InProgress');
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
@@ -125,7 +139,7 @@ export default function RegistrationRequestStatusList() {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'available' || filterName !== '';
+    filterRole !== 'InProgress' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -134,7 +148,7 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'available', label: 'Available Requests', color: 'warning', count: getLengthByStatus('available') },
+    { value: 'InProgress', label: 'Available Requests', color: 'warning', count: getLengthByStatus('InProgress') },
     { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
@@ -174,6 +188,9 @@ export default function RegistrationRequestStatusList() {
     setTableData([...newTableData, newRow])
     setOpenConfirm(false);
   };
+
+  console.log(dataFiltered)
+
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -228,7 +245,7 @@ export default function RegistrationRequestStatusList() {
 
           <RegistrationTableToolbar
             filterName={filterName}
-            isFiltered={isFiltered}
+            // isFiltered={isFiltered}
             onFilterName={handleFilterName}
             onResetFilter={handleResetFilter}
           />
@@ -241,19 +258,34 @@ export default function RegistrationRequestStatusList() {
                 />
 
                 <TableBody>
-                  {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    console.log(row)
                     // updateRequest === row.id ? <Request row={row} tableData={tableData} setTableData={setTableData}/> :
-                    <TableRow
+                    return (<TableRow
                       hover
-                      key={row.id}
+                      key={row.request.id}
+                    // onClick={() => handleOpenConfirm(row.id)}
                     >
-                      <TableCell align="left" > R{row.id} </TableCell>
-                      <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.courseType}</TableCell>
-                      <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.registeredCourses}</TableCell>
-                      <TableCell align="left">{row.requestedBy}</TableCell>
-
+                      <TableCell align="left" > {row.request.id} </TableCell>
+                      {/* <TableCell align="left" > {row.id} </TableCell> */}
+                      <TableCell align="left">{row.request.dateCreated}</TableCell>
+                      {/* <TableCell align="left">{row.courseType}</TableCell> */}
+                      <TableCell align="left">{row.information.section}</TableCell>
+                      <TableCell align="center">{row.information.length}</TableCell>
+                      {
+                      
+                      axios.get(`${HOG_API}/api/EP/Get`)
+                        .then(response => {
+                          // console.log(response.data.data)
+                          const EP= (response.data.data);
+                          const eachEP = EP.filter(eachEP => eachEP.id===row.request.takenByEPId);
+                          // console.log("API table" ,response.data.data);
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        }) &&
+                      <TableCell align="left">{eachEP}</TableCell>
+                      }
                       {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
@@ -281,8 +313,8 @@ export default function RegistrationRequestStatusList() {
                         </Tooltip>
                       </TableCell>
 
-                    </TableRow>
-                  ))}
+                    </TableRow>)
+                  })}
 
                   <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
 
@@ -333,6 +365,8 @@ function applyFilter({
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
+  console.log(inputData)
+
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
@@ -342,14 +376,17 @@ function applyFilter({
   inputData = stabilizedThis.map((el) => el[0]);
 
   if (filterName) {
-    inputData = inputData.filter((request) =>
-      request.id === parseInt(filterName, 10) ||
-      request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-      request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    // console.log('filterName')
+    inputData = inputData.filter((eachRequest) =>
+      eachRequest.request.id === parseInt(filterName, 10) ||
+      eachRequest.information.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      // eachRequest.request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+    );
   }
 
   if (filterRole !== '') {
-    inputData = inputData.filter((request) => request.role === filterRole);
+    console.log('filterRole')
+    inputData = inputData.filter((eachRequest) => eachRequest.request.eaStatus === filterRole);
   }
 
   return inputData;
