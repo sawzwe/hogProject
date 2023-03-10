@@ -100,7 +100,7 @@ export default function StaffRequestPage() {
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
-        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get/${id}`)
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
         .then((res) => setCurrentRequest(res.data.data))
         .catch((error) => {
             if (error.response.status === 404) {

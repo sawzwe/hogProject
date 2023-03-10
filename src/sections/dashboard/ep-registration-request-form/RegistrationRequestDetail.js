@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types';
-import { useState, useCallback } from 'react';
+import * as Yup from 'yup';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
+import axios from 'axios';
+// firebase
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata } from "firebase/storage"
 // form
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -28,6 +35,9 @@ import {
     TableHead,
     TableRow,
     FormGroup,
+    DialogActions,
+    DialogTitle,
+    DialogContent
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -35,11 +45,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 // components
+import { useSnackbar } from '../../../components/snackbar';
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
-import FormProvider, { RHFUpload, RHFRadioGroup } from '../../../components/hook-form';
+import FormProvider, { RHFUploadPayment, RHFRadioGroup, RHFTextField } from '../../../components/hook-form';
 import ViewCourseCard from './ViewCourseCard';
+import FileThumbnail from '../../../components/file-thumbnail';
+import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 //
 import { fDate } from '../../../utils/formatTime';
+import { HOG_API, FIREBASE_API } from '../../../config';
+import { useAuthContext } from '../../../auth/useAuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -65,7 +80,7 @@ export default function RegistrationRequestDetail({ currentRequest }) {
         students
     } = currentRequest;
 
-    const status = (request.status === 'PendingEA' ? 'Pending EA' : request.status === 'PendingEP' ? 'Pending Payment' : request.status === 'PendingOA' && 'Pending OA')
+    const status = (request.status === 'PendingEA' ? 'Pending EA' : request.status === 'PendingEP' ? 'Pending Payment' : request.status === 'PendingOA' ? 'Pending OA' : request.status === 'Complete' ? 'Complete' : 'Reject')
 
     const handleOpenCourseDialog = async (courseIndex) => {
         await setSelectedCourse(information[courseIndex]);
@@ -77,95 +92,21 @@ export default function RegistrationRequestDetail({ currentRequest }) {
         setOpenCourseDialog(false);
     }
 
-    console.log(currentRequest)
+    if (status === 'Pending EA') {
+        return <PendingEAForm request={request} students={students} registeredCourses={information} />
+    }
 
-    return (
-        <>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={5}>
-                    <Typography variant="h5">Status: {status}</Typography>
-                </Grid>
-                <Grid item xs={12} md={12}>
-                    <StudentSection courseType="Private" students={students} />
-                </Grid>
-                <Grid item xs={12} md={12}>
-                    <CourseSection
-                        courseType="Private"
-                        courses={information}
-                        schedules={schedules}
-                        onView={handleOpenCourseDialog}
-                    />
-                </Grid>
+    if (status === 'Pending Payment') {
+        return <PendingEPForm request={request} students={students} registeredCourses={information} />
+    }
 
-                {status === 'Pending Payment' && (
-                    <Grid item xs={12} md={12}>
-                        <AttachedPayment
-                            requestStatus={request.status}
-                            paymentStatus={request.paymentStatus}
-                        />
-                    </Grid>
-                )}
+    if (status === 'Pending OA' || status === 'Complete') {
+        return <PendingOAForm request={request} students={students} registeredCourses={information} status={status} />
+    }
 
-                {status === 'Pending OA' && (
-                    <Grid item xs={12} md={12}>
-                        <AttachedPayment
-                            requestStatus={request.status}
-                            paymentStatus={request.paymentStatus}
-                        />
-                    </Grid>
-                )}
-
-                {!!request.epRemark1 && (
-                    <Grid item xs={12} md={12}>
-                        <AdditionalCommentSection message={request.epRemark1} />
-                    </Grid>
-                )}
-
-                {!!request.epRemark2 && (
-                    <Grid item xs={12} md={12}>
-                        <AdditionalCommentSection message={request.epRemark2} />
-                    </Grid>
-                )}
-
-                {!!request.eaRemark && (
-                    <Grid item xs={12} md={12}>
-                        <AdditionalCommentSection message={request.eaRemark} status="Reject" />
-                    </Grid>
-                )}
-
-                {!!request.oaRemark && (
-                    <Grid item xs={12} md={12}>
-                        <AdditionalCommentSection message={request.oaRemark} />
-                    </Grid>
-                )}
-
-                <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                        {status === 'Pending Payment' && (
-                            <>
-                                <LoadingButton variant="contained" color="error" sx={{ height: '3em' }}>
-                                    Reject
-                                </LoadingButton>
-                                <LoadingButton variant="contained" color="primary" sx={{ height: '3em' }}>
-                                    Submit
-                                </LoadingButton>
-                            </>
-                        )}
-                    </Stack>
-                </Grid>
-            </Grid>
-
-            {Object.keys(selectedCourse).length > 0 && (
-                <ViewCourseDialog
-                    open={openCourseDialog}
-                    onClose={handleCloseEditCourseDialog}
-                    status={status}
-                    registeredCourse={selectedCourse}
-                />
-            )}
-        </>
-    )
-
+    if (status === 'Reject') {
+        return <RejectForm request={request} students={students} registeredCourses={information} />
+    }
 }
 
 // ----------------------------------------------------------------------
@@ -279,157 +220,13 @@ export function CourseSection({ courseType, courses, onView, schedules }) {
 
 // ----------------------------------------------------------------------
 
-AttachedPayment.propTypes = {
-    requestStatus: PropTypes.string,
-    paymentStatus: PropTypes.string,
-}
-
-export function AttachedPayment({ requestStatus, paymentStatus }) {
-
-    const PAYMENT_TYPE_OPTIONS = [
-        { value: 'Complete Payment', label: 'Complete Payment' },
-        { value: 'Installments Payment', label: 'Installments Payment' }
-    ];
-
-    // Form for payment
-    const methods = useForm({
-        defaultValues: {
-            paymentAttachmentFiles: [],
-            paymentType: '',
-        }
-    })
-
-    const {
-        watch,
-        setValue,
-    } = methods;
-
-    const values = watch();
-
-    const { paymentAttachmentFiles } = values
-
-    // Payment Attachment Files ------------------------------------------------------------
-    const handleDropFiles = useCallback(
-        (acceptedFiles) => {
-            const files = paymentAttachmentFiles || [];
-            const newFiles = acceptedFiles.map((file) =>
-                Object.assign(file, {
-                    preview: URL.createObjectURL(file),
-                })
-            );
-            setValue('paymentAttachmentFiles', [...files, ...newFiles]);
-        },
-        [setValue, paymentAttachmentFiles]
-    );
-
-    const handleRemoveFile = (inputFile) => {
-        const filtered = paymentAttachmentFiles && paymentAttachmentFiles?.filter((file) => file !== inputFile);
-        setValue('paymentAttachmentFiles', filtered);
-    };
-
-    const handleRemoveAllFiles = () => {
-        setValue('paymentAttachmentFiles', []);
-    };
-
-    return (
-        <FormProvider methods={methods}>
-            <Grid item xs={12} md={12}>
-                <Card sx={{ p: 3 }}>
-                    <Typography variant="h5"
-                        sx={{
-                            mb: 2,
-                            display: 'block',
-                        }}>Additional Files</Typography>
-                    <RHFRadioGroup
-                        name="paymentType"
-                        options={PAYMENT_TYPE_OPTIONS}
-                        sx={{
-                            '& .MuiFormControlLabel-root': { mr: 4 },
-                        }}
-                        required
-                        disabled={(requestStatus !== 'Pending Payment')}
-                    />
-                    <Box
-                        rowGap={3}
-                        columnGap={2}
-                        display="grid"
-                        gridTemplateColumns={{
-                            xs: 'repeat(1, 1fr)',
-                            sm: 'repeat(1, 1fr)',
-                        }}
-                        sx={{ mt: 2 }}
-                    >
-                        {requestStatus === 'Pending Payment' && (
-                            <RHFUpload
-                                multiple
-                                thumbnail
-                                name="paymentAttachmentFiles"
-                                maxSize={3145728}
-                                onDrop={handleDropFiles}
-                                onRemove={handleRemoveFile}
-                                onRemoveAll={handleRemoveAllFiles}
-                            />
-                        )}
-
-                        {requestStatus !== 'Pending EA' && requestStatus !== 'Pending Payment' && (
-                            <RHFUpload
-                                multiple
-                                thumbnail
-                                disabled
-                                name="paymentAttachmentFiles"
-                                maxSize={3145728}
-                            />
-                        )}
-                    </Box>
-                </Card>
-            </Grid>
-        </FormProvider>
-    )
-}
-
-// ----------------------------------------------------------------------
-
-AdditionalCommentSection.propTypes = {
-    message: PropTypes.string,
-    status: PropTypes.string
-}
-
-export function AdditionalCommentSection({ message, status }) {
-    return (
-        <Card sx={{ p: 3 }}>
-            <Typography variant="h5"
-                sx={{
-                    mb: 2,
-                    display: 'block',
-                }}
-            >
-                {status !== 'Reject' ? 'Additional Comment' : 'Rejected Reason'}
-            </Typography>
-            <Box
-                rowGap={3}
-                columnGap={2}
-                display="grid"
-                gridTemplateColumns={{
-                    xs: 'repeat(1, 1fr)',
-                    sm: 'repeat(1, 1fr)',
-                }}
-            >
-                <TextField disabled value={message} />
-            </Box>
-        </Card>
-    )
-}
-
-// ----------------------------------------------------------------------
-
 ViewCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    status: PropTypes.string,
     registeredCourse: PropTypes.object
 }
 
-export function ViewCourseDialog({ open, onClose, status, registeredCourse }) {
+export function ViewCourseDialog({ open, onClose, registeredCourse }) {
     return (
 
         registeredCourse.schedules === undefined ? (
@@ -546,29 +343,6 @@ export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
                                         ))}
                                     </Grid>
                                 </Stack>
-                                {/* {preferredDays.map((day, index) => (
-                                    <Grid key={index} item xs={12} md={6}>
-                                        <PreferredDay day={day} />
-                                    </Grid>
-                                ))} */}
-                                {/* <Grid item xs={12} md={6}>
-                                        <PreferredDay day='friday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='tuesday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='saturday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='wednesday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='sunday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='thursday' />
-                                    </Grid> */}
                             </Grid>
                         </Grid>
                     </Stack>
@@ -846,8 +620,6 @@ PreferredDay.propTypes = {
 
 export function PreferredDay({ day }) {
 
-    console.log(day)
-
     return (
         <Stack direction="row" spacing={2} sx={{ mt: 1 }} justifyContent="flex-start" alignItems="center" >
             <Box sx={{ width: 50 }}>
@@ -856,69 +628,640 @@ export function PreferredDay({ day }) {
                 </FormGroup>
             </Box>
             <TextField size="small" fullWidth defaultValue={day.fromTime} disabled />
-            {/* <RHFSelect
-                name={`${day}.fromTime`}
-                label="From"
-                size="small"
-                disabled
-                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-            >
-                {TIME_OPTIONS.map((time) => (
-                    <MenuItem
-                        key={time}
-                        value={time}
-                        autoFocus
-                        sx={{
-                            mx: 1,
-                            my: 0.5,
-                            borderRadius: 0.75,
-                            typography: 'body2',
-                            textTransform: 'capitalize',
-                            '&:first-of-type': { mt: 0 },
-                            '&:last-of-type': { mb: 0 },
-                        }}
-                    >
-                        {time}
-                    </MenuItem>
-                ))}
-            </RHFSelect> */}
-
             <Typography variant="inherit" > - </Typography>
-
             <TextField size="small" fullWidth defaultValue={day.toTime} disabled />
+        </Stack>
+    )
+}
 
-            {/* <RHFSelect
-                name={`${day}.toTime`}
-                label="To"
-                size="small"
-                disabled
-                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-            >
-                {TIME_OPTIONS.map((time) => {
-                    const toTime = moment(time, "HH:mm")
-                    const fromTime = moment(values[day].fromTime, "HH:mm")
-                    if (fromTime.isBefore(toTime)) {
-                        return (
-                            <MenuItem
-                                key={time}
-                                value={time}
+// ----------------------------------------------------------------------
+
+PendingEPForm.propTypes = {
+    request: PropTypes.object,
+    students: PropTypes.array,
+    registeredCourses: PropTypes.array
+}
+
+export function PendingEPForm({ request, students, registeredCourses }) {
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
+    const { user } = useAuthContext();
+
+    // Firebase
+    const firebaseApp = initializeApp(FIREBASE_API);
+    const storage = getStorage(firebaseApp);
+
+    const MAX_FILE_SIZE = 2 * 1000 * 1000; // 2 Mb
+    const FILE_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
+
+    const PAYMENT_TYPE_OPTIONS = [
+        { value: 'Complete Payment', label: 'Complete Payment' },
+        { value: 'Installments Payment', label: 'Installments Payment' }
+    ];
+
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const PendingPaymentSchema = Yup.object().shape({
+        paymentAttachmentFiles: Yup.array()
+            .min(1, 'At least on payment attachment is required'),
+        paymentType: Yup.string().required('At least one payment Type is required'),
+    });
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        await setSelectedCourse(registeredCourses[courseIndex]);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        setOpenCourseDialog(false);
+    }
+
+    const defaultValues = {
+        paymentAttachmentFiles: [],
+        paymentType: '',
+        additionalComment: ''
+    }
+
+    // Form for payment
+    const methods = useForm({
+        resolver: yupResolver(PendingPaymentSchema),
+        defaultValues,
+    })
+
+    const {
+        watch,
+        setValue,
+        handleSubmit
+    } = methods;
+
+    const values = watch();
+
+    const { paymentAttachmentFiles, paymentType } = values
+
+    // Payment Attachment Files ------------------------------------------------------------
+    const handleDropFiles = useCallback(
+        (acceptedFiles) => {
+            const files = paymentAttachmentFiles || [];
+            const newFiles = acceptedFiles.map((file) =>
+                Object.assign(file, {
+                    preview: URL.createObjectURL(file),
+                })
+            );
+            setValue('paymentAttachmentFiles', [...files, ...newFiles]);
+        },
+        [setValue, paymentAttachmentFiles]
+    );
+
+    const handleRemoveFile = (inputFile) => {
+        const filtered = paymentAttachmentFiles && paymentAttachmentFiles?.filter((file) => file !== inputFile);
+        setValue('paymentAttachmentFiles', filtered);
+    };
+
+    const handleRemoveAllFiles = () => {
+        setValue('paymentAttachmentFiles', []);
+    };
+
+    const onSubmitPayment = async (data) => {
+
+        const updatedRequest = {
+            request: {
+                id: request.id,
+                status: "PendingOA",
+                eaStatus: "Complete",
+                paymentStatus: "Complete",
+                epRemark1: data.additionalComment,
+                epRemark2: request.epRemark2,
+                eaRemark: request.eaRemark,
+                oaRemark: request.oaRemark,
+                takenByEPId: user.id,
+                takenByEAId: request.takenByEAId,
+                takenByOAId: request.takenByOAId,
+            }
+        }
+
+        setIsSubmitting(true)
+        try {
+            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
+                .then(() => {
+                    data.paymentAttachmentFiles.map((file) => {
+                        const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
+                        return uploadBytes(storagePaymentFilesRef, file)
+                            .catch((error) => {
+                                throw error;
+                            });
+                    })
+                })
+                .catch((error) => {
+                    throw error;
+                })
+            setIsSubmitting(false);
+            enqueueSnackbar('Successfully submitted the payment', { variant: 'success' });
+            navigate('/course-registration/ep-request-status');
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: 'error' });
+            setIsSubmitting(false);
+        }
+    }
+
+    const onSubmit = async (data) => {
+        try {
+            setOpenConfirmDialog(true);
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: 'error' });
+        }
+    }
+
+    const onError = (error) => {
+        const errors = Object.values(error);
+        enqueueSnackbar(errors[0].message, { variant: 'error' });
+    }
+
+    return (
+        <>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={5}>
+                        <Typography variant="h5">Status: Pending Payment</Typography>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <StudentSection courseType="Private" students={students} />
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <CourseSection
+                            courseType="Private"
+                            courses={registeredCourses}
+                            onView={handleOpenCourseDialog}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} md={12}>
+                        <Grid item xs={12} md={12}>
+                            <Card sx={{ p: 3 }}>
+                                <Typography variant="h5"
+                                    sx={{
+                                        mb: 2,
+                                        display: 'block',
+                                    }}>Additional Files</Typography>
+                                <RHFRadioGroup
+                                    name="paymentType"
+                                    options={PAYMENT_TYPE_OPTIONS}
+                                    sx={{
+                                        '& .MuiFormControlLabel-root': { mr: 4 },
+                                    }}
+                                    required
+                                />
+                                <Box
+                                    rowGap={3}
+                                    columnGap={2}
+                                    display="grid"
+                                    gridTemplateColumns={{
+                                        xs: 'repeat(1, 1fr)',
+                                        sm: 'repeat(1, 1fr)',
+                                    }}
+                                    sx={{ mt: 2 }}
+                                >
+                                    <RHFUploadPayment
+                                        multiple
+                                        thumbnail
+                                        name="paymentAttachmentFiles"
+                                        maxSize={3145728}
+                                        onDrop={handleDropFiles}
+                                        onRemove={handleRemoveFile}
+                                        onRemoveAll={handleRemoveAllFiles}
+                                    />
+                                </Box>
+                            </Card>
+                        </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
                                 sx={{
-                                    mx: 1,
-                                    my: 0.5,
-                                    borderRadius: 0.75,
-                                    typography: 'body2',
-                                    textTransform: 'capitalize',
-                                    '&:first-of-type': { mt: 0 },
-                                    '&:last-of-type': { mb: 0 },
+                                    mb: 2,
+                                    display: 'block',
                                 }}
                             >
-                                {time}
-                            </MenuItem>
-                        )
-                    }
-                    return null;
-                })}
-            </RHFSelect> */}
-        </Stack>
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <RHFTextField name="additionalComment" label="Comment for pending payment" />
+                            </Box>
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12} md={12}>
+                        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                            <Button variant="contained" color="error" sx={{ height: '3em' }}>
+                                Reject
+                            </Button>
+                            <Button type="submit" variant="contained" color="primary" sx={{ height: '3em' }}>
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Grid>
+                </Grid>
+
+                <Dialog fullWidth maxWidth="md" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+                    <DialogTitle>
+                        Submit the request?
+                    </DialogTitle>
+                    <DialogContent>
+                        Once submitted, the request with payment attachments will be sent to Office Admin.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" color="inherit" onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
+                        <LoadingButton loading={isSubmitting} type="submit" variant="contained" color="primary" onClick={handleSubmit(onSubmitPayment)}>Submit</LoadingButton>
+                    </DialogActions>
+                </Dialog>
+            </FormProvider>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                />
+            )}
+        </>
+    )
+}
+
+
+// ----------------------------------------------------------------------
+
+PendingOAForm.propTypes = {
+    request: PropTypes.object,
+    students: PropTypes.array,
+    registeredCourses: PropTypes.array,
+    status: PropTypes.string,
+}
+
+export function PendingOAForm({ request, students, registeredCourses, status }) {
+
+    const {
+        id,
+        eaStatus,
+        paymentStatus,
+        epRemark1,
+        epRemark2
+    } = request;
+
+    const dataFetchedRef = useRef(false);
+
+    // Firebase
+    const firebaseApp = initializeApp(FIREBASE_API);
+    const storage = getStorage(firebaseApp);
+    const [filesURL, setFilesURL] = useState([]);
+
+    const fetchPayments = async () => {
+        const listRef = ref(storage, `payments/${id}`);
+        try {
+            await listAll(listRef)
+                .then((res) => {
+                    res.items.map((itemRef) => (
+                        getMetadata(itemRef)
+                            .then((metadata) => {
+                                getDownloadURL(itemRef)
+                                    .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
+                                    .catch((error) => {
+                                        throw error;
+                                    });
+                            })
+                            .catch((error) => {
+                                throw error;
+                            })
+                    ))
+                })
+                .catch((error) => {
+                    throw error;
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchPayments();
+    }, [])
+
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        await setSelectedCourse(registeredCourses[courseIndex]);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        setOpenCourseDialog(false);
+    }
+
+    if (filesURL.length === 0) {
+        return <LoadingScreen />
+    }
+
+    return (
+        <>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={5}>
+                    <Typography variant="h5">{`Status: ${status}`}</Typography>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <StudentSection courseType="Private" students={students} />
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <CourseSection
+                        courseType="Private"
+                        courses={registeredCourses}
+                        onView={handleOpenCourseDialog}
+                    />
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}>
+                                Payment Attachments
+                            </Typography>
+                            <Stack direction="row">
+                                {filesURL.map((file) => {
+                                    return (
+                                        <Stack
+                                            key={file.name}
+                                            component={'div'}
+                                            alignItems="center"
+                                            display="inline-flex"
+                                            justifyContent="center"
+                                            sx={{
+                                                m: 0.5,
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: 1.25,
+                                                overflow: 'hidden',
+                                                position: 'relative',
+                                                border: (theme) => `solid 1px ${theme.palette.divider}`,
+                                            }}
+                                        >
+                                            <FileThumbnail
+                                                tooltip
+                                                imageView
+                                                file={file}
+                                                onDownload={() => window.open(`${file.preview}`)}
+                                            />
+                                        </Stack>
+                                    )
+                                })}
+                            </Stack>
+                        </Card>
+                    </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}
+                        >
+                            Additional Comment
+                        </Typography>
+                        <Box
+                            rowGap={3}
+                            columnGap={2}
+                            display="grid"
+                            gridTemplateColumns={{
+                                xs: 'repeat(1, 1fr)',
+                                sm: 'repeat(1, 1fr)',
+                            }}
+                        >
+                            <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
+                        </Box>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                />
+            )}
+        </>
+    )
+}
+
+// ----------------------------------------------------------------------
+
+RejectForm.propTypes = {
+    request: PropTypes.object,
+    students: PropTypes.array,
+    registeredCourses: PropTypes.array
+}
+
+export function RejectForm({ request, students, registeredCourses }) {
+
+    const {
+        id,
+        eaStatus,
+        paymentStatus,
+        epRemark2,
+        eaRemark
+    } = request;
+
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        await setSelectedCourse(registeredCourses[courseIndex]);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        setOpenCourseDialog(false);
+    }
+
+    return (
+        <>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={5}>
+                    <Typography variant="h5">{`Status: Rejected`}</Typography>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <StudentSection courseType="Private" students={students} />
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <CourseSection
+                        courseType="Private"
+                        courses={registeredCourses}
+                        onView={handleOpenCourseDialog}
+                    />
+                </Grid>
+
+                {!!eaRemark && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={eaRemark} label="Comment for pending payment" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
+
+                {!!epRemark2 && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={epRemark2} label="Comment for pending payment" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
+            </Grid>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                />
+            )}
+        </>
+    )
+}
+
+// ----------------------------------------------------------------------
+
+PendingEAForm.propTypes = {
+    request: PropTypes.object,
+    students: PropTypes.array,
+    registeredCourses: PropTypes.array
+}
+
+export function PendingEAForm({ request, students, registeredCourses }) {
+
+    const {
+        epRemark1,
+    } = request;
+
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        await setSelectedCourse(registeredCourses[courseIndex]);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        setOpenCourseDialog(false);
+    }
+
+    return (
+        <>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={5}>
+                    <Typography variant="h5">Status: Pending EA</Typography>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <StudentSection courseType="Private" students={students} />
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <CourseSection
+                        courseType="Private"
+                        courses={registeredCourses}
+                        onView={handleOpenCourseDialog}
+                    />
+                </Grid>
+                {!!epRemark1 && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={epRemark1} label="Comment for scheduling" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
+            </Grid>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                />
+            )}
+        </>
     )
 }

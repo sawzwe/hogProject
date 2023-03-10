@@ -99,7 +99,7 @@ export default function RegistrationRequestDetailPage() {
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
-        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get/${id}`)
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
             .then((res) => setCurrentRequest(res.data.data))
             .catch((error) => console.error(error))
     }
@@ -114,8 +114,7 @@ export default function RegistrationRequestDetailPage() {
     if (currentRequest === undefined) {
         return <LoadingScreen />
     }
-    // const currentRequest = _regRequests.find((request) => request.id === requestId);
-    // const currentRequest = MOCKUP_GROUP_REQUEST;
+
     const currentMockRequest = (id === '1') ? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
 
     return (
@@ -126,7 +125,7 @@ export default function RegistrationRequestDetailPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
-                    heading="Course Registration Request"
+                    heading="Course Registration"
                     links={[
                         { name: 'All Requests', href: PATH_REGISTRATION.epRequestStatus },
                         { name: 'Request Detail' }

@@ -126,7 +126,7 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
     const onSubmit = async () => {
         try {
             await addCourseToDatabase();
-            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Request/Put`, {
+            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
                 request: {
                     id: request.id,
                     status: "PendingEP",

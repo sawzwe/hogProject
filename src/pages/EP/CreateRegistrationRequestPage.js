@@ -48,7 +48,7 @@ export default function CreateRegistrationRequestPage() {
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
-                    heading="Create registration request"
+                    heading="Course Registration"
                     links={[
                         {
                             name: 'Create Request',
