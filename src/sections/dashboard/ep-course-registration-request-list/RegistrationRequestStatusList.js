@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react';
 import sumBy from 'lodash/sumBy';
+import axios from 'axios';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 // @mui
@@ -22,7 +24,7 @@ import {
   Box
 } from '@mui/material';
 // utils
-import { fTimestamp } from '../../../utils/formatTime';
+import { fTimestamp, fDate } from '../../../utils/formatTime';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -41,6 +43,7 @@ import {
 } from '../../../components/table';
 // sections
 import RegistrationTableToolbar from './RegistrationTableToolbar';
+import { HOG_API } from '../../../config';
 
 function createData(id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt) {
   return { id, requestDate, courseType, section, registeredCourses, requestedBy, role, receipt };
@@ -58,17 +61,17 @@ const TABLE_HEAD_REQUESTS = [
 
 const TABLE_DATA_REQUESTS = [
   // Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
-  createData(222, '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
-  createData(102, '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'pendingPayment', 'incompleteReceipt'),
-  createData(545, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'pendingEA', ''),
-  createData(565, '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData(585, '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'pendingOA', ''),
-  createData(458, '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'pendingPayment', 'completeReceipt'),
-  createData(123, '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData(451, '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData(111, '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'completed', ''),
-  createData(333, '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'rejected', ''),
-  createData(845, '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'rejected', ''),
+  createData(222, '30-Oct-2022', 'Group', 'Class 20', 1, 'Nirawit(Boss)', 'PendingEA', 'None'),
+  createData(102, '16-Nov-2022', 'Private', 'Thanatuch Lertritsirkul', 2, 'Nirawit(Boss)', 'PendingEP', 'Incomplete'),
+  createData(545, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', 1, 'Nirawit(Boss)', 'PendingEA', 'Pending'),
+  createData(565, '30-Nov-2022', 'Semi Private', 'Semi Group 20', 1, 'Nirawit(Boss)', 'PendingOA', 'Complete'),
+  createData(585, '25-Dec-2022', 'Private', 'Piyaphon Wu', 2, 'Nirawit(Boss)', 'PendingOA', 'Complete'),
+  createData(458, '30-Dec-2022', 'Group', 'Class 23', 1, 'Nirawit(Boss)', 'PendingEP', 'Complete'),
+  createData(123, '15-Dec-2022', 'Group', 'Class 50', 1, 'Nirawit(Boss)', 'Complete', 'Complete'),
+  createData(451, '18-Dec-2022', 'Private', 'Zain', 1, 'Nirawit(Boss)', 'Reject', 'None'),
+  createData(111, '27-Dec-2022', 'Private', 'Pan', 1, 'Nirawit(Boss)', 'Complete', 'Complete'),
+  createData(333, '02-Dec-2022', 'Group', 'Class 80', 1, 'Nirawit(Boss)', 'Reject', 'None'),
+  createData(845, '02-Dec-2022', 'Private', 'Tar', 1, 'Nirawit(Boss)', 'Reject', 'None'),
 ];
 
 const errorTheme = createTheme({
@@ -85,11 +88,13 @@ const errorTheme = createTheme({
 });
 
 // ----------------------------------------------------------------------
+RegistrationRequestStatusList.propTypes = {
+  registrationRequests: PropTypes.array
+}
 
-export default function RegistrationRequestStatusList() {
 
+export default function RegistrationRequestStatusList({ registrationRequests }) {
   const { themeStretch } = useSettingsContext();
-
   const navigate = useNavigate();
 
   const {
@@ -113,15 +118,44 @@ export default function RegistrationRequestStatusList() {
 
   const [tableData, setTableData] = useState([]);
 
+  // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
-    setTableData(TABLE_DATA_REQUESTS);
+    const formattedData = registrationRequests.map((request) => {
+
+      // Waiting Pan fixing the API (Either takenByEPId not to be 0 or add EP's name to PrivateRegistrationRequest/Request/Get)
+
+      // const EPId = request.request.takenByEPId
+      // let epName = ''
+      // await axios.get(`${HOG_API}/api/EP/Get/${EPId}`)
+      //   .then((res) => {
+      //     epName = `${res.data.data.fName} (${res.data.data.nickname})`
+      //   })
+      //   .catch((error) => {
+      //     epName = `Undefined (Undefined)`
+      //   })
+
+      return {
+        id: request.request.id,
+        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+        courseType: request.request?.courseType || 'Private',
+        section: request.information[0]?.section || '-',
+        registeredCourses: request.information.length,
+        requestedBy: request.request.takenByEPId,
+        role: request.request.status,
+        receipt: request.request.paymentStatus,
+      }
+    })
+
+    setTableData(formattedData);
   }, []);
+
+  console.log(tableData)
 
   const [filterName, setFilterName] = useState('');
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('pendingEA');
+  const [filterRole, setFilterRole] = useState('PendingEA');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -144,11 +178,11 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'pendingEA', label: 'Pending for EA',  count: getLengthByStatus('pendingEA') },
-    { value: 'pendingPayment', label: 'Pending for Payment', color: 'warning', count: getLengthByStatus('pendingPayment') },
-    { value: 'pendingOA', label: 'Pending for OA',  count: getLengthByStatus('pendingOA') },
-    { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
-    { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
+    { value: 'PendingEA', label: 'Pending EA', count: getLengthByStatus('PendingEA') },
+    { value: 'PendingEP', label: 'Pending Payment', color: 'warning', count: getLengthByStatus('PendingEP') },
+    { value: 'PendingOA', label: 'Pending OA', count: getLengthByStatus('PendingOA') },
+    { value: 'Complete', label: 'Completed', count: getLengthByStatus('Complete'), color: 'success' },
+    { value: 'Reject', label: 'Rejected', count: getLengthByStatus('Reject'), color: 'error' },
   ];
 
 
@@ -284,8 +318,8 @@ export default function RegistrationRequestStatusList() {
                     <TableRow
                       hover
                       key={row.id}
-                      onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}          
-                      sx={{cursor: "pointer"}}          >
+                      onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}
+                      sx={{ cursor: "pointer" }}          >
                       <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
@@ -295,7 +329,7 @@ export default function RegistrationRequestStatusList() {
                       {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
-                          <Iconify icon="ic:error" color="red" />
+                            <Iconify icon="ic:error" color="red" />
                           </TableCell>
                         </ThemeProvider>
                       ) :
@@ -303,7 +337,7 @@ export default function RegistrationRequestStatusList() {
                       }
 
                       <TableCell>
-                            <Iconify icon="ic:chevron-right" />
+                        <Iconify icon="ic:chevron-right" />
                       </TableCell>
 
                     </TableRow>
@@ -356,9 +390,10 @@ function applyFilter({
   //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   // }
   if (filterName) {
-    inputData = inputData.filter((request) => 
-    request.id === parseInt(filterName, 10) || 
-    request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) =>
+      request.id === parseInt(filterName, 10) ||
+      request.requestDate.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {
