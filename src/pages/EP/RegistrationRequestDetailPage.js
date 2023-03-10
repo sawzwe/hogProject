@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
 import { PATH_REGISTRATION } from '../../routes/paths';
@@ -89,9 +90,8 @@ const MOCKUP_PRIVATE_REQUEST = {
 
 export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
-
-    // Request ID
     const { id } = useParams();
+
 
     // const currentRequest = _regRequests.find((request) => request.id === requestId);
     // const currentRequest = MOCKUP_GROUP_REQUEST;
@@ -107,7 +107,7 @@ export default function RegistrationRequestDetailPage() {
                 <CustomBreadcrumbs
                     heading="Course Registration Request"
                     links={[
-                        { name: 'Request Status', href: PATH_REGISTRATION.epRequestStatus },
+                        { name: 'All Requests', href: PATH_REGISTRATION.epRequestStatus },
                         { name: 'Request Detail ' }
                     ]}
                 />
