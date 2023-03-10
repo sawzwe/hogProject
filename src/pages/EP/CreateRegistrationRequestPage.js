@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
+// auth
+import { useAuthContext } from '../../auth/useAuthContext';
 // routes
 import { PATH_REGISTRATION } from '../../routes/paths';
 // components
@@ -16,14 +18,16 @@ import { HOG_API } from '../../config';
 // ----------------------------------------------------------------------
 
 export default function CreateRegistrationRequestPage() {
+    const { user } = useAuthContext()
     const { themeStretch } = useSettingsContext();
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`, Role: `${user.role}` } }
 
     const dataFetchedRef = useRef(false);
 
     const [studentList, setStudentList] = useState([]);
 
     const fetchStudent = async() => {
-        axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get`)
+        axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get`, config)
         .then((res) => setStudentList(res.data.data))
         .catch((error) => console.error(error))
     }
