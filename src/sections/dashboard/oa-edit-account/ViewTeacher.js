@@ -30,7 +30,7 @@ export default function ViewTeacher({ currentTeacher }) {
         nickname: currentTeacher?.nickname || '',
         phone: currentTeacher?.phone || '',
         line: currentTeacher?.line || '',
-        email: currentTeacher?.fName || '',
+        email: currentTeacher?.email || '',
         monday: currentTeacher.monday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.monday.fromTime, toTime: currentTeacher.monday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
         tuesday: currentTeacher.tuesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.tuesday.fromTime, toTime: currentTeacher.tuesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
         wednesday: currentTeacher.wednesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.wednesday.fromTime, toTime: currentTeacher.wednesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
