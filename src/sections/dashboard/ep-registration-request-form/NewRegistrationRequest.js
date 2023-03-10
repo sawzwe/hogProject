@@ -71,11 +71,12 @@ const MAX_STUDENTS_PER_REQUEST_SEMI_PRIVATE = 15;
 NewViewRegistrationRequest.propTypes = {
     isView: PropTypes.bool,
     studentList: PropTypes.array,
+    educationPlannerId: PropTypes.number,
 };
 
 // ----------------------------------------------------------------------
 
-export default function NewViewRegistrationRequest({ studentList }) {
+export default function NewViewRegistrationRequest({ studentList, educationPlannerId }) {
 
     const [courseType, setCourseType] = useState('');
 
@@ -130,11 +131,11 @@ export default function NewViewRegistrationRequest({ studentList }) {
             </Grid> */}
 
             {courseType === 'Semi Private' && (
-                <NewSemiPrivateRequestForm studentList={studentList} />
+                <NewSemiPrivateRequestForm studentList={studentList} educationPlannerId={educationPlannerId} />
             )}
 
             {courseType === 'Private' && (
-                <NewPrivateRequestForm studentList={studentList} />
+                <NewPrivateRequestForm studentList={studentList} educationPlannerId={educationPlannerId} />
             )}
 
         </>
@@ -177,7 +178,7 @@ NewPrivateRequestForm.propTypes = {
     studentList: PropTypes.array,
 }
 
-export function NewPrivateRequestForm({ studentList }) {
+export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
@@ -282,7 +283,7 @@ export function NewPrivateRequestForm({ studentList }) {
                 eaStatus: "InProgress",
                 paymentStatus: "None",
                 epRemark1: additionalComment,
-                takenByEPId: 4,
+                takenByEPId: educationPlannerId,
             }
 
             const information = courses.map((eachCourse) => {
@@ -310,12 +311,13 @@ export function NewPrivateRequestForm({ studentList }) {
                 request,
                 information,
             })
-                .then(() => enqueueSnackbar('The request is successfully created', { variant: 'success' }))
-                .then(() => navigate('/course-registration/ep-request-status'))
                 .catch((error) => {
-                    console.error(error)
-                    return enqueueSnackbar(error.message, { variant: 'error' })
+                    throw error;
                 })
+
+            enqueueSnackbar('The request is successfully created', { variant: 'success' })
+            navigate('/course-registration/ep-request-status')
+
         } catch (error) {
             console.log(error)
             enqueueSnackbar(error.message, { variant: 'error' })
@@ -523,8 +525,7 @@ export function NewSemiPrivateRequestForm({ studentList }) {
                 }
             })
 
-            console.log(studentIds);
-            console.log(information);
+
 
             // console.log(data);
             enqueueSnackbar('The request is successfully created', { variant: 'success' })
@@ -1326,22 +1327,22 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                         <PreferredDay day='monday' />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <PreferredDay day='tuesday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='wednesday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <PreferredDay day='thursday' />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
                                         <PreferredDay day='friday' />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <PreferredDay day='tuesday' />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         <PreferredDay day='saturday' />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
+                                        <PreferredDay day='wednesday' />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
                                         <PreferredDay day='sunday' />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <PreferredDay day='thursday' /> 
                                     </Grid>
                                 </Grid>
                             </Grid>
