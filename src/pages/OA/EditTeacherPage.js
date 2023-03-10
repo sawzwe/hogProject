@@ -29,7 +29,7 @@ export default function NewAccountPage() {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${id}`)
             .then((res) => {
                 console.log('res', res);
-                const data = res.data.data.fullName
+                const data = res.data.data
                 setTeacher(data)
                 // console.log('data', data)
             })
@@ -42,20 +42,25 @@ export default function NewAccountPage() {
         dataFetchedRef.current = true;
     }, [])
 
-    const DUMMY_TEACHER = {
-        id: '1',
+    if (teacher === undefined){
+        return <LoadingScreen/>
+    }
+
+    const TEACHER_DATA = {
+        id: teacher.id,
         role: 'Teacher',
-        fName: 'Piyaphon',
-        lName: 'Wu',
-        nickname: 'Hong',
-        phone: '0971478523',
-        line: 'hong1',
-        email: 'hong@hotmail.com',
-        monday: {fromTime: '09:00', toTime: '18:00'},
-        tuesday: {fromTime: '09:00', toTime: '18:00'},
-        wednesday: {fromTime: '09:00', toTime: '18:00'},
-        thursday: {fromTime: '09:00', toTime: '18:00'},
-        friday: {fromTime: '09:00', toTime: '18:00'},
+        fullname: teacher.fullName,
+        fName: teacher.fName,
+        lName: teacher.lName,
+        nickname: teacher.nickname,
+        phone: teacher.phone,
+        line: teacher.line,
+        email: teacher.email,
+        monday: {fromTime: teacher.workTimes[0].fromTime, toTime: teacher.workTimes[0].toTime},
+        tuesday: {fromTime: teacher.workTimes[1].fromTime, toTime: teacher.workTimes[1].toTime},
+        wednesday: {fromTime: teacher.workTimes[2].fromTime, toTime: teacher.workTimes[2].toTime},
+        thursday: {fromTime: teacher.workTimes[3].fromTime, toTime: teacher.workTimes[3].toTime},
+        friday: {fromTime: teacher.workTimes[4].fromTime, toTime: teacher.workTimes[4].toTime},
         saturday: {fromTime: '', toTime: ''},
         sunday: {fromTime: '', toTime: ''}
     }
@@ -71,12 +76,12 @@ export default function NewAccountPage() {
                     heading="Edit Teacher Account"
                     links={[
                         { name: 'All Teachers', href: PATH_ACCOUNT.teacherManagement.searchTeacher },
-                        { name: `${teacher}` },
+                        { name: `${TEACHER_DATA.fullname}` },
                         { name: 'Edit Account' }
                     ]}
                 />
 
-                <EditTeacher currentTeacher={DUMMY_TEACHER} />
+                <EditTeacher currentTeacher={TEACHER_DATA} />
             </Container>
         </>
     );

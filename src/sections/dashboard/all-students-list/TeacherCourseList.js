@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 // @mui
 import { Table, Tooltip, TableRow, TableBody, TableCell, IconButton, TableContainer } from '@mui/material';
 // components
@@ -43,15 +45,20 @@ const TABLE_DATA = [
 ];
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Student ID', align: 'left' },
+  { id: 'id', label: 'Teacher ID', align: 'left' },
   { id: 'fullname', label: 'Fullname  ', align: 'left' },
   { id: 'nickname', label: 'Nickname  ', align: 'left' },
   { id: 'details', label: ' ', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
-
-export default function TeacherCourseList() {
+TeacherCourseList.propTypes = {
+  privateScheduleRequest: PropTypes.array,
+};
+export default function TeacherCourseList({privateScheduleRequest}) {
+  const navigate = useNavigate();
+  // console.log('request', privateScheduleRequest.privateClasses[0]?.teacherPrivateClass.teacherId);
+    // console.log('request', privateScheduleRequest.privateClasses[0].teacherPrivateClass.teacherId);
   const {
     dense,
     page,
@@ -69,8 +76,26 @@ export default function TeacherCourseList() {
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
-    setTableData(TABLE_DATA);
+    const formattedData = privateScheduleRequest.map((request) => {
+      return {
+        classId: request.privateClasses[0].teacherPrivateClass.id,
+        teacherId: request.privateClasses[0].teacherPrivateClass.teacherId,
+        // requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+        // courseType: request.request?.courseType || 'Private',
+        // section: request.information[0]?.section || '-',
+        // registeredCourses: request.information.length,
+        // requestedBy: request.request.takenByEPId,
+        // eaStatus: request.request.eaStatus,
+        // receipt: request.request.paymentStatus,
+      }
+    })
+
+    setTableData(formattedData);
   }, []);
+
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA);
+  // }, []);
 
   // Search
   const [filterValue, setFilterValue] = useState('');
@@ -148,12 +173,14 @@ export default function TeacherCourseList() {
             />
 
             <TableBody>
-              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => (
                 <TableRow
                  hover
-                key={row.id}
+                key={row.classId}
+                onClick={()=>navigate(`/account/teacher-management/teacher-course/${row.teacherId}`)}
+                sx={{cursor:'pointer'}}
                 >
-                  <TableCell align="left" > T{row.id} </TableCell>
+                  <TableCell align="left" > {row.teacherId} </TableCell>
                   <TableCell align="left">{row.fullname}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell>

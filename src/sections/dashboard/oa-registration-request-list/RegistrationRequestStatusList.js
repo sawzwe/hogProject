@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'
 import sumBy from 'lodash/sumBy';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +23,7 @@ import {
   Box
 } from '@mui/material';
 // utils
-import { fTimestamp } from '../../../utils/formatTime';
+import { fTimestamp, fDate } from '../../../utils/formatTime';
 // components
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
@@ -58,8 +59,8 @@ const TABLE_HEAD_REQUESTS = [
   { id: 'courseType', label: 'Course Type', align: 'left' },
   { id: 'section ', label: 'Section', align: 'left', width: 200 },
   { id: 'paymentType', label: 'Payment Type', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
-  { id: 'incomplete' },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'center' },
+  // { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
 
@@ -86,8 +87,11 @@ const errorTheme = createTheme({
 });
 
 // ----------------------------------------------------------------------
+RegistrationRequestStatusList.propTypes = {
+  registrationRequests: PropTypes.array
+}
 
-export default function RegistrationRequestStatusList() {
+export default function RegistrationRequestStatusList({registrationRequests}) {
 
   const { themeStretch } = useSettingsContext();
 
@@ -113,16 +117,32 @@ export default function RegistrationRequestStatusList() {
   } = useTable({ defaultOrderBy: 'createDate' });
 
   const [tableData, setTableData] = useState([]);
-
   useEffect(() => {
-    setTableData(TABLE_DATA_REQUESTS);
+    const formattedData = registrationRequests.map( (request) => {      
+      // const EPId = request.request.takenByEPId
+      return {
+        id: request.request.id,
+        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+        courseType: request.request?.courseType || 'Private',
+        section: request.information[0]?.section || '-',
+        registeredCourses: request.information.length,
+        requestedBy: request.request.takenByEPId,
+        role: request.request.status,
+        receipt: request.request.paymentStatus,
+      }
+    })
+
+    setTableData(formattedData);
   }, []);
+  // useEffect(() => {
+  //   setTableData(TABLE_DATA_REQUESTS);
+  // }, []);
 
   const [filterName, setFilterName] = useState('');
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('all');
+  const [filterRole, setFilterRole] = useState('');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -136,7 +156,7 @@ export default function RegistrationRequestStatusList() {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !== 'all' || filterName !== '';
+    filterRole !==''  || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -145,7 +165,7 @@ export default function RegistrationRequestStatusList() {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: 'all', label: 'All', color: 'warning', count: getLengthByStatus('all') },
+    { value: '', label: 'All', color: 'warning', count: getLengthByStatus('') },
     { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
     { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
   ];
@@ -201,7 +221,7 @@ export default function RegistrationRequestStatusList() {
 
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
+    setFilterRole('');
   };
 
   return (
@@ -266,15 +286,17 @@ export default function RegistrationRequestStatusList() {
                     <TableRow
                       hover
                       key={row.id}
+                      sx={{cursor:'pointer'}}
+                      onClick={()=>navigate(`/course-registration/oa-request-status/${row.id}`)}
                     >
-                      <TableCell align="left" > R{row.id} </TableCell>
+                      <TableCell align="left" > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.paymentType}</TableCell>
-                      <TableCell align="left">{row.requestedBy}</TableCell>
+                      <TableCell align="left">{row.receipt}</TableCell>
+                      <TableCell align="center">{row.requestedBy}</TableCell>
 
-                      {row.receipt === 'incompleteReceipt' ? (
+                      {/* {row.receipt === 'incompleteReceipt' ? (
                         <ThemeProvider theme={errorTheme}>
                           <TableCell align="left">
                             <Tooltip title="Incomplete Reciept">
@@ -286,14 +308,10 @@ export default function RegistrationRequestStatusList() {
                         </ThemeProvider>
                       ) :
                         <TableCell align="left" />
-                      }
+                      } */}
 
                       <TableCell>
-                        <Tooltip title="More Info">
-                          <IconButton>
                             <Iconify icon="ic:chevron-right" />
-                          </IconButton>
-                        </Tooltip>
                       </TableCell>
 
                     </TableRow>
