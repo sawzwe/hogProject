@@ -92,6 +92,7 @@ export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
     const { id } = useParams();
 
+
     // const currentRequest = _regRequests.find((request) => request.id === requestId);
     // const currentRequest = MOCKUP_GROUP_REQUEST;
     const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
@@ -106,7 +107,7 @@ export default function RegistrationRequestDetailPage() {
                 <CustomBreadcrumbs
                     heading="Course Registration Request"
                     links={[
-                        { name: 'Request Status', href: PATH_REGISTRATION.epRequestStatus },
+                        { name: 'All Requests', href: PATH_REGISTRATION.epRequestStatus },
                         { name: 'Request Detail ' }
                     ]}
                 />

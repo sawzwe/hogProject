@@ -149,7 +149,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     setTableData(formattedData);
   }, []);
 
-  console.log(tableData)
+  console.log(tableData);
 
   const [filterName, setFilterName] = useState('');
 
