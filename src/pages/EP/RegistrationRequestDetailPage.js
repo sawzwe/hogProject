@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
@@ -7,9 +8,11 @@ import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import LoadingScreen from '../../components/loading-screen';
 // sections
 import RegistrationRequestDetail from '../../sections/dashboard/ep-registration-request-form/RegistrationRequestDetail'
-
+//
+import { HOG_API } from '../../config';
 // ----------------------------------------------------------------------
 
 const MOCKUP_GROUP_REQUEST = {
@@ -92,10 +95,28 @@ export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
     const { id } = useParams();
 
+    const [currentRequest, setCurrentRequest] = useState();
+    const dataFetchedRef = useRef(false);
 
+    const fetchRequest = () => {
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get/${id}`)
+            .then((res) => setCurrentRequest(res.data.data))
+            .catch((error) => console.error(error))
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchRequest();
+    }, [])
+
+    if (currentRequest === undefined) {
+        return <LoadingScreen />
+    }
     // const currentRequest = _regRequests.find((request) => request.id === requestId);
     // const currentRequest = MOCKUP_GROUP_REQUEST;
-    const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
+    const currentMockRequest = (id === '1') ? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>
@@ -108,11 +129,11 @@ export default function RegistrationRequestDetailPage() {
                     heading="Course Registration Request"
                     links={[
                         { name: 'All Requests', href: PATH_REGISTRATION.epRequestStatus },
-                        { name: 'Request Detail ' }
+                        { name: 'Request Detail' }
                     ]}
                 />
 
-                <RegistrationRequestDetail request={currentRequest} />
+                <RegistrationRequestDetail currentRequest={currentRequest} mockRequest={currentMockRequest} />
             </Container>
         </>
     );

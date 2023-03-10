@@ -120,19 +120,18 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
 
   // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
-    const formattedData = registrationRequests.map((request) => {
+    const formattedData = registrationRequests.map( (request) => {
 
       // Waiting Pan fixing the API (Either takenByEPId not to be 0 or add EP's name to PrivateRegistrationRequest/Request/Get)
 
-      // const EPId = request.request.takenByEPId
+      
+      const EPId = request.request.takenByEPId
       // let epName = ''
-      // await axios.get(`${HOG_API}/api/EP/Get/${EPId}`)
-      //   .then((res) => {
-      //     epName = `${res.data.data.fName} (${res.data.data.nickname})`
-      //   })
-      //   .catch((error) => {
-      //     epName = `Undefined (Undefined)`
-      //   })
+      // const epName = axios.get(`${HOG_API}/api/EP/Get/${EPId}`)
+      //   .then((res) => res.data.data.nickname)
+      //   .catch((error) => `Undefined (Undefined)`)
+
+      //   console.log(epName)
 
       return {
         id: request.request.id,

@@ -57,7 +57,7 @@ export default function CreateRegistrationRequestPage() {
                     ]}
                 />
 
-                <NewRegistrationRequest studentList={studentList} />
+                <NewRegistrationRequest studentList={studentList} educationPlannerId={user.id} />
             </Container>
         </>
     );
