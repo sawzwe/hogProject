@@ -133,7 +133,7 @@ export default function RegistrationRequestDetailPage() {
                     ]}
                 />
 
-                <RegistrationRequestDetail currentRequest={currentRequest} mockRequest={currentMockRequest} />
+                <RegistrationRequestDetail currentRequest={currentRequest} />
             </Container>
         </>
     );

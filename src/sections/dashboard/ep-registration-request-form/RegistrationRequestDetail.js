@@ -44,30 +44,19 @@ import { fDate } from '../../../utils/formatTime';
 // ----------------------------------------------------------------------
 
 RegistrationRequestDetail.propTypes = {
-    mockRequest: PropTypes.object,
     currentRequest: PropTypes.object
 };
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestDetail({ mockRequest, currentRequest }) {
+export default function RegistrationRequestDetail({ currentRequest }) {
 
     const [selectedCourse, setSelectedCourse] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
 
-    if (!mockRequest) {
+    if (!currentRequest) {
         return null;
     }
-
-    const {
-        regRequestId,
-        courseType,
-        courses,
-        attachedPayment,
-        paymentType,
-        additionalComment,
-        rejectedReason,
-    } = mockRequest;
 
     const {
         request,
@@ -88,6 +77,8 @@ export default function RegistrationRequestDetail({ mockRequest, currentRequest 
         setOpenCourseDialog(false);
     }
 
+    console.log(currentRequest)
+
     return (
         <>
             <Grid container spacing={3}>
@@ -95,34 +86,56 @@ export default function RegistrationRequestDetail({ mockRequest, currentRequest 
                     <Typography variant="h5">Status: {status}</Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                    <StudentSection courseType={courseType} students={students} />
+                    <StudentSection courseType="Private" students={students} />
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <CourseSection
-                        courseType={courseType}
+                        courseType="Private"
                         courses={information}
                         schedules={schedules}
                         onView={handleOpenCourseDialog}
                     />
                 </Grid>
 
-                {status !== 'Pending EA' && (
+                {status === 'Pending Payment' && (
                     <Grid item xs={12} md={12}>
                         <AttachedPayment
-                            courseType={courseType}
-                            payment={attachedPayment}
-                            paymentType={paymentType}
-                            status={status} />
+                            requestStatus={request.status}
+                            paymentStatus={request.paymentStatus}
+                        />
                     </Grid>
                 )}
 
-                <Grid item xs={12} md={12}>
-                    <AdditionalCommentSection message={additionalComment} />
-                </Grid>
-
-                {status === 'Rejected' && (
+                {status === 'Pending OA' && (
                     <Grid item xs={12} md={12}>
-                        <AdditionalCommentSection message={rejectedReason} status={status} />
+                        <AttachedPayment
+                            requestStatus={request.status}
+                            paymentStatus={request.paymentStatus}
+                        />
+                    </Grid>
+                )}
+
+                {!!request.epRemark1 && (
+                    <Grid item xs={12} md={12}>
+                        <AdditionalCommentSection message={request.epRemark1} />
+                    </Grid>
+                )}
+
+                {!!request.epRemark2 && (
+                    <Grid item xs={12} md={12}>
+                        <AdditionalCommentSection message={request.epRemark2} />
+                    </Grid>
+                )}
+
+                {!!request.eaRemark && (
+                    <Grid item xs={12} md={12}>
+                        <AdditionalCommentSection message={request.eaRemark} status="Reject" />
+                    </Grid>
+                )}
+
+                {!!request.oaRemark && (
+                    <Grid item xs={12} md={12}>
+                        <AdditionalCommentSection message={request.oaRemark} />
                     </Grid>
                 )}
 
@@ -267,13 +280,11 @@ export function CourseSection({ courseType, courses, onView, schedules }) {
 // ----------------------------------------------------------------------
 
 AttachedPayment.propTypes = {
-    courseType: PropTypes.string,
-    payment: PropTypes.array,
-    paymentType: PropTypes.string,
-    status: PropTypes.string,
+    requestStatus: PropTypes.string,
+    paymentStatus: PropTypes.string,
 }
 
-export function AttachedPayment({ courseType, payment, paymentType, status }) {
+export function AttachedPayment({ requestStatus, paymentStatus }) {
 
     const PAYMENT_TYPE_OPTIONS = [
         { value: 'Complete Payment', label: 'Complete Payment' },
@@ -283,8 +294,8 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
     // Form for payment
     const methods = useForm({
         defaultValues: {
-            paymentAttachmentFiles: payment || [],
-            paymentType: paymentType || '',
+            paymentAttachmentFiles: [],
+            paymentType: '',
         }
     })
 
@@ -336,7 +347,7 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
                             '& .MuiFormControlLabel-root': { mr: 4 },
                         }}
                         required
-                        disabled={(status !== 'Pending Payment')}
+                        disabled={(requestStatus !== 'Pending Payment')}
                     />
                     <Box
                         rowGap={3}
@@ -348,7 +359,7 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
                         }}
                         sx={{ mt: 2 }}
                     >
-                        {status === 'Pending Payment' && (
+                        {requestStatus === 'Pending Payment' && (
                             <RHFUpload
                                 multiple
                                 thumbnail
@@ -359,7 +370,8 @@ export function AttachedPayment({ courseType, payment, paymentType, status }) {
                                 onRemoveAll={handleRemoveAllFiles}
                             />
                         )}
-                        {status !== 'Pending EA' && status !== 'Pending Payment' && (
+
+                        {requestStatus !== 'Pending EA' && requestStatus !== 'Pending Payment' && (
                             <RHFUpload
                                 multiple
                                 thumbnail
@@ -425,11 +437,6 @@ export function ViewCourseDialog({ open, onClose, status, registeredCourse }) {
         ) : (
             <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
         )
-        //     status === 'Pending EA' && (
-        //     <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
-        // )
-
-        // status === 'Pending Payment' || status === 'PendingOA' || status === 'Complete' || status === 'Reject' 
     )
 }
 
