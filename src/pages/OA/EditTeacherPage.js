@@ -56,13 +56,34 @@ export default function NewAccountPage() {
         phone: teacher.phone,
         line: teacher.line,
         email: teacher.email,
-        monday: {fromTime: teacher.workTimes[0].fromTime, toTime: teacher.workTimes[0].toTime},
-        tuesday: {fromTime: teacher.workTimes[1].fromTime, toTime: teacher.workTimes[1].toTime},
-        wednesday: {fromTime: teacher.workTimes[2].fromTime, toTime: teacher.workTimes[2].toTime},
-        thursday: {fromTime: teacher.workTimes[3].fromTime, toTime: teacher.workTimes[3].toTime},
-        friday: {fromTime: teacher.workTimes[4].fromTime, toTime: teacher.workTimes[4].toTime},
-        saturday: {fromTime: '', toTime: ''},
-        sunday: {fromTime: '', toTime: ''}
+        monday: {
+            fromTime: teacher.workTimes[0] ? teacher.workTimes[0].fromTime || '' : '',
+            toTime: teacher.workTimes[0] ? teacher.workTimes[0].toTime || '' : ''
+          },
+          tuesday: {
+            fromTime: teacher.workTimes[1] ? teacher.workTimes[1].fromTime || '' : '',
+            toTime: teacher.workTimes[1] ? teacher.workTimes[1].toTime || '' : ''
+          },
+          wednesday: {
+            fromTime: teacher.workTimes[2] ? teacher.workTimes[2].fromTime || '' : '',
+            toTime: teacher.workTimes[2] ? teacher.workTimes[2].toTime || '' : ''
+          },
+          thursday: {
+            fromTime: teacher.workTimes[3] ? teacher.workTimes[3].fromTime || '' : '',
+            toTime: teacher.workTimes[3] ? teacher.workTimes[3].toTime || '' : ''
+          },
+          friday: {
+            fromTime: teacher.workTimes[4] ? teacher.workTimes[4].fromTime || '' : '',
+            toTime: teacher.workTimes[4] ? teacher.workTimes[4].toTime || '' : ''
+          },
+          saturday: {
+            fromTime: teacher.workTimes[5] ? teacher.workTimes[5].fromTime || '' : '',
+            toTime: teacher.workTimes[5] ? teacher.workTimes[5].toTime || '' : ''
+          },
+          sunday: {
+            fromTime: teacher.workTimes[6] ? teacher.workTimes[6].fromTime || '' : '',
+            toTime: teacher.workTimes[6] ? teacher.workTimes[6].toTime || '' : ''
+          }
     }
 
     return (
