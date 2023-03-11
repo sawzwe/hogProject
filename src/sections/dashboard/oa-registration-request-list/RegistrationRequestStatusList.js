@@ -142,7 +142,7 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('');
+  const [filterRole, setFilterRole] = useState('PendingOA');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
