@@ -21,7 +21,7 @@ export default function RegistrationRequestStatusPage() {
 
     const fetchRequests = async () => {
         try {
-            await axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get`)
+            await axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get`)
                 .then((res) => {
                     setRegistrationRequests(res.data.data)
                 })

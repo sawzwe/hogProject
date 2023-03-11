@@ -2,6 +2,9 @@
 import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LockResetIcon from '@mui/icons-material/LockReset';
+import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import CallReceivedIcon from '@mui/icons-material/CallReceived';
 // routes
 import { PATH_AUTH, PATH_ACCOUNT, PATH_REGISTRATION, PATH_COURSE_TRANSFER, PATH_SCHEDULE_CHANGING } from '../../../routes/paths';
 // components
@@ -17,6 +20,9 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
 
 const ICONS = {
   user: icon('ic_user'),
+  newUser: <LibraryAddRoundedIcon />,
+  editUser: <EditRoundedIcon />,
+  leave: <CallReceivedIcon />,
   calendar: icon('ic_calendar'),
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
@@ -47,7 +53,7 @@ const EPNavConfig = [
           { title: 'course detail', path: PATH_ACCOUNT.studentManagement.searchCourseStudent },
         ],
       },
-      { title: 'new student', path: 'new-student', icon: ICONS.user },
+      { title: 'new student', path: 'new-student', icon: ICONS.newUser },
     ],
   },
 
@@ -158,11 +164,11 @@ const OANavConfig = [
   {
     subheader: 'account management',
     items: [
-      { title: 'New Account', path: 'new-staff', icon: ICONS.user },
+      { title: 'New Account', path: 'new-staff', icon: ICONS.newUser },
       {
         title: 'Edit Account',
         path: PATH_ACCOUNT.root,
-        icon: ICONS.group,
+        icon: ICONS.editUser,
         children: [
           { title: 'Student', path: PATH_ACCOUNT.studentManagement.searchStudent },
           { title: 'Teacher', path: PATH_ACCOUNT.teacherManagement.searchTeacher },
@@ -176,8 +182,8 @@ const OANavConfig = [
   {
     subheader: 'request management',
     items: [
-      { title: 'Registration Request', path: PATH_REGISTRATION.oaRequestStatus, icon: ICONS.user },
-      { title: 'Leaving Request', path: 'schedule-changing/leaving-request', icon: ICONS.group },
+      { title: 'Registration Request', path: PATH_REGISTRATION.oaRequestStatus, icon: ICONS.mail },
+      { title: 'Leaving Request', path: 'schedule-changing/leaving-request', icon: ICONS.leave },
     ],
   },
 

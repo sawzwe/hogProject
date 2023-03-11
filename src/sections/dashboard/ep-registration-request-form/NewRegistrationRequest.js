@@ -306,7 +306,7 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
                 }
             })
 
-            await axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Request/Post`, {
+            await axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Post`, {
                 studentIds,
                 request,
                 information,
@@ -1491,48 +1491,3 @@ export function PreferredDay({ day }) {
         </Stack>
     )
 }
-
-
-// {courseType === "Group" &&
-// <>
-//     {/* Payment Attachment */}
-//     <Grid item xs={12} md={12}>
-//         <Card sx={{ p: 3 }}>
-//             <Typography variant="h5"
-//                 sx={{
-//                     mb: 2,
-//                     display: 'block',
-//                 }}>Additional Files</Typography>
-//             <RHFRadioGroup
-//                 name="paymentType"
-//                 options={PAYMENT_TYPE_OPTIONS}
-//                 sx={{
-//                     '& .MuiFormControlLabel-root': { mr: 4 },
-//                 }}
-//                 required
-//             />
-//             <Box
-//                 rowGap={3}
-//                 columnGap={2}
-//                 display="grid"
-//                 gridTemplateColumns={{
-//                     xs: 'repeat(1, 1fr)',
-//                     sm: 'repeat(1, 1fr)',
-//                 }}
-//                 sx={{ mt: 2 }}
-//             >
-//                 <RHFUpload
-//                     multiple
-//                     thumbnail
-//                     name="paymentAttachmentFiles"
-//                     maxSize={3145728}
-//                     onDrop={handleDropFiles}
-//                     onRemove={handleRemoveFile}
-//                     onRemoveAll={handleRemoveAllFiles}
-//                     onUpload={() => console.log('ON UPLOAD')}
-//                 />
-//             </Box>
-//         </Card>
-//     </Grid>
-// </>
-// }

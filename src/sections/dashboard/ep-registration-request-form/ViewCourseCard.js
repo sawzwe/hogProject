@@ -37,7 +37,7 @@ export default function ViewCourseCard({ courseIndex, courseInfo, onView }) {
                     <TextField fullWidth variant="standard" disabled label="End Date" value={fDate(toDate, 'dd-MMM-yyyy')} />
                 </Grid>
                 <Grid item xs={12} md={2.75}>
-                    <Button fullWidth variant="outlined" size='large' color="inherit" onClick={() => onView(courseIndex)} sx={{fontSize: '0.9rem'}}>
+                    <Button fullWidth variant="contained" size='large' color="inherit" onClick={() => onView(courseIndex)} sx={{fontSize: '0.9rem'}}>
                         <InfoIcon sx={{mr: 1}} /> Course Detail
                     </Button>
                 </Grid>

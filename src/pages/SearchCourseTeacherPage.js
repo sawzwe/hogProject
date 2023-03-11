@@ -23,7 +23,7 @@ export default function SearchTeacherCoursePage() {
     const [privateScheduleRequest, setPrivateScheduleRequest] = useState();
 
     const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Schedule/Get`)
+        return axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get`)
             .then(response => {
                 // console.log(response.data.data)
                 setPrivateScheduleRequest(response.data.data);

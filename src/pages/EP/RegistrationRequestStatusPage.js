@@ -22,7 +22,7 @@ export default function RegistrationRequestStatusPage() {
 
     const fetchRequests = async () => {
         try {
-            await axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get`)
+            await axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get`)
                 .then((res) => {
                     setRegistrationRequests(res.data.data)
                 })
@@ -53,7 +53,7 @@ export default function RegistrationRequestStatusPage() {
 
             <Container maxWidth={themeStretch ? false : 'xl'}>
                 <CustomBreadcrumbs
-                    heading="All Requests"
+                    heading="Course Registration"
                     links={[
                         {
                             name: 'All Requests',

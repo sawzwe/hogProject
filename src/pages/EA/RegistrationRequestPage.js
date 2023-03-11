@@ -21,7 +21,7 @@ export default function RegistrationRequestPage() {
     const [privateRegistrationRequest, setPrivateRegistrationRequest] = useState();
 
     const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Request/Get`)
+        return axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get`)
             .then(response => {
                 // console.log(response.data.data)
                 setPrivateRegistrationRequest(response.data.data);
