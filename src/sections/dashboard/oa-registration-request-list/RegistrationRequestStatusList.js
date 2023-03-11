@@ -289,7 +289,7 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
                       sx={{cursor:'pointer'}}
                       onClick={()=>navigate(`/course-registration/oa-request-status/${row.id}`)}
                     >
-                      <TableCell align="left" > {row.id} </TableCell>
+                      <TableCell align="left" > {row.id} </TableCell> 
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
