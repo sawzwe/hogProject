@@ -174,36 +174,37 @@ export function AuthProvider({ children }) {
             }
         }
 
-        axios.post(`${HOG_API}/api/Student/Post`, formattedData)
+        return axios.post(`${HOG_API}/api/Student/Post`, formattedData)
             .then(async (res) => {
                 const uid = res.data.data.firebaseId;
                 const userRef = doc(collection(DB, 'users'), uid);
-                return setDoc(userRef, {
+                await setDoc(userRef, {
                     uid,
                     id: res.data.data.id,
                     email: data.studentEmail,
                     displayName: `${data.studentFirstName} ${data.studentLastName}`,
                     role: "Student"
                 })
-                    .catch((error) => console.error(error))
-                    .then(() => {
-                        const file = data.studentImageURL
-                        const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
-                        uploadBytes(storageProfileRef, file)
-                            .then((snapshot) => { console.log("uploaded!") })
-                            .catch((error) => console.error(error));
+                    .catch((error) => {
+                        throw error;
                     })
-                    .catch((error) => console.error(error))
-                    .then(() => {
-                        data.studentAdditionalFiles.map((file, index) => {
-                            const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
-                            return uploadBytes(storageAdditionalFilesRef, file)
-                                .then((snapshot) => console.log("Additional File uploaded!"))
-                                .catch((error) => console.error(error));
-                        })
-                    })
+                const file = data.studentImageURL
+                const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
+                await uploadBytes(storageProfileRef, file)
+                    .catch((error) => {
+                        throw error;
+                    });
+                data.studentAdditionalFiles.map((file, index) => {
+                    const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
+                    return uploadBytes(storageAdditionalFilesRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                })
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                throw error;
+            })
     }
 
     // UPDATE STUDENT
@@ -215,6 +216,9 @@ export function AuthProvider({ children }) {
             await updateDoc(studentRef, {
                 "displayName": `${data.studentFirstName} ${data.studentLastName}`
             })
+                .catch((error) => {
+                    throw error;
+                });
         }
 
         // Delete old image and add new if user editted profile picture
@@ -223,7 +227,9 @@ export function AuthProvider({ children }) {
             const newImageRef = ref(storage, `users/students/${currentStudent.firebaseId}/Avatar/${data.studentImageURL.name}`);
             deleteObject(lastImageRef)
             await uploadBytes(newImageRef, data.studentImageURL)
-                .catch((error) => console.error(error))
+                .catch((error) => {
+                    throw error;
+                });
         }
 
         // Delete additional files on changes
@@ -239,13 +245,17 @@ export function AuthProvider({ children }) {
                     return deleteObject(itemRef)
                 });
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                throw error;
+            });
         // Add new additional files on changes
         await data.studentAdditionalFiles.map((file) => {
             const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
             if (file instanceof File) {
                 return uploadBytes(fileRef, file)
-                    .catch((error) => console.error(error));
+                    .catch((error) => {
+                        throw error;
+                    });
             }
             return null;
         })
@@ -289,7 +299,9 @@ export function AuthProvider({ children }) {
                 province: data.province,
                 zipcode: data.zipCode,
             }
-        }).catch((error) => console.error(error))
+        }).catch((error) => {
+            throw error;
+        })
     }
 
     // CREATE TEACHER

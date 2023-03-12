@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 // firebase
 import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
-import { Container, Button } from '@mui/material';
+import { Container, Button, Stack } from '@mui/material';
 // axios
 import axios from 'axios';
 // routes
@@ -25,7 +25,7 @@ export default function ViewStudentPage() {
     const { id } = useParams();
 
     const dataFetchedRef = useRef(false);
-    
+
     // Firebase Storage
     const storage = getStorage();
 
@@ -58,18 +58,22 @@ export default function ViewStudentPage() {
                     })
             })
             .catch((error) => navigate('*', { replace: false }))
-    }
+    };
 
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
         fetchData();
-    }, [])
+    }, []);
 
     if (student === undefined || !avatarURL) {
         return <LoadingScreen />;
-    }
+    };
+
+    const handleResetPassword = () => {
+        console.log('Reset Password');
+    };
 
     return (
         <>
@@ -78,7 +82,7 @@ export default function ViewStudentPage() {
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                
+
                 <CustomBreadcrumbs
                     heading="Student Information"
                     links={[
@@ -89,7 +93,13 @@ export default function ViewStudentPage() {
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
                     action={
-                        <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+                        <>
+                            <Stack direction="row" spacing={2}>
+                                <Button size='large' color="inherit" variant='outlined' onClick={handleResetPassword}>Reset Password</Button>
+                                <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+
+                            </Stack>
+                        </>
                     }
                 />
 
