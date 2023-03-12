@@ -730,6 +730,9 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 onClose={() => setOpenAddClassDialog(false)}
                 onAdd={handleAddClass}
                 hourPerClass={selectedCourse.hourPerClass}
+                fromDate={selectedCourse.fromDate}
+                toDate={selectedCourse.toDate}
+                method={selectedCourse.method}
             />
 
             <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
@@ -983,9 +986,12 @@ AddClassDialog.propTypes = {
     onClose: PropTypes.func,
     onAdd: PropTypes.func,
     hourPerClass: PropTypes.number,
+    fromDate: PropTypes.string,
+    toDate: PropTypes.string,
+    method: PropTypes.string,
 }
 
-export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
+export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [
@@ -1008,7 +1014,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
         classDate: '',
         classTime: '',
         classTeacher: '',
-        classMethod: 'Onsite'
+        classMethod: _.capitalize(method)
     };
 
     const methods = useForm({
@@ -1041,6 +1047,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
         }, 200)
     }
 
+
     return (
         <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
             <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -1055,6 +1062,8 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
                                 render={({ field, fieldState: { error } }) => (
                                     <DatePicker
                                         label="Date"
+                                        minDate={new Date(fromDate)}
+                                        maxDate={new Date(toDate)}
                                         value={field.value}
                                         onChange={(newValue) => {
                                             field.onChange(newValue);
