@@ -149,13 +149,12 @@ export function StudentSection({ courseType, students }) {
 // ----------------------------------------------------------------------
 
 CourseSection.propTypes = {
-    courseType: PropTypes.string,
     courses: PropTypes.array,
     onView: PropTypes.func,
     schedules: PropTypes.array
 }
 
-export function CourseSection({ courseType, courses, onView, schedules }) {
+export function CourseSection({ courses, onView, schedules }) {
 
     // Schedule Dialog for group
     const [open, setOpen] = useState(false);
@@ -223,16 +222,17 @@ export function CourseSection({ courseType, courses, onView, schedules }) {
 ViewCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    registeredCourse: PropTypes.object
+    registeredCourse: PropTypes.object,
+    courseType: PropTypes.string
 }
 
-export function ViewCourseDialog({ open, onClose, registeredCourse }) {
+export function ViewCourseDialog({ open, onClose, registeredCourse, courseType }) {
     return (
 
         registeredCourse.schedules === undefined ? (
             <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
         ) : (
-            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
+            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} courseType={courseType} />
         )
     )
 }
@@ -242,7 +242,7 @@ export function ViewCourseDialog({ open, onClose, registeredCourse }) {
 UnscheduledCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    registeredCourse: PropTypes.object
+    registeredCourse: PropTypes.object,
 }
 
 export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
@@ -357,10 +357,11 @@ export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
 ScheduledCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    registeredCourse: PropTypes.object
+    registeredCourse: PropTypes.object,
+    courses: PropTypes.string
 }
 
-export function ScheduledCourseDialog({ open, onClose, registeredCourse }) {
+export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType }) {
 
     const {
         course,
@@ -450,7 +451,7 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse }) {
                                 <TextField
                                     fullWidth
                                     variant="outlined"
-                                    value="Private"
+                                    value={courseType}
                                     label="Course Type"
                                     disabled
                                     InputProps={{
@@ -788,11 +789,10 @@ export function PendingEPForm({ request, students, registeredCourses }) {
                         <Typography variant="h5">Status: Pending Payment</Typography>
                     </Grid>
                     <Grid item xs={12} md={12}>
-                        <StudentSection courseType="Private" students={students} />
+                        <StudentSection courseType={request.courseType} students={students} />
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <CourseSection
-                            courseType="Private"
                             courses={registeredCourses}
                             onView={handleOpenCourseDialog}
                         />
@@ -893,6 +893,7 @@ export function PendingEPForm({ request, students, registeredCourses }) {
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
+                    courseType={request.courseType}
                 />
             )}
         </>
@@ -984,11 +985,10 @@ export function PendingOAForm({ request, students, registeredCourses, status }) 
                     <Typography variant="h5">{`Status: ${status}`}</Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                    <StudentSection courseType="Private" students={students} />
+                    <StudentSection courseType={request.courseType} students={students} />
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <CourseSection
-                        courseType="Private"
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
                     />
@@ -1111,11 +1111,10 @@ export function RejectForm({ request, students, registeredCourses }) {
                     <Typography variant="h5">{`Status: Rejected`}</Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                    <StudentSection courseType="Private" students={students} />
+                    <StudentSection courseType={request.courseType} students={students} />
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <CourseSection
-                        courseType="Private"
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
                     />
@@ -1197,6 +1196,7 @@ export function PendingEAForm({ request, students, registeredCourses }) {
 
     const {
         epRemark1,
+        courseType
     } = request;
 
     const [selectedCourse, setSelectedCourse] = useState({});
@@ -1219,11 +1219,10 @@ export function PendingEAForm({ request, students, registeredCourses }) {
                     <Typography variant="h5">Status: Pending EA</Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
-                    <StudentSection courseType="Private" students={students} />
+                    <StudentSection courseType={courseType} students={students} />
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <CourseSection
-                        courseType="Private"
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
                     />
@@ -1248,7 +1247,7 @@ export function PendingEAForm({ request, students, registeredCourses }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <TextField fullWidth defaultValue={epRemark1} label="Comment for scheduling" disabled />
+                                <TextField fullWidth defaultValue={epRemark1} label="Comment to Education Admin" disabled />
                             </Box>
                         </Card>
                     </Grid>

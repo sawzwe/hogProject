@@ -307,21 +307,6 @@ export function AuthProvider({ children }) {
     // CREATE TEACHER
     const registerTeacher = async (data) => {
         await axios.post(`${HOG_API}/api/Teacher/Post`, data)
-            // .then((res) => {
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Teacher"
-            //     })
-            //     .catch((error) => {
-            //         throw error;
-            //     })
-            // })
             .catch((error) => {
                 throw error;
             })
@@ -330,21 +315,6 @@ export function AuthProvider({ children }) {
     // CREATE EP
     const registerEP = async (data) => {
         await axios.post(`${HOG_API}/api/EP/Post`, data)
-            // .then((res) => {
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Education Planner"
-            //     })
-            //         .catch((error) => {
-            //             throw error;
-            //         })
-            // })
             .catch((error) => {
                 throw error;
             })
@@ -353,23 +323,6 @@ export function AuthProvider({ children }) {
     // CREATE EA
     const registerEA = async (data) => {
         await axios.post(`${HOG_API}/api/EA/Post`, data)
-            // .then(async (res) => {
-            //     console.log(res);
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Education Admin"
-            //     })
-            //         .then(() => 'Success')
-            //         .catch((error) => {
-            //             throw error;
-            //         })
-            // })
             .catch((error) => {
                 throw error;
             })

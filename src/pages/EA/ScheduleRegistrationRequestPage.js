@@ -5,6 +5,8 @@ import axios from 'axios';
 // @mui
 import { Container, Typography } from '@mui/material';
 import { PATH_REGISTRATION } from '../../routes/paths';
+// auth
+import { useAuthContext } from '../../auth/useAuthContext';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
@@ -92,6 +94,7 @@ const MOCKUP_PRIVATE_REQUEST = {
 // ----------------------------------------------------------------------
 
 export default function StaffRequestPage() {
+    const { user } = useAuthContext()
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -141,7 +144,7 @@ export default function StaffRequestPage() {
                         { name: 'Request detail' },
                     ]}
                 />
-                <ScheduleRegistrationRequest currentRequest={currentRequest} />
+                <ScheduleRegistrationRequest currentRequest={currentRequest}  educationAdminId={user.id} />
             </Container>
         </>
     );

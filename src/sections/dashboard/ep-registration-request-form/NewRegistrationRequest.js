@@ -176,6 +176,7 @@ export default function NewViewRegistrationRequest({ studentList, educationPlann
 
 NewPrivateRequestForm.propTypes = {
     studentList: PropTypes.array,
+    educationPlannerId: PropTypes.number
 }
 
 export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
@@ -279,6 +280,8 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
             const studentIds = selectedStudent.map((student) => student.id);
 
             const request = {
+                courseType: 'Private',
+                section: selectedStudent[0].nickname,
                 status: 'PendingEA',
                 eaStatus: "InProgress",
                 paymentStatus: "None",
@@ -296,7 +299,6 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
                     course: eachCourse.course,
                     subject: eachCourse.subject,
                     level: eachCourse.level,
-                    section,
                     totalHour: eachCourse.totalHour,
                     method: eachCourse.method,
                     hourPerClass: eachCourse.hourPerClass,
@@ -371,7 +373,7 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <RHFTextField name="additionalComment" label="Add comment here" />
+                                <RHFTextField name="additionalComment" label="Comment to Education Admin" />
                             </Box>
                         </Card>
                     </Grid>
@@ -411,10 +413,12 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
 
 NewSemiPrivateRequestForm.propTypes = {
     studentList: PropTypes.array,
+    educationPlannerId: PropTypes.number
 }
 
-export function NewSemiPrivateRequestForm({ studentList }) {
+export function NewSemiPrivateRequestForm({ studentList, educationPlannerId }) {
     const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     const NewRequestSchema = Yup.object().shape({
         courseType: Yup.string().required('Course type is required'),
@@ -497,14 +501,33 @@ export function NewSemiPrivateRequestForm({ studentList }) {
 
     const onSubmit = async (data) => {
         try {
-
             // Clean up the data
             const {
                 selectedStudent,
+                section,
                 courses,
-                section
+                additionalComment
             } = data;
+
+            if (selectedStudent.length === 0) {
+                enqueueSnackbar('At least one student must be selected', { variant: 'error' })
+            }
+
+            if (courses.length === 0) {
+                enqueueSnackbar('At least one course must be created', { variant: 'error' })
+            }
+
             const studentIds = selectedStudent.map((student) => student.id);
+
+            const request = {
+                courseType: 'Semi Private',
+                section,
+                status: 'PendingEA',
+                eaStatus: "InProgress",
+                paymentStatus: "None",
+                epRemark1: additionalComment,
+                takenByEPId: educationPlannerId,
+            }
 
             const information = courses.map((eachCourse) => {
                 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -514,7 +537,6 @@ export function NewSemiPrivateRequestForm({ studentList }) {
                 return {
                     course: eachCourse.course,
                     subject: eachCourse.subject,
-                    section,
                     level: eachCourse.level,
                     totalHour: eachCourse.totalHour,
                     method: eachCourse.method,
@@ -525,10 +547,18 @@ export function NewSemiPrivateRequestForm({ studentList }) {
                 }
             })
 
+            await axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Post`, {
+                studentIds,
+                request,
+                information,
+            })
+                .catch((error) => {
+                    throw error;
+                })
 
-
-            // console.log(data);
             enqueueSnackbar('The request is successfully created', { variant: 'success' })
+            navigate('/course-registration/ep-request-status')
+
         } catch (error) {
             console.log(error)
             enqueueSnackbar(error.message, { variant: 'error' })
@@ -856,13 +886,62 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const { enqueueSnackbar } = useSnackbar();
 
+    const today = new Date();
+    const [privateSubjects, setPrivateSubjects] = useState([]);
+    const [privateLevels, setPrivateLevels] = useState([]);
+
+    const defaultValues = {
+        newCourseType: selectedCourse?.newCourseType || 'Existing Course',
+        course: selectedCourse?.course || '',
+        subject: selectedCourse?.subject || '',
+        level: selectedCourse?.level || '',
+        totalHour: selectedCourse?.totalHour || '',
+        hourPerClass: selectedCourse?.hourPerClass || '',
+        method: selectedCourse?.method || '',
+        fromDate: selectedCourse?.fromDate || today,
+        toDate: selectedCourse?.toDate || null,
+        monday: selectedCourse?.monday || { isSelected: false, fromTime: '', toTime: '' },
+        tuesday: selectedCourse?.tuesday || { isSelected: false, fromTime: '', toTime: '' },
+        wednesday: selectedCourse?.wednesday || { isSelected: false, fromTime: '', toTime: '' },
+        thursday: selectedCourse?.thursday || { isSelected: false, fromTime: '', toTime: '' },
+        friday: selectedCourse?.friday || { isSelected: false, fromTime: '', toTime: '' },
+        saturday: selectedCourse?.saturday || { isSelected: false, fromTime: '', toTime: '' },
+        sunday: selectedCourse?.sunday || { isSelected: false, fromTime: '', toTime: '' }
+    };
+
     const NewCourseSchema = Yup.object().shape({
         newCourseType: Yup.string().required('At least one type must be selected'),
         course: Yup.string().required('Course name is required'),
-        subject: Yup.string().required('Subject is required'),
-        level: Yup.string().required('Level is required'),
-        totalHour: Yup.number().typeError('Total hours must be number').required('Total hours is required'),
-        hourPerClass: Yup.number().typeError('Hours per class must be number').required('Hours per class is required'),
+        subject: Yup.string()
+            .test(
+                'isRequired',
+                'Subject is required',
+                (value, context) => ((privateSubjects.length === 0 && value === '') ||
+                    (privateSubjects.length > 0 && value !== '') ||
+                    (context.parent.newCourseType === 'Custom Course')),
+            ),
+        level: Yup.string()
+            .test(
+                'isRequired',
+                'Level is required',
+                (value, context) => ((privateLevels.length === 0 && value === '') ||
+                    (privateLevels.length > 0 && value !== '') ||
+                    (context.parent.newCourseType === 'Custom Course')),
+            ),
+        totalHour: Yup.number().typeError('Total hours must be number').min(1, 'Total hours must be greater than 0').required('Total hours is required'),
+        hourPerClass: Yup.number().typeError('Hours per class must be number')
+            .max(3, 'Maximum hours/class is 3 hours')
+            .required('Hours per class is required')
+            .test(
+                'maxTotalHour',
+                'Hours/Class must be less than total hours',
+                (value, context) => (value <= parseFloat(context.parent.totalHour)),
+            )
+            .test(
+                'divisible',
+                'Total hours must be divisible by hours/class',
+                (value, context) => (parseFloat(context.parent.totalHour) % value === 0),
+            ),
         method: Yup.string().required('Learning method is required'),
         fromDate: Yup.string().required('Start date is required'),
         toDate: Yup.string().required('End date is required'),
@@ -958,29 +1037,6 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
             })
     });
 
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-
-    const defaultValues = {
-        newCourseType: selectedCourse?.newCourseType || 'Existing Course',
-        course: selectedCourse?.course || '',
-        subject: selectedCourse?.subject || '',
-        level: selectedCourse?.level || '',
-        totalHour: selectedCourse?.totalHour || '',
-        hourPerClass: selectedCourse?.hourPerClass || '',
-        method: selectedCourse?.method || '',
-        fromDate: selectedCourse?.fromDate || today,
-        toDate: selectedCourse?.toDate || tomorrow,
-        monday: selectedCourse?.monday || { isSelected: false, fromTime: '', toTime: '' },
-        tuesday: selectedCourse?.tuesday || { isSelected: false, fromTime: '', toTime: '' },
-        wednesday: selectedCourse?.wednesday || { isSelected: false, fromTime: '', toTime: '' },
-        thursday: selectedCourse?.thursday || { isSelected: false, fromTime: '', toTime: '' },
-        friday: selectedCourse?.friday || { isSelected: false, fromTime: '', toTime: '' },
-        saturday: selectedCourse?.saturday || { isSelected: false, fromTime: '', toTime: '' },
-        sunday: selectedCourse?.sunday || { isSelected: false, fromTime: '', toTime: '' }
-    };
 
     const methods = useForm({
         resolver: yupResolver(NewCourseSchema),
@@ -1030,9 +1086,6 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
         { value: 'Custom Course', label: 'Custom Course' },
     ];
 
-    const [privateSubjects, setPrivateSubjects] = useState([]);
-    const [privateLevels, setPrivateLevels] = useState([]);
-
     useEffect(() => {
         if (isEdit && newCourseType === 'Existing Course') {
             const targetCourse = COURSE_OPTIONS.find((option) => option.course === course)
@@ -1048,10 +1101,12 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
     const handleChangeCourseType = (event) => {
         reset(defaultValues);
-        setValue('course', '')
-        setValue('subject', '')
-        setValue('level', '')
+        setValue('course', '');
+        setValue('subject', '');
+        setValue('level', '');
         setValue('newCourseType', event.target.value);
+        setPrivateSubjects([]);
+        setPrivateLevels([]);
     };
 
     const handleChangeCourse = (event) => {
@@ -1060,8 +1115,19 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
         setValue('level', '')
 
         const targetCourse = COURSE_OPTIONS.find((option) => option.course === event.target.value)
+        // if (!targetCourse.subjects.length) {
+        //     setValue('subject', '-')
+        // }
+        // if (!targetCourse.level.length) {
+        //     setValue('level', '-')
+        // }
         setPrivateSubjects(targetCourse.subjects)
         setPrivateLevels(targetCourse.level)
+    }
+
+    const handleChangeStartDate = (event) => {
+        setValue('fromDate', event.target.value);
+        setValue('toDate', '');
     }
 
     const onSubmitCourse = async (data) => {
@@ -1078,17 +1144,34 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
         } catch (error) {
             console.error(error);
             reset();
-            setError('afterSubmit', {
-                ...error,
-                message: error.message
-            });
         }
     }
 
     const onErrorCourse = (error) => {
-        if (error.preferredDaySlot) {
-            enqueueSnackbar("At least one perferred day is required!", { variant: 'error' });
-        }
+        const errors = Object.values(error)
+        enqueueSnackbar(errors[0].message, { variant: 'error' })
+        // if (error.preferredDaySlot) {
+        //     return enqueueSnackbar("At least one perferred day is required!", { variant: 'error' });
+        // }
+        // if (error.totalHour) {
+        //     if (error.totalHour.type === 'min') {
+        //         return enqueueSnackbar(error.totalHour.message, { variant: 'error' });
+        //     }
+        // }
+        // if (error.hourPerClass) {
+        //     if (error.hourPerClass.type === 'max') {
+        //         return enqueueSnackbar(error.hourPerClass.message, { variant: 'error' });
+        //     }
+
+        //     if (error.hourPerClass.type === 'maxTotalHour') {
+        //         return enqueueSnackbar(error.hourPerClass.message, { variant: 'error' });
+        //     }
+
+        //     if (error.hourPerClass.type === 'divisible') {
+        //         return enqueueSnackbar(error.hourPerClass.message, { variant: 'error' });
+        //     }
+        // }
+        // return enqueueSnackbar(error.message, { variant: 'error' });
     };
 
     return (
@@ -1229,17 +1312,17 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                             <RHFTextField name="course" label="Course" required />
                                         </Grid>
                                         <Grid item xs={6} md={6}>
-                                            <RHFTextField name="subject" label="Subject" required />
+                                            <RHFTextField name="subject" label="Subject" />
                                         </Grid>
                                         <Grid item xs={6} md={6}>
-                                            <RHFTextField name="level" label="Level" required />
+                                            <RHFTextField name="level" label="Level" />
                                         </Grid>
                                     </>
                                 }
 
                                 {/* Total Hours */}
                                 <Grid item xs={6} md={2}>
-                                    <RHFTextField name="totalHour" label="Total Hours" type="number" required />
+                                    <RHFTextField isNumber error={false} helperText="" name="totalHour" label="Total Hours" required />
                                 </Grid>
 
                                 {/* Learning Method */}
@@ -1271,7 +1354,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
                                 {/* Hours Per Class */}
                                 <Grid item xs={6} md={2}>
-                                    <RHFTextField name="hourPerClass" label="Hours/Class" type="number" required />
+                                    <RHFTextField isNumber error={false} helperText="" name="hourPerClass" label="Hours/Class" required />
                                 </Grid>
                             </Grid>
                         </Stack>
@@ -1286,6 +1369,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                         value={fromDate}
                                         onChange={(newValue) => {
                                             setValue('fromDate', newValue);
+                                            setValue('toDate', null);
                                         }}
                                         renderInput={(params) => (
                                             <TextField
@@ -1342,7 +1426,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
                                         <PreferredDay day='sunday' />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <PreferredDay day='thursday' /> 
+                                        <PreferredDay day='thursday' />
                                     </Grid>
                                 </Grid>
                             </Grid>

@@ -117,38 +117,24 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
   } = useTable({ defaultOrderBy: 'createDate' });
 
   const [tableData, setTableData] = useState([]);
+  const [EPName, setEPName] = useState('')
 
   // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
-    const formattedData = registrationRequests.map( (request) => {
-
-      // Waiting Pan fixing the API (Either takenByEPId not to be 0 or add EP's name to PrivateRegistrationRequest/Request/Get)
-
-      
-      const EPId = request.request.takenByEPId
-      // let epName = ''
-      // const epName = axios.get(`${HOG_API}/api/EP/Get/${EPId}`)
-      //   .then((res) => res.data.data.nickname)
-      //   .catch((error) => `Undefined (Undefined)`)
-
-      //   console.log(epName)
-
+    const formattedData = registrationRequests.map((request) => {
       return {
         id: request.request.id,
         requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request?.courseType || 'Private',
-        section: request.information[0]?.section || '-',
+        courseType: request.request.courseType,
+        section: request.request.section,
         registeredCourses: request.information.length,
         requestedBy: request.request.takenByEPId,
         role: request.request.status,
         receipt: request.request.paymentStatus,
       }
     })
-
     setTableData(formattedData);
   }, []);
-
-  console.log(tableData);
 
   const [filterName, setFilterName] = useState('');
 
@@ -319,7 +305,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
                       key={row.id}
                       onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}
                       sx={{ cursor: "pointer" }}          >
-                      <TableCell align="left" > {row.id} </TableCell>
+                      <TableCell align="left" sx={{pl: 5.5}} > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
                       <TableCell align="center">{row.registeredCourses}</TableCell>
