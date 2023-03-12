@@ -92,6 +92,7 @@ RegistrationRequestStatusList.propTypes = {
 }
 
 export default function RegistrationRequestStatusList({registrationRequests}) {
+  console.log(registrationRequests)
 
   const { themeStretch } = useSettingsContext();
 
