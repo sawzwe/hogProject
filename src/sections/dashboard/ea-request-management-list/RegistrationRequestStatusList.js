@@ -175,7 +175,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   const getLengthByStatus = (eaStatus) => tableData.filter((item) => item.eaStatus === eaStatus).length;
   const getLengthByInProgress = () => tableData.filter((item) => (item.eaStatus === 'InProgress' && item.takenByEAId === 0)).length;
   const getLengthByTakenInProgress = () => tableData.filter((item) => (item.eaStatus === 'InProgress' && item.takenByEAId === educationAdminId)).length;
-  console.log(tableData);
 
   const TABS = [
     { value: "InProgress", label: 'Available Requests', color: 'warning', count: getLengthByInProgress() },
@@ -216,9 +215,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   };
   // console.log('After', tableData)
   const takeRequest = async () => {
-    // console.log('Before',tableData)
-    // console.log('Accept',currentId)
-    console.log(selectedRow);
     setIsTakingRequest(true);
     try {
       await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
@@ -240,10 +236,9 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
         .catch((error) => {
           throw error;
         })
-      setIsTakingRequest(false);
-      enqueueSnackbar('Successfully taken the request', { variant: 'success' });
-      setOpenConfirm(false);
       navigate(0)
+      setIsTakingRequest(false);
+      setOpenConfirm(false);
     } catch (error) {
       enqueueSnackbar(error.message, { variant: 'error' });
       setIsTakingRequest(false);

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import sumBy from 'lodash/sumBy';
 import axios from 'axios';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -31,6 +31,7 @@ import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
+import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import {
   useTable,
   getComparator,
@@ -96,6 +97,7 @@ RegistrationRequestStatusList.propTypes = {
 export default function RegistrationRequestStatusList({ registrationRequests }) {
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
+  const dataFetchedRef = useRef(false);
 
   const {
     dense,
@@ -121,19 +123,25 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
 
   // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
-    const formattedData = registrationRequests.map((request) => {
-      return {
-        id: request.request.id,
-        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request.courseType,
-        section: request.request.section,
-        registeredCourses: request.information.length,
-        requestedBy: request.request.takenByEPId,
-        role: request.request.status,
-        receipt: request.request.paymentStatus,
-      }
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
+    registrationRequests.map((request) => {
+      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+        .then((res) => {
+          const newData = {
+            id: request.request.id,
+            requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+            courseType: request.request.courseType,
+            section: request.request.section,
+            registeredCourses: request.information.length,
+            requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+            role: request.request.status,
+            receipt: request.request.paymentStatus,
+          }
+          setTableData(tableData => [...tableData, newData])
+        })
     })
-    setTableData(formattedData);
   }, []);
 
   const [filterName, setFilterName] = useState('');
@@ -224,6 +232,10 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     setFilterRole('pendingEA');
   };
 
+  if (!dataFetchedRef.current) return (
+    <LoadingScreen />
+  )
+
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -305,7 +317,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
                       key={row.id}
                       onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}
                       sx={{ cursor: "pointer" }}          >
-                      <TableCell align="left" sx={{pl: 5.5}} > {row.id} </TableCell>
+                      <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
                       <TableCell align="center">{row.registeredCourses}</TableCell>

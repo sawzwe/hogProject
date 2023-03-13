@@ -162,15 +162,39 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
             setIsSubmitting(false);
         }
     };
+
     const onReject = async () => {
-        try {
-            if (rejectedReasonMessage === '') {
-                enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
-            } else {
-                console.log(createdCourses);
+        if (rejectedReasonMessage === '') {
+            enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
+        } else {
+            setIsSubmitting(true);
+            try {
+                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+                    request: {
+                        id: request.id,
+                        status: "Reject",
+                        eaStatus: "Reject",
+                        paymentStatus: "None",
+                        epRemark1: request.epRemark1,
+                        epRemark2: request.epRemark2,
+                        eaRemark: rejectedReasonMessage,
+                        oaRemark: request.oaRemark,
+                        takenByEPId: request.takenByEPId,
+                        takenByEAId: educationAdminId,
+                        takenByOAId: 0
+                    }
+                })
+                    .catch((error) => {
+                        throw error;
+                    })
+
+                setIsSubmitting(false);
+                enqueueSnackbar('The request is successfully rejected', { variant: 'success' });
+                navigate('/course-registration/ea-request-status');
+            } catch (error) {
+                enqueueSnackbar(error.message, { variant: 'error' });
+                setIsSubmitting(false);
             }
-        } catch (error) {
-            enqueueSnackbar(error.message, { variant: 'error' });
         }
     };
 
@@ -248,9 +272,9 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                 </DialogContent>
                 <DialogActions>
                     <Button color="inherit" variant="outlined" onClick={handleRejectClose}>Cancel</Button>
-                    <Button variant="contained" onClick={onReject} color="error">
+                    <LoadingButton variant="contained" loading={isSubmitting} onClick={onReject} color="error">
                         Reject
-                    </Button>
+                    </LoadingButton>
                 </DialogActions>
             </Dialog>
         </Grid>

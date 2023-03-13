@@ -96,13 +96,14 @@ export default function RegistrationRequestDetailPage() {
     const { id } = useParams();
 
     const [currentRequest, setCurrentRequest] = useState();
+    const [currentSchedule, setCurrentSchedule] = useState();
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
         axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
             .then((res) => setCurrentRequest(res.data.data))
             .catch((error) => console.error(error))
-    }
+    };
 
     useEffect(() => {
         if (dataFetchedRef.current) return;

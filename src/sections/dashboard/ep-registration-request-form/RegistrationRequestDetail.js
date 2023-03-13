@@ -644,9 +644,25 @@ PendingEPForm.propTypes = {
 }
 
 export function PendingEPForm({ request, students, registeredCourses }) {
+    const { user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
-    const { user } = useAuthContext();
+    const dataFetchedRef = useRef(false);
+
+    const [currentSchedules, setCurrentSchedules] = useState([]);
+
+    const fetchSchedule = () => {
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/GetSchedule/${request.id}`)
+            .then((res) => setCurrentSchedules(res.data.data))
+            .catch((error) => console.error(error))
+    };
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchSchedule()
+    }, []);
 
     // Firebase
     const firebaseApp = initializeApp(FIREBASE_API);

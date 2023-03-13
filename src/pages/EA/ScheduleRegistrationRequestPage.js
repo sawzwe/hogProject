@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 // @mui
+import { LoadingButton } from '@mui/lab';
 import { Container, Typography } from '@mui/material';
 import { PATH_REGISTRATION } from '../../routes/paths';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
 // components
+import { useSnackbar } from '../../components/snackbar';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 import LoadingScreen from '../../components/loading-screen';
@@ -93,23 +95,25 @@ const MOCKUP_PRIVATE_REQUEST = {
 
 // ----------------------------------------------------------------------
 
-export default function StaffRequestPage() {
+export default function ScheduleRegistrationRequestPage() {
     const { user } = useAuthContext()
     const { themeStretch } = useSettingsContext();
-    const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
+
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [currentRequest, setCurrentRequest] = useState();
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
         axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
-        .then((res) => setCurrentRequest(res.data.data))
-        .catch((error) => {
-            if (error.response.status === 404) {
-                navigate('/404')
-            }
-        })
+            .then((res) => setCurrentRequest(res.data.data))
+            .catch((error) => {
+                if (error.response.status === 404) {
+                    navigate('/404')
+                }
+            })
     }
 
     useEffect(() => {
@@ -117,15 +121,44 @@ export default function StaffRequestPage() {
         dataFetchedRef.current = true;
 
         fetchRequest();
-    }, [])
+    }, []);
 
     if (currentRequest === undefined) {
         return <LoadingScreen />;
-    }
+    };
 
-    // const currentRequest = _regRequests.find((request) => request.id === requestId);
-    // const currentRequest = MOCKUP_GROUP_REQUEST;
-    // const currentRequest = MOCKUP_PRIVATE_REQUEST;
+    if (currentRequest.request.eaStatus === 'InProgress' && currentRequest.request.takenByEAId !== user.id) {
+        return navigate('/course-registration/ea-request-status')
+    };
+
+    const handleReleaseRequest = async () => {
+        try {
+            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+                request: {
+                    id: currentRequest.request.id,
+                    status: "PendingEA",
+                    eaStatus: "InProgress",
+                    paymentStatus: "None",
+                    epRemark1: currentRequest.request.epRemark1,
+                    epRemark2: currentRequest.request.epRemark2,
+                    eaRemark: currentRequest.request.eaRemark,
+                    oaRemark: currentRequest.request.oaRemark,
+                    takenByEPId: currentRequest.request.takenByEPId,
+                    takenByEAId: 0,
+                    takenByOAId: 0
+                }
+            })
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error;
+                })
+            navigate('/course-registration/ea-request-status');
+            // navigate(0);
+        } catch (error) {
+            console.log(error);
+            enqueueSnackbar(error.message, { variant: 'error' });
+        }
+    }
 
     return (
         <>
@@ -143,8 +176,15 @@ export default function StaffRequestPage() {
                         },
                         { name: 'Request detail' },
                     ]}
+                    action={
+                        currentRequest.request.status === 'PendingEA' && currentRequest.request.takenByEAId !== 0 && (
+                            <LoadingButton variant="text" size="large" color="error" onClick={handleReleaseRequest}>
+                                Withdraw request
+                            </LoadingButton>
+                        )
+                    }
                 />
-                <ScheduleRegistrationRequest currentRequest={currentRequest}  educationAdminId={user.id} />
+                <ScheduleRegistrationRequest currentRequest={currentRequest} educationAdminId={user.id} />
             </Container>
         </>
     );

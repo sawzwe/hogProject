@@ -83,8 +83,10 @@ StudentNewEditForm.propTypes = {
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent, currentAvatar, currentFiles }) {
     const navigate = useNavigate();
-    const { registerStudent, updateStudent } = useAuthContext();
+    const { registerStudent, updateStudent, user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
+
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -190,7 +192,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
             }
 
             if (isEdit) {
-                await updateStudent(currentStudent, data)
+                await updateStudent(currentStudent, data, config)
                     .catch((error) => {
                         throw error;
                     })
@@ -200,7 +202,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                 navigate(`/account/student-management/student/${currentStudent.id}`);
                 reset(defaultValues);
             } else {
-                await registerStudent(data)
+                await registerStudent(data, config)
                     .catch((error) => {
                         throw error;
                     })
@@ -599,7 +601,12 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                 </Grid>
 
                 <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1}>
+                        {isEdit && (
+                            <Button variant="outlined" color="inherit" sx={{ height: '3em' }} onClick={() => navigate(`/account/student-management/student/${currentStudent.id}`)}>
+                                Cancel
+                            </Button>
+                        )}
                         <Button type="submit" variant="contained" sx={{ height: '3em' }}>
                             {!isEdit ? 'Create Student' : 'Save Changes'}
                         </Button>

@@ -1,12 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // firebase
 import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
 import { Container, Button, Stack, Card } from '@mui/material';
-// axios
-import axios from 'axios';
+// auth
+import { useAuthContext } from '../auth/useAuthContext';
 // routes
 import { PATH_ACCOUNT } from '../routes/paths';
 // components
@@ -21,9 +22,11 @@ import { studentList } from '../sections/dashboard/ep-registration-request-form/
 
 export default function ViewStudentPage() {
     const { themeStretch } = useSettingsContext();
+    const { user } = useAuthContext();
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const dataFetchedRef = useRef(false);
 
@@ -31,7 +34,7 @@ export default function ViewStudentPage() {
 
 
     const fetchData = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`, config)
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data.fullName

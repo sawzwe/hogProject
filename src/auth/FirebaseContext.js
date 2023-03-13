@@ -136,7 +136,7 @@ export function AuthProvider({ children }) {
     //                 .then(() => signOut(AUTH_STUDENT))
     //         })
 
-    const registerStudent = async (data) => {
+    const registerStudent = async (data, config) => {
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         const formattedData = {
             title: data.studentTitle,
@@ -174,7 +174,7 @@ export function AuthProvider({ children }) {
             }
         }
 
-        return axios.post(`${HOG_API}/api/Student/Post`, formattedData)
+        return axios.post(`${HOG_API}/api/Student/Post`, formattedData, config)
             .then(async (res) => {
                 const uid = res.data.data.firebaseId;
                 const userRef = doc(collection(DB, 'users'), uid);

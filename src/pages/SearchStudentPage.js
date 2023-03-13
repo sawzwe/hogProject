@@ -25,7 +25,7 @@ export default function SearchStudentPage() {
     const dataFetchedRef = useRef(false);
     const [studentTableData, setStudentTableData] = useState();
 
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`, Role: `${user.role}` } }
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const fetchData = async () => {
         return axios.get(`${HOG_API}/api/Student/Get`, config)
