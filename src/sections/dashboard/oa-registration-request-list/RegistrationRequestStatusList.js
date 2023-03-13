@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types'
 import sumBy from 'lodash/sumBy';
+import axios from 'axios';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 // @mui
@@ -26,6 +27,7 @@ import {
 import { fTimestamp, fDate } from '../../../utils/formatTime';
 // components
 import Label from '../../../components/label';
+import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
@@ -42,6 +44,7 @@ import {
 } from '../../../components/table';
 // sections
 import RegistrationTableToolbar from './RegistrationTableToolbar';
+import { HOG_API } from '../../../config';
 // import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
@@ -56,11 +59,10 @@ function createData(id, requestDate, courseType, section, paymentType, requested
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'courseType', label: 'Course Type', align: 'left' },
-  { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'paymentType', label: 'Payment Type', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'center' },
-  // { id: 'incomplete' },
+  { id: 'section ', label: 'Section', align: 'left', width: '18%' },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left', width: '16%' },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: '18%' },
+  { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
 
@@ -91,11 +93,9 @@ RegistrationRequestStatusList.propTypes = {
   registrationRequests: PropTypes.array
 }
 
-export default function RegistrationRequestStatusList({registrationRequests}) {
-  console.log(registrationRequests)
-
+export default function RegistrationRequestStatusList({ registrationRequests }) {
   const { themeStretch } = useSettingsContext();
-
+  const dataFetchedRef = useRef(false);
   const navigate = useNavigate();
 
   const {
@@ -118,22 +118,27 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
   } = useTable({ defaultOrderBy: 'createDate' });
 
   const [tableData, setTableData] = useState([]);
-  useEffect(() => {
-    const formattedData = registrationRequests.map( (request) => {      
-      // const EPId = request.request.takenByEPId
-      return {
-        id: request.request.id,
-        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request?.courseType || 'Private',
-        section: request.information[0]?.section || '-',
-        registeredCourses: request.information.length,
-        requestedBy: request.request.takenByEPId,
-        role: request.request.status,
-        receipt: request.request.paymentStatus,
-      }
-    })
 
-    setTableData(formattedData);
+  useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
+    registrationRequests.map((request) => {
+      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+        .then((res) => {
+          const newData = {
+            id: request.request.id,
+            requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+            courseType: request.request.courseType,
+            section: request.request.section,
+            registeredCourses: request.information.length,
+            requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+            role: request.request.status,
+            receipt: request.request.paymentStatus,
+          }
+          setTableData(tableData => [...tableData, newData])
+        })
+    })
   }, []);
   // useEffect(() => {
   //   setTableData(TABLE_DATA_REQUESTS);
@@ -143,7 +148,7 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [filterRole, setFilterRole] = useState('');
+  const [filterRole, setFilterRole] = useState('PendingOA');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -157,7 +162,7 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
   const denseHeight = dense ? 56 : 76;
 
   const isFiltered =
-    filterRole !==''  || filterName !== '';
+    filterRole !== '' || filterName !== '';
 
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
@@ -166,9 +171,9 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
 
   const TABS = [
-    { value: '', label: 'All', color: 'warning', count: getLengthByStatus('') },
-    { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
-    { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
+    { value: 'PendingOA', label: 'All', color: 'warning', count: getLengthByStatus('PendingOA') },
+    { value: 'Complete', label: 'Completed', count: getLengthByStatus('Complete'), color: 'success' },
+    { value: 'Reject', label: 'Rejected', count: getLengthByStatus('Reject'), color: 'error' },
   ];
 
 
@@ -225,6 +230,10 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
     setFilterRole('');
   };
 
+  if (!dataFetchedRef.current) return (
+    <LoadingScreen />
+  )
+
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -270,7 +279,6 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
 
           <RegistrationTableToolbar
             filterName={filterName}
-            isFiltered={isFiltered}
             onFilterName={handleFilterName}
             onResetFilter={handleResetFilter}
           />
@@ -287,32 +295,17 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
                     <TableRow
                       hover
                       key={row.id}
-                      sx={{cursor:'pointer'}}
-                      onClick={()=>navigate(`/course-registration/oa-request-status/${row.id}`)}
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => navigate(`/course-registration/oa-request-status/${row.id}`)}
                     >
-                      <TableCell align="left" > {row.id} </TableCell> 
+                      <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.courseType}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="left">{row.receipt}</TableCell>
-                      <TableCell align="center">{row.requestedBy}</TableCell>
-
-                      {/* {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Tooltip title="Incomplete Reciept">
-                              <IconButton color='primary'>
-                                <Iconify icon="ic:error" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </ThemeProvider>
-                      ) :
-                        <TableCell align="left" />
-                      } */}
-
+                      <TableCell align="left">{row.requestedBy}</TableCell>
+                      <TableCell align="center">{row.registeredCourses}</TableCell>
+                      <TableCell align="left" />
                       <TableCell>
-                            <Iconify icon="ic:chevron-right" />
+                        <Iconify icon="ic:chevron-right" />
                       </TableCell>
 
                     </TableRow>
@@ -332,9 +325,6 @@ export default function RegistrationRequestStatusList({registrationRequests}) {
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-            //
-            // dense={dense}
-            // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
@@ -361,24 +351,16 @@ function applyFilter({
 
   inputData = stabilizedThis.map((el) => el[0]);
 
-  // if (filterName) {
-  //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
-  // }
-
   if (filterName) {
-    inputData = inputData.filter((request) => request.id === parseInt(filterName, 10) || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    inputData = inputData.filter((request) =>
+      request.id === parseInt(filterName, 10) ||
+      request.requestDate.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+      request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
   }
 
   if (filterRole !== '') {
     inputData = inputData.filter((request) => request.role === filterRole);
   }
-
-  // if (filterStatus !== 'completed') {
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
-  // else if (filterRole === 'rejected' || filterRole ==='completed'){
-  //   inputData = inputData.filter((request) => request.status === filterStatus);
-  // }
 
   return inputData;
 }

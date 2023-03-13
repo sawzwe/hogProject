@@ -43,7 +43,7 @@ export default function RegistrationRequestStatusPage() {
     if (registrationRequests === undefined) {
         return <LoadingScreen />;
     }
-    // console.log("data",registrationRequests)
+
     return (
         <>
             <Helmet>
@@ -55,10 +55,9 @@ export default function RegistrationRequestStatusPage() {
                     heading="Course Registration Request Status"
                     links={[
                         {
-                            name: 'Course Registration',
+                            name: 'All Requests',
                             href: PATH_REGISTRATION.oaRequestStatus,
                         },
-                        { name: 'Request status' },
                     ]}
                 />
                 <RegistrationRequestStatusList registrationRequests={registrationRequests}/>

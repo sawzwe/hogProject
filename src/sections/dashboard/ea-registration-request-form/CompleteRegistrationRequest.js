@@ -239,6 +239,7 @@ export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
         preferredDays
     } = registeredCourse
 
+    console.log("HI")
     return (
         <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}
             PaperProps={{
@@ -933,11 +934,13 @@ export function OtherRejectForm({ request, students, registeredCourses, schedule
     const handleOpenCourseDialog = async (courseIndex) => {
         const _course = registeredCourses[courseIndex];
         await setSelectedCourse(_course);
-        const _schedule = schedules.find(
-            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
-                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
-        );
-        await setCurrentSchedule(_schedule);
+        // if (hasSchedule) {
+        //     const _schedule = schedules.find(
+        //         eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+        //             && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+        //     );
+        //     await setCurrentSchedule(_schedule);
+        // }
         setOpenCourseDialog(true);
     }
 
@@ -957,7 +960,7 @@ export function OtherRejectForm({ request, students, registeredCourses, schedule
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
-                        hasSchedule
+                        hasSchedule={hasSchedule}
                     />
                 </Grid>
 
@@ -986,14 +989,14 @@ export function OtherRejectForm({ request, students, registeredCourses, schedule
                 </Grid>
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
                     courseType={request.courseType}
                     schedules={currentSchedule}
-                    hasSchedule
+                    hasSchedule={hasSchedule}
                 />
             )}
         </>

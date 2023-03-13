@@ -333,7 +333,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
                           }
                         }}
                       >
-                        <TableCell align="left" > {row.id} </TableCell>
+                        <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
                         <TableCell align="left">{row.requestDate}</TableCell>
                         <TableCell align="left">{row.section}</TableCell>
                         <TableCell align="center">{row.registeredCourses}</TableCell>

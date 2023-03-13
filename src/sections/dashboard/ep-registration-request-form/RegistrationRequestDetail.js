@@ -196,46 +196,6 @@ export function CourseSection({ courses, onView, schedules, hasSchedule }) {
     const [open, setOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({});
 
-    const handleSchedule = () => {
-        const course = {
-            id: 1,
-            reqId: 1,
-            course: "string",
-            section: "",
-            subject: "string",
-            level: "string",
-            method: "onsite",
-            totalHour: 0,
-            hourPerClass: 0,
-            fromDate: "01-March-2023",
-            toDate: "31-March-2023",
-            privateClasses: [
-                {
-                    id: 1,
-                    room: "string",
-                    method: "onsite",
-                    date: "02-March-2023 00:00:00",
-                    fromTime: "09:00",
-                    toTime: "12:00",
-                    studentPrivateClasses: [
-                        {
-                            id: 1,
-                            studentId: 2,
-                            attendance: "None"
-                        }
-                    ],
-                    teacherPrivateClass: {
-                        id: 1,
-                        teacherId: 2,
-                        status: "Incomplete"
-                    }
-                }
-            ]
-        }
-        // const selectedSchedule = schedules.find((schedule) => schedule.id === course.scheduleId);
-        setSelectedCourse(course);
-        setOpen(true);
-    };
 
     return (
         <Card sx={{ p: 3 }}>
@@ -1134,7 +1094,7 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
-                        hasSchedule
+                        hasSchedule={hasSchedule}
                     />
                 </Grid>
 

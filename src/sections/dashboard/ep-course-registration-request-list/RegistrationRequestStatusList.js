@@ -53,9 +53,9 @@ function createData(id, requestDate, courseType, section, registeredCourses, req
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
+  { id: 'section ', label: 'Section', align: 'left', width: '18%' },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left', width: '16%' },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: '18%' },
   { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
@@ -119,7 +119,6 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
   } = useTable({ defaultOrderBy: 'createDate' });
 
   const [tableData, setTableData] = useState([]);
-  const [EPName, setEPName] = useState('')
 
   // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
@@ -316,19 +315,22 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
                       hover
                       key={row.id}
                       onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}
-                      sx={{ cursor: "pointer" }}          >
+                      sx={{ cursor: "pointer" }}
+                    >
                       <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.registeredCourses}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
+                      <TableCell align="center">{row.registeredCourses}</TableCell>
 
-                      {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Iconify icon="ic:error" color="red" />
-                          </TableCell>
-                        </ThemeProvider>
+                      {row.receipt === 'Incomplete' ? (
+                        <TableCell align="left">
+                          <Tooltip title="Incomplete Payment">
+                            <IconButton>
+                              <Iconify icon="ic:error" color="#FF3030" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
                       ) :
                         <TableCell align="left" />
                       }
@@ -354,9 +356,6 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          // dense={dense}
-          // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>
