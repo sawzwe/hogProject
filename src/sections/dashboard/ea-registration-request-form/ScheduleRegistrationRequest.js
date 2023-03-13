@@ -128,7 +128,6 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                 ))
             }
 
-            console.log(formattedSchedule);
             return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
                 .then((res) => console.log(res))
                 .catch((error) => {
@@ -752,6 +751,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     onEdit={handleEditClass}
                     onDelete={handleDeleteClass}
                     hourPerClass={selectedCourse.hourPerClass}
+                    fromDate={selectedCourse.fromDate}
+                    toDate={selectedCourse.toDate}
                 />
             }
 
@@ -782,10 +783,12 @@ EditClassDialog.propTypes = {
     schedule: PropTypes.object,
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
-    hourPerClass: PropTypes.number
+    hourPerClass: PropTypes.number,
+    fromDate: PropTypes.string,
+    toDate: PropTypes.string,
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [
@@ -888,6 +891,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                 <DatePicker
                                     label="Date"
                                     value={field.value}
+                                    minDate={new Date(fromDate)}
+                                    maxDate={new Date(toDate)}
                                     onChange={(newValue) => {
                                         field.onChange(newValue);
                                     }}

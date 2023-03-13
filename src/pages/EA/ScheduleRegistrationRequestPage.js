@@ -16,6 +16,7 @@ import LoadingScreen from '../../components/loading-screen';
 // sections
 import Page404 from '../Page404';
 import ScheduleRegistrationRequest from '../../sections/dashboard/ea-registration-request-form/ScheduleRegistrationRequest'
+import CompleteRegistrationRequest from '../../sections/dashboard/ea-registration-request-form/CompleteRegistrationRequest';
 //
 import { HOG_API } from '../../config';
 
@@ -148,14 +149,13 @@ export default function ScheduleRegistrationRequestPage() {
                     takenByOAId: 0
                 }
             })
-                .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
             navigate('/course-registration/ea-request-status');
             // navigate(0);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             enqueueSnackbar(error.message, { variant: 'error' });
         }
     }
@@ -184,7 +184,12 @@ export default function ScheduleRegistrationRequestPage() {
                         )
                     }
                 />
-                <ScheduleRegistrationRequest currentRequest={currentRequest} educationAdminId={user.id} />
+                {currentRequest.request.eaStatus === 'InProgress' ? (
+                    <ScheduleRegistrationRequest currentRequest={currentRequest} educationAdminId={user.id} />
+                ) : (
+                    <CompleteRegistrationRequest currentRequest={currentRequest} />
+                )}
+
             </Container>
         </>
     );

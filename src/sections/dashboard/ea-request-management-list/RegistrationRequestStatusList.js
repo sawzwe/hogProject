@@ -205,7 +205,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   };
 
   const handleOpenRequest = (row) => {
-    console.log(row);
     navigate(`/course-registration/ea-request-status/${row.id}`)
   }
 

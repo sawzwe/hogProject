@@ -43,16 +43,16 @@ import {
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 // components
 import { useSnackbar } from '../../../components/snackbar';
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import FormProvider, { RHFUploadPayment, RHFRadioGroup, RHFTextField } from '../../../components/hook-form';
-import ViewCourseCard from './ViewCourseCard';
 import FileThumbnail from '../../../components/file-thumbnail';
 import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
+//
+import ViewCourseCard from '../ep-registration-request-form/ViewCourseCard';
 //
 import { fDate } from '../../../utils/formatTime';
 import { HOG_API, FIREBASE_API } from '../../../config';
@@ -60,17 +60,14 @@ import { useAuthContext } from '../../../auth/useAuthContext';
 
 // ----------------------------------------------------------------------
 
-RegistrationRequestDetail.propTypes = {
-    currentRequest: PropTypes.object,
-    educationPlannerId: PropTypes.number
+CompleteRegistrationRequest.propTypes = {
+    currentRequest: PropTypes.object
 };
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestDetail({ currentRequest, educationPlannerId }) {
-
+export default function CompleteRegistrationRequest({ currentRequest }) {
     const dataFetchedRef = useRef(false);
-
     const [selectedCourse, setSelectedCourse] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
     const [schedules, setSchedules] = useState([]);
@@ -80,8 +77,6 @@ export default function RegistrationRequestDetail({ currentRequest, educationPla
         information,
         students
     } = currentRequest;
-
-    const status = (request.status === 'PendingEA' ? 'Pending EA' : request.status === 'PendingEP' ? 'Pending Payment' : request.status === 'PendingOA' ? 'Pending OA' : request.status === 'Complete' ? 'Complete' : 'Reject')
 
     const handleOpenCourseDialog = async (courseIndex) => {
         await setSelectedCourse(information[courseIndex]);
@@ -96,35 +91,16 @@ export default function RegistrationRequestDetail({ currentRequest, educationPla
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
-        if (request.eaStatus === 'Complete') {
+        if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
             axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
                 .then((res) => setSchedules(res.data.data))
                 .catch((error) => console.error(error))
         }
     }, [])
 
-    if (status === 'Pending EA') {
-        return <PendingEAForm
-            request={request}
-            students={students}
-            registeredCourses={information}
-            status={status}
-        />
-    }
-
-    if (status === 'Pending Payment') {
-        return <PendingEPForm
-            request={request}
-            students={students}
-            registeredCourses={information}
-            schedules={schedules}
-            hasSchedule={!!schedules.length}
-            educationPlannerId={educationPlannerId}
-        />
-    }
-
-    if (status === 'Pending OA' || status === 'Complete') {
-        return <PendingOAForm
+    // Complete Registration (has schedules)
+    if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
+        return <CompleteForm
             request={request}
             students={students}
             registeredCourses={information}
@@ -133,12 +109,23 @@ export default function RegistrationRequestDetail({ currentRequest, educationPla
         />
     }
 
-    if (status === 'Reject') {
-        return <RejectForm
+    // Reject from other roles (has schedules)
+    if (request.eaStatus === 'Complete' && request.status === 'Reject') {
+        return <OtherRejectForm
             request={request}
             students={students}
             registeredCourses={information}
             schedules={schedules}
+            hasSchedule={!!schedules.length}
+        />
+    }
+
+    // Reject from EA himself
+    if (request.status === 'Reject') {
+        return <EARejectForm
+            request={request}
+            students={students}
+            registeredCourses={information}
             hasSchedule={!!schedules.length}
         />
     }
@@ -191,51 +178,6 @@ CourseSection.propTypes = {
 }
 
 export function CourseSection({ courses, onView, schedules, hasSchedule }) {
-
-    // Schedule Dialog for group
-    const [open, setOpen] = useState(false);
-    const [selectedCourse, setSelectedCourse] = useState({});
-
-    const handleSchedule = () => {
-        const course = {
-            id: 1,
-            reqId: 1,
-            course: "string",
-            section: "",
-            subject: "string",
-            level: "string",
-            method: "onsite",
-            totalHour: 0,
-            hourPerClass: 0,
-            fromDate: "01-March-2023",
-            toDate: "31-March-2023",
-            privateClasses: [
-                {
-                    id: 1,
-                    room: "string",
-                    method: "onsite",
-                    date: "02-March-2023 00:00:00",
-                    fromTime: "09:00",
-                    toTime: "12:00",
-                    studentPrivateClasses: [
-                        {
-                            id: 1,
-                            studentId: 2,
-                            attendance: "None"
-                        }
-                    ],
-                    teacherPrivateClass: {
-                        id: 1,
-                        teacherId: 2,
-                        status: "Incomplete"
-                    }
-                }
-            ]
-        }
-        // const selectedSchedule = schedules.find((schedule) => schedule.id === course.scheduleId);
-        setSelectedCourse(course);
-        setOpen(true);
-    };
 
     return (
         <Card sx={{ p: 3 }}>
@@ -664,380 +606,29 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
 
 // ----------------------------------------------------------------------
 
-PreferredDay.propTypes = {
-    day: PropTypes.object,
-};
+// PreferredDay.propTypes = {
+//     day: PropTypes.object,
+// };
 
-export function PreferredDay({ day }) {
+// export function PreferredDay({ day }) {
 
-    return (
-        <Stack direction="row" spacing={2} sx={{ mt: 1 }} justifyContent="flex-start" alignItems="center" >
-            <Box sx={{ width: 50 }}>
-                <FormGroup>
-                    <FormControlLabel disabled control={<Checkbox checked={!!day.fromTime} />} label={day.day.charAt(0).toUpperCase() + day.day.slice(1, 3)} />
-                </FormGroup>
-            </Box>
-            <TextField size="small" fullWidth defaultValue={day.fromTime} disabled />
-            <Typography variant="inherit" > - </Typography>
-            <TextField size="small" fullWidth defaultValue={day.toTime} disabled />
-        </Stack>
-    )
-}
-
-// ----------------------------------------------------------------------
-
-PendingEPForm.propTypes = {
-    request: PropTypes.object,
-    students: PropTypes.array,
-    registeredCourses: PropTypes.array,
-    schedules: PropTypes.array,
-    hasSchedule: PropTypes.bool,
-    educationPlannerId: PropTypes.number
-}
-
-export function PendingEPForm({ request, students, registeredCourses, schedules, hasSchedule, educationPlannerId }) {
-    const { user } = useAuthContext();
-    const { enqueueSnackbar } = useSnackbar();
-    const navigate = useNavigate();
-    const dataFetchedRef = useRef(false);
-
-    // Firebase
-    const firebaseApp = initializeApp(FIREBASE_API);
-    const storage = getStorage(firebaseApp);
-
-    const MAX_FILE_SIZE = 2 * 1000 * 1000; // 2 Mb
-    const FILE_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
-
-    const PAYMENT_TYPE_OPTIONS = [
-        { value: 'Complete Payment', label: 'Complete Payment' },
-        { value: 'Installments Payment', label: 'Installments Payment' }
-    ];
-
-    const [selectedCourse, setSelectedCourse] = useState({});
-    const [currentSchedule, setCurrentSchedule] = useState({});
-
-    const [openCourseDialog, setOpenCourseDialog] = useState(false);
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    const [openRejectDialog, setOpenRejectDialog] = useState(false);
-    const [rejectedReasonMessage, setRejectedReasonMessage] = useState('');
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const PendingPaymentSchema = Yup.object().shape({
-        paymentAttachmentFiles: Yup.array()
-            .min(1, 'At least on payment attachment is required'),
-        paymentType: Yup.string().required('At least one payment Type is required'),
-    });
-
-    const handleOpenCourseDialog = async (courseIndex) => {
-        const _course = registeredCourses[courseIndex];
-        await setSelectedCourse(_course);
-        const _schedule = schedules.find(
-            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
-                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
-        );
-        await setCurrentSchedule(_schedule);
-        setOpenCourseDialog(true);
-    }
-
-    const handleCloseEditCourseDialog = async () => {
-        await setSelectedCourse({});
-        setOpenCourseDialog(false);
-    }
-
-    const defaultValues = {
-        paymentAttachmentFiles: [],
-        paymentType: '',
-        additionalComment: ''
-    }
-
-    // Form for payment
-    const methods = useForm({
-        resolver: yupResolver(PendingPaymentSchema),
-        defaultValues,
-    })
-
-    const {
-        watch,
-        setValue,
-        handleSubmit
-    } = methods;
-
-    const values = watch();
-
-    const { paymentAttachmentFiles, paymentType } = values
-
-    // Payment Attachment Files ------------------------------------------------------------
-    const handleDropFiles = useCallback(
-        (acceptedFiles) => {
-            const files = paymentAttachmentFiles || [];
-            const newFiles = acceptedFiles.map((file) =>
-                Object.assign(file, {
-                    preview: URL.createObjectURL(file),
-                })
-            );
-            setValue('paymentAttachmentFiles', [...files, ...newFiles]);
-        },
-        [setValue, paymentAttachmentFiles]
-    );
-
-    const handleRemoveFile = (inputFile) => {
-        const filtered = paymentAttachmentFiles && paymentAttachmentFiles?.filter((file) => file !== inputFile);
-        setValue('paymentAttachmentFiles', filtered);
-    };
-
-    const handleRemoveAllFiles = () => {
-        setValue('paymentAttachmentFiles', []);
-    };
-
-    const onSubmitPayment = async (data) => {
-
-        const updatedRequest = {
-            request: {
-                id: request.id,
-                status: "PendingOA",
-                eaStatus: "Complete",
-                paymentStatus: "Complete",
-                epRemark1: data.additionalComment,
-                epRemark2: request.epRemark2,
-                eaRemark: request.eaRemark,
-                oaRemark: request.oaRemark,
-                takenByEPId: user.id,
-                takenByEAId: request.takenByEAId,
-                takenByOAId: request.takenByOAId,
-            }
-        }
-
-        setIsSubmitting(true)
-        try {
-            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
-                .then(() => {
-                    data.paymentAttachmentFiles.map((file) => {
-                        const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
-                        return uploadBytes(storagePaymentFilesRef, file)
-                            .catch((error) => {
-                                throw error;
-                            });
-                    })
-                })
-                .catch((error) => {
-                    throw error;
-                })
-            setIsSubmitting(false);
-            enqueueSnackbar('Successfully submitted the payment', { variant: 'success' });
-            navigate('/course-registration/ep-request-status');
-        } catch (error) {
-            enqueueSnackbar(error.message, { variant: 'error' });
-            setIsSubmitting(false);
-        }
-    }
-
-    const onReject = async () => {
-        if (rejectedReasonMessage === '') {
-            enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
-        } else {
-            setIsSubmitting(true);
-            try {
-                const classIds = schedules.map((eachSchedule) => eachSchedule.course.id)
-                await classIds.forEach((id) => {
-                    axios.delete(`${HOG_API}/api/Schedule/Delete/${id}`)
-                        .catch((error) => {
-                            throw error;
-                        })
-                })
-
-                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
-                    request: {
-                        id: request.id,
-                        status: "Reject",
-                        eaStatus: "Complete",
-                        paymentStatus: "None",
-                        epRemark1: rejectedReasonMessage,
-                        epRemark2: request.epRemark2,
-                        eaRemark: request.eaRemark,
-                        oaRemark: request.oaRemark,
-                        takenByEPId: educationPlannerId,
-                        takenByEAId: request.takenByEAId,
-                        takenByOAId: 0
-                    }
-                })
-                    .catch((error) => {
-                        throw error;
-                    })
-
-                setIsSubmitting(false);
-                enqueueSnackbar('The request is successfully rejected', { variant: 'success' });
-                navigate('/course-registration/ep-request-status');
-            } catch (error) {
-                console.error(error);
-                enqueueSnackbar(error.message, { variant: 'error' });
-                setIsSubmitting(false);
-            }
-        }
-    }
-
-    const onSubmit = async (data) => {
-        try {
-            setOpenConfirmDialog(true);
-        } catch (error) {
-            enqueueSnackbar(error.message, { variant: 'error' });
-        }
-    }
-
-    const onError = (error) => {
-        const errors = Object.values(error);
-        enqueueSnackbar(errors[0].message, { variant: 'error' });
-    }
-
-    return (
-        <>
-            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit, onError)}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={5}>
-                        <Typography variant="h5">Status: Pending Payment</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <StudentSection courseType={request.courseType} students={students} />
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <CourseSection
-                            courses={registeredCourses}
-                            onView={handleOpenCourseDialog}
-                            hasSchedule
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} md={12}>
-                        <Grid item xs={12} md={12}>
-                            <Card sx={{ p: 3 }}>
-                                <Typography variant="h5"
-                                    sx={{
-                                        mb: 2,
-                                        display: 'block',
-                                    }}>Additional Files</Typography>
-                                <RHFRadioGroup
-                                    name="paymentType"
-                                    options={PAYMENT_TYPE_OPTIONS}
-                                    sx={{
-                                        '& .MuiFormControlLabel-root': { mr: 4 },
-                                    }}
-                                    required
-                                />
-                                <Box
-                                    rowGap={3}
-                                    columnGap={2}
-                                    display="grid"
-                                    gridTemplateColumns={{
-                                        xs: 'repeat(1, 1fr)',
-                                        sm: 'repeat(1, 1fr)',
-                                    }}
-                                    sx={{ mt: 2 }}
-                                >
-                                    <RHFUploadPayment
-                                        multiple
-                                        thumbnail
-                                        name="paymentAttachmentFiles"
-                                        maxSize={3145728}
-                                        onDrop={handleDropFiles}
-                                        onRemove={handleRemoveFile}
-                                        onRemoveAll={handleRemoveAllFiles}
-                                    />
-                                </Box>
-                            </Card>
-                        </Grid>
-                    </Grid>
-
-                    <Grid item xs={12} md={12}>
-                        <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}
-                            >
-                                Additional Comment
-                            </Typography>
-                            <Box
-                                rowGap={3}
-                                columnGap={2}
-                                display="grid"
-                                gridTemplateColumns={{
-                                    xs: 'repeat(1, 1fr)',
-                                    sm: 'repeat(1, 1fr)',
-                                }}
-                            >
-                                <RHFTextField name="additionalComment" label="Comment for pending payment" />
-                            </Box>
-                        </Card>
-                    </Grid>
-
-                    <Grid item xs={12} md={12}>
-                        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                            <Button variant="contained" color="error" sx={{ height: '3em' }} onClick={() => setOpenRejectDialog(true)}>
-                                Reject
-                            </Button>
-                            <Button type="submit" variant="contained" color="primary" sx={{ height: '3em' }}>
-                                Submit
-                            </Button>
-                        </Stack>
-                    </Grid>
-                </Grid>
-
-                <Dialog fullWidth maxWidth="md" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-                    <DialogTitle>
-                        Submit the request?
-                    </DialogTitle>
-                    <DialogContent>
-                        Once submitted, the request with payment attachments will be sent to Office Admin.
-                    </DialogContent>
-                    <DialogActions>
-                        <Button variant="outlined" color="inherit" onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
-                        <LoadingButton loading={isSubmitting} type="submit" variant="contained" color="primary" onClick={handleSubmit(onSubmitPayment)}>Submit</LoadingButton>
-                    </DialogActions>
-                </Dialog>
-
-                <Dialog
-                    open={openRejectDialog}
-                    onClose={() => setOpenRejectDialog(false)}
-                    maxWidth="md"
-                    fullWidth
-                >
-                    <DialogTitle>
-                        <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                            <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
-                            <Typography variant="h5">Reject the request?</Typography>
-                        </Stack>
-                    </DialogTitle>
-                    <DialogContent>
-                        <TextField fullWidth name="rejectedReason" label="Reason" multiline rows={3} sx={{ my: 1 }} onChange={(event) => setRejectedReasonMessage(event.target.value)} required />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button color="inherit" variant="outlined" onClick={() => setOpenRejectDialog(false)}>Cancel</Button>
-                        <LoadingButton variant="contained" loading={isSubmitting} onClick={onReject} color="error">
-                            Reject
-                        </LoadingButton>
-                    </DialogActions>
-                </Dialog>
-            </FormProvider>
-
-            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
-                <ViewCourseDialog
-                    open={openCourseDialog}
-                    onClose={handleCloseEditCourseDialog}
-                    registeredCourse={selectedCourse}
-                    courseType={request.courseType}
-                    schedules={currentSchedule}
-                    hasSchedule
-                />
-            )}
-        </>
-    )
-}
-
+//     return (
+//         <Stack direction="row" spacing={2} sx={{ mt: 1 }} justifyContent="flex-start" alignItems="center" >
+//             <Box sx={{ width: 50 }}>
+//                 <FormGroup>
+//                     <FormControlLabel disabled control={<Checkbox checked={!!day.fromTime} />} label={day.day.charAt(0).toUpperCase() + day.day.slice(1, 3)} />
+//                 </FormGroup>
+//             </Box>
+//             <TextField size="small" fullWidth defaultValue={day.fromTime} disabled />
+//             <Typography variant="inherit" > - </Typography>
+//             <TextField size="small" fullWidth defaultValue={day.toTime} disabled />
+//         </Stack>
+//     )
+// }
 
 // ----------------------------------------------------------------------
 
-PendingOAForm.propTypes = {
+CompleteForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
     registeredCourses: PropTypes.array,
@@ -1045,7 +636,7 @@ PendingOAForm.propTypes = {
     hasSchedule: PropTypes.bool,
 }
 
-export function PendingOAForm({ request, students, registeredCourses, schedules, hasSchedule }) {
+export function CompleteForm({ request, students, registeredCourses, schedules, hasSchedule }) {
 
     const {
         id,
@@ -1054,47 +645,6 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
         epRemark1,
         epRemark2
     } = request;
-
-    const dataFetchedRef = useRef(false);
-
-    // Firebase
-    const firebaseApp = initializeApp(FIREBASE_API);
-    const storage = getStorage(firebaseApp);
-    const [filesURL, setFilesURL] = useState([]);
-
-    const fetchPayments = async () => {
-        const listRef = ref(storage, `payments/${id}`);
-        try {
-            await listAll(listRef)
-                .then((res) => {
-                    res.items.map((itemRef) => (
-                        getMetadata(itemRef)
-                            .then((metadata) => {
-                                getDownloadURL(itemRef)
-                                    .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
-                                    .catch((error) => {
-                                        throw error;
-                                    });
-                            })
-                            .catch((error) => {
-                                throw error;
-                            })
-                    ))
-                })
-                .catch((error) => {
-                    throw error;
-                })
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    useEffect(() => {
-        if (dataFetchedRef.current) return;
-        dataFetchedRef.current = true;
-
-        fetchPayments();
-    }, [])
 
     const [selectedCourse, setSelectedCourse] = useState({});
     const [currentSchedule, setCurrentSchedule] = useState({});
@@ -1117,16 +667,9 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
         setOpenCourseDialog(false);
     }
 
-    if (filesURL.length === 0) {
-        return <LoadingScreen />
-    }
-
     return (
         <>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={5}>
-                    <Typography variant="h5">{`Status: Pending OA`}</Typography>
-                </Grid>
                 <Grid item xs={12} md={12}>
                     <StudentSection courseType={request.courseType} students={students} />
                 </Grid>
@@ -1136,49 +679,6 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                         onView={handleOpenCourseDialog}
                         hasSchedule
                     />
-                </Grid>
-
-                <Grid item xs={12} md={12}>
-                    <Grid item xs={12} md={12}>
-                        <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}>
-                                Payment Attachments
-                            </Typography>
-                            <Stack direction="row">
-                                {filesURL.map((file) => {
-                                    return (
-                                        <Stack
-                                            key={file.name}
-                                            component={'div'}
-                                            alignItems="center"
-                                            display="inline-flex"
-                                            justifyContent="center"
-                                            sx={{
-                                                m: 0.5,
-                                                width: 80,
-                                                height: 80,
-                                                borderRadius: 1.25,
-                                                overflow: 'hidden',
-                                                position: 'relative',
-                                                border: (theme) => `solid 1px ${theme.palette.divider}`,
-                                            }}
-                                        >
-                                            <FileThumbnail
-                                                tooltip
-                                                imageView
-                                                file={file}
-                                                onDownload={() => window.open(`${file.preview}`)}
-                                            />
-                                        </Stack>
-                                    )
-                                })}
-                            </Stack>
-                        </Card>
-                    </Grid>
                 </Grid>
 
                 <Grid item xs={12} md={12}>
@@ -1200,7 +700,7 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
-                            <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
+                            <TextField fullWidth defaultValue={epRemark1} label="Comment from Education Planner" disabled />
                         </Box>
                     </Card>
                 </Grid>
@@ -1254,9 +754,6 @@ export function RejectForm({ request, students, registeredCourses }) {
     return (
         <>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={5}>
-                    <Typography variant="h5">{`Status: Rejected`}</Typography>
-                </Grid>
                 <Grid item xs={12} md={12}>
                     <StudentSection courseType={request.courseType} students={students} />
                 </Grid>
@@ -1334,17 +831,18 @@ export function RejectForm({ request, students, registeredCourses }) {
 
 // ----------------------------------------------------------------------
 
-PendingEAForm.propTypes = {
+EARejectForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
     registeredCourses: PropTypes.array
 }
 
-export function PendingEAForm({ request, students, registeredCourses }) {
+export function EARejectForm({ request, students, registeredCourses }) {
 
     const {
         epRemark1,
-        courseType
+        courseType,
+        eaRemark
     } = request;
 
     const [selectedCourse, setSelectedCourse] = useState({});
@@ -1363,9 +861,6 @@ export function PendingEAForm({ request, students, registeredCourses }) {
     return (
         <>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={5}>
-                    <Typography variant="h5">Status: Pending EA</Typography>
-                </Grid>
                 <Grid item xs={12} md={12}>
                     <StudentSection courseType={courseType} students={students} />
                 </Grid>
@@ -1375,31 +870,29 @@ export function PendingEAForm({ request, students, registeredCourses }) {
                         onView={handleOpenCourseDialog}
                     />
                 </Grid>
-                {!!epRemark1 && (
-                    <Grid item xs={12} md={12}>
-                        <Card sx={{ p: 3 }}>
-                            <Typography variant="h5"
-                                sx={{
-                                    mb: 2,
-                                    display: 'block',
-                                }}
-                            >
-                                Additional Comment
-                            </Typography>
-                            <Box
-                                rowGap={3}
-                                columnGap={2}
-                                display="grid"
-                                gridTemplateColumns={{
-                                    xs: 'repeat(1, 1fr)',
-                                    sm: 'repeat(1, 1fr)',
-                                }}
-                            >
-                                <TextField fullWidth defaultValue={epRemark1} label="Comment to Education Admin" disabled />
-                            </Box>
-                        </Card>
-                    </Grid>
-                )}
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}
+                        >
+                            Additional Comment
+                        </Typography>
+                        <Box
+                            rowGap={3}
+                            columnGap={2}
+                            display="grid"
+                            gridTemplateColumns={{
+                                xs: 'repeat(1, 1fr)',
+                                sm: 'repeat(1, 1fr)',
+                            }}
+                        >
+                            <TextField fullWidth defaultValue={eaRemark} label="Comment from Education Admin" disabled />
+                        </Box>
+                    </Card>
+                </Grid>
             </Grid>
 
             {Object.keys(selectedCourse).length > 0 && (
@@ -1407,6 +900,100 @@ export function PendingEAForm({ request, students, registeredCourses }) {
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
+                />
+            )}
+        </>
+    )
+}
+
+// ----------------------------------------------------------------------
+
+OtherRejectForm.propTypes = {
+    request: PropTypes.object,
+    students: PropTypes.array,
+    registeredCourses: PropTypes.array,
+    schedules: PropTypes.array,
+    hasSchedule: PropTypes.bool,
+}
+
+export function OtherRejectForm({ request, students, registeredCourses, schedules, hasSchedule }) {
+
+    const {
+        id,
+        eaStatus,
+        paymentStatus,
+        epRemark1,
+        epRemark2
+    } = request;
+
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [currentSchedule, setCurrentSchedule] = useState({});
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        const _course = registeredCourses[courseIndex];
+        await setSelectedCourse(_course);
+        const _schedule = schedules.find(
+            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+        );
+        await setCurrentSchedule(_schedule);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        await setCurrentSchedule({});
+        setOpenCourseDialog(false);
+    }
+
+    return (
+        <>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={12}>
+                    <StudentSection courseType={request.courseType} students={students} />
+                </Grid>
+                <Grid item xs={12} md={12}>
+                    <CourseSection
+                        courses={registeredCourses}
+                        onView={handleOpenCourseDialog}
+                        hasSchedule
+                    />
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}
+                        >
+                            Additional Comment
+                        </Typography>
+                        <Box
+                            rowGap={3}
+                            columnGap={2}
+                            display="grid"
+                            gridTemplateColumns={{
+                                xs: 'repeat(1, 1fr)',
+                                sm: 'repeat(1, 1fr)',
+                            }}
+                        >
+                            <TextField fullWidth defaultValue={epRemark1} label="Comment from Education Planner" disabled />
+                        </Box>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule
                 />
             )}
         </>
