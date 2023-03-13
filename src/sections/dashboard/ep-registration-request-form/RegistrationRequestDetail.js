@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
+import moment from 'moment';
 // firebase
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata } from "firebase/storage"
@@ -66,17 +67,15 @@ RegistrationRequestDetail.propTypes = {
 
 export default function RegistrationRequestDetail({ currentRequest }) {
 
+    const dataFetchedRef = useRef(false);
+
     const [selectedCourse, setSelectedCourse] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
-
-    if (!currentRequest) {
-        return null;
-    }
+    const [schedules, setSchedules] = useState([]);
 
     const {
         request,
         information,
-        schedules,
         students
     } = currentRequest;
 
@@ -92,20 +91,53 @@ export default function RegistrationRequestDetail({ currentRequest }) {
         setOpenCourseDialog(false);
     }
 
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+        if (request.eaStatus === 'Complete') {
+            axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+                .then((res) => setSchedules(res.data.data))
+                .catch((error) => console.error(error))
+        }
+    }, [])
+
     if (status === 'Pending EA') {
-        return <PendingEAForm request={request} students={students} registeredCourses={information} />
+        return <PendingEAForm
+            request={request}
+            students={students}
+            registeredCourses={information}
+            status={status}
+        />
     }
 
     if (status === 'Pending Payment') {
-        return <PendingEPForm request={request} students={students} registeredCourses={information} />
+        return <PendingEPForm
+            request={request}
+            students={students}
+            registeredCourses={information}
+            schedules={schedules}
+            hasSchedule={!!schedules.length}
+        />
     }
 
     if (status === 'Pending OA' || status === 'Complete') {
-        return <PendingOAForm request={request} students={students} registeredCourses={information} status={status} />
+        return <PendingOAForm
+            request={request}
+            students={students}
+            registeredCourses={information}
+            schedules={schedules}
+            hasSchedule={!!schedules.length}
+        />
     }
 
     if (status === 'Reject') {
-        return <RejectForm request={request} students={students} registeredCourses={information} />
+        return <RejectForm
+            request={request}
+            students={students}
+            registeredCourses={information}
+            schedules={schedules}
+            hasSchedule={!!schedules.length}
+        />
     }
 }
 
@@ -151,10 +183,11 @@ export function StudentSection({ courseType, students }) {
 CourseSection.propTypes = {
     courses: PropTypes.array,
     onView: PropTypes.func,
-    schedules: PropTypes.array
+    schedules: PropTypes.array,
+    hasSchedule: PropTypes.bool,
 }
 
-export function CourseSection({ courses, onView, schedules }) {
+export function CourseSection({ courses, onView, schedules, hasSchedule }) {
 
     // Schedule Dialog for group
     const [open, setOpen] = useState(false);
@@ -211,7 +244,7 @@ export function CourseSection({ courses, onView, schedules }) {
                 </Grid>
             </Grid>
             {courses.map((course, index) => (
-                <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} />
+                <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} hasSchedule={hasSchedule} />
             ))}
         </Card>
     )
@@ -223,16 +256,18 @@ ViewCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
     registeredCourse: PropTypes.object,
-    courseType: PropTypes.string
+    courseType: PropTypes.string,
+    schedules: PropTypes.object,
+    hasSchedule: PropTypes.bool,
 }
 
-export function ViewCourseDialog({ open, onClose, registeredCourse, courseType }) {
+export function ViewCourseDialog({ open, onClose, registeredCourse, courseType, schedules, hasSchedule }) {
     return (
 
-        registeredCourse.schedules === undefined ? (
+        !hasSchedule ? (
             <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
         ) : (
-            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} courseType={courseType} />
+            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} schedules={schedules} courseType={courseType} />
         )
     )
 }
@@ -358,10 +393,11 @@ ScheduledCourseDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
     registeredCourse: PropTypes.object,
-    courses: PropTypes.string
+    courses: PropTypes.string,
+    schedules: PropTypes.object,
 }
 
-export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType }) {
+export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType, schedules }) {
 
     const {
         course,
@@ -375,7 +411,9 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
         preferredDays
     } = registeredCourse
 
-    const schedules = []
+    const {
+        classes
+    } = schedules
 
     const customTextFieldStyle = {
         fontSize: '0.9rem'
@@ -385,11 +423,15 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
 
     function accumulatedHours() {
         let HoursCount = 0;
-        schedules.forEach((eachSchedule) => {
-            HoursCount += parseInt(eachSchedule.hourPerClass, 10)
+        classes.forEach((eachClass) => {
+            const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+            const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+            HoursCount += timeB.diff(timeA, 'hours');
         })
         return HoursCount;
     }
+
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     // Tables ---------------------------------------------------------------------------------
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -401,7 +443,7 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
         },
         [`&.${tableCellClasses.body}`]: {
             fontSize: '0.7rem',
-            padding: 5,
+            padding: 16,
             border: `1px solid ${theme.palette.divider}`,
 
         },
@@ -565,46 +607,50 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
                             </Typography>
                         </Stack>
 
-                        {!!schedules.length && (
-                            <TableContainer component={Paper} >
-                                <Table sx={{ width: '100%' }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <StyledTableCell align="center">No.</StyledTableCell>
-                                            <StyledTableCell align="center">Day</StyledTableCell>
-                                            <StyledTableCell align="center">Date</StyledTableCell>
-                                            <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
-                                            <StyledTableCell align="center">Method</StyledTableCell>
-                                            <StyledTableCell align="center">Teacher</StyledTableCell>
-                                            <StyledTableCell align="center">Hours</StyledTableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {schedules.map((eachClass, index) => {
-                                            displayAccumulatedHours += parseInt(eachClass.hourPerClass, 10);
-                                            return (
-                                                <StyledTableRow key={index}>
-                                                    <StyledTableCell component="th" scope="row" align="center">
-                                                        {(index + 1).toString()}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="center"> {eachClass.day.slice(0, 3)} </StyledTableCell>
-                                                    <StyledTableCell align="center">{fDate(eachClass.date)}</StyledTableCell>
-                                                    <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
-                                                    <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.toUpperCase()}`}</StyledTableCell>
-                                                    <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                                </StyledTableRow>
-                                            )
-                                        })}
-                                        <StyledTableRow>
-                                            <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
-                                            <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
-                                        </StyledTableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        )}
+
+                        <TableContainer component={Paper} >
+                            <Table sx={{ width: '100%' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell align="center">No.</StyledTableCell>
+                                        <StyledTableCell align="center">Day</StyledTableCell>
+                                        <StyledTableCell align="center">Date</StyledTableCell>
+                                        <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
+                                        <StyledTableCell align="center">Method</StyledTableCell>
+                                        <StyledTableCell align="center">Teacher</StyledTableCell>
+                                        <StyledTableCell align="center">Hours</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {classes.map((eachClass, index) => {
+                                        const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+                                        const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+                                        const hourPerClass = timeB.diff(timeA, 'hours')
+                                        displayAccumulatedHours += hourPerClass;
+                                        const classDate = new Date(eachClass.date);
+                                        return (
+                                            <StyledTableRow key={index}>
+                                                <StyledTableCell component="th" scope="row" align="center">
+                                                    {(index + 1).toString()}
+                                                </StyledTableCell>
+                                                <StyledTableCell align="center"> {weekday[classDate.getDay()].slice(0, 3)} </StyledTableCell>
+                                                <StyledTableCell align="center">{fDate(classDate, 'dd-MMM-yyyy')}</StyledTableCell>
+                                                <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
+                                                <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
+                                                <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
+                                                <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.teacherId}</StyledTableCell>
+                                                <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
+                                            </StyledTableRow>
+                                        )
+                                    })}
+                                    <StyledTableRow>
+                                        <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
+                                        <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
+                                    </StyledTableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
                     </Scrollbar>
                 </Grid>
             </Grid>
@@ -640,29 +686,16 @@ export function PreferredDay({ day }) {
 PendingEPForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
-    registeredCourses: PropTypes.array
+    registeredCourses: PropTypes.array,
+    schedules: PropTypes.array,
+    hasSchedule: PropTypes.bool,
 }
 
-export function PendingEPForm({ request, students, registeredCourses }) {
+export function PendingEPForm({ request, students, registeredCourses, schedules, hasSchedule }) {
     const { user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const dataFetchedRef = useRef(false);
-
-    const [currentSchedules, setCurrentSchedules] = useState([]);
-
-    const fetchSchedule = () => {
-        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/GetSchedule/${request.id}`)
-            .then((res) => setCurrentSchedules(res.data.data))
-            .catch((error) => console.error(error))
-    };
-
-    useEffect(() => {
-        if (dataFetchedRef.current) return;
-        dataFetchedRef.current = true;
-
-        fetchSchedule()
-    }, []);
 
     // Firebase
     const firebaseApp = initializeApp(FIREBASE_API);
@@ -677,6 +710,7 @@ export function PendingEPForm({ request, students, registeredCourses }) {
     ];
 
     const [selectedCourse, setSelectedCourse] = useState({});
+    const [currentSchedule, setCurrentSchedule] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -688,7 +722,13 @@ export function PendingEPForm({ request, students, registeredCourses }) {
     });
 
     const handleOpenCourseDialog = async (courseIndex) => {
-        await setSelectedCourse(registeredCourses[courseIndex]);
+        const _course = registeredCourses[courseIndex];
+        await setSelectedCourse(_course);
+        const _schedule = schedules.find(
+            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+        );
+        await setCurrentSchedule(_schedule);
         setOpenCourseDialog(true);
     }
 
@@ -811,6 +851,7 @@ export function PendingEPForm({ request, students, registeredCourses }) {
                         <CourseSection
                             courses={registeredCourses}
                             onView={handleOpenCourseDialog}
+                            hasSchedule
                         />
                     </Grid>
 
@@ -904,12 +945,14 @@ export function PendingEPForm({ request, students, registeredCourses }) {
                 </Dialog>
             </FormProvider>
 
-            {Object.keys(selectedCourse).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
                     courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule
                 />
             )}
         </>
@@ -923,10 +966,11 @@ PendingOAForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
     registeredCourses: PropTypes.array,
-    status: PropTypes.string,
+    schedules: PropTypes.array,
+    hasSchedule: PropTypes.bool,
 }
 
-export function PendingOAForm({ request, students, registeredCourses, status }) {
+export function PendingOAForm({ request, students, registeredCourses, schedules, hasSchedule }) {
 
     const {
         id,
@@ -978,15 +1022,23 @@ export function PendingOAForm({ request, students, registeredCourses, status }) 
     }, [])
 
     const [selectedCourse, setSelectedCourse] = useState({});
+    const [currentSchedule, setCurrentSchedule] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
 
     const handleOpenCourseDialog = async (courseIndex) => {
-        await setSelectedCourse(registeredCourses[courseIndex]);
+        const _course = registeredCourses[courseIndex];
+        await setSelectedCourse(_course);
+        const _schedule = schedules.find(
+            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+        );
+        await setCurrentSchedule(_schedule);
         setOpenCourseDialog(true);
     }
 
     const handleCloseEditCourseDialog = async () => {
         await setSelectedCourse({});
+        await setCurrentSchedule({});
         setOpenCourseDialog(false);
     }
 
@@ -998,7 +1050,7 @@ export function PendingOAForm({ request, students, registeredCourses, status }) 
         <>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={5}>
-                    <Typography variant="h5">{`Status: ${status}`}</Typography>
+                    <Typography variant="h5">{`Status: Pending OA`}</Typography>
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <StudentSection courseType={request.courseType} students={students} />
@@ -1007,6 +1059,7 @@ export function PendingOAForm({ request, students, registeredCourses, status }) 
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
+                        status="PendingOA"
                     />
                 </Grid>
 
@@ -1078,11 +1131,14 @@ export function PendingOAForm({ request, students, registeredCourses, status }) 
                 </Grid>
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule
                 />
             )}
         </>
@@ -1133,6 +1189,7 @@ export function RejectForm({ request, students, registeredCourses }) {
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
+                        status="Reject"
                     />
                 </Grid>
 
@@ -1241,6 +1298,7 @@ export function PendingEAForm({ request, students, registeredCourses }) {
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
+                        status="PendingEA"
                     />
                 </Grid>
                 {!!epRemark1 && (

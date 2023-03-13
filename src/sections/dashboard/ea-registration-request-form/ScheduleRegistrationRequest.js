@@ -92,14 +92,14 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
         setSubmitDialogOpen(false);
     };
 
-    const addScheduleToDatabase = () => {
-        return createdCourses.forEach((eachCourse) => {
+    const addScheduleToDatabase = async () => {
+        await createdCourses.forEach((eachCourse) => {
             const formattedSchedule = {
                 requestId: request.id,
                 course: {
                     course: eachCourse.course,
-                    subject: eachCourse.subject,
-                    level: eachCourse.level,
+                    subject: eachCourse.subject || "",
+                    level: eachCourse.level || "",
                     section: request.section,
                     method: eachCourse.method,
                     totalHour: eachCourse.totalHour,
@@ -127,7 +127,13 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                     }
                 ))
             }
+
+            console.log(formattedSchedule);
             return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error
+                })
         })
     }
 
