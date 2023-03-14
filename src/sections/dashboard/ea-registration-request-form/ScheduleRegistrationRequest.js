@@ -8,7 +8,9 @@ import { useForm, Controller } from 'react-hook-form';
 // @mui
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
+    Fade,
     TextField,
     Grid,
     Stack,
@@ -28,7 +30,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogContentText,
-    DialogActions
+    DialogActions,
+    InputAdornment
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -43,6 +46,9 @@ import { fDate } from '../../../utils/formatTime'
 import { useSnackbar } from '../../../components/snackbar';
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import FormProvider, { RHFSelect } from '../../../components/hook-form';
+//
+import { AddClassDialog } from '../AddClassDialog';
+import { EditClassDialog } from '../EditClassDialog';
 import { HOG_API } from '../../../config';
 
 ScheduleRegistrationRequest.propTypes = {
@@ -121,7 +127,7 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                             }
                         )),
                         teacherPrivateClass: {
-                            teacherId: 1,
+                            teacherId: eachClass.teacher.id,
                             status: 'Incomplete'
                         }
                     }
@@ -129,7 +135,6 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
             }
 
             return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
-                .then((res) => console.log(res))
                 .catch((error) => {
                     throw error
                 })
@@ -218,7 +223,13 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                 <StudentSection students={students} />
             </Grid>
             <Grid item xs={12} md={12}>
-                <CourseSection courseType={courseType} createdCourses={createdCourses} courses={information} onCreate={handleCreateCourse} />
+                <CourseSection
+                    courseType={courseType}
+                    createdCourses={createdCourses}
+                    courses={information}
+                    onCreate={handleCreateCourse}
+                    students={students}
+                />
             </Grid>
 
             <Grid item xs={12} md={12}>
@@ -332,9 +343,10 @@ CourseSection.propTypes = {
     courses: PropTypes.array,
     onCreate: PropTypes.func,
     createdCourses: PropTypes.array,
+    students: PropTypes.array,
 }
 
-export function CourseSection({ courseType, courses, onCreate, createdCourses }) {
+export function CourseSection({ courseType, courses, onCreate, createdCourses, students }) {
 
     // Schedule Dialog
     const [open, setOpen] = useState(false);
@@ -419,6 +431,7 @@ export function CourseSection({ courseType, courses, onCreate, createdCourses })
                         selectedCourse={selectedCourse}
                         onCreate={handleCreate}
                         completeCourses={completeCourses}
+                        students={students}
                     />
                 )
             }
@@ -436,9 +449,10 @@ CreateScheduleDialog.propTypes = {
     hourPerClass: PropTypes.number,
     onCreate: PropTypes.func,
     completeCourses: PropTypes.array,
+    student: PropTypes.array
 }
 
-export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, completeCourses }) {
+export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, completeCourses, students }) {
     const { enqueueSnackbar } = useSnackbar();
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -539,6 +553,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             border: `1px solid ${theme.palette.divider}`,
         },
     }));
+
+    console.log(schedules)
 
     return (
         <Dialog fullWidth maxWidth="xl" open={open} onClose={close}>
@@ -720,7 +736,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                                     <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
                                                     <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.toUpperCase()}`}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.nickname} ${eachClass.teacher.workType === 'Normal' ? '' : `(${eachClass.teacher.workType})`} `}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                                     <StyledTableCell align="center" > {
                                                         <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
@@ -753,6 +769,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     hourPerClass={selectedCourse.hourPerClass}
                     fromDate={selectedCourse.fromDate}
                     toDate={selectedCourse.toDate}
+                    students={students}
                 />
             }
 
@@ -764,6 +781,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 fromDate={selectedCourse.fromDate}
                 toDate={selectedCourse.toDate}
                 method={selectedCourse.method}
+                students={students}
             />
 
             <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
@@ -771,440 +789,6 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     {checkAlreadyCreated(completeCourses, selectedCourse) ? 'Save Changes' : 'Create'}
                 </Button>
             </Grid>
-        </Dialog>
-    )
-}
-
-// ----------------------------------------------------------------------
-
-EditClassDialog.propTypes = {
-    open: PropTypes.bool,
-    close: PropTypes.func,
-    schedule: PropTypes.object,
-    onEdit: PropTypes.func,
-    onDelete: PropTypes.func,
-    hourPerClass: PropTypes.number,
-    fromDate: PropTypes.string,
-    toDate: PropTypes.string,
-}
-
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate }) {
-
-    // fetch all teachers
-    const TEACHER_OPTIONS = [
-        { fullName: 'John Smith', nickname: 'Tar' },
-        { fullName: 'John Smite', nickname: 'Keen' },
-        { fullName: 'Jane Smoke', nickname: 'Kwan' }
-    ];
-
-    // fetch available time of specific teacher
-    const TIME_OPTIONS = [
-        '10:00-12:00', '13:00-15:00', '16:00-18:00'
-    ];
-
-    // don't fetch
-    const LEARNING_METHOD_OPTIONS = [
-        'Onsite', 'Online'
-    ];
-
-    const {
-        date,
-        fromTime,
-        toTime,
-        teacher,
-        method,
-    } = schedule;
-
-    const defaultValues = {
-        scheduleDate: date,
-        scheduleTime: fromTime.concat('-', toTime),
-        scheduleTeacher: _.capitalize(teacher),
-        scheduleMethod: method
-    };
-
-    const methods = useForm({
-        defaultValues
-    });
-
-    const {
-        watch,
-        control,
-        setValue,
-        reset,
-    } = methods;
-
-    const values = watch();
-    const { scheduleDate, scheduleTeacher, scheduleTime, scheduleMethod } = values;
-
-    useEffect(() => {
-        if (Object.keys(schedule).length) {
-            setValue('scheduleDate', date);
-            setValue('scheduleTeacher', _.capitalize(teacher));
-            setValue('scheduleTime', fromTime.concat('-', toTime));
-            setValue('scheduleMethod', method);
-        }
-    }, [schedule])
-
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-    const handleSaveChange = () => {
-        const newSchedule = {
-            day: weekday[new Date(scheduleDate).getDay()].slice(0, 3),
-            date: scheduleDate,
-            hourPerClass,
-            teacher: TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.nickname.toLowerCase() === scheduleTeacher.toLowerCase()).nickname.toUpperCase(),
-            fromTime: scheduleTime.slice(0, 5),
-            toTime: scheduleTime.slice(6, 11),
-            method: scheduleMethod
-        };
-        onEdit(newSchedule);
-        handleClose();
-    }
-
-    const handleDelete = () => {
-        onDelete(schedule);
-        handleClose();
-    }
-
-    const handleClose = () => {
-        close();
-        setTimeout(() => {
-            reset();
-        }, 200);
-    }
-
-    return (
-        <Dialog fullWidth maxWidth="lg" open={open} onClose={close}>
-            <FormProvider methods={methods}>
-                <Grid container spacing={1} sx={{ p: 3 }}>
-                    <Grid item xs={12} md={12} sx={{ pb: 2 }}>
-                        <Stack direction="row">
-                            <Typography variant="h6"> Edit Schedule </Typography>
-                        </Stack>
-                    </Grid>
-
-                    <Grid item xs={12} md={3}>
-                        <Controller
-                            name="scheduleDate"
-                            control={control}
-                            render={({ field, fieldState: { error } }) => (
-                                <DatePicker
-                                    label="Date"
-                                    value={field.value}
-                                    minDate={new Date(fromDate)}
-                                    maxDate={new Date(toDate)}
-                                    onChange={(newValue) => {
-                                        field.onChange(newValue);
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField {...params} fullWidth error={!!error} helperText={error?.message} required />
-                                    )}
-                                    disableMaskedInput
-                                    inputFormat="dd-MMM-yyyy"
-                                />
-                            )}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} md={3}>
-                        <RHFSelect
-                            fullWidth
-                            name="scheduleTime"
-                            label="Time"
-                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                            required>
-                            {TIME_OPTIONS.map((eachTime, index) => (
-                                <MenuItem
-                                    key={index}
-                                    value={eachTime}
-                                    sx={{
-                                        mx: 1,
-                                        my: 0.5,
-                                        borderRadius: 0.75,
-                                        typography: 'body2',
-                                        textTransform: 'capitalize',
-                                        '&:first-of-type': { mt: 0 },
-                                        '&:last-of-type': { mb: 0 },
-                                    }}
-                                >
-                                    {eachTime}
-                                </MenuItem>
-                            ))}
-                        </RHFSelect>
-                    </Grid>
-
-                    <Grid item xs={12} md={3}>
-                        <RHFSelect
-                            fullWidth
-                            name="scheduleTeacher"
-                            label="Teacher"
-                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                            required>
-                            {TEACHER_OPTIONS.map((eachTeacher, index) => (
-                                <MenuItem
-                                    key={index}
-                                    value={eachTeacher.nickname}
-                                    sx={{
-                                        mx: 1,
-                                        my: 0.5,
-                                        borderRadius: 0.75,
-                                        typography: 'body2',
-                                        textTransform: 'capitalize',
-                                        '&:first-of-type': { mt: 0 },
-                                        '&:last-of-type': { mb: 0 },
-                                    }}
-                                >
-                                    {`${eachTeacher.nickname} (${eachTeacher.fullName})`}
-                                </MenuItem>
-                            ))}
-                        </RHFSelect>
-                    </Grid>
-
-                    <Grid item xs={12} md={3}>
-                        <RHFSelect
-                            fullWidth
-                            name="scheduleMethod"
-                            label="Learning Method"
-                            SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                            required>
-                            {LEARNING_METHOD_OPTIONS.map((eachMethod, index) => (
-                                <MenuItem
-                                    key={index}
-                                    value={eachMethod}
-                                    sx={{
-                                        mx: 1,
-                                        my: 0.5,
-                                        borderRadius: 0.75,
-                                        typography: 'body2',
-                                        textTransform: 'capitalize',
-                                        '&:first-of-type': { mt: 0 },
-                                        '&:last-of-type': { mb: 0 },
-                                    }}
-                                >
-                                    {eachMethod}
-                                </MenuItem>
-                            ))}
-                        </RHFSelect>
-                    </Grid>
-                </Grid>
-
-                <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, pb: 3 }} spacing={1.5}>
-                    <Stack direction="row" sx={{ ml: 1.5 }}>
-                        <Grid item>
-                            <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
-                                Delete
-                            </Button>
-                        </Grid>
-                    </Stack>
-                    <Stack direction="row" spacing={1}>
-                        <Grid item>
-                            <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>
-                                Close
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button variant="contained" size="medium" onClick={handleSaveChange}>
-                                Save Change
-                            </Button>
-                        </Grid>
-                    </Stack>
-                </Grid>
-            </FormProvider>
-        </Dialog>
-    )
-}
-
-// ----------------------------------------------------------------
-
-AddClassDialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    onAdd: PropTypes.func,
-    hourPerClass: PropTypes.number,
-    fromDate: PropTypes.string,
-    toDate: PropTypes.string,
-    method: PropTypes.string,
-}
-
-export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method }) {
-
-    // fetch all teachers
-    const TEACHER_OPTIONS = [
-        { fullName: 'John Smith', nickname: 'Tar' },
-        { fullName: 'John Smite', nickname: 'Keen' },
-        { fullName: 'Jane Smoke', nickname: 'Kwan' }
-    ];
-
-    // fetch available time of specific teacher
-    const TIME_OPTIONS = [
-        '10:00-12:00', '13:00-15:00', '16:00-18:00'
-    ];
-
-    // don't fetch
-    const METHOD_OPTIONS = [
-        'Onsite', 'Online'
-    ];
-
-    const defaultValues = {
-        classDate: '',
-        classTime: '',
-        classTeacher: '',
-        classMethod: _.capitalize(method)
-    };
-
-    const methods = useForm({
-        defaultValues
-    });
-
-    const {
-        control,
-        reset,
-        handleSubmit
-    } = methods;
-
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-    const onSubmit = (data) => {
-        const newClass = {
-            day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
-            date: data.classDate,
-            hourPerClass,
-            fromTime: data.classTime.slice(0, 5),
-            toTime: data.classTime.slice(6, 11),
-            method: data.classMethod,
-            teacher: data.classTeacher.toUpperCase()
-        };
-
-        onAdd(newClass);
-        onClose();
-        setTimeout(() => {
-            reset(defaultValues);
-        }, 200)
-    }
-
-
-    return (
-        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
-            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-                <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
-                <DialogContent>
-                    <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-
-                        <Grid item xs={12} md={3}>
-                            <Controller
-                                name="classDate"
-                                control={control}
-                                render={({ field, fieldState: { error } }) => (
-                                    <DatePicker
-                                        label="Date"
-                                        minDate={new Date(fromDate)}
-                                        maxDate={new Date(toDate)}
-                                        value={field.value}
-                                        onChange={(newValue) => {
-                                            field.onChange(newValue);
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField {...params} fullWidth error={!!error} helperText={error?.message} required />
-                                        )}
-                                        disableMaskedInput
-                                        inputFormat="dd-MMM-yyyy"
-                                    />
-                                )}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                            <RHFSelect
-                                fullWidth
-                                name="classTime"
-                                label="Time"
-                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                                required>
-                                {TIME_OPTIONS.map((eachTime, index) => (
-                                    <MenuItem
-                                        key={index}
-                                        value={eachTime}
-                                        sx={{
-                                            mx: 1,
-                                            my: 0.5,
-                                            borderRadius: 0.75,
-                                            typography: 'body2',
-                                            textTransform: 'capitalize',
-                                            '&:first-of-type': { mt: 0 },
-                                            '&:last-of-type': { mb: 0 },
-                                        }}
-                                    >
-                                        {eachTime}
-                                    </MenuItem>
-                                ))}
-                            </RHFSelect>
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                            <RHFSelect
-                                fullWidth
-                                name="classTeacher"
-                                label="Teacher"
-                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                                required>
-                                {TEACHER_OPTIONS.map((eachTeacher, index) => (
-                                    <MenuItem
-                                        key={index}
-                                        value={eachTeacher.nickname}
-                                        sx={{
-                                            mx: 1,
-                                            my: 0.5,
-                                            borderRadius: 0.75,
-                                            typography: 'body2',
-                                            textTransform: 'capitalize',
-                                            '&:first-of-type': { mt: 0 },
-                                            '&:last-of-type': { mb: 0 },
-                                        }}
-                                    >
-                                        {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
-                                    </MenuItem>
-                                ))}
-                            </RHFSelect>
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                            <RHFSelect
-                                fullWidth
-                                name="classMethod"
-                                label="Learning Method"
-                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
-                                required>
-                                {METHOD_OPTIONS.map((eachMethod, index) => (
-                                    <MenuItem
-                                        key={index}
-                                        value={eachMethod}
-                                        sx={{
-                                            mx: 1,
-                                            my: 0.5,
-                                            borderRadius: 0.75,
-                                            typography: 'body2',
-                                            textTransform: 'capitalize',
-                                            '&:first-of-type': { mt: 0 },
-                                            '&:last-of-type': { mb: 0 },
-                                        }}
-                                    >
-                                        {eachMethod}
-                                    </MenuItem>
-                                ))}
-                            </RHFSelect>
-                        </Grid>
-
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="outlined" color="inherit" onClick={onClose}>
-                        Cancel
-                    </Button>
-                    <Button type="submit" variant="contained" color="primary">
-                        Add
-                    </Button>
-                </DialogActions>
-            </FormProvider>
         </Dialog>
     )
 }
