@@ -45,16 +45,8 @@ import {
 // sections
 import RegistrationTableToolbar from './RegistrationTableToolbar';
 import { HOG_API } from '../../../config';
-// import Condition from 'yup/lib/Condition';
 
 // ----------------------------------------------------------------------
-
-// {Condition=== true && ()}
-// {Condition=== true ? () : (else)}
-
-function createData(id, requestDate, courseType, section, paymentType, requestedBy, role, receipt) {
-  return { id, requestDate, courseType, section, paymentType, requestedBy, role, receipt };
-}
 
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
@@ -62,19 +54,9 @@ const TABLE_HEAD_REQUESTS = [
   { id: 'section ', label: 'Section', align: 'left', width: '18%' },
   { id: 'requestedBy', label: 'Requested by (EP)', align: 'left', width: '16%' },
   { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: '18%' },
-  { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
 
-const TABLE_DATA_REQUESTS = [
-  // Table {  RID,    Req Date ,     courseType,     section,           paymentType, requestedBy,      role,   Receipt }
-  createData(222, '28-Nov-2022', 'Private', 'Saw Zwe Wai Yan', "Full Payment", 'Nirawit(Boss)', 'all', 'completeReceipt'),
-  createData(125, '15-Dec-2022', 'Group', 'Class 50', "Full Payment", 'Nirawit(Boss)', 'completed', ''),
-  createData(128, '28-Nov-2022', 'Private', 'Zain', "Installment", 'Nirawit(Boss)', 'all', 'incompleteReceipt'),
-  createData(258, '02-Dec-2022', 'Group', 'Class 80', "Full Payment", 'Nirawit(Boss)', 'rejected', ''),
-  createData(545, '02-Dec-2022', 'Private', 'Tar', "Full Payment", 'Nirawit(Boss)', 'rejected', ''),
-
-];
 const errorTheme = createTheme({
   palette: {
     primary: {
@@ -169,11 +151,12 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     (!dataFiltered.length && !!filterRole);
 
   const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
+  const getLengthByReceipt = (receipt) => tableData.filter((item) => item.receipt === receipt).length;
 
   const TABS = [
     { value: 'PendingOA', label: 'All', color: 'warning', count: getLengthByStatus('PendingOA') },
-    { value: 'Complete', label: 'Completed', count: getLengthByStatus('Complete'), color: 'success' },
-    { value: 'Reject', label: 'Rejected', count: getLengthByStatus('Reject'), color: 'error' },
+    { value: 'Complete', label: 'Completed', count: getLengthByReceipt('Complete'), color: 'success' },
+    { value: 'Incomplete', label: 'Incomplete', count: getLengthByReceipt('Incomplete'), color: 'error' },
   ];
 
 
@@ -303,7 +286,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
                       <TableCell align="left">{row.section}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
                       <TableCell align="center">{row.registeredCourses}</TableCell>
-                      <TableCell align="left" />
+                      {/* <TableCell align="left" /> */}
                       <TableCell>
                         <Iconify icon="ic:chevron-right" />
                       </TableCell>
@@ -359,7 +342,12 @@ function applyFilter({
   }
 
   if (filterRole !== '') {
-    inputData = inputData.filter((request) => request.role === filterRole);
+    console.log(inputData);
+    if (filterRole === 'Incomplete') {
+      inputData = inputData.filter((request) => request.receipt === 'Incomplete');
+    } else {
+      inputData = inputData.filter((request) => request.role === filterRole);
+    }
   }
 
   return inputData;
