@@ -18,10 +18,28 @@ ViewTeacher.propTypes = {
 }
 
 export default function ViewTeacher({ currentTeacher }) {
+    console.log("teacher",currentTeacher.workTimes)
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
     const [openDeleteAccountDialog, setOpenDeleteAccountDialog] = useState(false);
+
+    // const defaultValues = {
+    //     role: 'Teacher',
+    //     fName: currentTeacher?.fName || '',
+    //     lName: currentTeacher?.lName || '',
+    //     nickname: currentTeacher?.nickname || '',
+    //     phone: currentTeacher?.phone || '',
+    //     line: currentTeacher?.line || '',
+    //     email: currentTeacher?.email || '',
+    //     monday: currentTeacher.monday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.monday.fromTime, toTime: currentTeacher.monday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     tuesday: currentTeacher.tuesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.tuesday.fromTime, toTime: currentTeacher.tuesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     wednesday: currentTeacher.wednesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.wednesday.fromTime, toTime: currentTeacher.wednesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     thursday: currentTeacher.thursday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.thursday.fromTime, toTime: currentTeacher.thursday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     friday: currentTeacher.friday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.friday.fromTime, toTime: currentTeacher.friday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     saturday: currentTeacher.saturday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.saturday.fromTime, toTime: currentTeacher.saturday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+    //     sunday: currentTeacher.sunday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.sunday.fromTime, toTime: currentTeacher.sunday.toTime } : { isSelected: false, fromTime: '', toTime: '' }
+    // };
 
     const defaultValues = {
         role: 'Teacher',
@@ -31,13 +49,13 @@ export default function ViewTeacher({ currentTeacher }) {
         phone: currentTeacher?.phone || '',
         line: currentTeacher?.line || '',
         email: currentTeacher?.email || '',
-        monday: currentTeacher.monday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.monday.fromTime, toTime: currentTeacher.monday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        tuesday: currentTeacher.tuesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.tuesday.fromTime, toTime: currentTeacher.tuesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        wednesday: currentTeacher.wednesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.wednesday.fromTime, toTime: currentTeacher.wednesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        thursday: currentTeacher.thursday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.thursday.fromTime, toTime: currentTeacher.thursday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        friday: currentTeacher.friday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.friday.fromTime, toTime: currentTeacher.friday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        saturday: currentTeacher.saturday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.saturday.fromTime, toTime: currentTeacher.saturday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
-        sunday: currentTeacher.sunday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.sunday.fromTime, toTime: currentTeacher.sunday.toTime } : { isSelected: false, fromTime: '', toTime: '' }
+        monday: currentTeacher.workTimes.monday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.monday.fromTime, toTime: currentTeacher.workTimes.monday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        tuesday: currentTeacher.workTimes.tuesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.tuesday.fromTime, toTime: currentTeacher.workTimes.tuesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        wednesday: currentTeacher.workTimes.wednesday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.wednesday.fromTime, toTime: currentTeacher.workTimes.wednesday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        thursday: currentTeacher.workTimes.thursday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.thursday.fromTime, toTime: currentTeacher.workTimes.thursday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        friday: currentTeacher.workTimes.friday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.friday.fromTime, toTime: currentTeacher.workTimes.friday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        saturday: currentTeacher.workTimes.saturday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.saturday.fromTime, toTime: currentTeacher.workTimes.saturday.toTime } : { isSelected: false, fromTime: '', toTime: '' },
+        sunday: currentTeacher.workTimes.sunday.fromTime !== '' ? { isSelected: true, fromTime: currentTeacher.workTimes.sunday.fromTime, toTime: currentTeacher.workTimes.sunday.toTime } : { isSelected: false, fromTime: '', toTime: '' }
     };
 
     const methods = useForm({

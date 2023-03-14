@@ -3,10 +3,12 @@ import { useState } from 'react';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router';
 // @mui
+import axios from 'axios';
 import { LoadingButton } from '@mui/lab';
 import { Stack, Typography, Dialog, Button, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 // components
 import { useSnackbar } from '../../../components/snackbar';
+import { HOG_API } from '../../../config';
 
 DeleteAccountDialog.propTypes = {
     accountId: PropTypes.string,
@@ -18,22 +20,32 @@ DeleteAccountDialog.propTypes = {
 
 export default function DeleteAccountDialog({ accountId, accountRole, accountName, open, onClose }) {
     const { enqueueSnackbar } = useSnackbar();
-
+    const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const element = document.querySelector('#delete-request-error-handling .status');
+    
     const handleDelete = async () => {
-        setIsSubmitting(true);
-        console.log("Delete account will be added soon!, Account's id, role = ", accountId, accountRole);
+      setIsSubmitting(true);
+    
+      try {
+        await axios.delete(`${HOG_API}/api/Teacher/Delete/${accountId}`);
         enqueueSnackbar("Deleted the account successfully", { variant: 'success' });
-        setIsSubmitting(false);
-
+        navigate(-1)
+      } catch (error) {
+        console.error('There was an error!', error);
+        element.parentElement.innerHTML = `Error: ${error.message}`;
+      }
+    
+      setIsSubmitting(false);
     };
+    
+      
 
     return (
         <Dialog maxWidth="md" open={open} onClose={onClose}>
             <DialogTitle>
                 <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
-                    <Typography variant='h4'>Edit Account?</Typography>
+                    <Typography variant='h4'>Delete Account?</Typography>
                 </Stack>
             </DialogTitle>
             <DialogContent>
