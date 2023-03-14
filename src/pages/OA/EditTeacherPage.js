@@ -47,45 +47,100 @@ export default function NewAccountPage() {
     }
 
     const TEACHER_DATA = {
-        id: teacher.id,
-        role: 'Teacher',
-        fullname: teacher.fullName,
-        fName: teacher.fName,
-        lName: teacher.lName,
-        nickname: teacher.nickname,
-        phone: teacher.phone,
-        line: teacher.line,
-        email: teacher.email,
-        monday: {
-            fromTime: teacher.workTimes[0] ? teacher.workTimes[0].fromTime || '' : '',
-            toTime: teacher.workTimes[0] ? teacher.workTimes[0].toTime || '' : ''
-          },
-          tuesday: {
-            fromTime: teacher.workTimes[1] ? teacher.workTimes[1].fromTime || '' : '',
-            toTime: teacher.workTimes[1] ? teacher.workTimes[1].toTime || '' : ''
-          },
-          wednesday: {
-            fromTime: teacher.workTimes[2] ? teacher.workTimes[2].fromTime || '' : '',
-            toTime: teacher.workTimes[2] ? teacher.workTimes[2].toTime || '' : ''
-          },
-          thursday: {
-            fromTime: teacher.workTimes[3] ? teacher.workTimes[3].fromTime || '' : '',
-            toTime: teacher.workTimes[3] ? teacher.workTimes[3].toTime || '' : ''
-          },
-          friday: {
-            fromTime: teacher.workTimes[4] ? teacher.workTimes[4].fromTime || '' : '',
-            toTime: teacher.workTimes[4] ? teacher.workTimes[4].toTime || '' : ''
-          },
-          saturday: {
-            fromTime: teacher.workTimes[5] ? teacher.workTimes[5].fromTime || '' : '',
-            toTime: teacher.workTimes[5] ? teacher.workTimes[5].toTime || '' : ''
-          },
-          sunday: {
-            fromTime: teacher.workTimes[6] ? teacher.workTimes[6].fromTime || '' : '',
-            toTime: teacher.workTimes[6] ? teacher.workTimes[6].toTime || '' : ''
-          }
-    }
+      id: teacher.id.toString(),
+      role: 'Teacher',
+      fullname: teacher.fullName,
+      fName: teacher.fName,
+      lName: teacher.lName,
+      nickname: teacher.nickname,
+      phone: teacher.phone,
+      line: teacher.line,
+      email: teacher.email,
+      workTimes: (() => {
+          const workTimes = {
+            monday: {
+              fromTime:  '',
+              toTime:      ''
+            },
+              tuesday:  {
+                fromTime:   '',
+                toTime:      ''
+              },
+              wednesday:  {
+                fromTime:   '',
+                toTime:      ''
+              },
+              thursday:  {
+                fromTime:   '',
+                toTime:  ''
+              },
+              friday:  {
+                fromTime:   '',
+                toTime:     ''
+              },
+              saturday:  {
+                fromTime:   '',
+                toTime:     ''
+              },
+              sunday:  {
+                fromTime:  '',
+                toTime:     ''
+              },
+          };
 
+          teacher.workTimes.forEach((workTime) => {
+              switch (workTime.day) {
+                  case 'monday':
+                      workTimes.monday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'tuesday':
+                      workTimes.tuesday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'wednesday':
+                      workTimes.wednesday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'thursday':
+                      workTimes.thursday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'friday':
+                      workTimes.friday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'saturday':
+                      workTimes.saturday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  case 'sunday':
+                      workTimes.sunday = {
+                          fromTime: workTime.fromTime || '',
+                          toTime: workTime.toTime || '',
+                      };
+                      break;
+                  default:
+                      break;
+              }
+          });
+          return workTimes;
+      })(),
+  };
+
+    
     return (
         <>
             <Helmet>
