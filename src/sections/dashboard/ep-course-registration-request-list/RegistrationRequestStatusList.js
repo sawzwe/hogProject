@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import sumBy from 'lodash/sumBy';
 import axios from 'axios';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -31,6 +31,7 @@ import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
+import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import {
   useTable,
   getComparator,
@@ -52,9 +53,9 @@ function createData(id, requestDate, courseType, section, registeredCourses, req
 const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
-  { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
+  { id: 'section ', label: 'Section', align: 'left', width: '18%' },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left', width: '16%' },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: '18%' },
   { id: 'incomplete' },
   { id: 'moreInfo' },
 ];
@@ -96,6 +97,7 @@ RegistrationRequestStatusList.propTypes = {
 export default function RegistrationRequestStatusList({ registrationRequests }) {
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
+  const dataFetchedRef = useRef(false);
 
   const {
     dense,
@@ -120,35 +122,26 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
 
   // / Table {  RID,    Req Date ,     courseType,     section,           regiscourses, requestedBy,      role,   Receipt }
   useEffect(() => {
-    const formattedData = registrationRequests.map( (request) => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
 
-      // Waiting Pan fixing the API (Either takenByEPId not to be 0 or add EP's name to PrivateRegistrationRequest/Request/Get)
-
-      
-      const EPId = request.request.takenByEPId
-      // let epName = ''
-      // const epName = axios.get(`${HOG_API}/api/EP/Get/${EPId}`)
-      //   .then((res) => res.data.data.nickname)
-      //   .catch((error) => `Undefined (Undefined)`)
-
-      //   console.log(epName)
-
-      return {
-        id: request.request.id,
-        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request?.courseType || 'Private',
-        section: request.information[0]?.section || '-',
-        registeredCourses: request.information.length,
-        requestedBy: request.request.takenByEPId,
-        role: request.request.status,
-        receipt: request.request.paymentStatus,
-      }
+    registrationRequests.map((request) => {
+      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+        .then((res) => {
+          const newData = {
+            id: request.request.id,
+            requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+            courseType: request.request.courseType,
+            section: request.request.section,
+            registeredCourses: request.information.length,
+            requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+            role: request.request.status,
+            receipt: request.request.paymentStatus,
+          }
+          setTableData(tableData => [...tableData, newData])
+        })
     })
-
-    setTableData(formattedData);
   }, []);
-
-  console.log(tableData);
 
   const [filterName, setFilterName] = useState('');
 
@@ -238,6 +231,10 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     setFilterRole('pendingEA');
   };
 
+  if (!dataFetchedRef.current) return (
+    <LoadingScreen />
+  )
+
   return (
     <>
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -318,19 +315,22 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
                       hover
                       key={row.id}
                       onClick={() => navigate(`/course-registration/ep-request-status/${row.id}`)}
-                      sx={{ cursor: "pointer" }}          >
-                      <TableCell align="left" > {row.id} </TableCell>
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
                       <TableCell align="left">{row.requestDate}</TableCell>
                       <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.registeredCourses}</TableCell>
                       <TableCell align="left">{row.requestedBy}</TableCell>
+                      <TableCell align="center">{row.registeredCourses}</TableCell>
 
-                      {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Iconify icon="ic:error" color="red" />
-                          </TableCell>
-                        </ThemeProvider>
+                      {row.receipt === 'Incomplete' ? (
+                        <TableCell align="left">
+                          <Tooltip title="Incomplete Payment">
+                            <IconButton>
+                              <Iconify icon="ic:error" color="#FF3030" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
                       ) :
                         <TableCell align="left" />
                       }
@@ -356,9 +356,6 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-          //
-          // dense={dense}
-          // onChangeDense={onChangeDense}
           />
         </Card>
       </Container>

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import _ from 'lodash';
+import { useNavigate } from 'react-router';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
@@ -46,17 +47,21 @@ import { HOG_API } from '../../../config';
 
 ScheduleRegistrationRequest.propTypes = {
     currentRequest: PropTypes.object,
+    educationAdminId: PropTypes.number,
 }
 
-export default function ScheduleRegistrationRequest({ currentRequest }) {
+export default function ScheduleRegistrationRequest({ currentRequest, educationAdminId }) {
 
     const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
     // Prevent user to submit the form unless all schedules are generated
     const [createdCourses, setCreatedCourses] = useState([]);
 
     const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [rejectedReasonMessage, setRejectedReasonMessage] = useState('');
 
@@ -73,7 +78,8 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
     const courseType = 'Private';
 
     const handleCreateCourse = (createdCourse) => {
-        setCreatedCourses([...createdCourses, createdCourse]);
+        const filteredCourses = createdCourses.filter((eachCourse) => eachCourse.course !== createdCourse.course || eachCourse.subject !== createdCourse.subject || eachCourse.level !== createdCourse.level || eachCourse.fromDate !== createdCourse.fromDate || eachCourse.toDate !== createdCourse.toDate);
+        setCreatedCourses([...filteredCourses, createdCourse]);
     }
 
     // submit
@@ -86,23 +92,26 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
         setSubmitDialogOpen(false);
     };
 
-    const addCourseToDatabase = () => {
-        createdCourses.forEach((eachCourse) => {
+    const addScheduleToDatabase = async () => {
+        await createdCourses.forEach((eachCourse) => {
             const formattedSchedule = {
-                reqId: request.id,
-                course: eachCourse.course,
-                subject: eachCourse.subject,
-                level: eachCourse.level,
-                method: eachCourse.method,
-                totalHour: eachCourse.totalHour,
-                hourPerClass: eachCourse.hourPerClass,
-                fromDate: fDate(new Date(eachCourse.fromDate), 'dd-MMMM-yyyy'),
-                toDate: fDate(new Date(eachCourse.toDate), 'dd-MMMM-yyyy'),
-                privateClasses: eachCourse.schedules.map((eachClass) => (
+                requestId: request.id,
+                course: {
+                    course: eachCourse.course,
+                    subject: eachCourse.subject || "",
+                    level: eachCourse.level || "",
+                    section: request.section,
+                    method: eachCourse.method,
+                    totalHour: eachCourse.totalHour,
+                    hourPerClass: eachCourse.hourPerClass,
+                    fromDate: fDate(new Date(eachCourse.fromDate), 'dd-MMMM-yyyy'),
+                    toDate: fDate(new Date(eachCourse.toDate), 'dd-MMMM-yyyy'),
+                },
+                classes: eachCourse.schedules.map((eachClass) => (
                     {
                         room: '',
                         method: eachClass.method,
-                        date: eachClass.date,
+                        date: fDate(new Date(eachClass.date), 'dd-MMM-yyyy'),
                         fromTime: eachClass.fromTime,
                         toTime: eachClass.toTime,
                         studentPrivateClasses: students.map((eachStudent) => (
@@ -119,13 +128,18 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
                 ))
             }
 
-            return axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Schedule/Post`, formattedSchedule)
+            return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error
+                })
         })
     }
 
     const onSubmit = async () => {
+        setIsSubmitting(true);
         try {
-            await addCourseToDatabase();
+            await addScheduleToDatabase()
             await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
                 request: {
                     id: request.id,
@@ -137,26 +151,55 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
                     eaRemark: request.eaRemark,
                     oaRemark: request.oaRemark,
                     takenByEPId: request.takenByEPId,
-                    takenByEAId: 1,
+                    takenByEAId: educationAdminId,
                     takenByOAId: 0
                 }
             })
-                .then((res) => enqueueSnackbar('Schedules are submitted successfully', { variant: 'success' }))
-                .catch((error) => console.error(error))
+                .catch((error) => {
+                    throw error;
+                })
 
+            setIsSubmitting(false);
+            enqueueSnackbar('Schedules are submitted successfully', { variant: 'success' });
+            navigate('/course-registration/ea-request-status');
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' });
+            setIsSubmitting(false);
         }
     };
+
     const onReject = async () => {
-        try {
-            if (rejectedReasonMessage === '') {
-                enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
-            } else {
-                console.log(createdCourses);
+        if (rejectedReasonMessage === '') {
+            enqueueSnackbar('Please enter a reason for rejection!', { variant: 'error' });
+        } else {
+            setIsSubmitting(true);
+            try {
+                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+                    request: {
+                        id: request.id,
+                        status: "Reject",
+                        eaStatus: "Reject",
+                        paymentStatus: "None",
+                        epRemark1: request.epRemark1,
+                        epRemark2: request.epRemark2,
+                        eaRemark: rejectedReasonMessage,
+                        oaRemark: request.oaRemark,
+                        takenByEPId: request.takenByEPId,
+                        takenByEAId: educationAdminId,
+                        takenByOAId: 0
+                    }
+                })
+                    .catch((error) => {
+                        throw error;
+                    })
+
+                setIsSubmitting(false);
+                enqueueSnackbar('The request is successfully rejected', { variant: 'success' });
+                navigate('/course-registration/ea-request-status');
+            } catch (error) {
+                enqueueSnackbar(error.message, { variant: 'error' });
+                setIsSubmitting(false);
             }
-        } catch (error) {
-            enqueueSnackbar(error.message, { variant: 'error' });
         }
     };
 
@@ -175,7 +218,7 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
                 <StudentSection students={students} />
             </Grid>
             <Grid item xs={12} md={12}>
-                <CourseSection courseType={courseType} courses={information} onCreate={handleCreateCourse} />
+                <CourseSection courseType={courseType} createdCourses={createdCourses} courses={information} onCreate={handleCreateCourse} />
             </Grid>
 
             <Grid item xs={12} md={12}>
@@ -211,9 +254,9 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
                 </DialogContent>
                 <DialogActions>
                     <Button color="inherit" variant="outlined" onClick={handleSubmitClose}>Cancel</Button>
-                    <Button variant="contained" onClick={onSubmit} color="primary">
+                    <LoadingButton variant="contained" onClick={onSubmit} loading={isSubmitting} color="primary">
                         Submit
-                    </Button>
+                    </LoadingButton>
                 </DialogActions>
             </Dialog>
 
@@ -234,9 +277,9 @@ export default function ScheduleRegistrationRequest({ currentRequest }) {
                 </DialogContent>
                 <DialogActions>
                     <Button color="inherit" variant="outlined" onClick={handleRejectClose}>Cancel</Button>
-                    <Button variant="contained" onClick={onReject} color="error">
+                    <LoadingButton variant="contained" loading={isSubmitting} onClick={onReject} color="error">
                         Reject
-                    </Button>
+                    </LoadingButton>
                 </DialogActions>
             </Dialog>
         </Grid>
@@ -288,14 +331,19 @@ CourseSection.propTypes = {
     courseType: PropTypes.string,
     courses: PropTypes.array,
     onCreate: PropTypes.func,
+    createdCourses: PropTypes.array,
 }
 
-export function CourseSection({ courseType, courses, onCreate }) {
+export function CourseSection({ courseType, courses, onCreate, createdCourses }) {
 
     // Schedule Dialog
     const [open, setOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({});
-    const [completeCourses, setCompleteCourses] = useState([]);
+    const [completeCourses, setCompleteCourses] = useState(createdCourses);
+
+    useEffect(() => {
+        setCompleteCourses(createdCourses)
+    }, [createdCourses])
 
     const handleOpenDialog = (course) => {
         setSelectedCourse(course);
@@ -307,14 +355,15 @@ export function CourseSection({ courseType, courses, onCreate }) {
         setOpen(false);
     }
 
+    const checkAlreadyCreated = (completeCourses, course) => {
+        return completeCourses.some((eachCourse) => (eachCourse.course === course.course && eachCourse.subject === course.subject && eachCourse.level === course.level && eachCourse.fromDate === course.fromDate && eachCourse.toDate === course.toDate));
+    }
+
     const handleCreate = (schedules) => {
         const createdCourse = { ...selectedCourse, schedules };
         setCompleteCourses([...completeCourses, createdCourse]);
         onCreate(createdCourse);
     };
-
-    const checkAlreadyCreated = (completeCourses, course) =>
-        completeCourses.some((eachCourse) => (eachCourse.course === course.course && eachCourse.subject === course.subject && eachCourse.level === course.level));
 
     return (
         <>
@@ -397,30 +446,15 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     // Generate Schedules -------------------------------------------------------------------
     const [schedules, setSchedules] = useState([])
 
-    // Fetch generated schedules
-    const getGeneratedSchedules = async () => {
-        try {
-            await axios.get('https://api.sampleapis.com/wines/reds')
-                .then((res) => console.log(res.data)) // Response received
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleGenerate = () => {
-        // async/await fetching data
-        getGeneratedSchedules()
-    }
-
     // Check if course is already in created Courses --------------------------------------------------
-    const checkAlreadyCreated = (completeCourses, course) => (
-        completeCourses.some((eachCourse) => (eachCourse.course === course.course && eachCourse.subject === course.subject && eachCourse.level === course.level))
-    )
+    const checkAlreadyCreated = (completeCourses, course) => {
+        return completeCourses.some((eachCourse) => (eachCourse.course === course.course && eachCourse.subject === course.subject && eachCourse.level === course.level && eachCourse.fromDate === course.fromDate && eachCourse.toDate === course.toDate));
+    }
 
     // If already created, then show the generated schedule
     useEffect(() => {
         if (!!Object.keys(selectedCourse).length && checkAlreadyCreated(completeCourses, selectedCourse)) {
-            const targetCourse = completeCourses.find((eachCourse) => (eachCourse.course === selectedCourse.course && eachCourse.subject === selectedCourse.subject && eachCourse.level === selectedCourse.level));
+            const targetCourse = completeCourses.find((eachCourse) => (eachCourse.course === selectedCourse.course && eachCourse.subject === selectedCourse.subject && eachCourse.level === selectedCourse.level && eachCourse.fromDate === selectedCourse.fromDate && eachCourse.toDate === selectedCourse.toDate));
             setSchedules(targetCourse.schedules);
         }
     }, [selectedCourse])
@@ -442,13 +476,11 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     const handleEditClass = (newClass) => {
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
         const updatedSchedules = [...filteredSchedules, newClass]
-        //  shallow copy the array
         setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
     }
 
     const handleDeleteClass = (deletedClass) => {
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== deletedClass)
-        //  shallow copy the array
         setSchedules(filteredSchedules.sort((class1, class2) => class1.date - class2.date));
     }
 
@@ -482,8 +514,6 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     const customTextFieldStyle = {
         fontSize: '0.9rem'
     }
-
-    console.log(schedules)
 
     // Tables ---------------------------------------------------------------------------------
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -721,6 +751,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     onEdit={handleEditClass}
                     onDelete={handleDeleteClass}
                     hourPerClass={selectedCourse.hourPerClass}
+                    fromDate={selectedCourse.fromDate}
+                    toDate={selectedCourse.toDate}
                 />
             }
 
@@ -729,11 +761,14 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 onClose={() => setOpenAddClassDialog(false)}
                 onAdd={handleAddClass}
                 hourPerClass={selectedCourse.hourPerClass}
+                fromDate={selectedCourse.fromDate}
+                toDate={selectedCourse.toDate}
+                method={selectedCourse.method}
             />
 
             <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
                 <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
-                    Create
+                    {checkAlreadyCreated(completeCourses, selectedCourse) ? 'Save Changes' : 'Create'}
                 </Button>
             </Grid>
         </Dialog>
@@ -748,10 +783,12 @@ EditClassDialog.propTypes = {
     schedule: PropTypes.object,
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
-    hourPerClass: PropTypes.number
+    hourPerClass: PropTypes.number,
+    fromDate: PropTypes.string,
+    toDate: PropTypes.string,
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [
@@ -797,14 +834,13 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
     } = methods;
 
     const values = watch();
-    const { scheduleDate, scheduleTeacher, scheduleFromTime, scheduleToTime, scheduleMethod } = values;
+    const { scheduleDate, scheduleTeacher, scheduleTime, scheduleMethod } = values;
 
     useEffect(() => {
         if (Object.keys(schedule).length) {
             setValue('scheduleDate', date);
-            setValue('scheduleTeacher', teacher.id);
-            setValue('scheduleFromTime', fromTime);
-            setValue('scheduleToTime', fromTime);
+            setValue('scheduleTeacher', _.capitalize(teacher));
+            setValue('scheduleTime', fromTime.concat('-', toTime));
             setValue('scheduleMethod', method);
         }
     }, [schedule])
@@ -816,9 +852,9 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             day: weekday[new Date(scheduleDate).getDay()].slice(0, 3),
             date: scheduleDate,
             hourPerClass,
-            teacher: TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.id === scheduleTeacher),
-            fromTime: scheduleFromTime.slice(0, 5),
-            toTime: scheduleToTime.slice(6, 11),
+            teacher: TEACHER_OPTIONS.find((eachTeacher) => eachTeacher.nickname.toLowerCase() === scheduleTeacher.toLowerCase()).nickname.toUpperCase(),
+            fromTime: scheduleTime.slice(0, 5),
+            toTime: scheduleTime.slice(6, 11),
             method: scheduleMethod
         };
         onEdit(newSchedule);
@@ -855,6 +891,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                 <DatePicker
                                     label="Date"
                                     value={field.value}
+                                    minDate={new Date(fromDate)}
+                                    maxDate={new Date(toDate)}
                                     onChange={(newValue) => {
                                         field.onChange(newValue);
                                     }}
@@ -916,7 +954,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                         '&:last-of-type': { mb: 0 },
                                     }}
                                 >
-                                    {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                    {`${eachTeacher.nickname} (${eachTeacher.fullName})`}
                                 </MenuItem>
                             ))}
                         </RHFSelect>
@@ -983,9 +1021,12 @@ AddClassDialog.propTypes = {
     onClose: PropTypes.func,
     onAdd: PropTypes.func,
     hourPerClass: PropTypes.number,
+    fromDate: PropTypes.string,
+    toDate: PropTypes.string,
+    method: PropTypes.string,
 }
 
-export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
+export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method }) {
 
     // fetch all teachers
     const TEACHER_OPTIONS = [
@@ -1008,7 +1049,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
         classDate: '',
         classTime: '',
         classTeacher: '',
-        classMethod: 'Onsite'
+        classMethod: _.capitalize(method)
     };
 
     const methods = useForm({
@@ -1026,7 +1067,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
     const onSubmit = (data) => {
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
-            date: fDate(data.classDate),
+            date: data.classDate,
             hourPerClass,
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
@@ -1040,6 +1081,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
             reset(defaultValues);
         }, 200)
     }
+
 
     return (
         <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}>
@@ -1055,6 +1097,8 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass }) {
                                 render={({ field, fieldState: { error } }) => (
                                     <DatePicker
                                         label="Date"
+                                        minDate={new Date(fromDate)}
+                                        maxDate={new Date(toDate)}
                                         value={field.value}
                                         onChange={(newValue) => {
                                             field.onChange(newValue);

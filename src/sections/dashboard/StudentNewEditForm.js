@@ -26,13 +26,6 @@ import FormProvider, { RHFAutocomplete, RHFUpload, RHFRadioGroup, RHFSelect, RHF
 
 // ----------------------------------------------------------------------
 
-// Get student data from table Student
-// Get registered course from table StudyCourse joined with Student
-// Get exam date from table Exam joined with Student
-
-// Once created, store the data to Student table, Firebase Auth and Firestore
-// Once saved, overwrite the data to Student and Exam tables
-
 const TITLE_OPTIONS = [
     { id: 1, name: 'Mr.' },
     { id: 2, name: 'Ms.' },
@@ -90,8 +83,10 @@ StudentNewEditForm.propTypes = {
 
 export default function StudentNewEditForm({ isEdit = false, currentStudent, currentAvatar, currentFiles }) {
     const navigate = useNavigate();
-    const { registerStudent, updateStudent } = useAuthContext();
+    const { registerStudent, updateStudent, user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
+
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -99,7 +94,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         studentLastName: Yup.string().required('Lastname is required'),
         studentNickname: Yup.string().required('Nickname is required'),
         studentDateOfBirth: Yup.string().nullable().required('Date of birth is required'),
-        studentPhoneNo: Yup.string().required('Phone number is required'),
+        studentPhoneNo: Yup.string().min(10, 'Phone number must contain 10 numbers').max(10, 'phone number must contain 10 numbers').required('Phone number is required'),
         studentLineId: Yup.string().required('Line ID is required'),
         studentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
         schoolName: Yup.string().required('School name is required'),
@@ -117,12 +112,12 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         subDistrict: Yup.string().required('Sub-District is required'),
         district: Yup.string().required('District is required'),
         province: Yup.string().required('Province is required'),
-        zipCode: Yup.string().required('ZipCode is required'),
+        zipCode: Yup.string().min(5, 'Zipcode must contain 5 numbers').max(5, 'Zipcode must contain 5 numbers').required('ZipCode is required'),
         parentFirstName: Yup.string().required('Firstname is required'),
         parentLastName: Yup.string().required('Lastname is required'),
         parentRelationships: Yup.string().required('Relationships is required'),
-        parentPhoneNo: Yup.string().required('Phone number is required'),
-        parentEmail: Yup.string().required('Email is required').email('Must be a valid email'),
+        parentPhoneNo: Yup.string().min(10, 'Phone number must contain 10 numbers').max(10, 'phone number must contain 10 numbers').required('Phone number is required'),
+        parentEmail: Yup.string().email('Must be a valid email').required('Email is required'),
         parentLineId: Yup.string().required('Line ID is required'),
         studentHealthInfo: Yup.string(),
         studentSource: Yup.string(),
@@ -136,34 +131,34 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
     const defaultValues = useMemo(
         () => ({
-            studentTitle: currentStudent?.title || 'Mr.',
-            studentFirstName: currentStudent?.fName || 'Piyaphon',
-            studentLastName: currentStudent?.lName || 'Wu',
-            studentNickname: currentStudent?.nickname || 'Hong',
-            studentDateOfBirth: currentStudent?.dob || '1-May-2002',
-            studentPhoneNo: currentStudent?.phone || '09846512',
-            studentLineId: currentStudent?.line || 'pnw029',
-            studentEmail: currentStudent?.email || 'hong@gmail.com',
-            schoolName: currentStudent?.school || 'Assumption College Rayong',
+            studentTitle: currentStudent?.title || '',
+            studentFirstName: currentStudent?.fName || '',
+            studentLastName: currentStudent?.lName || '',
+            studentNickname: currentStudent?.nickname || '',
+            studentDateOfBirth: currentStudent?.dob || '',
+            studentPhoneNo: currentStudent?.phone || '',
+            studentLineId: currentStudent?.line || '',
+            studentEmail: currentStudent?.email || '',
+            schoolName: currentStudent?.school || '',
             schoolCountry: currentStudent?.countryOfSchool || countries[216].label,
-            levelOfStudy: currentStudent?.levelOfStudy || 'Matthayom 6',
-            targetUniversity: currentStudent?.targetUni || 'Assumption University',
-            targetScore: currentStudent?.targetScore || 'IELTS 9.0',
-            studyProgram: !!currentStudent?.program ? currentStudent.program !== "International Program" && currentStudent.program!== 'Bilingual/EP Program' && currentStudent.program!== 'Thai Program' && currentStudent.program!== 'Gifted Program' && currentStudent.program!== 'Homeschool' ? 'Other' : currentStudent?.program : STUDY_PROGRAM_OPTIONS[2].value,
+            levelOfStudy: currentStudent?.levelOfStudy || '',
+            targetUniversity: currentStudent?.targetUni || '',
+            targetScore: currentStudent?.targetScore || '',
+            studyProgram: !!currentStudent?.program ? currentStudent.program !== "International Program" && currentStudent.program !== 'Bilingual/EP Program' && currentStudent.program !== 'Thai Program' && currentStudent.program !== 'Gifted Program' && currentStudent.program !== 'Homeschool' ? 'Other' : currentStudent?.program : '',
             otherProgram: currentStudent?.program || '',
-            address: currentStudent?.address.address || '2/18 Moo 2 Rd.Sukhumwit',
-            subDistrict: currentStudent?.address.subdistrict || 'Nernpra',
-            district: currentStudent?.address.district || 'Mueng Rayong',
-            province: currentStudent?.address.province || 'Rayong',
-            zipCode: currentStudent?.address.zipcode || '21000',
-            parentFirstName: currentStudent?.parent.fName || 'dadFirstname',
-            parentLastName: currentStudent?.parent.lName || 'dadLastname',
-            parentRelationships: currentStudent?.parent.relationship || 'Father',
-            parentPhoneNo: currentStudent?.parent.phone || '097485612',
-            parentEmail: currentStudent?.parent.email || 'dad@gmail.com',
-            parentLineId: currentStudent?.parent.line || 'dad@line',
-            studentHealthInfo: currentStudent?.healthInfo || 'Seafood allergy',
-            studentSource: currentStudent?.hogInfo || 'Know from friends',
+            address: currentStudent?.address.address || '',
+            subDistrict: currentStudent?.address.subdistrict || '',
+            district: currentStudent?.address.district || '',
+            province: currentStudent?.address.province || '',
+            zipCode: currentStudent?.address.zipcode || '',
+            parentFirstName: currentStudent?.parent.fName || '',
+            parentLastName: currentStudent?.parent.lName || '',
+            parentRelationships: currentStudent?.parent.relationship || '',
+            parentPhoneNo: currentStudent?.parent.phone || '',
+            parentEmail: currentStudent?.parent.email || '',
+            parentLineId: currentStudent?.parent.line || '',
+            studentHealthInfo: currentStudent?.healthInfo || '',
+            studentSource: currentStudent?.hogInfo || '',
             studentImageURL: currentAvatar || '',
             studentAdditionalFiles: currentFiles || [],
         }),
@@ -181,36 +176,45 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         control,
         setValue,
         handleSubmit,
-        formState: { isSubmitting },
     } = methods;
 
     const values = watch();
 
     // Confirm Dialog
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmitConfirmDialog = async (data) => {
+        setIsSubmitting(true);
         try {
             if (data.studyProgram === 'Other') {
                 data.studyProgram = data.otherProgram;
             }
 
             if (isEdit) {
-                await updateStudent(currentStudent, data)
-                    .then(() => setOpenConfirmDialog(false))
-                    .then(() => enqueueSnackbar('Update successfully!'))
-                    .then(() => reset())
-                    .then(() => navigate(`/account/student-management/student/${currentStudent.id}`))
-                    .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
+                await updateStudent(currentStudent, data, config)
+                    .catch((error) => {
+                        throw error;
+                    })
+                setIsSubmitting(false);
+                enqueueSnackbar('Update successfully!');
+                setOpenConfirmDialog(false);
+                navigate(`/account/student-management/student/${currentStudent.id}`);
+                reset(defaultValues);
             } else {
-                await registerStudent(data)
-                    .then(() => setOpenConfirmDialog(false))
-                    .then(() => enqueueSnackbar('Successfully created!'))
-                    .then(() => reset())
-                    .catch((error) => enqueueSnackbar(error.message, { variant: 'error' }))
+                await registerStudent(data, config)
+                    .catch((error) => {
+                        throw error;
+                    })
+                setIsSubmitting(false);
+                enqueueSnackbar('Successfully created!')
+                setOpenConfirmDialog(false);
+                navigate(`/account/student-management/student`);
+                reset(defaultValues);
             }
         } catch (error) {
             enqueueSnackbar(`${error.message}`, { variant: 'error' });
+            setIsSubmitting(false);
         }
     }
 
@@ -276,7 +280,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
     useEffect(() => {
         if (isEdit && currentStudent) {
-            if (currentStudent.program !== "International Program" && currentStudent.program!== 'Bilingual/EP Program' && currentStudent.program!== 'Thai Program' && currentStudent.program!== 'Gifted Program' && currentStudent.program!== 'Homeschool') {
+            if (currentStudent.program !== "International Program" && currentStudent.program !== 'Bilingual/EP Program' && currentStudent.program !== 'Thai Program' && currentStudent.program !== 'Gifted Program' && currentStudent.program !== 'Homeschool') {
                 // reset(defaultValues);
                 setShowOtherStudyProgram(true)
                 setValue("studyProgram", "Other");
@@ -326,6 +330,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                         <br /> max size of {fData(3145728)}
                                     </Typography>
                                 }
+                                required
                             />
                         </Box>
                     </Card>
@@ -333,30 +338,17 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
 
                 {/* Student Information */}
                 <Grid item xs={12} md={8}>
-                    <Card sx={{ p: 3 }}>
+                    <Card sx={{ p: 3, pb: 4.8 }}>
                         <Typography variant="h5"
                             sx={{
                                 mb: 2,
                                 display: 'block',
-                            }}>Student Information</Typography>
-                        <Box
-                            rowGap={3}
-                            columnGap={2}
-                            display="grid"
-                            gridTemplateColumns={{
-                                xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(1, 1fr)',
-                            }}
-                            gridTemplateAreas={{
-                                xs: `"studentTitle" "studentFirstName" "studentLastName" "studentNickname" "studentDateOfBirth" "studentPhoneNumber" "studentLineId" "studentEmail"`,
-                                md: `"studentTitle studentFirstName studentFirstName studentLastName studentLastName studentNickname"
-                                "studentDateOfBirth studentDateOfBirth studentDateOfBirth studentPhoneNumber studentPhoneNumber studentPhoneNumber" 
-                                "studentLineId studentLineId studentLineId studentEmail studentEmail studentEmail"`
-                            }}
-                        >
-                            <Box gridArea={"studentTitle"}>
+                            }}>
+                            Student Information
+                        </Typography>
+                        <Grid direction="row" container spacing={2}>
+                            <Grid item xs={12} md={2}>
                                 <RHFSelect
-                                    fullWidth
                                     name="studentTitle"
                                     label="Title"
                                     SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
@@ -379,17 +371,17 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
-                            </Box>
-                            <Box gridArea={"studentFirstName"}>
+                            </Grid>
+                            <Grid item xs={12} md={3.5}>
                                 <RHFTextField name="studentFirstName" label="First Name" required />
-                            </Box>
-                            <Box gridArea={"studentLastName"}>
+                            </Grid>
+                            <Grid item xs={12} md={3.5}>
                                 <RHFTextField name="studentLastName" label="Last Name" required />
-                            </Box>
-                            <Box gridArea={"studentNickname"}>
+                            </Grid>
+                            <Grid item xs={12} md={3}>
                                 <RHFTextField name="studentNickname" label="Nickname" required />
-                            </Box>
-                            <Box gridArea={"studentDateOfBirth"}>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
                                 <Controller
                                     name="studentDateOfBirth"
                                     control={control}
@@ -408,17 +400,17 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                         />
                                     )}
                                 />
-                            </Box>
-                            <Box gridArea={"studentPhoneNumber"}>
-                                <RHFTextField type="number" name="studentPhoneNo" label="Phone Number" required />
-                            </Box>
-                            <Box gridArea={"studentLineId"}>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <RHFTextField isNumber name="studentPhoneNo" label="Phone Number" required />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
                                 <RHFTextField name="studentLineId" label="Line ID" required />
-                            </Box>
-                            <Box gridArea={"studentEmail"}>
-                                <RHFTextField name="studentEmail" label="Email Address" required />
-                            </Box>
-                        </Box>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <RHFTextField name="studentEmail" label="Email Address" required disabled={isEdit} />
+                            </Grid>
+                        </Grid>
                     </Card>
                 </Grid>
 
@@ -518,7 +510,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="province" label="Province" required />
                             </Box>
                             <Box gridArea={"zipCode"}>
-                                <RHFTextField name="zipCode" label="Zip Code/Post Code" required />
+                                <RHFTextField isNumber name="zipCode" label="Zip Code/Post Code" required />
                             </Box>
                         </Box>
                     </Card>
@@ -543,13 +535,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="parentRelationships" label="Relationships" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField type="number" name="parentPhoneNo" label="Phone Number" required />
+                                <RHFTextField isNumber name="parentPhoneNo" label="Phone Number" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField name="parentEmail" label="Email Address" />
+                                <RHFTextField name="parentEmail" label="Email Address" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField name="parentLineId" label="Line ID" />
+                                <RHFTextField name="parentLineId" label="Line ID" required />
                             </Grid>
                         </Grid>
                     </Card>
@@ -609,7 +601,12 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                 </Grid>
 
                 <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center">
+                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1}>
+                        {isEdit && (
+                            <Button variant="outlined" color="inherit" sx={{ height: '3em' }} onClick={() => navigate(`/account/student-management/student/${currentStudent.id}`)}>
+                                Cancel
+                            </Button>
+                        )}
                         <Button type="submit" variant="contained" sx={{ height: '3em' }}>
                             {!isEdit ? 'Create Student' : 'Save Changes'}
                         </Button>
@@ -621,6 +618,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                 open={openConfirmDialog}
                 onClose={() => setOpenConfirmDialog(false)}
                 isEdit={isEdit}
+                isSubmitting={isSubmitting}
                 onSubmit={handleSubmit(handleSubmitConfirmDialog)}
             />
 
@@ -635,13 +633,10 @@ ConfirmDialog.propTypes = {
     onClose: PropTypes.func,
     onSubmit: PropTypes.func,
     isEdit: PropTypes.bool,
+    isSubmitting: PropTypes.bool,
 }
 
-export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
-
-    const {
-        formState: { isSubmitting },
-    } = useFormContext();
+export function ConfirmDialog({ open, onClose, onSubmit, isEdit, isSubmitting }) {
 
     return (
         <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>

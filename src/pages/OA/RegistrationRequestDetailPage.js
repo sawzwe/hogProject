@@ -1,13 +1,19 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
 import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
+import LoadingScreen from '../../components/loading-screen';
 // sections
 import RegistrationRequestDetail from '../../sections/dashboard/oa-registration-request-form/RegistrationRequestDetail'
+//
+import { HOG_API } from '../../config';
+import { useAuthContext } from '../../auth/useAuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -89,10 +95,33 @@ const MOCKUP_PRIVATE_REQUEST = {
 
 export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
-
     const { id } = useParams();
+    const { user } = useAuthContext();
 
-    const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
+    const [currentRequest, setCurrentRequest] = useState();
+    const [currentSchedule, setCurrentSchedule] = useState();
+    const dataFetchedRef = useRef(false);
+
+    const fetchRequest = () => {
+        axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
+            .then((res) => setCurrentRequest(res.data.data))
+            .catch((error) => console.error(error))
+    };
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchRequest();
+    }, [])
+
+    if (currentRequest === undefined) {
+        return <LoadingScreen />
+    }
+
+
+
+    // const currentRequest = (id === '1')? MOCKUP_GROUP_REQUEST : MOCKUP_PRIVATE_REQUEST;
 
     return (
         <>
@@ -109,7 +138,7 @@ export default function RegistrationRequestDetailPage() {
                     ]}
                 />
 
-                <RegistrationRequestDetail request={currentRequest} />
+                <RegistrationRequestDetail currentRequest={currentRequest} officeAdminId={user.id} />
             </Container>
         </>
     );

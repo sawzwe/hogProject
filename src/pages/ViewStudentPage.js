@@ -1,12 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // firebase
 import { getStorage, ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 // @mui
-import { Container, Button } from '@mui/material';
-// axios
-import axios from 'axios';
+import { Container, Button, Stack } from '@mui/material';
+// auth
+import { useAuthContext } from '../auth/useAuthContext';
 // routes
 import { PATH_ACCOUNT } from '../routes/paths';
 // components
@@ -21,11 +22,14 @@ import { studentList } from '../sections/dashboard/ep-registration-request-form/
 
 export default function ViewStudentPage() {
     const { themeStretch } = useSettingsContext();
-    const navigate = useNavigate();
     const { id } = useParams();
+    const { user } = useAuthContext();
+    const navigate = useNavigate();
+
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const dataFetchedRef = useRef(false);
-    
+
     // Firebase Storage
     const storage = getStorage();
 
@@ -34,7 +38,7 @@ export default function ViewStudentPage() {
     const [filesURL, setFilesURL] = useState([]);
 
     const fetchData = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`, config)
             .then((res) => {
                 const data = res.data.data
                 setStudent(data)
@@ -58,18 +62,22 @@ export default function ViewStudentPage() {
                     })
             })
             .catch((error) => navigate('*', { replace: false }))
-    }
+    };
 
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
         fetchData();
-    }, [])
+    }, []);
 
     if (student === undefined || !avatarURL) {
         return <LoadingScreen />;
-    }
+    };
+
+    const handleResetPassword = () => {
+        console.log('Reset Password');
+    };
 
     return (
         <>
@@ -78,7 +86,7 @@ export default function ViewStudentPage() {
             </Helmet>
 
             <Container maxWidth={themeStretch ? false : 'lg'}>
-                
+
                 <CustomBreadcrumbs
                     heading="Student Information"
                     links={[
@@ -89,7 +97,13 @@ export default function ViewStudentPage() {
                         { name: student?.fName.concat(' ', student?.lName) },
                     ]}
                     action={
-                        <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+                        <>
+                            <Stack direction="row" spacing={2}>
+                                <Button size='large' color="inherit" variant='outlined' onClick={handleResetPassword}>Reset Password</Button>
+                                <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
+
+                            </Stack>
+                        </>
                     }
                 />
 

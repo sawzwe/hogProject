@@ -1,6 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { Alert, Tooltip, Stack, Typography, Link, Box } from '@mui/material';
+
 // hooks
 import { useAuthContext } from '../../auth/useAuthContext';
 // layouts
@@ -9,6 +10,8 @@ import LoginLayout from '../../layouts/login';
 import { PATH_AUTH } from '../../routes/paths';
 // components
 import AuthLoginForm from './AuthLoginForm';
+import Logo from '../../components/logo';
+import hog from '../../assets/logo/hogLogo.png';
 // import AuthWithSocial from './AuthWithSocial';
 
 // ----------------------------------------------------------------------
@@ -18,31 +21,28 @@ export default function Login() {
 
   return (
     <LoginLayout>
-      <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
-        <Typography variant="h4">Sign in to Minimal</Typography>
-
-        <Stack direction="row" spacing={0.5}>
-          <Typography variant="body2">New user?</Typography>
-
-          <Link to={PATH_AUTH.register} component={RouterLink} variant="subtitle2">Create an account</Link>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4, position: 'relative' }}>
+        <Stack direction="column">
+          <Typography variant="h4">Sign In</Typography>
+          <Typography variant="body1">to House of Griffin</Typography>
         </Stack>
-
-        <Tooltip title={method} placement="left">
+        <Tooltip title={'Firebase Auth'} placement="left">
           <Box
             component="img"
             alt={method}
             src={`/assets/icons/auth/ic_${method}.png`}
-            sx={{ width: 32, height: 32, position: 'absolute', right: 0 }}
+            sx={{ width: 38, height: 38, position: 'absolute', right: 0 }}
           />
+          {/* <Box
+            component="img"
+            src={hog}
+            sx={{ width: '2.5em', height: '3em', position: 'absolute', right: 0 }}
+          /> */}
+
         </Tooltip>
       </Stack>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Use email : <strong>siwach@hotmail.com</strong> <br />password :<strong> 123456</strong>
-      </Alert>
-
       <AuthLoginForm />
-
     </LoginLayout>
   );
 }

@@ -13,6 +13,7 @@ import LoadingScreen from '../../components/loading-screen';
 import RegistrationRequestDetail from '../../sections/dashboard/ep-registration-request-form/RegistrationRequestDetail'
 //
 import { HOG_API } from '../../config';
+import { useAuthContext } from '../../auth/useAuthContext';
 // ----------------------------------------------------------------------
 
 const MOCKUP_GROUP_REQUEST = {
@@ -94,15 +95,17 @@ const MOCKUP_PRIVATE_REQUEST = {
 export default function RegistrationRequestDetailPage() {
     const { themeStretch } = useSettingsContext();
     const { id } = useParams();
+    const { user } = useAuthContext();
 
     const [currentRequest, setCurrentRequest] = useState();
+    const [currentSchedule, setCurrentSchedule] = useState();
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
         axios.get(`${HOG_API}/api/PrivateRegistrationRequest/Get/${id}`)
             .then((res) => setCurrentRequest(res.data.data))
             .catch((error) => console.error(error))
-    }
+    };
 
     useEffect(() => {
         if (dataFetchedRef.current) return;
@@ -132,7 +135,7 @@ export default function RegistrationRequestDetailPage() {
                     ]}
                 />
 
-                <RegistrationRequestDetail currentRequest={currentRequest} />
+                <RegistrationRequestDetail currentRequest={currentRequest} educationPlannerId={user.id} />
             </Container>
         </>
     );

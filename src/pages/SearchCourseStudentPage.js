@@ -4,6 +4,9 @@ import { useState, useEffect,useRef } from 'react';
 import { Card, Container, Stack } from '@mui/material';
 // components
 import axios from 'axios';
+// auth
+import { useAuthContext } from '../auth/useAuthContext';
+// components
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import LoadingScreen from '../components/loading-screen/LoadingScreen';
@@ -18,13 +21,15 @@ import { HOG_API } from '../config';
 
 export default function SearchCourseStudentPage() {
     const { themeStretch } = useSettingsContext();
-    // console.log(HOG_API)
+    const { user } = useAuthContext()
+
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const dataFetchedRef = useRef(false);
     const [studentCourseData, setStudentCourseData] = useState();
 
     const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/Student/Info/Get`)
+        return axios.get(`${HOG_API}/api/Student/CourseCount/Get`, config)
             .then(response => {
                 // console.log(response.data.data)
                 setStudentCourseData(response.data.data);
