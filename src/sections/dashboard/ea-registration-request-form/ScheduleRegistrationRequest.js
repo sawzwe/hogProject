@@ -554,8 +554,6 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         },
     }));
 
-    console.log(schedules)
-
     return (
         <Dialog fullWidth maxWidth="xl" open={open} onClose={close}>
 

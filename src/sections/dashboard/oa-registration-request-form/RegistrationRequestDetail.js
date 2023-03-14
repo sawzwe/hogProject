@@ -310,7 +310,7 @@ export default function RegistrationRequestDetail({ currentRequest, officeAdminI
                     </Card>
                 </Grid>
 
-                {request.status !== 'Complete' && request.status !== 'Reject' &&
+                {request.status !== 'Complete' && request.status !== 'Reject' && request.paymentStatus !== 'Incomplete' &&
                     <Grid item xs={12} md={12}>
                         <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
                             <Button variant="outlined" color="inherit" sx={{ height: '3em' }} onClick={() => setOpenSendBackDialog(true)}>
@@ -460,16 +460,18 @@ export function StudentSection({ courseType, students }) {
                 </Grid>
             </Grid>
 
-            {students.map((student, index) => (
-                <Stack key={index} flexDirection="row" alignItems="center" mt={2} >
-                    <TextField
-                        disabled
-                        variant="standard"
-                        sx={{ width: 320 }}
-                        value={`${student.fullName} (${student.nickname})`}
-                    />
-                </Stack>
-            ))}
+            <Grid container direction="row" spacing={1} sx={{ mt: 1 }}>
+                {students.map((student, index) => (
+                    <Grid item xs={12} md={4} key={student.id}>
+                        <TextField
+                            disabled
+                            variant="standard"
+                            sx={{ width: 320 }}
+                            value={`${student.fullName} (${student.nickname})`}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
 
         </Card>
     )
