@@ -1,5 +1,11 @@
 import PropTypes from 'prop-types';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
+import moment from 'moment';
+import axios from 'axios';
+// firebase
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata } from "firebase/storage"
 // form
 import { useForm } from 'react-hook-form';
 // @mui
@@ -21,91 +27,328 @@ import {
     AccordionSummary,
     AccordionDetails,
     Divider,
-    DialogTitle, DialogContent, DialogContentText, DialogActions
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Table,
+    TableBody,
+    TableContainer,
+    TableHead,
+    TableRow,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // components
+import { useSnackbar } from '../../../components/snackbar';
 import Scrollbar from '../../../components/scrollbar/Scrollbar';
 import { Upload } from '../../../components/upload';
+import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import FormProvider, { RHFUpload, RHFRadioGroup } from '../../../components/hook-form';
+import FileThumbnail from '../../../components/file-thumbnail';
+//
+import { fDate } from '../../../utils/formatTime';
+import ViewCourseCard from '../ep-registration-request-form/ViewCourseCard';
+import { HOG_API, FIREBASE_API } from '../../../config';
+import { useAuthContext } from '../../../auth/useAuthContext';
 
 // ----------------------------------------------------------------------
 
 RegistrationRequestDetail.propTypes = {
-    request: PropTypes.object,
+    currentRequest: PropTypes.object,
+    officeAdminId: PropTypes.number
 };
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestDetail({ request }) {
+export default function RegistrationRequestDetail({ currentRequest, officeAdminId }) {
+    const dataFetchedRef = useRef(false);
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
+    const {
+        request,
+        information,
+        students
+    } = currentRequest;
+
+    const [openCourseDialog, setOpenCourseDialog] = useState(false);
     const [openAcceptDialog, setOpenAcceptDialog] = useState(false);
     const [openSendBackDialog, setOpenSendBackDialog] = useState(false);
 
-    if (!request) {
-        return null;
+    const [schedules, setSchedules] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState({});
+    const [currentSchedule, setCurrentSchedule] = useState({});
+
+    const [rejectedReason, setRejectedReason] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Firebase
+    const firebaseApp = initializeApp(FIREBASE_API);
+    const storage = getStorage(firebaseApp);
+    const [filesURL, setFilesURL] = useState([]);
+
+    const fetchPayments = async () => {
+        const listRef = ref(storage, `payments/${request.id}`);
+        try {
+            await listAll(listRef)
+                .then((res) => {
+                    res.items.map((itemRef) => (
+                        getMetadata(itemRef)
+                            .then((metadata) => {
+                                getDownloadURL(itemRef)
+                                    .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
+                                    .catch((error) => {
+                                        throw error;
+                                    });
+                            })
+                            .catch((error) => {
+                                throw error;
+                            })
+                    ))
+                })
+                .catch((error) => {
+                    throw error;
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchSchedules = async () => {
+        if (request.eaStatus === 'Complete') {
+            await axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+                .then((res) => setSchedules(res.data.data))
+                .catch((error) => console.error(error))
+        }
     }
 
-    const {
-        regRequestId,
-        courseType,
-        students,
-        courses,
-        attachedPayment,
-        paymentType,
-        additionalComment,
-        rejectedReason,
-        status
-    } = request;
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchPayments();
+        fetchSchedules();
+    }, [])
+
+    const handleOpenCourseDialog = async (courseIndex) => {
+        const _course = information[courseIndex];
+        await setSelectedCourse(_course);
+        const _schedule = schedules.find(
+            eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+        );
+        await setCurrentSchedule(_schedule);
+        setOpenCourseDialog(true);
+    }
+
+    const handleCloseEditCourseDialog = async () => {
+        await setSelectedCourse({});
+        await setCurrentSchedule({});
+        setOpenCourseDialog(false);
+    }
+
+    if (filesURL.length === 0) {
+        return <LoadingScreen />
+    }
+
+    const handleAccept = async () => {
+        setIsSubmitting(true);
+        try {
+            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+                request: {
+                    id: request.id,
+                    status: 'Complete',
+                    eaStatus: 'Complete',
+                    paymentStatus: 'Complete',
+                    epRemark1: request.epRemark1,
+                    epRemark2: request.epRemark2,
+                    eaRemark: request.eaRemark,
+                    oaRemark: request.oaRemark,
+                    takenByEPId: request.takenByEPId,
+                    takenByEAId: request.takenByEAId,
+                    takenByOAId: officeAdminId
+                }
+            })
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error;
+                })
+
+            enqueueSnackbar('Registration request accepted successfully', { variant: 'success' });
+            setIsSubmitting(false);
+            setTimeout(() => {
+                navigate('/course-registration/oa-request-status')
+            }, 1000)
+
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: 'error' });
+            setIsSubmitting(false);
+        }
+    }
+
+    const handleSendBack = async (reason) => {
+        setIsSubmitting(true);
+        if (reason === '') {
+            enqueueSnackbar('Please enter rejected reason before proceeding', { variant: 'error' });
+            setIsSubmitting(false);
+        } else {
+            try {
+                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+                    request: {
+                        id: request.id,
+                        status: 'PendingEP',
+                        eaStatus: 'Complete',
+                        paymentStatus: 'Incomplete',
+                        epRemark1: request.epRemark1,
+                        epRemark2: request.epRemark2,
+                        eaRemark: request.eaRemark,
+                        oaRemark: request.oaRemark,
+                        takenByEPId: request.takenByEPId,
+                        takenByEAId: request.takenByEAId,
+                        takenByOAId: officeAdminId
+                    }
+                })
+                    .catch((error) => {
+                        throw error;
+                    })
+
+                enqueueSnackbar('The request is successfully sent back', { variant: 'success' });
+                setIsSubmitting(false);
+                setTimeout(() => {
+                    navigate('/course-registration/oa-request-status')
+                }, 1000)
+            } catch (error) {
+                enqueueSnackbar(error.message, { variant: 'error' });
+                setIsSubmitting(false);
+            }
+        }
+    }
 
     return (
-        <Grid container spacing={3}>
-            <Grid item xs={12} md={5}>
-                <Typography variant="h5">Status: {status}</Typography>
-            </Grid>
-            <Grid item xs={12} md={12}>
-                <StudentSection courseType={courseType} students={students} />
-            </Grid>
-            <Grid item xs={12} md={12}>
-                <CourseSection courseType={courseType} courses={courses} />
-            </Grid>
-
-            <Grid item xs={12} md={12}>
-                <AttachedPayment
-                    courseType={courseType}
-                    payment={attachedPayment}
-                    paymentType={paymentType}
-                    status={status} />
-            </Grid>
-
-            <Grid item xs={12} md={12}>
-                <AdditionalCommentSection message={additionalComment} />
-            </Grid>
-
-            {status === 'Rejected' && (
+        <>
+            <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
-                    <AdditionalCommentSection message={rejectedReason} status={status} />
+                    <StudentSection courseType={request.courseType} students={students} />
                 </Grid>
+                <Grid item xs={12} md={12}>
+                    <CourseSection
+                        courses={information}
+                        onView={handleOpenCourseDialog}
+                        hasSchedule={!!schedules.length}
+                    />
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}>
+                                Payment Attachments
+                            </Typography>
+                            <Stack direction="row">
+                                {filesURL.map((file) => {
+                                    return (
+                                        <Stack
+                                            key={file.name}
+                                            component={'div'}
+                                            alignItems="center"
+                                            display="inline-flex"
+                                            justifyContent="center"
+                                            sx={{
+                                                m: 0.5,
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: 1.25,
+                                                overflow: 'hidden',
+                                                position: 'relative',
+                                                border: (theme) => `solid 1px ${theme.palette.divider}`,
+                                            }}
+                                        >
+                                            <FileThumbnail
+                                                tooltip
+                                                imageView
+                                                file={file}
+                                                onDownload={() => window.open(`${file.preview}`)}
+                                            />
+                                        </Stack>
+                                    )
+                                })}
+                            </Stack>
+                        </Card>
+                    </Grid>
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                    <Card sx={{ p: 3 }}>
+                        <Typography variant="h5"
+                            sx={{
+                                mb: 2,
+                                display: 'block',
+                            }}
+                        >
+                            Additional Comment
+                        </Typography>
+                        <Box
+                            rowGap={3}
+                            columnGap={2}
+                            display="grid"
+                            gridTemplateColumns={{
+                                xs: 'repeat(1, 1fr)',
+                                sm: 'repeat(1, 1fr)',
+                            }}
+                        >
+                            <TextField fullWidth defaultValue={request.epRemark1} label="Comment from Education Planner" disabled />
+                        </Box>
+                    </Card>
+                </Grid>
+
+                {request.status !== 'Complete' && request.status !== 'Reject' &&
+                    <Grid item xs={12} md={12}>
+                        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                            <Button variant="outlined" color="inherit" sx={{ height: '3em' }} onClick={() => setOpenSendBackDialog(true)}>
+                                Send back to EP
+                            </Button>
+                            <Button variant="contained" color="primary" sx={{ height: '3em' }} onClick={() => setOpenAcceptDialog(true)}>
+                                Accept
+                            </Button>
+                        </Stack>
+                        <AcceptDialog
+                            open={openAcceptDialog}
+                            close={() => setOpenAcceptDialog(false)}
+                            onAccept={handleAccept}
+                            isSubmitting={isSubmitting}
+                        />
+                        <SendBackDialog
+                            open={openSendBackDialog}
+                            close={() => setOpenSendBackDialog(false)}
+                            onSendBack={handleSendBack}
+                            isSubmitting={isSubmitting}
+                        />
+                    </Grid>
+                }
+
+            </Grid>
+
+            {Object.keys(selectedCourse).length > 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule={Object.keys(currentSchedule).length > 0}
+                />
             )}
 
-            {status === 'Pending OA' && (
-                <Grid item xs={12} md={12}>
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                        <LoadingButton variant="contained" color="inherit" sx={{ height: '3em' }} onClick={() => setOpenSendBackDialog(true)}>
-                            Send back to EP
-                        </LoadingButton>
-                        <LoadingButton variant="contained" color="primary" sx={{ height: '3em' }} onClick={() => setOpenAcceptDialog(true)}>
-                            Accept
-                        </LoadingButton>
-                    </Stack>
-                    <AcceptDialog open={openAcceptDialog} close={() => setOpenAcceptDialog(false)} />
-                    <SendBackDialog open={openSendBackDialog} close={() => setOpenSendBackDialog(false)} />
-                </Grid>
-            )}
-        </Grid>
+        </>
     )
 
 }
@@ -115,14 +358,11 @@ export default function RegistrationRequestDetail({ request }) {
 AcceptDialog.propTypes = {
     open: PropTypes.bool,
     close: PropTypes.func,
+    onAccept: PropTypes.func,
+    isSubmitting: PropTypes.bool,
 }
 
-export function AcceptDialog({ open, close }) {
-
-    const onAccept = () => {
-        console.log('accept')
-        close();
-    }
+export function AcceptDialog({ open, close, onAccept, isSubmitting }) {
 
     return (
         <Dialog
@@ -143,7 +383,7 @@ export function AcceptDialog({ open, close }) {
             </DialogContent>
             <DialogActions>
                 <Button color="inherit" variant="outlined" onClick={close}>Cancel</Button>
-                <LoadingButton variant="contained" onClick={onAccept} color="primary">
+                <LoadingButton loading={isSubmitting} variant="contained" onClick={onAccept} color="primary">
                     Accept
                 </LoadingButton>
             </DialogActions>
@@ -156,16 +396,13 @@ export function AcceptDialog({ open, close }) {
 SendBackDialog.propTypes = {
     open: PropTypes.bool,
     close: PropTypes.func,
+    onSendBack: PropTypes.func,
+    isSubmitting: PropTypes.bool,
 }
 
-export function SendBackDialog({ open, close }) {
+export function SendBackDialog({ open, close, onSendBack, isSubmitting }) {
 
-    const [sendingBackReason, setSendingBackReason] = useState('');
-
-    const onSendBack = () => {
-        console.log('Sent Back')
-        close();
-    }
+    const [sendBackReason, setSendBackReason] = useState('');
 
     return (
         <Dialog
@@ -183,17 +420,17 @@ export function SendBackDialog({ open, close }) {
             <DialogContent>
                 <TextField
                     fullWidth
-                    name="sendingBackReason"
-                    label="Reason"
+                    name="sendBackReason"
+                    label="Reason..."
                     multiline
                     rows={3}
                     sx={{ my: 1 }}
-                    onChange={(event) => setSendingBackReason(event.target.value)}
+                    onChange={(event) => setSendBackReason(event.target.value)}
                     required />
             </DialogContent>
             <DialogActions>
                 <Button color="inherit" variant="outlined" onClick={close}>Cancel</Button>
-                <LoadingButton variant="contained" onClick={onSendBack} color="error">
+                <LoadingButton loading={isSubmitting} variant="contained" onClick={() => onSendBack(sendBackReason)} color="error">
                     Confirm
                 </LoadingButton>
             </DialogActions>
@@ -229,7 +466,7 @@ export function StudentSection({ courseType, students }) {
                         disabled
                         variant="standard"
                         sx={{ width: 320 }}
-                        value={`${student.fName} ${student.lName} (${student.nickname})`}
+                        value={`${student.fullName} (${student.nickname})`}
                     />
                 </Stack>
             ))}
@@ -241,20 +478,16 @@ export function StudentSection({ courseType, students }) {
 // ----------------------------------------------------------------------
 
 CourseSection.propTypes = {
-    courseType: PropTypes.string,
     courses: PropTypes.array,
+    onView: PropTypes.func,
+    hasSchedule: PropTypes.bool,
 }
 
-export function CourseSection({ courseType, courses }) {
+export function CourseSection({ courses, onView, hasSchedule }) {
 
     // Schedule Dialog for group
     const [open, setOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({});
-
-    const handleSchedule = (course) => {
-        setSelectedCourse(course);
-        setOpen(true);
-    };
 
     return (
         <Card sx={{ p: 3 }}>
@@ -265,216 +498,146 @@ export function CourseSection({ courseType, courses }) {
                     <Typography variant="h6">{`New Course(s)`}</Typography>
                 </Grid>
             </Grid>
-
-            {courseType === 'Group' ?
-                courses.map((course, index) => (
-                    <Paper key={index} elevation={2} sx={{ mt: 2, p: 3 }}>
-                        <Grid container
-                            direction="column"
-                            spacing={2}
-                            justifyContent="space-between"
-                            alignItems="flex-start">
-                            <Grid container item xs={12} md={12}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{course.course} ({courseType.toUpperCase()})</Typography>
-                            </Grid>
-                        </Grid>
-
-                        <Grid container direction="row" spacing={2} sx={{ mt: 1 }}>
-                            <Grid item xs={12} md={3}>
-                                <TextField fullWidth disabled label="Section" value={course.section} />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField fullWidth disabled label="Learning Method" value={course.method} />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField fullWidth disabled label="Start Date" value={course.startDate} />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField fullWidth disabled label="End Date" value={course.endDate} />
-                            </Grid>
-                        </Grid>
-
-                        <Grid container direction="row" spacing={2} sx={{ mt: 1 }}>
-                            <Grid item xs={12} md={12}>
-                                <TextField fullWidth disabled label="Subject" value={course.subjects.map(subject => subject.toUpperCase()).join(' | ')} />
-                            </Grid>
-                        </Grid>
-
-                        <Grid container direction="row" justifyContent="flex-end" spacing={2} sx={{ mt: 1 }}>
-                            <Grid item>
-                                <Button variant="contained" size='large' color="inherit" sx={{ mr: 1, mb: 1 }} onClick={() => handleSchedule(course)}>
-                                    <InfoIcon fontSize="medium" sx={{ mr: 0.5 }} /> Schedules
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                ))
-                : courses.map((course, index) => (
-                    <Paper key={index} elevation={2} sx={{ mt: 2, p: 3 }}>
-                        <Grid container
-                            direction="column"
-                            spacing={2}
-                            justifyContent="space-between"
-                            alignItems="flex-start">
-                            <Grid container item xs={12} md={12}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{course.course} {course.subject} {course.level} ({courseType.toUpperCase()})</Typography>
-                            </Grid>
-                        </Grid>
-
-                        <Grid container direction="row" spacing={1} sx={{ mt: 1, mb: 2 }}>
-                            <Grid item xs={6} md={3}>
-                                <TextField fullWidth disabled label="Start Date" value={course.startDate} />
-                            </Grid>
-                            <Grid item xs={6} md={3}>
-                                <TextField fullWidth disabled label="End Date" value={course.endDate} />
-                            </Grid>
-                            <Grid item xs={12} md={2}>
-                                <TextField fullWidth disabled label="Total Hours" value={course.totalHours} />
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth disabled label="Learning Method" value={course.method} />
-                            </Grid>
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth disabled label="Hours/Class" value={course.hoursPerClass} />
-                            </Grid>
-                        </Grid>
-
-                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>Available Days</Typography>
-                        <Grid container direction="row" spacing={1} sx={{ mt: 1 }}>
-                            {course.availableDays.map((eachDay, index) => (
-                                <Grid item xs={6} md={1.71} key={index}>
-                                    <TextField label={eachDay.day} value={`${eachDay.from} - ${eachDay.to} hrs`} disabled />
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                    </Paper>
-                ))
-            }
-
-            <ScheduleDialog open={open} close={() => setOpen(false)} course={selectedCourse} />
+            {courses.map((course, index) => (
+                <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} hasSchedule={hasSchedule} />
+            ))}
         </Card>
+    )
+}
+
+
+// ----------------------------------------------------------------------
+
+ViewCourseDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    registeredCourse: PropTypes.object,
+    courseType: PropTypes.string,
+    schedules: PropTypes.object,
+    hasSchedule: PropTypes.bool,
+}
+
+export function ViewCourseDialog({ open, onClose, registeredCourse, courseType, schedules, hasSchedule }) {
+
+    return (
+
+        !hasSchedule ? (
+            <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
+        ) : (
+            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} schedules={schedules} courseType={courseType} />
+        )
     )
 }
 
 // ----------------------------------------------------------------------
 
-ScheduleDialog.propTypes = {
+UnscheduledCourseDialog.propTypes = {
     open: PropTypes.bool,
-    close: PropTypes.func,
-    course: PropTypes.object
+    onClose: PropTypes.func,
+    registeredCourse: PropTypes.object,
 }
 
-export function ScheduleDialog({ open, close, course }) {
+export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
+
+    const {
+        course,
+        subject,
+        method,
+        level,
+        fromDate,
+        toDate,
+        hourPerClass,
+        totalHour,
+        preferredDays
+    } = registeredCourse
 
     return (
-        <Dialog fullWidth maxWidth="lg" open={open} onClose={close}
+        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}
             PaperProps={{
                 sx: {
                     '&::-webkit-scrollbar': { display: 'none' }
                 }
-            }}>
-            <Grid container spacing={1}>
+            }} >
+            <Grid container direction="row" sx={{ p: 3, mb: 0 }} spacing={2} >
+                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
+                    <Typography variant="h6"> Course Detail </Typography>
+                    <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
+                </Grid>
+            </Grid>
+
+            <Grid container direction="row" sx={{ px: 1, mb: 1 }} spacing={2}>
                 <Grid item xs={12} md={12}>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pt: 2.5, px: 3 }}>
-                        <Typography variant="h6"> Join Group </Typography>
-                        <IconButton variant="h6" onClick={close}> <CloseIcon /> </IconButton>
+                    <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={6} md={6}>
+                                <TextField fullWidth defaultValue={course} label="Course" disabled />
+                            </Grid>
+                            <Grid item xs={6} md={6}>
+                                <TextField fullWidth defaultValue={subject} label="Subject" disabled />
+                            </Grid>
+                            <Grid item xs={6} md={6}>
+                                <TextField fullWidth defaultValue={level} label="Level" disabled />
+                            </Grid>
+
+                            {/* Total Hours */}
+                            <Grid item xs={6} md={2}>
+                                <TextField fullWidth defaultValue={totalHour} label="Total Hours" type="number" disabled />
+                            </Grid>
+
+                            {/* Learning Method */}
+                            <Grid item xs={6} md={2}>
+                                <TextField
+                                    fullWidth
+                                    defaultValue={method}
+                                    label="Method"
+                                    inputProps={{
+                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
+                                    }}
+                                    disabled
+                                />
+                            </Grid>
+
+                            {/* Hours Per Class */}
+                            <Grid item xs={6} md={2}>
+                                <TextField fullWidth defaultValue={hourPerClass} label="Hours/Class" disabled />
+                            </Grid>
+                        </Grid>
                     </Stack>
-                </Grid>
+                    <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth defaultValue={fDate(fromDate, 'dd-MMM-yyyy')} label="Start Date" disabled />
+                            </Grid>
 
-                <Grid item xs={12} md={5}>
-                    <Stack justifyContent="flex-start" sx={{ py: 1, pl: 3, pr: 1 }} spacing={2}>
-                        <Typography variant="h6"> Course Information </Typography>
-                        <TextField
-                            variant="outlined"
-                            value={course.name}
-                            label="Course"
-                            disabled
-                        />
-                        <TextField
-                            variant="outlined"
-                            id="sectionNo"
-                            value={course.section}
-                            label="Section"
-                            disabled
-                        />
-                        <Stack direction="row" justifyContent="flex-start" spacing={2}>
-                            <TextField
-                                variant="outlined"
-                                id="level"
-                                value={course.level}
-                                label="Level"
-                                disabled
-                            />
-                            <TextField
-                                variant="outlined"
-                                value={course.method}
-                                label="Learning Method"
-                                disabled
-                            />
-                        </Stack>
-                        <Stack direction="row" justifyContent="flex-start" spacing={2}>
-                            <TextField
-                                variant="outlined"
-                                value={course.startDate}
-                                label="Start Date"
-                                disabled
-                            />
-                            <TextField
-                                variant="outlined"
-                                value={course.endDate}
-                                label="End Date"
-                                disabled
-                            />
-                        </Stack>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth defaultValue={fDate(toDate, 'dd-MMM-yyyy')} label="End Date" disabled />
+                            </Grid>
 
-                        <Stack spacing={1} sx={{ pb: 1 }}>
-                            <Typography variant="subtitle1"> Selected subjects </Typography>
-                            <Stack direction="row" spacing={2}>
-                                {!!course.subjects && course.subjects.map(eachSubject => (
-                                    <FormControlLabel
-                                        key={eachSubject}
-                                        control={
-                                            <Checkbox
-                                                disabled
-                                                defaultChecked
-                                            />
-                                        }
-                                        label={eachSubject}
-                                    />
-                                ))}
-                            </Stack>
-                        </Stack>
+                            <Grid item xs={12} md={12}>
+                                <Typography variant="inherit" sx={{ color: 'text.disabled' }}>Preferred Days</Typography>
+                            </Grid>
+
+                            <Grid item xs={12} md={12}>
+                                <Stack direction="row" sx={{ pb: 3 }}>
+                                    <Grid container direction="row" spacing={2}>
+                                        {preferredDays.map((eachDay, index) => (
+                                            <Grid item xs={6} md={1.7} key={index}>
+                                                <TextField
+                                                    fullWidth
+                                                    label={eachDay.day}
+                                                    value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+                                                    InputProps={{
+                                                        style: { fontSize: '0.8rem' }
+                                                    }}
+                                                    disabled
+                                                />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Stack>
+                            </Grid>
+                        </Grid>
                     </Stack>
-
-                </Grid>
-                <Grid item xs={12} md={7}>
-                    <Scrollbar sx={{ maxHeight: 80 * 5 }}>
-                        <Stack justifyContent="flex-start" sx={{ py: 1, px: 3 }} >
-                            <Typography variant="h6" sx={{ mb: 2 }}> Classes & Schedules </Typography>
-                            <Divider />
-                            {!!course.subjects && course.subjects.map((subject, index) => (
-                                <Accordion key={index}>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                    >
-                                        <Typography variant="body2">{course.course} {subject.toUpperCase()} - 20 Hours</Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <Typography>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                            malesuada lacus ex, sit amet blandit leo lobortis eget.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                            malesuada lacus ex, sit amet blandit leo lobortis eget.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                            malesuada lacus ex, sit amet blandit leo lobortis eget.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                            malesuada lacus ex, sit amet blandit leo lobortis eget.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                            malesuada lacus ex, sit amet blandit leo lobortis eget.
-                                        </Typography>
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))
-                            }
-                        </Stack>
-                    </Scrollbar>
                 </Grid>
             </Grid>
         </Dialog>
@@ -483,97 +646,271 @@ export function ScheduleDialog({ open, close, course }) {
 
 // ----------------------------------------------------------------------
 
-AttachedPayment.propTypes = {
-    courseType: PropTypes.string,
-    payment: PropTypes.array,
-    paymentType: PropTypes.string,
-    status: PropTypes.string,
+ScheduledCourseDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    registeredCourse: PropTypes.object,
+    courses: PropTypes.string,
+    schedules: PropTypes.object,
 }
 
-export function AttachedPayment({ courseType, payment, paymentType, status }) {
+export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType, schedules }) {
 
-    const PAYMENT_TYPE_OPTIONS = [
-        { value: 'Complete Payment', label: 'Complete Payment' },
-        { value: 'Installments Payment', label: 'Installments Payment' }
-    ];
+    const {
+        course,
+        subject,
+        level,
+        fromDate,
+        toDate,
+        hourPerClass,
+        totalHour,
+        method,
+        preferredDays
+    } = registeredCourse
 
-    // Form for payment
-    const methods = useForm({
-        defaultValues: {
-            paymentAttachmentFiles: payment || [],
-            paymentType: paymentType || '',
-        }
-    })
+    const {
+        classes
+    } = schedules
+
+    const customTextFieldStyle = {
+        fontSize: '0.9rem'
+    }
+
+    let displayAccumulatedHours = 0;
+
+    function accumulatedHours() {
+        let HoursCount = 0;
+        classes.forEach((eachClass) => {
+            const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+            const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+            HoursCount += timeB.diff(timeA, 'hours');
+        })
+        return HoursCount;
+    }
+
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    // Tables ---------------------------------------------------------------------------------
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+            backgroundColor: theme.palette.divider,
+            color: theme.palette.common.black,
+            fontSize: '0.7rem',
+            border: `1px solid ${theme.palette.divider}`,
+        },
+        [`&.${tableCellClasses.body}`]: {
+            fontSize: '0.7rem',
+            padding: 16,
+            border: `1px solid ${theme.palette.divider}`,
+
+        },
+    }));
+
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:last-child td, &:last-child th': {
+            backgroundColor: theme.palette.divider,
+            padding: 16,
+            fontWeight: 600,
+            border: `1px solid ${theme.palette.divider}`,
+        },
+    }));
 
     return (
-        <FormProvider methods={methods}>
-            <Grid item xs={12} md={12}>
-                <Card sx={{ p: 3 }}>
-                    <Typography variant="h5"
-                        sx={{
-                            mb: 2,
-                            display: 'block',
-                        }}>Additional Files</Typography>
+        <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
 
-                        <RHFRadioGroup
-                            name="paymentType"
-                            options={PAYMENT_TYPE_OPTIONS}
-                            sx={{
-                                '& .MuiFormControlLabel-root': { mr: 4 },
-                            }}
-                            required
-                            disabled={(status !== 'Pending Payment')}
-                        />
 
-                    <Box
-                        rowGap={3}
-                        columnGap={2}
-                        display="grid"
-                        gridTemplateColumns={{
-                            xs: 'repeat(1, 1fr)',
-                            sm: 'repeat(1, 1fr)',
-                        }}
-                        sx={{ mt: 2 }}
-                    />
-                    <Upload
-                        multiple
-                        thumbnail
-                        disabled
-                        name="paymentAttachmentFiles"
-                        maxSize={3145728}
-                    />
-                </Card>
+            <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
+                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
+                    <Typography variant="h6"> Course Detail </Typography>
+                    <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
+                </Grid>
             </Grid>
-        </FormProvider>
-    )
-}
 
-// ----------------------------------------------------------------------
+            <Grid container direction="row" sx={{ px: 3 }} spacing={2}>
+                <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={12} sx={{ pb: 2 }}>
+                        <Typography variant="h6"> Course Information </Typography>
+                    </Grid>
 
-AdditionalCommentSection.propTypes = {
-    message: PropTypes.string,
-    status: PropTypes.string
-}
+                    <Stack direction="row" sx={{ pb: 2 }}>
+                        <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={course.concat(' ', subject, ' ', level)}
+                                    label="Course"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={courseType}
+                                    label="Course Type"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Stack>
 
-export function AdditionalCommentSection({ message, status }) {
-    return (
-        <Card sx={{ p: 3 }}>
-            <Typography variant="h5"
-                sx={{
-                    mb: 2,
-                    display: 'block',
-                }}>{status !== 'Rejected' ? 'Additional Comment' : 'Rejected Reason'}</Typography>
-            <Box
-                rowGap={3}
-                columnGap={2}
-                display="grid"
-                gridTemplateColumns={{
-                    xs: 'repeat(1, 1fr)',
-                    sm: 'repeat(1, 1fr)',
-                }}
-            >
-                <TextField disabled value={message} />
-            </Box>
-        </Card>
+                    <Stack direction="row" sx={{ pb: 2 }}>
+                        <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={method}
+                                    label="Learning Method"
+                                    disabled
+                                    inputProps={{
+                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={totalHour}
+                                    label="Total Hours"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={hourPerClass}
+                                    label="Hours/Class"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Stack>
+
+                    <Stack direction="row" sx={{ pb: 2 }} spacing={2}>
+                        <Grid container direction="row" spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={fDate(fromDate, 'dd-MMM-yyyy')}
+                                    label="Start Date"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    value={fDate(toDate, 'dd-MMM-yyyy')}
+                                    label="End Date"
+                                    disabled
+                                    InputProps={{
+                                        style: customTextFieldStyle
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Stack>
+
+                    <Grid item xs={12} md={12} sx={{ mb: 1 }}>
+                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
+                            Preferred Days
+                        </Typography>
+                    </Grid>
+
+                    <Stack direction="row" sx={{ pb: 3 }}>
+                        <Grid container direction="row" spacing={2}>
+                            {preferredDays.map((eachDay, index) => (
+                                <Grid item xs={6} md={3} key={index}>
+                                    <TextField
+                                        fullWidth
+                                        label={eachDay.day}
+                                        value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+                                        InputProps={{
+                                            style: { fontSize: '0.8rem' }
+                                        }}
+                                        disabled
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Stack>
+                </Grid>
+
+                <Grid item xs={12} md={7}>
+                    <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                            <Typography variant="h6">
+                                Classes & Schedules
+                            </Typography>
+                        </Stack>
+
+
+                        <TableContainer component={Paper} >
+                            <Table sx={{ width: '100%' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell align="center">No.</StyledTableCell>
+                                        <StyledTableCell align="center">Day</StyledTableCell>
+                                        <StyledTableCell align="center">Date</StyledTableCell>
+                                        <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
+                                        <StyledTableCell align="center">Method</StyledTableCell>
+                                        <StyledTableCell align="center">Teacher</StyledTableCell>
+                                        <StyledTableCell align="center">Hours</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {classes.map((eachClass, index) => {
+                                        const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+                                        const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+                                        const hourPerClass = timeB.diff(timeA, 'hours')
+                                        displayAccumulatedHours += hourPerClass;
+                                        const classDate = new Date(eachClass.date);
+                                        return (
+                                            <StyledTableRow key={index}>
+                                                <StyledTableCell component="th" scope="row" align="center">
+                                                    {(index + 1).toString()}
+                                                </StyledTableCell>
+                                                <StyledTableCell align="center"> {weekday[classDate.getDay()].slice(0, 3)} </StyledTableCell>
+                                                <StyledTableCell align="center">{fDate(classDate, 'dd-MMM-yyyy')}</StyledTableCell>
+                                                <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
+                                                <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
+                                                <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
+                                                <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.teacherId}</StyledTableCell>
+                                                <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
+                                            </StyledTableRow>
+                                        )
+                                    })}
+                                    <StyledTableRow>
+                                        <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
+                                        <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
+                                    </StyledTableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                    </Scrollbar>
+                </Grid>
+            </Grid>
+        </Dialog>
     )
 }

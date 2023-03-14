@@ -10,6 +10,7 @@ import { PATH_REGISTRATION } from '../../routes/paths';
 // components
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import LoadingScreen from '../../components/loading-screen/LoadingScreen';
 // sections
 import NewRegistrationRequest from '../../sections/dashboard/ep-registration-request-form/NewRegistrationRequest';
 //
@@ -24,7 +25,7 @@ export default function CreateRegistrationRequestPage() {
 
     const dataFetchedRef = useRef(false);
 
-    const [studentList, setStudentList] = useState([]);
+    const [studentList, setStudentList] = useState(null);
 
     const fetchStudent = async() => {
         axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get`, config)
@@ -38,6 +39,10 @@ export default function CreateRegistrationRequestPage() {
 
         fetchStudent();
     }, [])
+
+    if (studentList === null) {
+        return <LoadingScreen />
+    }
 
     return (
         <>

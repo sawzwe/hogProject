@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 // @mui
+import { LoadingButton } from '@mui/lab';
 import {
   Tab,
   Tabs,
@@ -13,18 +16,17 @@ import {
   Divider,
   TableBody,
   Container,
-  IconButton,
   TableContainer,
   TableRow,
   TableCell, createTheme, ThemeProvider,
 } from '@mui/material';
 // components
-import axios from 'axios';
 import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import { useSettingsContext } from '../../../components/settings';
 import { fTimestamp, fDate } from '../../../utils/formatTime';
+import { useSnackbar } from '../../../components/snackbar';
 import {
   useTable,
   getComparator,
@@ -93,11 +95,14 @@ const errorTheme = createTheme({
 
 RegistrationRequestStatusList.propTypes = {
   privateRegistrationRequest: PropTypes.array,
+  educationAdminId: PropTypes.number,
 };
 
-export default function RegistrationRequestStatusList({ privateRegistrationRequest }) {
+export default function RegistrationRequestStatusList({ privateRegistrationRequest, educationAdminId }) {
   // console.log('RegistrationRequestStatusList', privateRegistrationRequest);
+  const { enqueueSnackbar } = useSnackbar();
   const { themeStretch } = useSettingsContext();
+  const navigate = useNavigate();
 
   const {
     dense,
@@ -118,12 +123,15 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
       return {
         id: request.request.id,
         requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request?.courseType || 'Private',
-        section: request.information[0]?.section || '-',
+        courseType: request.request.courseType,
+        section: request.request.section,
         registeredCourses: request.information.length,
         requestedBy: request.request.takenByEPId,
+        takenByEAId: request.request.takenByEAId,
         eaStatus: request.request.eaStatus,
+        status: request.request.status,
         receipt: request.request.paymentStatus,
+        epRemark1: request.request.epRemark1,
       }
     })
 
@@ -134,7 +142,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   // }, []);
 
   // console.log(tableData);
-  let eachEP;
 
   const [filterName, setFilterName] = useState('');
 
@@ -142,13 +149,18 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const [currentId, setCurrentId] = useState(-1);
+  const [currentId, setCurrentId] = useState({});
+
+  const [selectedRow, setSelectedRow] = useState({});
+
+  const [isTakingRequest, setIsTakingRequest] = useState(false);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
     filterName,
     filterRole,
+    educationAdminId
   });
 
   const denseHeight = dense ? 56 : 76;
@@ -160,13 +172,15 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole);
 
-  const getLengthByStatus = (eaStatus) => tableData.filter((item) => item.eaStatus === eaStatus).length;  
+  const getLengthByStatus = (eaStatus) => tableData.filter((item) => item.eaStatus === eaStatus).length;
+  const getLengthByInProgress = () => tableData.filter((item) => (item.eaStatus === 'InProgress' && item.takenByEAId === 0)).length;
+  const getLengthByTakenInProgress = () => tableData.filter((item) => (item.eaStatus === 'InProgress' && item.takenByEAId === educationAdminId)).length;
 
   const TABS = [
-    { value: "InProgress", label: 'Available Requests', color: 'warning', count: getLengthByStatus("InProgress") },
-    { value: 'myRequest', label: 'My Requests', color: 'warning', count: getLengthByStatus('myRequest') },
-    { value: 'completed', label: 'Completed', count: getLengthByStatus('completed'), color: 'success' },
-    { value: 'rejected', label: 'Rejected', count: getLengthByStatus('rejected'), color: 'error' },
+    { value: "InProgress", label: 'Available Requests', color: 'warning', count: getLengthByInProgress() },
+    { value: 'MyRequests', label: 'My Requests', color: 'warning', count: getLengthByTakenInProgress() },
+    { value: 'Complete', label: 'Completed', count: getLengthByStatus('Complete'), color: 'success' },
+    { value: 'Reject', label: 'Rejected', count: getLengthByStatus('Reject'), color: 'error' },
   ];
 
 
@@ -180,27 +194,59 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     setFilterName(event.target.value);
   };
 
-  const handleOpenConfirm = (currentId) => {
-    setCurrentId(currentId);
+  const handleOpenConfirm = (row) => {
+    setSelectedRow(row);
     setOpenConfirm(true);
   };
 
   const handleCloseConfirm = () => {
+    setSelectedRow({});
     setOpenConfirm(false);
   };
+
+  const handleOpenRequest = (row) => {
+    navigate(`/course-registration/ea-request-status/${row.id}`)
+  }
 
   const handleResetFilter = () => {
     setFilterName('');
     setFilterRole('available');
   };
   // console.log('After', tableData)
-  const acceptRequest = (currentId, tableData, setTableData) => {
-    // console.log('Before',tableData)
-    // console.log('Accept',currentId)
-    const newRow = tableData.find(el => (el.id === currentId))
-    newRow.role = 'myRequest';
-    const newTableData = tableData.filter(el => el.id !== currentId);
-    setTableData([...newTableData, newRow])
+  const takeRequest = async () => {
+    setIsTakingRequest(true);
+    try {
+      await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, {
+        request: {
+          id: selectedRow.id,
+          status: selectedRow.status,
+          eaStatus: selectedRow.eaStatus,
+          paymentStatus: selectedRow.receipt,
+          epRemark1: selectedRow.epRemark1,
+          epRemark2: "",
+          eaRemark: "",
+          oaRemark: "",
+          takenByEPId: selectedRow.requestedBy,
+          takenByEAId: educationAdminId,
+          takenByOAId: 0
+        }
+      })
+        .then((res) => console.log(res))
+        .catch((error) => {
+          throw error;
+        })
+      navigate(0)
+      setIsTakingRequest(false);
+      setOpenConfirm(false);
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
+      setIsTakingRequest(false);
+      setOpenConfirm(false);
+    }
+    // const newRow = tableData.find(el => (el.id === currentId))
+    // newRow.role = 'myRequest';
+    // const newTableData = tableData.filter(el => el.id !== currentId);
+    // setTableData([...newTableData, newRow])
     setOpenConfirm(false);
   };
   // console.log("tabledata",tableData)
@@ -274,60 +320,29 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
 
                 <TableBody>
                   {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    return (<TableRow
-                      hover
-                      key={row.id}
-                      sx={{cursor:'pointer'}}
-                    // onClick={() => handleOpenConfirm(row.id)}
-                    >
-                      <TableCell align="left" > {row.id} </TableCell>
-                      <TableCell align="left">{row.requestDate}</TableCell>
-                      <TableCell align="left">{row.section}</TableCell>
-                      <TableCell align="center">{row.registeredCourses}</TableCell>
-                      <TableCell align="center">{row.requestedBy}</TableCell>
-
-                      {/* {
-                      
-                      axios.get(`${HOG_API}/api/EP/Get`)
-                        .then(response => {
-                          // console.log(response.data.data)
-                          const EP= (response.data.data);
-                          const eachEP = EP.filter(eachEP => eachEP.id===row.request.takenByEPId);
-                          // console.log("API table" ,response.data.data);
-                        })
-                        .catch(error => {
-                          console.log(error);
-                        }) &&
-                      <TableCell align="left">{eachEP}</TableCell>
-                      } */}
-                      {row.receipt === 'incompleteReceipt' ? (
-                        <ThemeProvider theme={errorTheme}>
-                          <TableCell align="left">
-                            <Tooltip title="Incomplete Reciept">
-                              <IconButton color='primary'>
-                                <Iconify icon="ic:error" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </ThemeProvider>
-                      ) :
+                    return (
+                      <TableRow
+                        hover
+                        key={row.id}
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          if (row.eaStatus === "InProgress" && row.takenByEAId === 0) {
+                            handleOpenConfirm(row)
+                          } else {
+                            handleOpenRequest(row)
+                          }
+                        }}
+                      >
+                        <TableCell align="left" sx={{ pl: 5.5 }} > {row.id} </TableCell>
+                        <TableCell align="left">{row.requestDate}</TableCell>
+                        <TableCell align="left">{row.section}</TableCell>
+                        <TableCell align="center">{row.registeredCourses}</TableCell>
+                        <TableCell align="center">{row.requestedBy}</TableCell>
                         <TableCell align="left" />
-                      }
-
-                      <TableCell>
-                        <Tooltip title="More Info">
-                          {row.role === 'available' ? (
-                            <IconButton onClick={() => handleOpenConfirm(row.id)}>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>) : (
-                            <IconButton>
-                              <Iconify icon="ic:chevron-right" />
-                            </IconButton>
-                          )}
-                        </Tooltip>
-                      </TableCell>
-
-                    </TableRow>)
+                        <TableCell>
+                          <Iconify icon="ic:chevron-right" />
+                        </TableCell>
+                      </TableRow>)
                   })}
 
                   <TableEmptyRows height={denseHeight} emptyRows={emptyRows(page, rowsPerPage, tableData.length)} />
@@ -342,13 +357,11 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
             open={openConfirm}
             onClose={handleCloseConfirm}
             title="Take the Request"
-            content="Once the request is taken, only you can see the request and proceed it."
+            content="Once the request is taken, only you can see and proceed the request."
             action={
-              <Button variant="contained" color="success" onClick={() => acceptRequest(currentId, tableData, setTableData)}>
-                <Link to={`/course-registration/ea-request-status/${parseInt(currentId, 10)}`} style={{ textDecoration: 'none', color: 'white' }}>
-                  Take Request
-                </Link>
-              </Button>
+              <LoadingButton loading={isTakingRequest} variant="contained" color="success" onClick={takeRequest}>
+                Take Request
+              </LoadingButton>
             }
           />
           <TablePaginationCustom
@@ -373,9 +386,9 @@ function applyFilter({
   comparator,
   filterName,
   filterRole,
+  educationAdminId
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
-
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -384,7 +397,7 @@ function applyFilter({
   });
 
   inputData = stabilizedThis.map((el) => el[0]);
-    // console.log("inut",inputData)
+  // console.log("inut",inputData)
 
   if (filterName) {
     // console.log('filterName')
@@ -397,8 +410,24 @@ function applyFilter({
   }
 
   if (filterRole !== '') {
-    // console.log('filterRole')
-    inputData = inputData.filter((eachRequest) => eachRequest.eaStatus === filterRole);
+    if (filterRole === 'MyRequests') {
+      inputData = inputData.filter((eachRequest) => (eachRequest.eaStatus === 'InProgress' && eachRequest.takenByEAId === educationAdminId));
+      return inputData;
+    }
+    if (filterRole === 'InProgress') {
+      inputData = inputData.filter((eachRequest) => eachRequest.eaStatus === 'InProgress' && eachRequest.takenByEAId === 0);
+      return inputData;
+    }
+
+    if (filterRole === 'Complete') {
+      inputData = inputData.filter((eachRequest) => eachRequest.eaStatus === 'Complete');
+      return inputData;
+    }
+
+    if (filterRole === 'Reject') {
+      inputData = inputData.filter((eachRequest) => eachRequest.eaStatus === 'Reject');
+      return inputData;
+    }
   }
 
   return inputData;

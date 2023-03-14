@@ -136,7 +136,7 @@ export function AuthProvider({ children }) {
     //                 .then(() => signOut(AUTH_STUDENT))
     //         })
 
-    const registerStudent = async (data) => {
+    const registerStudent = async (data, config) => {
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         const formattedData = {
             title: data.studentTitle,
@@ -174,36 +174,37 @@ export function AuthProvider({ children }) {
             }
         }
 
-        axios.post(`${HOG_API}/api/Student/Post`, formattedData)
+        return axios.post(`${HOG_API}/api/Student/Post`, formattedData, config)
             .then(async (res) => {
                 const uid = res.data.data.firebaseId;
                 const userRef = doc(collection(DB, 'users'), uid);
-                return setDoc(userRef, {
+                await setDoc(userRef, {
                     uid,
                     id: res.data.data.id,
                     email: data.studentEmail,
                     displayName: `${data.studentFirstName} ${data.studentLastName}`,
                     role: "Student"
                 })
-                    .catch((error) => console.error(error))
-                    .then(() => {
-                        const file = data.studentImageURL
-                        const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
-                        uploadBytes(storageProfileRef, file)
-                            .then((snapshot) => { console.log("uploaded!") })
-                            .catch((error) => console.error(error));
+                    .catch((error) => {
+                        throw error;
                     })
-                    .catch((error) => console.error(error))
-                    .then(() => {
-                        data.studentAdditionalFiles.map((file, index) => {
-                            const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
-                            return uploadBytes(storageAdditionalFilesRef, file)
-                                .then((snapshot) => console.log("Additional File uploaded!"))
-                                .catch((error) => console.error(error));
-                        })
-                    })
+                const file = data.studentImageURL
+                const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
+                await uploadBytes(storageProfileRef, file)
+                    .catch((error) => {
+                        throw error;
+                    });
+                data.studentAdditionalFiles.map((file, index) => {
+                    const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
+                    return uploadBytes(storageAdditionalFilesRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                })
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                throw error;
+            })
     }
 
     // UPDATE STUDENT
@@ -215,6 +216,9 @@ export function AuthProvider({ children }) {
             await updateDoc(studentRef, {
                 "displayName": `${data.studentFirstName} ${data.studentLastName}`
             })
+                .catch((error) => {
+                    throw error;
+                });
         }
 
         // Delete old image and add new if user editted profile picture
@@ -223,7 +227,9 @@ export function AuthProvider({ children }) {
             const newImageRef = ref(storage, `users/students/${currentStudent.firebaseId}/Avatar/${data.studentImageURL.name}`);
             deleteObject(lastImageRef)
             await uploadBytes(newImageRef, data.studentImageURL)
-                .catch((error) => console.error(error))
+                .catch((error) => {
+                    throw error;
+                });
         }
 
         // Delete additional files on changes
@@ -239,13 +245,17 @@ export function AuthProvider({ children }) {
                     return deleteObject(itemRef)
                 });
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                throw error;
+            });
         // Add new additional files on changes
         await data.studentAdditionalFiles.map((file) => {
             const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
             if (file instanceof File) {
                 return uploadBytes(fileRef, file)
-                    .catch((error) => console.error(error));
+                    .catch((error) => {
+                        throw error;
+                    });
             }
             return null;
         })
@@ -289,27 +299,14 @@ export function AuthProvider({ children }) {
                 province: data.province,
                 zipcode: data.zipCode,
             }
-        }).catch((error) => console.error(error))
+        }).catch((error) => {
+            throw error;
+        })
     }
 
     // CREATE TEACHER
     const registerTeacher = async (data) => {
         await axios.post(`${HOG_API}/api/Teacher/Post`, data)
-            // .then((res) => {
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Teacher"
-            //     })
-            //     .catch((error) => {
-            //         throw error;
-            //     })
-            // })
             .catch((error) => {
                 throw error;
             })
@@ -318,21 +315,6 @@ export function AuthProvider({ children }) {
     // CREATE EP
     const registerEP = async (data) => {
         await axios.post(`${HOG_API}/api/EP/Post`, data)
-            // .then((res) => {
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Education Planner"
-            //     })
-            //         .catch((error) => {
-            //             throw error;
-            //         })
-            // })
             .catch((error) => {
                 throw error;
             })
@@ -341,23 +323,6 @@ export function AuthProvider({ children }) {
     // CREATE EA
     const registerEA = async (data) => {
         await axios.post(`${HOG_API}/api/EA/Post`, data)
-            // .then(async (res) => {
-            //     console.log(res);
-            //     const uid = res.data.data.firebaseId;
-            //     const databaseId = res.data.data.id;
-            //     const userRef = doc(collection(DB, 'users'), uid);
-            //     setDoc(userRef, {
-            //         uid,
-            //         id: databaseId,
-            //         email: res.data.data.email,
-            //         displayName: `${res.data.data.fName} ${res.data.data.lName}`,
-            //         role: "Education Admin"
-            //     })
-            //         .then(() => 'Success')
-            //         .catch((error) => {
-            //             throw error;
-            //         })
-            // })
             .catch((error) => {
                 throw error;
             })

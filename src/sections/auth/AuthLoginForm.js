@@ -28,8 +28,8 @@ export default function AuthLoginForm() {
   });
 
   const defaultValues = {
-    email: 'siwach@hotmail.com',
-    password: '123456',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -48,20 +48,23 @@ export default function AuthLoginForm() {
     try {
       await login(data.email, data.password);
     } catch (error) {
-      console.error(error.message);
-
-      reset();
-
-      setError('afterSubmit', {
-        ...error,
-        message: error.message
-      });
+      if (error.message === 'Firebase: Error (auth/user-not-found).') {
+        setError('afterSubmit', {
+          ...error,
+          message: 'Email or password is incorrect'
+        });
+      } else {
+        setError('afterSubmit', {
+          ...error,
+          message: error.message
+        });
+      }
     }
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3}>
+      <Stack spacing={2}>
         {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
 
         <RHFTextField name="email" label="Email address" />
@@ -82,12 +85,6 @@ export default function AuthLoginForm() {
         />
       </Stack>
 
-      <Stack alignItems="flex-end" sx={{ my: 2 }}>
-        <Link variant="body2" color="inherit" underline="always">
-          Forgot password?
-        </Link>
-      </Stack>
-
       <LoadingButton
         fullWidth
         color="inherit"
@@ -102,6 +99,7 @@ export default function AuthLoginForm() {
             bgcolor: 'text.primary',
             color: (theme) => (theme.palette.mode === 'light' ? 'common.white' : 'grey.800'),
           },
+          my: 3
         }}
       >
         Login

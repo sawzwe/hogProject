@@ -10,7 +10,7 @@ import StudentRequestStatusList from '../../sections/dashboard/ea-request-manage
 
 // ----------------------------------------------------------------------
 
-export default function StaffRequestPage() {
+export default function StudentRequestPage() {
     const { themeStretch } = useSettingsContext();
 
     return (
