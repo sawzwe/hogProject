@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import _ from 'lodash';
 import { useNavigate } from 'react-router';
+import Moment from 'moment';
+import { extendMoment } from "moment-range";
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
@@ -456,6 +458,7 @@ CreateScheduleDialog.propTypes = {
 
 export function CreateScheduleDialog({ open, close, courseType, selectedCourse, hourPerClass, onCreate, completeCourses, students }) {
     const { enqueueSnackbar } = useSnackbar();
+    const moment = extendMoment(Moment);
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -476,8 +479,13 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     }, [selectedCourse])
 
     // Edit Schedule ---------------------------------------------------------------------------------
+    const [openAddClassDialog, setOpenAddClassDialog] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState({})
     const [openEditClass, setOpenEditClass] = useState(false);
+
+    const handleCloseAddClassDialog = () => {
+        setOpenAddClassDialog(false);
+    }
 
     const handleOpenEditDialog = (row) => {
         setSelectedSchedule(row);
@@ -489,10 +497,62 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         setOpenEditClass(false);
     }
 
-    const handleEditClass = (newClass) => {
-        const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
-        const updatedSchedules = [...filteredSchedules, newClass]
-        setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+    const handleAddClass = async (newClass) => {
+        let hasConflict = false;
+        await schedules.forEach((eachClass) => {
+
+            // Calculate overlapping time
+            const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+            const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+
+            const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
+            const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
+
+            const range1 = moment.range(timeAStart, timeAEnd);
+            const range2 = moment.range(timeBStart, timeBEnd);
+
+            if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
+                hasConflict = true;
+            }
+        })
+
+        if (!hasConflict) {
+            const updatedSchedules = [...schedules, newClass]
+            setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+            setOpenAddClassDialog(false);
+        } else {
+            enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
+        }
+    }
+
+    const handleEditClass = async (newClass) => {
+        let hasConflict = false;
+        await schedules.forEach((eachClass) => {
+
+            // Calculate overlapping time
+            const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+            const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+
+            const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
+            const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
+
+            const range1 = moment.range(timeAStart, timeAEnd);
+            const range2 = moment.range(timeBStart, timeBEnd);
+
+            if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
+                hasConflict = true;
+            }
+        })
+
+        if (!hasConflict) {
+            const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
+            const updatedSchedules = [...filteredSchedules, newClass]
+            setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+            setSelectedSchedule({});
+            setOpenEditClass(false);
+        } else {
+            enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
+        }
     }
 
     const handleDeleteClass = (deletedClass) => {
@@ -508,13 +568,6 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             HoursCount += parseInt(eachSchedule.hourPerClass, 10)
         })
         return HoursCount;
-    }
-
-    const [openAddClassDialog, setOpenAddClassDialog] = useState(false);
-
-    const handleAddClass = (newClass) => {
-        const updatedSchedules = [...schedules, newClass]
-        setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
     }
 
     const handleCreate = () => {
@@ -775,7 +828,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
             <AddClassDialog
                 open={openAddClassDialog}
-                onClose={() => setOpenAddClassDialog(false)}
+                onClose={handleCloseAddClassDialog}
                 onAdd={handleAddClass}
                 hourPerClass={selectedCourse.hourPerClass}
                 fromDate={selectedCourse.fromDate}
@@ -817,7 +870,7 @@ export function AdditionalCommentSection({ message, status }) {
                     sm: 'repeat(1, 1fr)',
                 }}
             >
-                <TextField disabled value={message} />
+                <TextField label="Comment from Education Planner" disabled value={message} />
             </Box>
         </Card>
     )

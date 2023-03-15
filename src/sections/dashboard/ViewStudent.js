@@ -49,9 +49,12 @@ export default function ViewStudent({ student, avatarURL, filesURL }) {
                 <AdditionalInfo student={student} />
             </Grid>
 
-            <Grid item xs={12} md={12}>
-                <AdditionalFiles student={student} filesURL={filesURL} />
-            </Grid>
+            {filesURL.length > 0 && (
+                <Grid item xs={12} md={12}>
+                    <AdditionalFiles student={student} filesURL={filesURL} />
+                </Grid>
+            )}
+
 
         </Grid>
     );

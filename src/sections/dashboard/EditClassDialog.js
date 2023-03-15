@@ -138,7 +138,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
                 .then(((res) => {
                     setAvailableTeacher(res.data.data)
@@ -175,7 +174,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             method: data.classMethod
         };
         onEdit(newClass);
-        handleClose();
+        // handleClose();
     }
 
     const handleDelete = () => {
