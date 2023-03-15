@@ -26,29 +26,43 @@ export default function ViewStudentPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
 
     const dataFetchedRef = useRef(false);
 
     const [student, setStudent] = useState();
+    const [courses, setCourses] = useState();
 
-
-    const fetchData = async () => {
+    const fetchStudent = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`, config)
             .then((res) => {
-                console.log('res', res);
-                const data = res.data.data.fullName
+                const data = res.data.data
                 setStudent(data)
-                // console.log('data', data)
+            })
+            .catch((error) => navigate('*', { replace: false }))
+    }
+
+
+    const fetchCourses = async () => {
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${id}`, config)
+            .then((res) => {
+                const data = res.data.data
+                setCourses(data)
             })
             .catch((error) => navigate('*', { replace: false }))
     }
 
     useEffect(() => {
         if (dataFetchedRef.current) return;
-        fetchData();
         dataFetchedRef.current = true;
+
+        fetchStudent();
+        fetchCourses();
     }, [])
+
+    if (student === undefined || courses === undefined) {
+        return <LoadingScreen />
+    }
 
     return (
         <>
@@ -65,13 +79,13 @@ export default function ViewStudentPage() {
                             name: 'All students',
                             href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
                         },
-                        { name: `${student}` },
+                        { name: `${student.fullName}` },
                     ]}
                 />
                 <Stack spacing={3}>
-                    <Card sx={{ p: 3 }}>
-                        <ViewEditStudentCourse />
-                    </Card>
+
+                    <ViewEditStudentCourse currentStudent={student} currentCourses={courses} />
+
                 </Stack>
             </Container>
         </>

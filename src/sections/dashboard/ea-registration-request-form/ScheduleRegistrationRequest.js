@@ -81,8 +81,6 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
         students,
     } = currentRequest;
 
-    const courseType = 'Private';
-
     const handleCreateCourse = (createdCourse) => {
         const filteredCourses = createdCourses.filter((eachCourse) => eachCourse.course !== createdCourse.course || eachCourse.subject !== createdCourse.subject || eachCourse.level !== createdCourse.level || eachCourse.fromDate !== createdCourse.fromDate || eachCourse.toDate !== createdCourse.toDate);
         setCreatedCourses([...filteredCourses, createdCourse]);
@@ -128,6 +126,7 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                         )),
                         teacherPrivateClass: {
                             teacherId: eachClass.teacher.id,
+                            workType: eachClass.teacher.workType,
                             status: 'Incomplete'
                         }
                     }
@@ -220,11 +219,14 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
     return (
         <Grid container spacing={3}>
             <Grid item xs={12} md={12}>
-                <StudentSection students={students} />
+                <StudentSection
+                    courseType={request.courseType}
+                    students={students}
+                />
             </Grid>
             <Grid item xs={12} md={12}>
                 <CourseSection
-                    courseType={courseType}
+                    courseType={request.courseType}
                     createdCourses={createdCourses}
                     courses={information}
                     onCreate={handleCreateCourse}

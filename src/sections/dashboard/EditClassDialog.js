@@ -63,6 +63,8 @@ EditClassDialog.propTypes = {
 }
 
 export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students }) {
+    console.log('students', students)
+    console.log('schedule', schedule)
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -192,7 +194,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
     useEffect(() => {
         if (Object.keys(schedule).length) {
             setValue('classDate', date);
-            console.log("Hi")
             handleChangeDate(date);
             setValue('classTime', fromTime.concat('-', toTime));
             handleChangeTime(fromTime.concat('-', toTime))
