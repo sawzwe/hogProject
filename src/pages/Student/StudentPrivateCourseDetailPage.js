@@ -72,7 +72,7 @@ export default function StudentPrivateCourseDetailPage() {
 
     // console.log(course)
     const currentclasses = currentcourse.registeredClasses;   
-    console.log('currentclass',currentclasses)
+    // console.log('currentclass',currentclasses)
 
     // const students = currentclasses.map((course, index) => {
     //     const eachStudent = course.students.map((student, index) => {
@@ -120,8 +120,8 @@ export default function StudentPrivateCourseDetailPage() {
         };
     });
 
-    console.log('mapped',mappedStudentClass)
-    console.log('course',course.course)
+    // console.log('mapped',mappedStudentClass)
+    // console.log('course',course.course)
 
     // classes = {[
     //     {
