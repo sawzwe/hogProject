@@ -11,13 +11,13 @@ export default function StudentCourse({ currentStudent }) {
 
     const {
         studentPrivateCourse,
-        studentGroupCourse
+        // studentGroupCourse
     } = currentStudent;
 
     return (
         <>
             {studentPrivateCourse.length > 0 && studentPrivateCourse.map((course, index) => <CourseCard key={index} accountRole='student' eachCourse={course} />)}
-            {studentGroupCourse.length > 0 && studentGroupCourse.map((course, index) => <CourseCard key={index} accountRole='student' eachCourse={course} />)}
+            {/* {studentGroupCourse.length > 0 && studentGroupCourse.map((course, index) => <CourseCard key={index} accountRole='student' eachCourse={course} />)} */}
         </>
     )
 }
