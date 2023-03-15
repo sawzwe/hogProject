@@ -36,6 +36,8 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    RadioGroup,
+    Radio
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -61,12 +63,13 @@ import { ViewCourseDialog } from '../ViewCourseDialog';
 
 RegistrationRequestDetail.propTypes = {
     currentRequest: PropTypes.object,
+    currentPayments: PropTypes.object,
     officeAdminId: PropTypes.number
 };
 
 // ----------------------------------------------------------------------
 
-export default function RegistrationRequestDetail({ currentRequest, officeAdminId }) {
+export default function RegistrationRequestDetail({ currentRequest, currentPayments, officeAdminId }) {
     const dataFetchedRef = useRef(false);
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
@@ -76,6 +79,8 @@ export default function RegistrationRequestDetail({ currentRequest, officeAdminI
         information,
         students
     } = currentRequest;
+
+    const paymentType = currentPayments.paymentType
 
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
     const [openAcceptDialog, setOpenAcceptDialog] = useState(false);
@@ -175,7 +180,6 @@ export default function RegistrationRequestDetail({ currentRequest, officeAdminI
                     takenByOAId: officeAdminId
                 }
             })
-                .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
@@ -250,6 +254,15 @@ export default function RegistrationRequestDetail({ currentRequest, officeAdminI
                                 }}>
                                 Payment Attachments
                             </Typography>
+                            <RadioGroup
+                                value={paymentType}
+                                sx={{my: 2, mx: 1}}
+                            >
+                                <Stack direction="row" spacing={1}>
+                                    <FormControlLabel value="Complete Payment" disabled control={<Radio />} label="Complete Payment" />
+                                    <FormControlLabel value="Installment Payment" disabled control={<Radio />} label="Installment Payment" />
+                                </Stack>
+                            </RadioGroup>
                             <Stack direction="row">
                                 {filesURL.map((file) => {
                                     return (
@@ -333,7 +346,7 @@ export default function RegistrationRequestDetail({ currentRequest, officeAdminI
                 }
 
             </Grid>
-            
+
             {Object.keys(selectedCourse).length > 0 && schedules.length === 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
