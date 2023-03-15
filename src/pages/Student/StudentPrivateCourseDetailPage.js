@@ -58,28 +58,151 @@ export default function StudentPrivateCourseDetailPage() {
     }
 
     const currentcourse = studentCourse.find(item => item.registeredCourses.id === parseInt(id,10));
-    console.log('course',currentcourse)
-    const currentclasses = currentcourse.registeredClasses;   
-    console.log(currentclasses)
-    
-    // // Map the student courses
-    // const mappedStudentCourse = studentCourse.map((course, index) => {
-    //     // console.log(course)
-    //     return {
-    //         id: course.registeredCourses.id.toString(),
-    //         course: course.registeredCourses.course, 
-    //         subject: course.registeredCourses.subject,
-    //         level: course.registeredCourses.level,
-    //         type: course.registeredCourses.method,
-    //     };
-    // });
+    // console.log('currentcourse',currentcourse)
+    const course = {
+        id: currentcourse.registeredCourses.id.toString(),
+        course: currentcourse.registeredCourses.course, 
+        subject: currentcourse.registeredCourses.subject,
+        level: currentcourse.registeredCourses.level,
+        type: currentcourse.registeredCourses.method,
+        section:currentcourse.registeredCourses.section,
+    }
 
-    // const currentStudents = {
-    //     fName: 'Piyaphon',
-    //     lName: 'Wu',
-    //     studentPrivateCourse: mappedStudentCourse,
-        
-    // };
+ 
+
+    // console.log(course)
+    const currentclasses = currentcourse.registeredClasses;   
+    console.log('currentclass',currentclasses)
+
+    // const students = currentclasses.map((course, index) => {
+    //     const eachStudent = course.students.map((student, index) => {
+    //       return {
+    //         id: student.studentPrivateClasses.id,
+    //         fullName: 'Hong',
+    //       };
+    //     });
+    //     return {
+    //       course,
+    //       students: eachStudent,
+    //     };
+    //   });
+      
+      
+    // const students = currentclasses.map((course, index) => {
+    //     const eachStudent = students.map((student,index) =>{
+    //         return {
+    //             id: student.studentPrivateClasses.id,
+    //             fullName: 'Hong',
+    //         };
+    //      })
+    //      return eachStudent
+    // });
+    // console.log('students',students)
+
+    
+    // Map the student courses
+    // console.log(currentclasses[0].teacherPrivateClass.teacherId)
+    // console.log(course.section)
+    const mappedStudentClass = currentclasses.map((eachClass, index) => {
+        // console.log(course.section)
+        return {
+            id: eachClass.id,
+            course,
+            classNo: index,
+            students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+            date: eachClass.date,
+            fromTime: eachClass.fromTime,
+            toTime: eachClass.toTime,
+            room: eachClass.room,
+            section: course.section,
+            teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: 'Kiratijuta Bhumichitr' },
+            attendance: 'Present'
+        };
+    });
+
+    console.log('mapped',mappedStudentClass)
+    console.log('course',course.course)
+
+    // classes = {[
+    //     {
+    //         id: '0',
+    //         course: { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private' },
+    //         classNo: '1',
+    //         students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '13-Mar-2023',
+    //         fromTime: '10:00',
+    //         toTime: '12:00',
+    //         room: '306',
+    //         section: 'Piyaphon Wu',
+    //         teacher: { id: '1', fullName: 'Kiratijuta Bhumichitr' },
+    //         attendance: 'Present'
+    //     },
+    //     {
+    //         id: '1',
+    //         course: { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private' },
+    //         classNo: '2',
+    //         students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '15-Mar-2023',
+    //         fromTime: '10:00',
+    //         toTime: '12:00',
+    //         room: '306',
+    //         section: 'Piyaphon Wu',
+    //         teacher: { id: '1', fullName: 'Kiratijuta Bhumichitr' },
+    //         attendance: 'Present'
+    //     },
+    //     {
+    //         id: '2',
+    //         course: { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private' },
+    //         classNo: '3',
+    //         students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '17-Mar-2023',
+    //         fromTime: '10:00',
+    //         toTime: '12:00',
+    //         room: '306',
+    //         section: 'Piyaphon Wu',
+    //         teacher: { id: '1', fullName: 'Kiratijuta Bhumichitr' },
+    //         attendance: 'None'
+    //     },
+    //     {
+    //         id: '3',
+    //         course: { id: '0', course: 'SAT', subject: 'MATH', level: 'INTENSIVE', type: 'Private' },
+    //         classNo: '4',
+    //         students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '19-Mar-2023',
+    //         fromTime: '10:00',
+    //         toTime: '12:00',
+    //         room: '306',
+    //         section: 'Piyaphon Wu',
+    //         teacher: { id: '1', fullName: 'Kiratijuta Bhumichitr' },
+    //         attendance: 'None'
+    //     },
+    //     {
+    //         id: '4',
+    //         course: { id: '1', course: 'GED', subject: 'MATH', level: 'REGULAR', type: 'Semi Private' },
+    //         classNo: '1',
+    //         students: [{ id: '0', fullName: 'Michael Bull'}, { id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '14-Mar-2023',
+    //         fromTime: '13:00',
+    //         toTime: '15:00',
+    //         room: '306',
+    //         section: 'Kaphao Mookrob Group',
+    //         teacher: { id: '2', fullName: 'Nirawit Janturong' },
+    //         attendance: 'None'
+    //     },
+    //     {
+    //         id: '5',
+    //         course: { id: '1', course: 'GED', subject: 'MATH', level: 'REGULAR', type: 'Semi Private' },
+    //         classNo: '2',
+    //         students: [{ id: '0', fullName: 'Michael Bull'}, { id: '1', fullName: 'Piyaphon Wu' }],
+    //         date: '16-Mar-2023',
+    //         fromTime: '13:00',
+    //         toTime: '15:00',
+    //         room: '306',
+    //         section: 'Kaphao Mookrob Group',
+    //         teacher: { id: '2', fullName: 'Nirawit Janturong' },
+    //         attendance: 'None'
+    //     }
+    // ],}
     return (
         <>
             <Helmet>
@@ -93,10 +216,10 @@ export default function StudentPrivateCourseDetailPage() {
                     direction="row">
                     <ArrowBackIosNewRoundedIcon sx={{ cursor: 'pointer', mr: 0.5 }} onClick={() => navigate(-1)} />
                     <Typography variant="h6">
-                        {`${currentcourse.registeredCourses.course} ${currentcourse.registeredCourses.subject} (${currentcourse.registeredCourses.method.toUpperCase()})`}
+                        {`${course.course} ${course.subject} (${course.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
-                {/* <StudentAllClasses classes={classes} /> */}
+                <StudentAllClasses classes={mappedStudentClass} />
             </Container>
         </>
     );
