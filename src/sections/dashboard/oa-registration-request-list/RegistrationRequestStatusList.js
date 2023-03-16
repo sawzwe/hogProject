@@ -155,9 +155,11 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
 
   const TABS = [
     { value: 'PendingOA', label: 'All', color: 'warning', count: getLengthByStatus('PendingOA') },
-    { value: 'Complete', label: 'Completed', count: getLengthByReceipt('Complete'), color: 'success' },
+    { value: 'Complete', label: 'Completed', count: getLengthByStatus('Complete'), color: 'success' },
     { value: 'Incomplete', label: 'Incomplete', count: getLengthByReceipt('Incomplete'), color: 'error' },
   ];
+
+  console.log(dataFiltered)
 
 
   const handleOpenConfirm = () => {

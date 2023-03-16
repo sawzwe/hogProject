@@ -6,7 +6,7 @@ import axios from 'axios';
 import moment from 'moment';
 // firebase
 import { initializeApp } from 'firebase/app';
-import { getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata } from "firebase/storage"
+import { getStorage, ref, uploadBytes, getDownloadURL, listAll, getMetadata, deleteObject } from "firebase/storage"
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -57,6 +57,7 @@ import LoadingScreen from '../../../components/loading-screen/LoadingScreen';
 import { fDate } from '../../../utils/formatTime';
 import { HOG_API, FIREBASE_API } from '../../../config';
 import { useAuthContext } from '../../../auth/useAuthContext';
+import { ViewCourseDialog } from '../ViewCourseDialog';
 
 // ----------------------------------------------------------------------
 
@@ -120,6 +121,7 @@ export default function RegistrationRequestDetail({ currentRequest, educationPla
             schedules={schedules}
             hasSchedule={!!schedules.length}
             educationPlannerId={educationPlannerId}
+            isEdit={request.paymentStatus === 'Incomplete'}
         />
     }
 
@@ -215,413 +217,413 @@ export function CourseSection({ courses, onView, schedules, hasSchedule }) {
     )
 }
 
-// ----------------------------------------------------------------------
+// // ----------------------------------------------------------------------
 
-ViewCourseDialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    registeredCourse: PropTypes.object,
-    courseType: PropTypes.string,
-    schedules: PropTypes.object,
-    hasSchedule: PropTypes.bool,
-}
+// ViewCourseDialog.propTypes = {
+//     open: PropTypes.bool,
+//     onClose: PropTypes.func,
+//     registeredCourse: PropTypes.object,
+//     courseType: PropTypes.string,
+//     schedules: PropTypes.object,
+//     hasSchedule: PropTypes.bool,
+// }
 
-export function ViewCourseDialog({ open, onClose, registeredCourse, courseType, schedules, hasSchedule }) {
-    return (
+// export function ViewCourseDialog({ open, onClose, registeredCourse, courseType, schedules, hasSchedule }) {
+//     return (
 
-        !hasSchedule ? (
-            <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
-        ) : (
-            <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} schedules={schedules} courseType={courseType} />
-        )
-    )
-}
+//         !hasSchedule ? (
+//             <UnscheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} />
+//         ) : (
+//             <ScheduledCourseDialog open={open} onClose={onClose} registeredCourse={registeredCourse} schedules={schedules} courseType={courseType} />
+//         )
+//     )
+// }
 
-// ----------------------------------------------------------------------
+// // ----------------------------------------------------------------------
 
-UnscheduledCourseDialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    registeredCourse: PropTypes.object,
-}
+// UnscheduledCourseDialog.propTypes = {
+//     open: PropTypes.bool,
+//     onClose: PropTypes.func,
+//     registeredCourse: PropTypes.object,
+// }
 
-export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
+// export function UnscheduledCourseDialog({ open, onClose, registeredCourse }) {
 
-    const {
-        course,
-        subject,
-        method,
-        level,
-        fromDate,
-        toDate,
-        hourPerClass,
-        totalHour,
-        preferredDays
-    } = registeredCourse
+//     const {
+//         course,
+//         subject,
+//         method,
+//         level,
+//         fromDate,
+//         toDate,
+//         hourPerClass,
+//         totalHour,
+//         preferredDays
+//     } = registeredCourse
 
-    return (
-        <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}
-            PaperProps={{
-                sx: {
-                    '&::-webkit-scrollbar': { display: 'none' }
-                }
-            }} >
-            <Grid container direction="row" sx={{ p: 3, mb: 0 }} spacing={2} >
-                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6"> Course Detail </Typography>
-                    <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
-                </Grid>
-            </Grid>
+//     return (
+//         <Dialog fullWidth maxWidth="md" open={open} onClose={onClose}
+//             PaperProps={{
+//                 sx: {
+//                     '&::-webkit-scrollbar': { display: 'none' }
+//                 }
+//             }} >
+//             <Grid container direction="row" sx={{ p: 3, mb: 0 }} spacing={2} >
+//                 <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
+//                     <Typography variant="h6"> Course Detail </Typography>
+//                     <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
+//                 </Grid>
+//             </Grid>
 
-            <Grid container direction="row" sx={{ px: 1, mb: 1 }} spacing={2}>
-                <Grid item xs={12} md={12}>
-                    <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={6} md={6}>
-                                <TextField fullWidth defaultValue={course} label="Course" disabled />
-                            </Grid>
-                            <Grid item xs={6} md={6}>
-                                <TextField fullWidth defaultValue={subject} label="Subject" disabled />
-                            </Grid>
-                            <Grid item xs={6} md={6}>
-                                <TextField fullWidth defaultValue={level} label="Level" disabled />
-                            </Grid>
+//             <Grid container direction="row" sx={{ px: 1, mb: 1 }} spacing={2}>
+//                 <Grid item xs={12} md={12}>
+//                     <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
+//                         <Grid container spacing={2}>
+//                             <Grid item xs={6} md={6}>
+//                                 <TextField fullWidth defaultValue={course} label="Course" disabled />
+//                             </Grid>
+//                             <Grid item xs={6} md={6}>
+//                                 <TextField fullWidth defaultValue={subject} label="Subject" disabled />
+//                             </Grid>
+//                             <Grid item xs={6} md={6}>
+//                                 <TextField fullWidth defaultValue={level} label="Level" disabled />
+//                             </Grid>
 
-                            {/* Total Hours */}
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth defaultValue={totalHour} label="Total Hours" type="number" disabled />
-                            </Grid>
+//                             {/* Total Hours */}
+//                             <Grid item xs={6} md={2}>
+//                                 <TextField fullWidth defaultValue={totalHour} label="Total Hours" type="number" disabled />
+//                             </Grid>
 
-                            {/* Learning Method */}
-                            <Grid item xs={6} md={2}>
-                                <TextField
-                                    fullWidth
-                                    defaultValue={method}
-                                    label="Method"
-                                    inputProps={{
-                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
-                                    }}
-                                    disabled
-                                />
-                            </Grid>
+//                             {/* Learning Method */}
+//                             <Grid item xs={6} md={2}>
+//                                 <TextField
+//                                     fullWidth
+//                                     defaultValue={method}
+//                                     label="Method"
+//                                     inputProps={{
+//                                         style: { textTransform: "capitalize", fontSize: "0.9rem" }
+//                                     }}
+//                                     disabled
+//                                 />
+//                             </Grid>
 
-                            {/* Hours Per Class */}
-                            <Grid item xs={6} md={2}>
-                                <TextField fullWidth defaultValue={hourPerClass} label="Hours/Class" disabled />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-                    <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField fullWidth defaultValue={fDate(fromDate, 'dd-MMM-yyyy')} label="Start Date" disabled />
-                            </Grid>
+//                             {/* Hours Per Class */}
+//                             <Grid item xs={6} md={2}>
+//                                 <TextField fullWidth defaultValue={hourPerClass} label="Hours/Class" disabled />
+//                             </Grid>
+//                         </Grid>
+//                     </Stack>
+//                     <Stack direction="row" sx={{ mb: 2, mx: 3 }}>
+//                         <Grid container spacing={2}>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField fullWidth defaultValue={fDate(fromDate, 'dd-MMM-yyyy')} label="Start Date" disabled />
+//                             </Grid>
 
-                            <Grid item xs={12} md={6}>
-                                <TextField fullWidth defaultValue={fDate(toDate, 'dd-MMM-yyyy')} label="End Date" disabled />
-                            </Grid>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField fullWidth defaultValue={fDate(toDate, 'dd-MMM-yyyy')} label="End Date" disabled />
+//                             </Grid>
 
-                            <Grid item xs={12} md={12}>
-                                <Typography variant="inherit" sx={{ color: 'text.disabled' }}>Preferred Days</Typography>
-                            </Grid>
+//                             <Grid item xs={12} md={12}>
+//                                 <Typography variant="inherit" sx={{ color: 'text.disabled' }}>Preferred Days</Typography>
+//                             </Grid>
 
-                            <Grid item xs={12} md={12}>
-                                <Stack direction="row" sx={{ pb: 3 }}>
-                                    <Grid container direction="row" spacing={2}>
-                                        {preferredDays.map((eachDay, index) => (
-                                            <Grid item xs={6} md={1.7} key={index}>
-                                                <TextField
-                                                    fullWidth
-                                                    label={eachDay.day}
-                                                    value={`${eachDay.fromTime} - ${eachDay.toTime}`}
-                                                    InputProps={{
-                                                        style: { fontSize: '0.8rem' }
-                                                    }}
-                                                    disabled
-                                                />
-                                            </Grid>
-                                        ))}
-                                    </Grid>
-                                </Stack>
-                            </Grid>
-                        </Grid>
-                    </Stack>
-                </Grid>
-            </Grid>
-        </Dialog>
-    )
-}
+//                             <Grid item xs={12} md={12}>
+//                                 <Stack direction="row" sx={{ pb: 3 }}>
+//                                     <Grid container direction="row" spacing={2}>
+//                                         {preferredDays.map((eachDay, index) => (
+//                                             <Grid item xs={6} md={1.7} key={index}>
+//                                                 <TextField
+//                                                     fullWidth
+//                                                     label={eachDay.day}
+//                                                     value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+//                                                     InputProps={{
+//                                                         style: { fontSize: '0.8rem' }
+//                                                     }}
+//                                                     disabled
+//                                                 />
+//                                             </Grid>
+//                                         ))}
+//                                     </Grid>
+//                                 </Stack>
+//                             </Grid>
+//                         </Grid>
+//                     </Stack>
+//                 </Grid>
+//             </Grid>
+//         </Dialog>
+//     )
+// }
 
-// ----------------------------------------------------------------------
+// // ----------------------------------------------------------------------
 
-ScheduledCourseDialog.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    registeredCourse: PropTypes.object,
-    courses: PropTypes.string,
-    schedules: PropTypes.object,
-}
+// ScheduledCourseDialog.propTypes = {
+//     open: PropTypes.bool,
+//     onClose: PropTypes.func,
+//     registeredCourse: PropTypes.object,
+//     courses: PropTypes.string,
+//     schedules: PropTypes.object,
+// }
 
-export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType, schedules }) {
+// export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseType, schedules }) {
 
-    const {
-        course,
-        subject,
-        level,
-        fromDate,
-        toDate,
-        hourPerClass,
-        totalHour,
-        method,
-        preferredDays
-    } = registeredCourse
+//     const {
+//         course,
+//         subject,
+//         level,
+//         fromDate,
+//         toDate,
+//         hourPerClass,
+//         totalHour,
+//         method,
+//         preferredDays
+//     } = registeredCourse
 
-    const {
-        classes
-    } = schedules
+//     const {
+//         classes
+//     } = schedules
 
-    const customTextFieldStyle = {
-        fontSize: '0.9rem'
-    }
+//     const customTextFieldStyle = {
+//         fontSize: '0.9rem'
+//     }
 
-    let displayAccumulatedHours = 0;
+//     let displayAccumulatedHours = 0;
 
-    function accumulatedHours() {
-        let HoursCount = 0;
-        classes.forEach((eachClass) => {
-            const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
-            const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
-            HoursCount += timeB.diff(timeA, 'hours');
-        })
-        return HoursCount;
-    }
+//     function accumulatedHours() {
+//         let HoursCount = 0;
+//         classes.forEach((eachClass) => {
+//             const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+//             const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+//             HoursCount += timeB.diff(timeA, 'hours');
+//         })
+//         return HoursCount;
+//     }
 
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+//     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    // Tables ---------------------------------------------------------------------------------
-    const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-            backgroundColor: theme.palette.divider,
-            color: theme.palette.common.black,
-            fontSize: '0.7rem',
-            border: `1px solid ${theme.palette.divider}`,
-        },
-        [`&.${tableCellClasses.body}`]: {
-            fontSize: '0.7rem',
-            padding: 16,
-            border: `1px solid ${theme.palette.divider}`,
+//     // Tables ---------------------------------------------------------------------------------
+//     const StyledTableCell = styled(TableCell)(({ theme }) => ({
+//         [`&.${tableCellClasses.head}`]: {
+//             backgroundColor: theme.palette.divider,
+//             color: theme.palette.common.black,
+//             fontSize: '0.7rem',
+//             border: `1px solid ${theme.palette.divider}`,
+//         },
+//         [`&.${tableCellClasses.body}`]: {
+//             fontSize: '0.7rem',
+//             padding: 16,
+//             border: `1px solid ${theme.palette.divider}`,
 
-        },
-    }));
+//         },
+//     }));
 
-    const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        '&:last-child td, &:last-child th': {
-            backgroundColor: theme.palette.divider,
-            padding: 16,
-            fontWeight: 600,
-            border: `1px solid ${theme.palette.divider}`,
-        },
-    }));
+//     const StyledTableRow = styled(TableRow)(({ theme }) => ({
+//         '&:last-child td, &:last-child th': {
+//             backgroundColor: theme.palette.divider,
+//             padding: 16,
+//             fontWeight: 600,
+//             border: `1px solid ${theme.palette.divider}`,
+//         },
+//     }));
 
-    return (
-        <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
-
-
-            <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
-                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6"> Course Detail </Typography>
-                    <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
-                </Grid>
-            </Grid>
-
-            <Grid container direction="row" sx={{ px: 3 }} spacing={2}>
-                <Grid item xs={12} md={5}>
-                    <Grid item xs={12} md={12} sx={{ pb: 2 }}>
-                        <Typography variant="h6"> Course Information </Typography>
-                    </Grid>
-
-                    <Stack direction="row" sx={{ pb: 2 }}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={course.concat(' ', subject, ' ', level)}
-                                    label="Course"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={courseType}
-                                    label="Course Type"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-
-                    <Stack direction="row" sx={{ pb: 2 }}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={method}
-                                    label="Learning Method"
-                                    disabled
-                                    inputProps={{
-                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={totalHour}
-                                    label="Total Hours"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={hourPerClass}
-                                    label="Hours/Class"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-
-                    <Stack direction="row" sx={{ pb: 2 }} spacing={2}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={fDate(fromDate, 'dd-MMM-yyyy')}
-                                    label="Start Date"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={fDate(toDate, 'dd-MMM-yyyy')}
-                                    label="End Date"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-
-                    <Grid item xs={12} md={12} sx={{ mb: 1 }}>
-                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
-                            Preferred Days
-                        </Typography>
-                    </Grid>
-
-                    <Stack direction="row" sx={{ pb: 3 }}>
-                        <Grid container direction="row" spacing={2}>
-                            {preferredDays.map((eachDay, index) => (
-                                <Grid item xs={6} md={3} key={index}>
-                                    <TextField
-                                        fullWidth
-                                        label={eachDay.day}
-                                        value={`${eachDay.fromTime} - ${eachDay.toTime}`}
-                                        InputProps={{
-                                            style: { fontSize: '0.8rem' }
-                                        }}
-                                        disabled
-                                    />
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Stack>
-                </Grid>
-
-                <Grid item xs={12} md={7}>
-                    <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                            <Typography variant="h6">
-                                Classes & Schedules
-                            </Typography>
-                        </Stack>
+//     return (
+//         <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
 
 
-                        <TableContainer component={Paper} >
-                            <Table sx={{ width: '100%' }}>
-                                <TableHead>
-                                    <TableRow>
-                                        <StyledTableCell align="center">No.</StyledTableCell>
-                                        <StyledTableCell align="center">Day</StyledTableCell>
-                                        <StyledTableCell align="center">Date</StyledTableCell>
-                                        <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
-                                        <StyledTableCell align="center">Method</StyledTableCell>
-                                        <StyledTableCell align="center">Teacher</StyledTableCell>
-                                        <StyledTableCell align="center">Hours</StyledTableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {classes.map((eachClass, index) => {
-                                        const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
-                                        const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
-                                        const hourPerClass = timeB.diff(timeA, 'hours')
-                                        displayAccumulatedHours += hourPerClass;
-                                        const classDate = new Date(eachClass.date);
-                                        return (
-                                            <StyledTableRow key={index}>
-                                                <StyledTableCell component="th" scope="row" align="center">
-                                                    {(index + 1).toString()}
-                                                </StyledTableCell>
-                                                <StyledTableCell align="center"> {weekday[classDate.getDay()].slice(0, 3)} </StyledTableCell>
-                                                <StyledTableCell align="center">{fDate(classDate, 'dd-MMM-yyyy')}</StyledTableCell>
-                                                <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
-                                                <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
-                                                <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
-                                                <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.teacherId}</StyledTableCell>
-                                                <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                            </StyledTableRow>
-                                        )
-                                    })}
-                                    <StyledTableRow>
-                                        <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
-                                        <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
-                                    </StyledTableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+//             <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
+//                 <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
+//                     <Typography variant="h6"> Course Detail </Typography>
+//                     <IconButton variant="h6" onClick={onClose}> <CloseIcon /> </IconButton>
+//                 </Grid>
+//             </Grid>
 
-                    </Scrollbar>
-                </Grid>
-            </Grid>
-        </Dialog>
-    )
-}
+//             <Grid container direction="row" sx={{ px: 3 }} spacing={2}>
+//                 <Grid item xs={12} md={5}>
+//                     <Grid item xs={12} md={12} sx={{ pb: 2 }}>
+//                         <Typography variant="h6"> Course Information </Typography>
+//                     </Grid>
+
+//                     <Stack direction="row" sx={{ pb: 2 }}>
+//                         <Grid container direction="row" spacing={2}>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={course.concat(' ', subject, ' ', level)}
+//                                     label="Course"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={courseType}
+//                                     label="Course Type"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                         </Grid>
+//                     </Stack>
+
+//                     <Stack direction="row" sx={{ pb: 2 }}>
+//                         <Grid container direction="row" spacing={2}>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={method}
+//                                     label="Learning Method"
+//                                     disabled
+//                                     inputProps={{
+//                                         style: { textTransform: "capitalize", fontSize: "0.9rem" }
+//                                     }}
+//                                 />
+//                             </Grid>
+//                             <Grid item xs={12} md={3}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={totalHour}
+//                                     label="Total Hours"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                             <Grid item xs={12} md={3}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={hourPerClass}
+//                                     label="Hours/Class"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                         </Grid>
+//                     </Stack>
+
+//                     <Stack direction="row" sx={{ pb: 2 }} spacing={2}>
+//                         <Grid container direction="row" spacing={2}>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={fDate(fromDate, 'dd-MMM-yyyy')}
+//                                     label="Start Date"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                             <Grid item xs={12} md={6}>
+//                                 <TextField
+//                                     fullWidth
+//                                     variant="outlined"
+//                                     value={fDate(toDate, 'dd-MMM-yyyy')}
+//                                     label="End Date"
+//                                     disabled
+//                                     InputProps={{
+//                                         style: customTextFieldStyle
+//                                     }}
+//                                 />
+//                             </Grid>
+//                         </Grid>
+//                     </Stack>
+
+//                     <Grid item xs={12} md={12} sx={{ mb: 1 }}>
+//                         <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
+//                             Preferred Days
+//                         </Typography>
+//                     </Grid>
+
+//                     <Stack direction="row" sx={{ pb: 3 }}>
+//                         <Grid container direction="row" spacing={2}>
+//                             {preferredDays.map((eachDay, index) => (
+//                                 <Grid item xs={6} md={3} key={index}>
+//                                     <TextField
+//                                         fullWidth
+//                                         label={eachDay.day}
+//                                         value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+//                                         InputProps={{
+//                                             style: { fontSize: '0.8rem' }
+//                                         }}
+//                                         disabled
+//                                     />
+//                                 </Grid>
+//                             ))}
+//                         </Grid>
+//                     </Stack>
+//                 </Grid>
+
+//                 <Grid item xs={12} md={7}>
+//                     <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
+//                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+//                             <Typography variant="h6">
+//                                 Classes & Schedules
+//                             </Typography>
+//                         </Stack>
+
+
+//                         <TableContainer component={Paper} >
+//                             <Table sx={{ width: '100%' }}>
+//                                 <TableHead>
+//                                     <TableRow>
+//                                         <StyledTableCell align="center">No.</StyledTableCell>
+//                                         <StyledTableCell align="center">Day</StyledTableCell>
+//                                         <StyledTableCell align="center">Date</StyledTableCell>
+//                                         <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
+//                                         <StyledTableCell align="center">Method</StyledTableCell>
+//                                         <StyledTableCell align="center">Teacher</StyledTableCell>
+//                                         <StyledTableCell align="center">Hours</StyledTableCell>
+//                                     </TableRow>
+//                                 </TableHead>
+//                                 <TableBody>
+//                                     {classes.map((eachClass, index) => {
+//                                         const timeA = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+//                                         const timeB = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+//                                         const hourPerClass = timeB.diff(timeA, 'hours')
+//                                         displayAccumulatedHours += hourPerClass;
+//                                         const classDate = new Date(eachClass.date);
+//                                         return (
+//                                             <StyledTableRow key={index}>
+//                                                 <StyledTableCell component="th" scope="row" align="center">
+//                                                     {(index + 1).toString()}
+//                                                 </StyledTableCell>
+//                                                 <StyledTableCell align="center"> {weekday[classDate.getDay()].slice(0, 3)} </StyledTableCell>
+//                                                 <StyledTableCell align="center">{fDate(classDate, 'dd-MMM-yyyy')}</StyledTableCell>
+//                                                 <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
+//                                                 <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
+//                                                 <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
+//                                                 <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.nickname} {!!eachClass.teacherPrivateClass?.workType ? `(${eachClass.teacherPrivateClass.workType})` : ''}</StyledTableCell>
+//                                                 <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
+//                                             </StyledTableRow>
+//                                         )
+//                                     })}
+//                                     <StyledTableRow>
+//                                         <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
+//                                         <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
+//                                     </StyledTableRow>
+//                                 </TableBody>
+//                             </Table>
+//                         </TableContainer>
+
+//                     </Scrollbar>
+//                 </Grid>
+//             </Grid>
+//         </Dialog>
+//     )
+// }
 
 
 // ----------------------------------------------------------------------
@@ -654,14 +656,14 @@ PendingEPForm.propTypes = {
     registeredCourses: PropTypes.array,
     schedules: PropTypes.array,
     hasSchedule: PropTypes.bool,
-    educationPlannerId: PropTypes.number
+    educationPlannerId: PropTypes.number,
+    isEdit: PropTypes.bool,
 }
 
-export function PendingEPForm({ request, students, registeredCourses, schedules, hasSchedule, educationPlannerId }) {
+export function PendingEPForm({ request, students, registeredCourses, schedules, hasSchedule, educationPlannerId, isEdit }) {
     const { user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
-    const dataFetchedRef = useRef(false);
 
     // Firebase
     const firebaseApp = initializeApp(FIREBASE_API);
@@ -698,6 +700,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
             eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
                 && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
         );
+        // console.log('_schedule', _schedule);
         await setCurrentSchedule(_schedule);
         setOpenCourseDialog(true);
     }
@@ -707,8 +710,10 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
         setOpenCourseDialog(false);
     }
 
+    const [loadPayment, setLoadPayment] = useState([]);
+
     const defaultValues = {
-        paymentAttachmentFiles: [],
+        paymentAttachmentFiles: (isEdit ? loadPayment : []),
         paymentType: '',
         additionalComment: ''
     }
@@ -722,12 +727,45 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
     const {
         watch,
         setValue,
-        handleSubmit
+        handleSubmit,
+        getValues
     } = methods;
 
     const values = watch();
 
     const { paymentAttachmentFiles, paymentType } = values
+
+    const dataFetchedRef = useRef(false);
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        if (isEdit) {
+            axios.get(`${HOG_API}/api/Payment/GetPrivatePayment/${request.id}`)
+                .then((res) => {
+                    setValue('paymentType', res.data.data[0].paymentType)
+                })
+                .catch((error) => console.error(error))
+
+            const listRef = ref(storage, `payments/${request.id}`);
+            listAll(listRef)
+                .then((res) => {
+                    res.items.map((itemRef) => (
+                        getMetadata(itemRef)
+                            .then((metadata) => {
+                                getDownloadURL(itemRef)
+                                    .then((url) => {
+                                        setValue('paymentAttachmentFiles', [...getValues().paymentAttachmentFiles, { name: metadata.name, type: metadata.contentType, ref: itemRef, preview: url }])
+                                    })
+                                    .catch((error) => console.error(error));
+                            })
+                            .catch((error) => console.error(error))
+                    )
+                    )
+                })
+        }
+    }, [])
 
     // Payment Attachment Files ------------------------------------------------------------
     const handleDropFiles = useCallback(
@@ -760,8 +798,8 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                 status: "PendingOA",
                 eaStatus: "Complete",
                 paymentStatus: "Complete",
-                epRemark1: data.additionalComment,
-                epRemark2: request.epRemark2,
+                epRemark1: request.epRemark1,
+                epRemark2: data.additionalComment,
                 eaRemark: request.eaRemark,
                 oaRemark: request.oaRemark,
                 takenByEPId: user.id,
@@ -772,19 +810,98 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
 
         setIsSubmitting(true)
         try {
-            await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
-                .then(() => {
-                    data.paymentAttachmentFiles.map((file) => {
-                        const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
-                        return uploadBytes(storagePaymentFilesRef, file)
-                            .catch((error) => {
-                                throw error;
-                            });
+
+            if (isEdit) {
+                const namePaymentFiles = data.paymentAttachmentFiles.map((file) => ({ file: file.name }))
+
+                await axios.get(`${HOG_API}/api/Payment/GetPrivatePayment/${request.id}`)
+                    .then((res) => {
+                        const payments = res.data.data[0].payment
+
+                        const currentPaymentFiles = data.paymentAttachmentFiles.filter((file) => file.ref !== undefined)
+                        // console.log('currentPaymentFiles', currentPaymentFiles)
+
+                        // Delete dropped files
+                        const filesRef = ref(storage, `payments/${request.id}`);
+                        if (currentPaymentFiles.length === 0) {
+                            listAll(filesRef)
+                                .then((res) => {
+                                    res.items.forEach((itemRef) => {
+                                        deleteObject(itemRef)
+                                    });
+                                })
+                                .catch((error) => {
+                                    throw error;
+                                });
+                        } else {
+                            listAll(filesRef)
+                                .then((res) => {
+                                    res.items.forEach((itemRef) => {
+                                        if (currentPaymentFiles.some((file) => file.ref._location.path_ === itemRef._location.path_)) {
+                                            return null;
+                                        }
+                                        return deleteObject(itemRef)
+                                    });
+                                })
+                                .catch((error) => {
+                                    throw error;
+                                });
+                        }
                     })
+                    .then(() => {
+                        data.paymentAttachmentFiles.map((file) => {
+                            const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
+                            if (file instanceof File) {
+                                return uploadBytes(fileRef, file)
+                                    .catch((error) => {
+                                        throw error;
+                                    });
+                            }
+                            return null;
+                        })
+                    })
+                    .catch((error) => console.error(error)
+                    )
+
+                // console.log('data attach name', namePaymentFiles)
+                // console.log('data attach', data.paymentAttachmentFiles)
+
+                await axios.put(`${HOG_API}/api/Payment/Put`, {
+                    privateRegReqId: request.id,
+                    payment: namePaymentFiles,
+                    paymentType
                 })
-                .catch((error) => {
-                    throw error;
+                    .catch((error) => {
+                        throw error;
+                    })
+
+                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
+                    .catch((error) => {
+                        throw error;
+                    })
+
+            } else {
+                await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
+                    .then(() => {
+                        data.paymentAttachmentFiles.map((file) => {
+                            const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
+                            return uploadBytes(storagePaymentFilesRef, file)
+                                .catch((error) => {
+                                    throw error;
+                                });
+                        })
+                    })
+                    .catch((error) => {
+                        throw error;
+                    })
+
+                const namePaymentFiles = data.paymentAttachmentFiles.map((file) => ({ file: file.name }))
+                await axios.post(`${HOG_API}/api/Payment/Post`, {
+                    privateRegReqId: request.id,
+                    payment: namePaymentFiles,
+                    paymentType
                 })
+            }
             setIsSubmitting(false);
             enqueueSnackbar('Successfully submitted the payment', { variant: 'success' });
             navigate('/course-registration/ep-request-status');
@@ -909,6 +1026,32 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                         </Grid>
                     </Grid>
 
+                    {isEdit && (
+                        <Grid item xs={12} md={12}>
+                            <Card sx={{ p: 3 }}>
+                                <Typography variant="h5"
+                                    sx={{
+                                        mb: 2,
+                                        display: 'block',
+                                    }}
+                                >
+                                    Remark from Office Admin
+                                </Typography>
+                                <Box
+                                    rowGap={3}
+                                    columnGap={2}
+                                    display="grid"
+                                    gridTemplateColumns={{
+                                        xs: 'repeat(1, 1fr)',
+                                        sm: 'repeat(1, 1fr)',
+                                    }}
+                                >
+                                    <TextField fullWidth label="Comment from Office Admin" defaultValue={request.oaRemark} disabled />
+                                </Box>
+                            </Card>
+                        </Grid>
+                    )}
+
                     <Grid item xs={12} md={12}>
                         <Card sx={{ p: 3 }}>
                             <Typography variant="h5"
@@ -945,7 +1088,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                     </Grid>
                 </Grid>
 
-                <Dialog fullWidth maxWidth="md" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+                <Dialog fullWidth maxWidth="sm" open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
                     <DialogTitle>
                         Submit the request?
                     </DialogTitle>
@@ -961,7 +1104,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                 <Dialog
                     open={openRejectDialog}
                     onClose={() => setOpenRejectDialog(false)}
-                    maxWidth="md"
+                    maxWidth="sm"
                     fullWidth
                 >
                     <DialogTitle>
@@ -982,7 +1125,17 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                 </Dialog>
             </FormProvider>
 
-            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && schedules.length === 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    hasSchedule={false}
+                />
+            )}
+
+            {Object.keys(selectedCourse).length > 0 && currentSchedule !== undefined && Object.keys(currentSchedule).length !== 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
@@ -992,6 +1145,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                     hasSchedule
                 />
             )}
+
         </>
     )
 }

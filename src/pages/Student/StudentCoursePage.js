@@ -79,7 +79,6 @@ export default function StudentCoursePage() {
         fName: 'Piyaphon',
         lName: 'Wu',
         studentPrivateCourse: mappedStudentCourse,
-        
     };
 
     // console.log('fetched',currentStudents)

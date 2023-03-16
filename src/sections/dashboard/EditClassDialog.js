@@ -63,6 +63,8 @@ EditClassDialog.propTypes = {
 }
 
 export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students }) {
+    console.log('students', students)
+    console.log('schedule', schedule)
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -136,7 +138,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
                 .then(((res) => {
                     setAvailableTeacher(res.data.data)
@@ -173,7 +174,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             method: data.classMethod
         };
         onEdit(newClass);
-        handleClose();
+        // handleClose();
     }
 
     const handleDelete = () => {
@@ -192,7 +193,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
     useEffect(() => {
         if (Object.keys(schedule).length) {
             setValue('classDate', date);
-            console.log("Hi")
             handleChangeDate(date);
             setValue('classTime', fromTime.concat('-', toTime));
             handleChangeTime(fromTime.concat('-', toTime))
