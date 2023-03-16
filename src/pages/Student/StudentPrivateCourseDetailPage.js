@@ -68,59 +68,7 @@ export default function StudentPrivateCourseDetailPage() {
         section:currentcourse.registeredCourses.section,
     }
 
- 
-
-    // console.log(course)
     const currentclasses = currentcourse.registeredClasses;   
-    // console.log('currentclass',currentclasses)
-
-    // const students = currentclasses.map((course, index) => {
-    //     const eachStudent = course.students.map((student, index) => {
-    //       return {
-    //         id: student.studentPrivateClasses.id,
-    //         fullName: 'Hong',
-    //       };
-    //     });
-    //     return {
-    //       course,
-    //       students: eachStudent,
-    //     };
-    //   });
-      
-      
-    // const students = currentclasses.map((course, index) => {
-    //     const eachStudent = students.map((student,index) =>{
-    //         return {
-    //             id: student.studentPrivateClasses.id,
-    //             fullName: 'Hong',
-    //         };
-    //      })
-    //      return eachStudent
-    // });
-    // console.log('students',students)
-
-    
-    // Map the student courses
-    // console.log(currentclasses[0].teacherPrivateClass.teacherId)
-    // console.log(course.section)
-    // console.log(currentclasses[0].studentPrivateClasses[0].attendance)
-    // const mappedStudentClass = currentclasses.map((eachClass, index) => {
-    //     // console.log(course.section)
-    //     return {
-    //         id: eachClass.id,
-    //         course,
-    //         classNo: (index+1),
-    //         // students: {id: eachClass.studentPrivateClasses.eachClass.studentId, fullName: eachClass.studentPrivateClasses.eachClass.fullName},
-    //         students: {id: '2', fullName: 'Hong'},
-    //         date: eachClass.date,
-    //         fromTime: eachClass.fromTime,
-    //         toTime: eachClass.toTime,
-    //         room: eachClass.room,
-    //         section: course.section,
-    //         teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-    //         attendance: eachClass.studentPrivateClasses.attendance
-    //     };
-    // });
 
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
