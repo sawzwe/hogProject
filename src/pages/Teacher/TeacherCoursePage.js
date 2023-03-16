@@ -31,7 +31,7 @@ export default function TeacherCoursePage() {
 
     const fetchStudent = async () => {
         // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`,config)
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${1}`,config)  
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`,config)  
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data
@@ -42,7 +42,7 @@ export default function TeacherCoursePage() {
     }
 
     const fetchCourse = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${1}`,config)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`,config)
         // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
             .then((res) => {
                 console.log('res', res);
