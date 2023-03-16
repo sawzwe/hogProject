@@ -72,7 +72,7 @@ export default function StudentPrivateCourseDetailPage() {
 
     // console.log(course)
     const currentclasses = currentcourse.registeredClasses;   
-    console.log('currentclass',currentclasses)
+    // console.log('currentclass',currentclasses)
 
     // const students = currentclasses.map((course, index) => {
     //     const eachStudent = course.students.map((student, index) => {
@@ -103,25 +103,53 @@ export default function StudentPrivateCourseDetailPage() {
     // Map the student courses
     // console.log(currentclasses[0].teacherPrivateClass.teacherId)
     // console.log(course.section)
-    const mappedStudentClass = currentclasses.map((eachClass, index) => {
-        // console.log(course.section)
-        return {
-            id: eachClass.id,
-            course,
-            classNo: index,
-            students: [{ id: '1', fullName: 'Piyaphon Wu' }],
-            date: eachClass.date,
-            fromTime: eachClass.fromTime,
-            toTime: eachClass.toTime,
-            room: eachClass.room,
-            section: course.section,
-            teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: 'Kiratijuta Bhumichitr' },
-            attendance: 'Present'
-        };
-    });
+    // console.log(currentclasses[0].studentPrivateClasses[0].attendance)
+    // const mappedStudentClass = currentclasses.map((eachClass, index) => {
+    //     // console.log(course.section)
+    //     return {
+    //         id: eachClass.id,
+    //         course,
+    //         classNo: (index+1),
+    //         // students: {id: eachClass.studentPrivateClasses.eachClass.studentId, fullName: eachClass.studentPrivateClasses.eachClass.fullName},
+    //         students: {id: '2', fullName: 'Hong'},
+    //         date: eachClass.date,
+    //         fromTime: eachClass.fromTime,
+    //         toTime: eachClass.toTime,
+    //         room: eachClass.room,
+    //         section: course.section,
+    //         teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
+    //         attendance: eachClass.studentPrivateClasses.attendance
+    //     };
+    // });
 
-    console.log('mapped',mappedStudentClass)
-    console.log('course',course.course)
+    const mappedStudentClass = currentclasses.map((eachClass, index) => {
+        // map the attendance records for each student private class
+        const mappedAttendance = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
+            // console.log(eachClass.studentPrivateClasses)
+          return {
+            attendance : eachClass.studentPrivateClasses.attendance
+          };
+        });
+      
+        return {
+          id: eachClass.id,
+          course,
+          classNo: (index+1),
+          students: {id: '2', fullName: 'Hong'},
+          date: eachClass.date,
+          fromTime: eachClass.fromTime,
+          toTime: eachClass.toTime,
+          room: eachClass.room,
+          section: course.section,
+          teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
+          attendance: 'Present'
+        };
+      });
+      
+    
+
+    // console.log('mapped',mappedStudentClass)
+    // console.log('course',course.course)
 
     // classes = {[
     //     {
@@ -216,11 +244,12 @@ export default function StudentPrivateCourseDetailPage() {
                     direction="row">
                     <ArrowBackIosNewRoundedIcon sx={{ cursor: 'pointer', mr: 0.5 }} onClick={() => navigate(-1)} />
                     <Typography variant="h6">
-                        {`${course.course} ${course.subject} (${course.type.toUpperCase()})`}
+                        {`${course.course} ${course.subject} ${course.level} (${course.type.toUpperCase()})`}
                     </Typography>
                 </Stack>
                 <StudentAllClasses classes={mappedStudentClass} />
             </Container>
+            
         </>
     );
 }
