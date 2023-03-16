@@ -11,18 +11,19 @@ import useResponsive from '../../../hooks/useResponsive';
 import CalendarClassCard from '../../../components/app-card/CalendarClassCard';
 
 TeacherCalendar.propTypes = {
-    currentTeacher: PropTypes.object,
+    currentTeacher: PropTypes.array,
 };
 
 export default function TeacherCalendar({ currentTeacher }) {
 
     const isDesktop = useResponsive('up', 'lg');
 
-    const today = new Date(2023, 2, 13)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0)
     const [value, setValue] = useState(today);
 
-    const { teacherPrivateClass, teacherGroupClass, teacherPrivateCourse, teacherGroupCourse } = currentTeacher;
-
+    // const { teacherPrivateClass, teacherGroupClass, teacherPrivateCourse, teacherGroupCourse } = currentTeacher;
+    const teacherPrivateClass = currentTeacher;
     const onKeyDown = (e) => {
         e.preventDefault();
     };
@@ -64,11 +65,11 @@ export default function TeacherCalendar({ currentTeacher }) {
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />))
             )}
-            {teacherGroupClass.length > 0 && (
+            {/* {teacherGroupClass.length > 0 && (
                 teacherGroupClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />))
-            )}
+            )} */}
         </>
     )
 }
