@@ -124,7 +124,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         studentImageURL: Yup.mixed()
             .test('required', "Student photo is required", (file) => file !== '')
             .test('fileSize', 'The file is too large', (file) => file && file.size <= MAX_FILE_SIZE)
-            .test('fileFormat', 'Unsupported Format', (file) => file && (FILE_FORMATS.includes(file.type)))
+            .test('fileFormat', 'Student Photo has unsupported format', (file) => file && (FILE_FORMATS.includes(file.type)))
     });
 
     const allStudyOptions = Object.values(STUDY_PROGRAM_OPTIONS);
@@ -197,7 +197,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                         throw error;
                     })
                 setIsSubmitting(false);
-                enqueueSnackbar('Update successfully!');
+                enqueueSnackbar('Updated student information successfully!');
                 setOpenConfirmDialog(false);
                 navigate(`/account/student-management/student/${currentStudent.id}`);
                 reset(defaultValues);
@@ -295,8 +295,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
         }
     }, [isEdit, currentStudent, currentAvatar, currentFiles]);
 
+    const onError = (error) => {
+        const errors = Object.values(error)
+        enqueueSnackbar(errors[0].message, { variant: 'error' })
+    }
+
     return (
-        <FormProvider methods={methods} onSubmit={handleSubmit(onConfirm)}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onConfirm, onError)}>
             {/* Student Image */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>

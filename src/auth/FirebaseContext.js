@@ -208,7 +208,49 @@ export function AuthProvider({ children }) {
     }
 
     // UPDATE STUDENT
-    const updateStudent = async (currentStudent, data) => {
+    const updateStudent = async (currentStudent, data, config) => {
+
+        // Axios to Azure
+        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
+        await axios.put(`${HOG_API}/api/Student/Put`, {
+            id: currentStudent.id,
+            firebaseId: currentStudent.firebaseId,
+            title: data.studentTitle,
+            fName: data.studentFirstName,
+            lName: data.studentLastName,
+            nickname: data.studentNickname,
+            profilePicture: data.studentImageURL.name,
+            additionalFiles: nameAdditionalFiles || [],
+            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
+            phone: data.studentPhoneNo.toString(),
+            line: data.studentLineId,
+            email: data.studentEmail,
+            school: data.schoolName,
+            countryOfSchool: data.schoolCountry,
+            levelOfStudy: data.levelOfStudy,
+            program: data.studyProgram,
+            targetUni: data.targetUniversity,
+            targetScore: data.targetScore,
+            hogInfo: data.studentSource,
+            healthInfo: data.studentHealthInfo,
+            parent: {
+                fName: data.parentFirstName,
+                lName: data.parentLastName,
+                relationship: data.parentRelationships,
+                phone: data.parentPhoneNo.toString(),
+                email: data.parentEmail,
+                line: data.parentLineId,
+            },
+            address: {
+                address: data.address,
+                subdistrict: data.subDistrict,
+                district: data.district,
+                province: data.province,
+                zipcode: data.zipCode,
+            }
+        }, config).catch((error) => {
+            throw error;
+        })
 
         // Change display name to Firestore if name has been changed
         if (data.studentFirstName !== currentStudent.firstName || data.studentLastName !== currentStudent.lastName) {
@@ -258,49 +300,6 @@ export function AuthProvider({ children }) {
                     });
             }
             return null;
-        })
-
-
-        // Axios to Azure
-        const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
-        await axios.put(`${HOG_API}/api/Student/Put`, {
-            id: currentStudent.id,
-            firebaseId: currentStudent.firebaseId,
-            title: data.studentTitle,
-            fName: data.studentFirstName,
-            lName: data.studentLastName,
-            nickname: data.studentNickname,
-            profilePicture: data.studentImageURL.name,
-            additionalFiles: nameAdditionalFiles || [],
-            dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
-            phone: data.studentPhoneNo.toString(),
-            line: data.studentLineId,
-            email: data.studentEmail,
-            school: data.schoolName,
-            countryOfSchool: data.schoolCountry,
-            levelOfStudy: data.levelOfStudy,
-            program: data.studyProgram,
-            targetUni: data.targetUniversity,
-            targetScore: data.targetScore,
-            hogInfo: data.studentSource,
-            healthInfo: data.studentHealthInfo,
-            parent: {
-                fName: data.parentFirstName,
-                lName: data.parentLastName,
-                relationship: data.parentRelationships,
-                phone: data.parentPhoneNo.toString(),
-                email: data.parentEmail,
-                line: data.parentLineId,
-            },
-            address: {
-                address: data.address,
-                subdistrict: data.subDistrict,
-                district: data.district,
-                province: data.province,
-                zipcode: data.zipCode,
-            }
-        }).catch((error) => {
-            throw error;
         })
     }
 

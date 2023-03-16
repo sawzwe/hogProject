@@ -17,79 +17,79 @@ import { useAuthContext } from '../../auth/useAuthContext';
 
 // ----------------------------------------------------------------------
 
-const MOCKUP_GROUP_REQUEST = {
-    regRequestId: '1',
-    courseType: 'Group',
-    students: [{ id: '1', fName: 'Piyaphon', lName: 'Wu', nickname: 'Hong' }],
-    courses: [
-        {
-            course: 'SAT',
-            section: 'CY/123',
-            subjects: ['Math', 'English'],
-            level: 'INTENSIVE',
-            method: 'Onsite',
-            startDate: '1-Jan-2023',
-            endDate: '14-Jan-2023'
-        },
-        {
-            course: 'GED',
-            section: 'CY/123',
-            subjects: ['Math'],
-            level: 'REGULAR',
-            method: 'Onsite',
-            startDate: '15-Jan-2023',
-            endDate: '31-Jan-2023'
-        }
-    ],
-    attachedPayment: [],
-    paymentType: 'Installments Payment',
-    additionalComment: '✌ Greeting from Education Planner.',
-    rejectedReason: '',
-    status: 'Pending OA'
-}
+// const MOCKUP_GROUP_REQUEST = {
+//     regRequestId: '1',
+//     courseType: 'Group',
+//     students: [{ id: '1', fName: 'Piyaphon', lName: 'Wu', nickname: 'Hong' }],
+//     courses: [
+//         {
+//             course: 'SAT',
+//             section: 'CY/123',
+//             subjects: ['Math', 'English'],
+//             level: 'INTENSIVE',
+//             method: 'Onsite',
+//             startDate: '1-Jan-2023',
+//             endDate: '14-Jan-2023'
+//         },
+//         {
+//             course: 'GED',
+//             section: 'CY/123',
+//             subjects: ['Math'],
+//             level: 'REGULAR',
+//             method: 'Onsite',
+//             startDate: '15-Jan-2023',
+//             endDate: '31-Jan-2023'
+//         }
+//     ],
+//     attachedPayment: [],
+//     paymentType: 'Installments Payment',
+//     additionalComment: '✌ Greeting from Education Planner.',
+//     rejectedReason: '',
+//     status: 'Pending OA'
+// }
 
-const MOCKUP_PRIVATE_REQUEST = {
-    regRequestId: '2',
-    courseType: 'Private',
-    students: [{ id: '1', fName: 'Piyaphon', lName: 'Wu', nickname: 'Hong' }],
-    courses: [
-        {
-            course: 'SAT',
-            section: '',
-            subjects: 'MATH',
-            level: 'INTENSIVE',
-            totalHours: '20',
-            method: 'Onsite',
-            hoursPerClass: '2',
-            startDate: '1-Jan-2023',
-            endDate: '14-Jan-2023',
-            availableDays: [
-                { day: 'Monday', from: '15:00', to: '18:00' },
-                { day: 'Tuesday', from: '15:00', to: '18:00' },
-                { day: 'Wednesday', from: '15:00', to: '18:00' },
-                { day: 'Thursday', from: '15:00', to: '18:00' },
-                { day: 'Friday', from: '15:00', to: '18:00' }
-            ]
-        },
-        {
-            course: 'SAT',
-            section: '',
-            subjects: 'ENGLISH',
-            level: 'REGULAR',
-            totalHours: '20',
-            method: 'Online',
-            hoursPerClass: '2',
-            startDate: '15-Jan-2023',
-            endDate: '31-Jan-2023',
-            availableDays: [{ day: 'Monday', from: '9:00', to: '18:00' }, { day: 'Wednesday', from: '9:00', to: '18:00' }]
-        }
-    ],
-    attachedPayment: [],
-    additionalComment: '✌ Greeting from Education Planner.',
-    paymentType: 'Complete Payment',
-    rejectedReason: 'There is no available time slot 🤪',
-    status: 'Pending OA'
-}
+// const MOCKUP_PRIVATE_REQUEST = {
+//     regRequestId: '2',
+//     courseType: 'Private',
+//     students: [{ id: '1', fName: 'Piyaphon', lName: 'Wu', nickname: 'Hong' }],
+//     courses: [
+//         {
+//             course: 'SAT',
+//             section: '',
+//             subjects: 'MATH',
+//             level: 'INTENSIVE',
+//             totalHours: '20',
+//             method: 'Onsite',
+//             hoursPerClass: '2',
+//             startDate: '1-Jan-2023',
+//             endDate: '14-Jan-2023',
+//             availableDays: [
+//                 { day: 'Monday', from: '15:00', to: '18:00' },
+//                 { day: 'Tuesday', from: '15:00', to: '18:00' },
+//                 { day: 'Wednesday', from: '15:00', to: '18:00' },
+//                 { day: 'Thursday', from: '15:00', to: '18:00' },
+//                 { day: 'Friday', from: '15:00', to: '18:00' }
+//             ]
+//         },
+//         {
+//             course: 'SAT',
+//             section: '',
+//             subjects: 'ENGLISH',
+//             level: 'REGULAR',
+//             totalHours: '20',
+//             method: 'Online',
+//             hoursPerClass: '2',
+//             startDate: '15-Jan-2023',
+//             endDate: '31-Jan-2023',
+//             availableDays: [{ day: 'Monday', from: '9:00', to: '18:00' }, { day: 'Wednesday', from: '9:00', to: '18:00' }]
+//         }
+//     ],
+//     attachedPayment: [],
+//     additionalComment: '✌ Greeting from Education Planner.',
+//     paymentType: 'Complete Payment',
+//     rejectedReason: 'There is no available time slot 🤪',
+//     status: 'Pending OA'
+// }
 
 // ----------------------------------------------------------------------
 
@@ -99,7 +99,8 @@ export default function RegistrationRequestDetailPage() {
     const { user } = useAuthContext();
 
     const [currentRequest, setCurrentRequest] = useState();
-    const [currentSchedule, setCurrentSchedule] = useState();
+    // const [currentSchedule, setCurrentSchedule] = useState();
+    const [currentPayments, setCurrentPayments] = useState();
     const dataFetchedRef = useRef(false);
 
     const fetchRequest = () => {
@@ -108,14 +109,21 @@ export default function RegistrationRequestDetailPage() {
             .catch((error) => console.error(error))
     };
 
+    const fetchPayments = () => {
+        axios.get(`${HOG_API}/api/Payment/GetPrivatePayment/${id}`)
+            .then((res) => setCurrentPayments(res.data.data[0]))
+            .catch((error) => console.error(error))
+    }
+
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
         fetchRequest();
+        fetchPayments();
     }, [])
 
-    if (currentRequest === undefined) {
+    if (currentRequest === undefined || currentPayments === undefined) {
         return <LoadingScreen />
     }
 
@@ -138,7 +146,7 @@ export default function RegistrationRequestDetailPage() {
                     ]}
                 />
 
-                <RegistrationRequestDetail currentRequest={currentRequest} officeAdminId={user.id} />
+                <RegistrationRequestDetail currentRequest={currentRequest} currentPayments={currentPayments} officeAdminId={user.id} />
             </Container>
         </>
     );

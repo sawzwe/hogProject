@@ -107,11 +107,13 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         };
 
         onAdd(newClass);
-        onClose();
-        setTimeout(() => {
-            reset(defaultValues);
-            resetValue();
-        }, 200)
+        reset();
+        setValue('classDate', data.classDate);
+        // onClose();
+        // setTimeout(() => {
+        //     reset(defaultValues);
+        //     resetValue();
+        // }, 200)
     }
 
     const handleChangeDate = async (newDate) => {
