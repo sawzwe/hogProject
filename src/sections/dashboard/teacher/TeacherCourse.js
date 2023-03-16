@@ -8,16 +8,15 @@ TeacherCourse.propTypes = {
 };
 
 export default function TeacherCourse({ currentTeacher }) {
-
+    // console.log('current teacher',currentTeacher)
     const {
         teacherPrivateCourse,
-        teacherGroupCourse
+        // teacherGroupCourse
     } = currentTeacher;
-
     return (
         <>
             {teacherPrivateCourse.length > 0 && teacherPrivateCourse.map((course, index) => <CourseCard key={index} accountRole='teacher' eachCourse={course} />)}
-            {teacherGroupCourse.length > 0 && teacherGroupCourse.map((course, index) => <CourseCard key={index} accountRole='teacher' eachCourse={course} />)}
+            {/* {teacherGroupCourse.length > 0 && teacherGroupCourse.map((course, index) => <CourseCard key={index} accountRole='teacher' eachCourse={course} />)} */}
         </>
     )
 }
