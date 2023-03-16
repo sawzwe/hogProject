@@ -32,11 +32,6 @@ export default function TeacherPrivateCourseDetailPage() {
 
     // Course ID
     const { courseId } = useParams();
-    // const currentCourse = currentStudent.studentPrivateCourse.find(course => course.id === '0');
-    // console.log('current',currentCourse)
-    // const classes = currentStudent.studentPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
-    // console.log('classes',classes)
-
     const [teacherCourse, setTeacherCourse] = useState();
 
     const fetchClass = async () => {
@@ -77,7 +72,7 @@ export default function TeacherPrivateCourseDetailPage() {
 
 
     const currentclasses = currentcourse.registeredClasses;
-    console.log(currentclasses)
+    // console.log(currentclasses)
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
         const mappedAttendanceStudent = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
@@ -110,11 +105,6 @@ export default function TeacherPrivateCourseDetailPage() {
     // console.log(currentTeacher)
     // console.log(mappedStudentClass)
 
-
-
-    // const currentCourse = currentTeacher.teacherPrivateCourse.find(course => course.id === courseId);
-    // const classes = currentTeacher.teacherPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
-    // console.log(classes)
     return (
         <>
             <Helmet>
