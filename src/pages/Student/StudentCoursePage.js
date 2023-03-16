@@ -76,16 +76,15 @@ export default function StudentCoursePage() {
     });
 
     const currentStudents = {
-        fName: 'Piyaphon',
-        lName: 'Wu',
+        fName: student.fName,
+        lName: student.lName,
         studentPrivateCourse: mappedStudentCourse,
         
     };
 
     // console.log('fetched',currentStudents)
     // console.log('dummy',currentStudent)
-    // console.log(student)
-
+    console.log(currentStudents)
     return (
         <>
             <Helmet>
