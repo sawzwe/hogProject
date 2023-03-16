@@ -21,8 +21,12 @@ StudentCalendar.propTypes = {
 export default function StudentCalendar({ currentStudent }) {
     const isDesktop = useResponsive('up', 'lg');
     // console.log('current',currentStudent)
-    const today = new Date(2023, 2, 15);
-    const real = new Date();
+    // const today = new Date(2023, 2, 15);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0)
+    // console.log(today)
+    // console.log(real)
+
     const [value, setValue] = useState(today);
     // console.log(real)
     
