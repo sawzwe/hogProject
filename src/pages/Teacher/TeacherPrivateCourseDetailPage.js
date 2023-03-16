@@ -77,36 +77,40 @@ export default function TeacherPrivateCourseDetailPage() {
 
 
     const currentclasses = currentcourse.registeredClasses;
+    console.log(currentclasses)
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
-        const mappedAttendance = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
-            
+        const mappedAttendanceStudent = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
+            // console.log( eachClass.teacherPrivateClass.status)
             return {
-                attendance: eachClass.studentPrivateClasses.attendance,
-                attendanceStatus: eachClass.teacherPrivateClass.status
+                attendance: studentPrivateClass.attendance,
+                attendanceStatus : eachClass.teacherPrivateClass.status,    
             };
         });
+        // console.log('hi',mappedAttendanceStudent[0].attendance)
 
         return {
             id: eachClass.id,
             course,
             classNo: (index + 1),
-            students: { id: '2', fullName: 'Michael Bull' },
+            // students: { id: '2', fullName: 'Michael Bull' },
             date: eachClass.date,
             fromTime: eachClass.fromTime,
-            // attendanceStatus : mappedAttendance.attendanceStatus,
-            attendanceStatus : 'Complete',
+            attendanceStatus : mappedAttendanceStudent[0].attendanceStatus,    
+            // attendanceStatus : 'Complete',
             toTime: eachClass.toTime,
             room: eachClass.room,
             section: course.section,
             teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-            studentAttendance: [
-                { student: { id: '2', firstName: 'Michael', lastName: 'Bull', fullName: 'Michael Bull', nickname: 'Michael' }, value: 'Present' }
-            ]
+            // studentAttendance: [
+            //     { student: { id: '2', firstName: 'Michael', lastName: 'Bull', fullName: 'Michael Bull', nickname: 'Michael' }, value: 'Present' }
+            // ]
         };
     });
     // console.log(currentTeacher)
-    console.log(mappedStudentClass)
+    // console.log(mappedStudentClass)
+
+
 
     // const currentCourse = currentTeacher.teacherPrivateCourse.find(course => course.id === courseId);
     // const classes = currentTeacher.teacherPrivateClass.filter(eachClass => (eachClass.course.id === currentCourse.id));
@@ -130,7 +134,7 @@ export default function TeacherPrivateCourseDetailPage() {
                 <Typography variant="body2" sx={{ ml: 3.5 }}>
                     {course.section}
                 </Typography>
-                {/* <TeacherAllClasses classes={mappedStudentClass} /> */}
+                <TeacherAllClasses classes={mappedStudentClass} />
             </Container>
         </>
     );
