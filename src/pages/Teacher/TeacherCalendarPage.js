@@ -73,7 +73,7 @@ export default function TeacherCalendarPage() {
                 toTime: eachClass.toTime,
                 room: eachClass.room,
                 section: course.section,
-                teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: 'Kiratijuta Bhumichitr' },
+                teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
                 attendance: 'Present'
             };
         });
