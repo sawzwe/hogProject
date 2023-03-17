@@ -263,6 +263,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
               px: 2,
               bgcolor: 'background.neutral',
             }}
+            scrollButtons={false}
           >
             <Tab
               key={TABS[0].value}
@@ -306,7 +307,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
 
           <RegistrationTableToolbar
             filterName={filterName}
-            // isFiltered={isFiltered}
             onFilterName={handleFilterName}
             onResetFilter={handleResetFilter}
           />

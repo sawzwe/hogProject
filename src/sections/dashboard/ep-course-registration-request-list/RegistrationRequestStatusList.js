@@ -246,6 +246,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
               px: 2,
               bgcolor: 'background.neutral',
             }}
+            scrollButtons={false}
           >
             <Tab
               key={TABS[0].value}
