@@ -848,20 +848,15 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                                 });
                         }
                     })
-                    .then(() => {
-                        data.paymentAttachmentFiles.map((file) => {
-                            const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
-                            if (file instanceof File) {
-                                return uploadBytes(fileRef, file)
-                                    .catch((error) => {
-                                        throw error;
-                                    });
-                            }
-                            return null;
-                        })
-                    })
-                    .catch((error) => console.error(error)
-                    )
+                    .catch((error) => console.error(error))
+
+                await Promise.all(data.paymentAttachmentFiles.map(async file => {
+                    const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
+                    return uploadBytes(fileRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                }))
 
                 // console.log('data attach name', namePaymentFiles)
                 // console.log('data attach', data.paymentAttachmentFiles)
@@ -882,18 +877,17 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
 
             } else {
                 await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
-                    .then(() => {
-                        data.paymentAttachmentFiles.map((file) => {
-                            const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
-                            return uploadBytes(storagePaymentFilesRef, file)
-                                .catch((error) => {
-                                    throw error;
-                                });
-                        })
-                    })
                     .catch((error) => {
                         throw error;
                     })
+
+                await Promise.all(data.paymentAttachmentFiles.map(async file => {
+                    const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
+                    return uploadBytes(fileRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                }))
 
                 const namePaymentFiles = data.paymentAttachmentFiles.map((file) => ({ file: file.name }))
                 await axios.post(`${HOG_API}/api/Payment/Post`, {

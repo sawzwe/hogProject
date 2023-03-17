@@ -86,7 +86,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
     const { registerStudent, updateStudent, user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -196,11 +196,15 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                     .catch((error) => {
                         throw error;
                     })
+                console.log("outside!")
                 setIsSubmitting(false);
-                enqueueSnackbar('Updated student information successfully!');
                 setOpenConfirmDialog(false);
-                navigate(`/account/student-management/student/${currentStudent.id}`);
-                reset(defaultValues);
+                // navigate(0);
+                enqueueSnackbar('Updated student information successfully!');
+                setTimeout(() => {
+                    navigate(`/account/student-management/student/${currentStudent.id}`);
+                }, 1000)
+                // reset(defaultValues);
             } else {
                 await registerStudent(data, config)
                     .catch((error) => {

@@ -188,19 +188,24 @@ export function AuthProvider({ children }) {
                     .catch((error) => {
                         throw error;
                     })
+
+                // Upload Avatar
                 const file = data.studentImageURL
                 const storageProfileRef = ref(storage, `users/students/${uid}/Avatar/${file.name}`);
                 await uploadBytes(storageProfileRef, file)
                     .catch((error) => {
                         throw error;
                     });
-                data.studentAdditionalFiles.map((file, index) => {
+
+                // Upload Additional Files
+                await Promise.all(data.studentAdditionalFiles.map(async file => {
                     const storageAdditionalFilesRef = ref(storage, `users/students/${uid}/Files/${file.name}`);
-                    return uploadBytes(storageAdditionalFilesRef, file)
+                    await uploadBytes(storageAdditionalFilesRef, file)
                         .catch((error) => {
                             throw error;
                         });
-                })
+                }))
+
             })
             .catch((error) => {
                 throw error;
@@ -252,6 +257,8 @@ export function AuthProvider({ children }) {
             throw error;
         })
 
+
+
         // Change display name to Firestore if name has been changed
         if (data.studentFirstName !== currentStudent.firstName || data.studentLastName !== currentStudent.lastName) {
             const studentRef = doc(DB, "users", currentStudent.firebaseId);
@@ -277,30 +284,62 @@ export function AuthProvider({ children }) {
         // Delete additional files on changes
         const filesRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files`);
         const additionalFiles = data.studentAdditionalFiles.filter((file) => file.ref !== undefined);
+        const uploadingFiles = data.studentAdditionalFiles.filter((file) => file instanceof File)
         const originalAdditionalFiles = additionalFiles.map((file) => file.ref);
-        await listAll(filesRef)
-            .then((res) => {
-                res.items.forEach((itemRef) => {
-                    if (originalAdditionalFiles.some((ref) => ref._location.path_ === itemRef._location.path_)) {
-                        return null;
-                    }
-                    return deleteObject(itemRef)
+
+        console.log(data.studentAdditionalFiles)
+        console.log('additionalFiles', additionalFiles)
+        console.log('original', originalAdditionalFiles)
+
+        if (additionalFiles.length === 0) {
+            // console.log("All deleted")
+            await listAll(filesRef)
+                .then((res) => {
+                    res.items.forEach((itemRef) => {
+                        deleteObject(itemRef)
+                    });
+                })
+                .catch((error) => {
+                    throw error;
                 });
-            })
-            .catch((error) => {
-                throw error;
-            });
-        // Add new additional files on changes
-        await data.studentAdditionalFiles.map((file) => {
-            const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
-            if (file instanceof File) {
-                return uploadBytes(fileRef, file)
+
+            // console.log("Uploading files...")
+            await Promise.all(uploadingFiles.map(async file => {
+                const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
+                await uploadBytes(fileRef, file)
+                    // .then((snapshot) => console.log('uploaded'))
                     .catch((error) => {
                         throw error;
                     });
-            }
-            return null;
-        })
+            }))
+
+            // console.log("finished uploading files")
+        } else {
+            console.log("Some deleted")
+            await listAll(filesRef)
+                .then(async (res) => {
+                    await res.items.forEach((itemRef) => {
+                        if (originalAdditionalFiles.some((ref) => ref._location.path_ === itemRef._location.path_)) {
+                            return null;
+                        }
+                        return deleteObject(itemRef)
+                    });
+                })
+                .catch((error) => {
+                    throw error;
+                });
+
+            await Promise.all(uploadingFiles.map(async file => {
+                const fileRef = ref(storage, `users/students/${currentStudent.firebaseId}/Files/${file.name}`)
+                await uploadBytes(fileRef, file)
+                    // .then((snapshot) => console.log('uploaded'))
+                    .catch((error) => {
+                        throw error;
+                    });
+            }))
+        }
+
+        // Add new additional files on changes
     }
 
     // CREATE TEACHER

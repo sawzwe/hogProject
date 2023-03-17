@@ -21,6 +21,7 @@ ViewStudent.propTypes = {
 };
 
 export default function ViewStudent({ student, avatarURL, filesURL }) {
+    // console.log(filesURL)
 
     return (
         <Grid container spacing={3}>
