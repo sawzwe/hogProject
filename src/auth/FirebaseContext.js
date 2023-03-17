@@ -287,10 +287,6 @@ export function AuthProvider({ children }) {
         const uploadingFiles = data.studentAdditionalFiles.filter((file) => file instanceof File)
         const originalAdditionalFiles = additionalFiles.map((file) => file.ref);
 
-        console.log(data.studentAdditionalFiles)
-        console.log('additionalFiles', additionalFiles)
-        console.log('original', originalAdditionalFiles)
-
         if (additionalFiles.length === 0) {
             // console.log("All deleted")
             await listAll(filesRef)
@@ -315,7 +311,6 @@ export function AuthProvider({ children }) {
 
             // console.log("finished uploading files")
         } else {
-            console.log("Some deleted")
             await listAll(filesRef)
                 .then(async (res) => {
                     await res.items.forEach((itemRef) => {

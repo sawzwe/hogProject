@@ -196,14 +196,11 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                     .catch((error) => {
                         throw error;
                     })
-                console.log("outside!")
                 setIsSubmitting(false);
                 setOpenConfirmDialog(false);
                 // navigate(0);
                 enqueueSnackbar('Updated student information successfully!');
-                setTimeout(() => {
-                    navigate(`/account/student-management/student/${currentStudent.id}`);
-                }, 1000)
+                navigate(`/account/student-management/student/${currentStudent.id}`);
                 // reset(defaultValues);
             } else {
                 await registerStudent(data, config)
@@ -648,7 +645,9 @@ ConfirmDialog.propTypes = {
 export function ConfirmDialog({ open, onClose, onSubmit, isEdit, isSubmitting }) {
 
     return (
-        <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
+        <Dialog fullWidth maxWidth="sm" open={open} onClose={
+            !isSubmitting ? onClose : null
+        }>
             <DialogTitle>
                 {isEdit ? 'Edit Student?' : 'Create Student?'}
             </DialogTitle>
@@ -656,7 +655,7 @@ export function ConfirmDialog({ open, onClose, onSubmit, isEdit, isSubmitting })
                 {isEdit ? 'Once editted, student information will be saved.' : 'Once submitted, student account will be created to the system.'}
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
+                <Button variant="outlined" color="inherit" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
                 <LoadingButton variant="contained" onClick={onSubmit} loading={isSubmitting}>Submit</LoadingButton>
             </DialogActions>
         </Dialog>

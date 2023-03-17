@@ -72,7 +72,7 @@ export default function ViewStudentPage() {
         fetchData();
     }, []);
 
-    if (student === undefined || !avatarURL || !dataFetchedRef.current) {
+    if (!dataFetchedRef.current) {
         return <LoadingScreen />;
     };
 
