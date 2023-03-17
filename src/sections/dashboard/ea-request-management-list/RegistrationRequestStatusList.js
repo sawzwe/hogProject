@@ -235,9 +235,9 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
         .catch((error) => {
           throw error;
         })
-      navigate(0)
       setIsTakingRequest(false);
       setOpenConfirm(false);
+      navigate(`/course-registration/ea-request-status/${selectedRow.id}`)
     } catch (error) {
       enqueueSnackbar(error.message, { variant: 'error' });
       setIsTakingRequest(false);

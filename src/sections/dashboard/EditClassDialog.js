@@ -63,8 +63,6 @@ EditClassDialog.propTypes = {
 }
 
 export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students }) {
-    console.log('students', students)
-    console.log('schedule', schedule)
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
