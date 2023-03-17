@@ -1322,7 +1322,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
                                 {/* Total Hours */}
                                 <Grid item xs={6} md={2}>
-                                    <RHFTextField isNumber error={false} helperText="" name="totalHour" label="Total Hours" required />
+                                    <RHFTextField isNumber inputProps={{ maxLength: 2 }} error={false} helperText="" name="totalHour" label="Total Hours" required />
                                 </Grid>
 
                                 {/* Learning Method */}
@@ -1354,7 +1354,7 @@ export function AddCourseDialog({ open, onClose, onAdd, onEdit, isEdit, selected
 
                                 {/* Hours Per Class */}
                                 <Grid item xs={6} md={2}>
-                                    <RHFTextField isNumber error={false} helperText="" name="hourPerClass" label="Hours/Class" required />
+                                    <RHFTextField isNumber inputProps={{ maxLength: 1 }} error={false} helperText="" name="hourPerClass" label="Hours/Class" required />
                                 </Grid>
                             </Grid>
                         </Stack>

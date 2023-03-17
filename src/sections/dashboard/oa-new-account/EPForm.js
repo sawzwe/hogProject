@@ -107,7 +107,7 @@ export default function EPForm() {
                         <RHFTextField name="nickname" label="Nickname" required />
                     </Grid>
                     <Grid item xs={12} md={4}>
-                        <RHFTextField isNumber name="phone" label="Phone number" required />
+                        <RHFTextField isNumber inputProps={{ maxLength: 10 }} name="phone" label="Phone number" required />
                     </Grid>
                     <Grid item xs={12} md={4}>
                         <RHFTextField name="line" label="Line ID" required />

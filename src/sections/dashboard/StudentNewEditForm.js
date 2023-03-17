@@ -408,7 +408,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <RHFTextField isNumber name="studentPhoneNo" label="Phone Number" required />
+                                <RHFTextField
+                                    isNumber
+                                    name="studentPhoneNo"
+                                    label="Phone Number"
+                                    inputProps={{ maxLength: 10 }}
+                                    required
+                                />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <RHFTextField name="studentLineId" label="Line ID" required />
@@ -516,7 +522,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="province" label="Province" required />
                             </Box>
                             <Box gridArea={"zipCode"}>
-                                <RHFTextField isNumber name="zipCode" label="Zip Code/Post Code" required />
+                                <RHFTextField isNumber name="zipCode" label="Zip Code/Post Code" inputProps={{ maxLength: 5 }} required />
                             </Box>
                         </Box>
                     </Card>
@@ -541,7 +547,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="parentRelationships" label="Relationships" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField isNumber name="parentPhoneNo" label="Phone Number" required />
+                                <RHFTextField isNumber name="parentPhoneNo" label="Phone Number" inputProps={{ maxLength: 10 }} required />
                             </Grid>
                             <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentEmail" label="Email Address" required />
