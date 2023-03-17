@@ -135,6 +135,7 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                 ))
             }
 
+            // console.log(formattedSchedule)
             return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
                 .catch((error) => {
                     throw error
@@ -516,14 +517,14 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             }
         })
 
+
         if (!hasConflict) {
             const updatedSchedules = [...schedules, newClass]
-            setSchedules(updatedSchedules.sort((class1, class2) =>  new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
+            setSchedules(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
             setOpenAddClassDialog(false);
             return "success"
-        } else {
-            enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
         }
+        return enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
     }
 
     const handleEditClass = async (newClass) => {

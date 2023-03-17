@@ -1310,7 +1310,7 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
-                            <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
+                            <TextField fullWidth defaultValue={epRemark2} label="Comment for Office Admin" disabled />
                         </Box>
                     </Card>
                 </Grid>
@@ -1344,6 +1344,7 @@ export function RejectForm({ request, students, registeredCourses }) {
         id,
         eaStatus,
         paymentStatus,
+        epRemark1,
         epRemark2,
         eaRemark
     } = request;
@@ -1399,6 +1400,32 @@ export function RejectForm({ request, students, registeredCourses }) {
                                 }}
                             >
                                 <TextField fullWidth defaultValue={eaRemark} label="Comment for pending payment" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
+
+                {!!epRemark1 && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
                             </Box>
                         </Card>
                     </Grid>

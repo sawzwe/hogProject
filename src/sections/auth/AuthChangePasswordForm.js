@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 // @mui
-import { Stack, IconButton, InputAdornment } from '@mui/material';
+import { Stack, IconButton, InputAdornment, Alert } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // auth
 import { useAuthContext } from '../../auth/useAuthContext';
@@ -21,46 +21,71 @@ export default function AuthResetPasswordForm() {
 
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmNewPassword, setShowConfirmedNewPassword] = useState(false);
+    const [showOldPassword, setShowOldPassword] = useState(false);
 
     const ResetPasswordSchema = Yup.object().shape({
-        newPassword: Yup.string().required('New Password is required'),
+        oldPassword: Yup.string().min(6, 'Password should be at least 6 characters').required('Old Password is required'),
+        newPassword: Yup.string().min(6, 'Password should be at least 6 characters').required('New Password is required'),
         confirmNewPassword: Yup.string()
-        .oneOf([Yup.ref('newPassword')], 'Passwords must match')
-        .required('Confirm New Password is required')
+            .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+            .required('Confirm New Password is required')
     });
 
     const methods = useForm({
         resolver: yupResolver(ResetPasswordSchema),
-        // defaultValues: { newPassword: 'demo@minimals.cc' },
+        defaultValues: {
+            oldPassword: '',
+            newPassword: '',
+            confirmNewPassword: ''
+        },
     });
 
     const {
         reset,
         setError,
         handleSubmit,
-        formState: { isSubmitting },
+        formState: { errors, isSubmitting },
     } = methods;
 
     const onSubmit = async (data) => {
         try {
-            await changePassword(data.newPassword);
+            await changePassword(data.oldPassword, data.newPassword);
             logout();
-            navigate('/login');
         } catch (error) {
-            console.error(error.message);
-
             reset();
-
-            setError('afterSubmit', {
-                ...error,
-                message: error.message
-            });
+            if (error.message === 'Firebase: Error (auth/wrong-password).') {
+                setError('afterSubmit', {
+                    ...error,
+                    message: 'Wrong password, please try again'
+                });
+            } else {
+                setError('afterSubmit', {
+                    ...error,
+                    message: error.message
+                });
+            }
         }
     };
 
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
+                {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
+                <RHFTextField
+                    name="oldPassword"
+                    label="Old Password"
+                    type={showOldPassword ? 'text' : 'password'}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowOldPassword(!showOldPassword)} edge="end">
+                                    <Iconify icon={showOldPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+
                 <RHFTextField
                     name="newPassword"
                     label="New Password"
@@ -89,6 +114,7 @@ export default function AuthResetPasswordForm() {
                         ),
                     }}
                 />
+
             </Stack>
 
             <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isSubmitting} sx={{ mt: 3 }}>

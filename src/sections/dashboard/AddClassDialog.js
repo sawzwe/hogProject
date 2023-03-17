@@ -129,6 +129,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         students.forEach((eachStudent, index) => {
             studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
         })
+        console.log(students);
 
         try {
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)

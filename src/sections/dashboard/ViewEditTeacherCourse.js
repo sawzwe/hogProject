@@ -12,7 +12,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import CircularProgress from '@mui/material/CircularProgress';
-import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import {
     Fade,
     TextField,
@@ -36,8 +35,7 @@ import {
     DialogContentText,
     DialogActions,
     InputAdornment,
-    Container,
-    Divider
+    Container
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -65,21 +63,14 @@ import { useAuthContext } from '../../auth/useAuthContext';
 
 // ----------------------------------------------------------------
 
-ViewEditStudentCourse.propTypes = {
-    currentStudent: PropTypes.object,
-    currentCourses: PropTypes.array,
-    pendingCourses: PropTypes.array
+ViewEditTeacherCourse.propTypes = {
+    currentTeacher: PropTypes.object,
+    currentCourses: PropTypes.array
 }
 
-export default function ViewEditStudentCourse({ currentStudent, currentCourses, pendingCourses }) {
-    // console.log(currentCourses)
-    const { enqueueSnackbar } = useSnackbar();
-    const { user } = useAuthContext();
-    const navigate = useNavigate();
+export default function ViewEditTeacherCourse({ currentTeacher, currentCourses }) {
 
-    // console.log(pendingCourses)
-    const allCourses = [...currentCourses, ...pendingCourses]
-    console.log(allCourses)
+    const { user } = useAuthContext()
 
     const {
         role
@@ -90,15 +81,12 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const [selectedSchedules, setSelectedSchedules] = useState([]);
 
     const [openViewEditSchedule, setOpenViewEditSchedule] = useState(false);
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-    const [deleteCourseId, setDeleteCourseId] = useState()
-    const [deleteCourseName, setDeleteCourseName] = useState()
     // const [openViewCourseDialog, setOpenViewCourseDialog] = useState(false);
 
     const handleSelect = async (course) => {
-        const currentCourse = allCourses.find((eachCourse) => eachCourse.registeredCourse.id === course.id).registeredCourse
-        const currentRequest = allCourses.find((eachCourse) => eachCourse.registeredCourse.id === course.id).request
-        const currentSchedules = allCourses.find((eachCourse) => eachCourse.registeredCourse.id === course.id).registeredClasses
+        const currentCourse = currentCourses.find((eachCourse) => eachCourse.course.id === course.id).course
+        const currentRequest = currentCourses.find((eachCourse) => eachCourse.course.id === course.id).request
+        const currentSchedules = currentCourses.find((eachCourse) => eachCourse.course.id === course.id).classes
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
@@ -106,30 +94,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
         setOpenViewEditSchedule(true);
     }
 
-    const handleClickDelete = async (course) => {
-        setDeleteCourseId(course.id)
-        setDeleteCourseName(`${(course.course)} ${(course.subject)} ${(course.level)} (${course.section})`)
-        setOpenDeleteDialog(true)
-    }
-
-    const handleCloseDelete = () => {
-        setDeleteCourseId()
-        setOpenDeleteDialog(false)
-    }
-
-    const handleDeleteCourse = async () => {
-        try {
-            await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
-                .catch((error) => {
-                    throw error
-                })
-            navigate(0)
-        } catch (error) {
-            enqueueSnackbar(error.message, { variant: 'error' })
-        }
-    }
-
-    if (allCourses.length === 0) {
+    if (currentCourses.length === 0) {
         return (
             <Container component={MotionContainer} sx={{ textAlign: 'center' }}>
                 <m.div variants={varBounce().in}>
@@ -139,7 +104,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
                 </m.div>
 
                 <m.div variants={varBounce().in}>
-                    <Typography sx={{ color: 'text.secondary' }}>Student has not registered for any courses yet</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>Teacher has not been assigned for any courses yet</Typography>
                 </m.div>
 
                 <m.div variants={varBounce().in}>
@@ -152,68 +117,20 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     return (
         <>
             <Grid container spacing={3}>
-                {currentCourses.length > 0 && (
-                    <Grid item xs={12} md={12}>
-                        <Typography variant="h6">
-                            Registered Course
-                        </Typography>
-                    </Grid>
-                )}
-
-                {currentCourses.length > 0 && (
-                    <Grid item xs={12} md={12}>
-                        <Stack direction="column" spacing={2}>
-                            {currentCourses.map((eachCourse) => (
-                                <ClassPaper
-                                    key={eachCourse.registeredCourse.id}
-                                    _course={eachCourse.registeredCourse}
-                                    _request={eachCourse.request}
-                                    onSelect={handleSelect}
-                                    onDelete={handleClickDelete}
-                                    role={role}
-                                />
-                            ))}
-                        </Stack>
-                    </Grid>
-                )}
-
-                {pendingCourses.length > 0 && (
-                    <Grid item xs={12} md={12}>
-                        {currentCourses.length > 0 && <Divider />}
-                        <Typography variant="h6" sx={{ mt: currentCourses.length > 0 ? 2 : 0 }}>
-                            Pending Course
-                        </Typography>
-                    </Grid>
-                )}
+                <Grid item xs={12} md={12}>
+                    <Typography variant="h6">
+                        Registered Course
+                    </Typography>
+                </Grid>
 
                 <Grid item xs={12} md={12}>
                     <Stack direction="column" spacing={2}>
-                        {pendingCourses.map((eachCourse) => (
-                            <ClassPaper
-                                key={eachCourse.registeredCourse.id}
-                                _course={eachCourse.registeredCourse}
-                                _request={eachCourse.request}
-                                onSelect={handleSelect}
-                                onDelete={handleClickDelete}
-                                role={role}
-                                pending
-                            />
+                        {currentCourses.map((eachCourse) => (
+                            <ClassPaper key={eachCourse.course.id} _course={eachCourse.course} _request={eachCourse.request} onSelect={handleSelect} role={role} />
                         ))}
                     </Stack>
                 </Grid>
             </Grid>
-            <Dialog fullWidth size="md" open={openDeleteDialog} onClose={handleCloseDelete}>
-                <DialogTitle>Remove the course?</DialogTitle>
-                <DialogContent>{`Once removed, ${deleteCourseName}'s course and schedules will be removed from the system.`}</DialogContent>
-                <DialogActions>
-                    <Button color="inherit" variant="outlined" onClick={handleCloseDelete}>
-                        Cancel
-                    </Button>
-                    <LoadingButton color="error" variant="contained" onClick={handleDeleteCourse}>
-                        Remove
-                    </LoadingButton>
-                </DialogActions>
-            </Dialog>
             {
                 Object.keys(selectedRequest).length !== 0 && (
                     <ViewEditScheduleDialog
@@ -234,14 +151,11 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
 
 ClassPaper.propTypes = {
     _course: PropTypes.object,
-    _request: PropTypes.object,
     onSelect: PropTypes.func,
-    onDelete: PropTypes.func,
-    role: PropTypes.string,
-    pending: PropTypes.bool,
+    role: PropTypes.string
 }
 
-export function ClassPaper({ _course, _request, onSelect, onDelete, role, pending }) {
+export function ClassPaper({ _course, _request, onSelect, role }) {
 
     const {
         course,
@@ -255,6 +169,8 @@ export function ClassPaper({ _course, _request, onSelect, onDelete, role, pendin
         paymentStatus,
         courseType
     } = _request;
+
+    if (paymentStatus !== 'Complete') return null;
 
     return (
         <Paper variant="elevation" elevation={2} sx={{ p: 3 }}>
@@ -291,7 +207,7 @@ export function ClassPaper({ _course, _request, onSelect, onDelete, role, pendin
                         {role === 'Education Admin' ? (
                             <>
                                 <EditIcon sx={{ mr: 1 }} />
-                                Edit
+                                Edit schedule
                             </>
                         ) : (
                             <>
@@ -302,15 +218,6 @@ export function ClassPaper({ _course, _request, onSelect, onDelete, role, pendin
                         }
                     </Button>
                 </Grid>
-
-                {role === 'Education Admin' && (
-                    <Grid item xs md>
-                        <Button fullWidth variant="contained" color="error" sx={{ height: 56 }} onClick={() => onDelete(_course)}>
-                            <DeleteRoundedIcon sx={{ mr: 1 }} /> Remove
-                        </Button>
-                    </Grid>
-                )}
-
             </Grid>
         </Paper>
     )
@@ -328,7 +235,7 @@ ViewEditScheduleDialog.propTypes = {
 }
 
 export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, selectedRequest, open, onClose, role }) {
-    // console.log(selectedSchedules)
+
     const { enqueueSnackbar } = useSnackbar();
     const moment = extendMoment(Moment);
     const navigate = useNavigate();
@@ -398,7 +305,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         let hasConflict = false;
 
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule.id !== newClass.id)
-        // console.log(filteredSchedules)
+
         await filteredSchedules.forEach((eachClass) => {
 
             // Calculate overlapping time
@@ -417,7 +324,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         })
 
         if (!hasConflict) {
-            // console.log(newClass)
+
             const previousData = schedules.find((eachClass) => eachClass.id === newClass.id)
 
             const formattedData = {
@@ -427,11 +334,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                 date: fDate(newClass.date, 'dd-MMM-yyyy'),
                 fromTime: newClass.fromTime,
                 toTime: newClass.toTime,
-                studentPrivateClasses: previousData.studentPrivateClasses.map((student) => ({
-                    id: student.id,
-                    studentId: student.studentId,
-                    attendance: student.attendance
-                })),
+                studentPrivateClasses: previousData.studentPrivateClasses,
                 teacherPrivateClass: {
                     id: previousData.teacherPrivateClass.id,
                     teacherId: newClass.teacher.id,
@@ -440,16 +343,13 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                 }
             }
 
+            // console.log(formattedData)
             try {
-                console.log(schedules)
-                console.log(formattedData)
                 await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
-                    .then((res) => console.log(res))
+                    // .then((res) => console.log(res))
                     .catch((error) => {
                         throw error
                     })
-
-                navigate(0)
             } catch (error) {
                 console.error(error)
                 enqueueSnackbar(error.message, { variant: 'error' })
@@ -526,7 +426,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         fontSize: '0.9rem'
     }
 
-    console.log('schedules', schedules);
+    // console.log('schedules', schedules);
     // console.log(role)
 
     return (
@@ -691,7 +591,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                                                     <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
                                                     <StyledTableCell align="center">{_.capitalize(eachClass.method)}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.nickname} {!!eachClass.teacherPrivateClass?.workType ? `(${eachClass.teacherPrivateClass.workType})` : ''}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.nickname}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                                     {role === 'Education Admin' && (
                                                         <StyledTableCell align="center">

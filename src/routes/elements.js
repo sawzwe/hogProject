@@ -18,6 +18,7 @@ export const LoginPage = Loadable(lazy(() => import('../pages/LoginPage')));
 export const PageViewStudent = Loadable(lazy(() => import('../pages/ViewStudentPage')));
 export const PageEditStudent = Loadable(lazy(() => import('../pages/EditStudentPage')));
 export const ViewEditStudentCoursePage = Loadable(lazy(() => import('../pages/ViewEditStudentCoursePage')))
+export const ViewEditTeacherCoursePage = Loadable(lazy(() => import('../pages/ViewEditTeacherCoursePage')))
 export const PageChangePassword = Loadable(lazy(() => import('../pages/ChangePasswordPage')));
 
 // EP ----------------------------------------------------------------------

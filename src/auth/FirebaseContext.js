@@ -7,7 +7,9 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    updatePassword
+    updatePassword,
+    reauthenticateWithCredential,
+    EmailAuthProvider
 } from 'firebase/auth';
 
 import { getFirestore, collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
@@ -100,7 +102,27 @@ export function AuthProvider({ children }) {
     }, []);
 
     // UPDATE PASSWORD
-    const changePassword = (newPassword) => updatePassword(AUTH.currentUser, newPassword);
+    const changePassword = async (oldPassword, newPassword) => {
+
+        const credential = EmailAuthProvider.credential(
+            AUTH.currentUser.email,
+            oldPassword
+        )
+
+        const result = await reauthenticateWithCredential(
+            AUTH.currentUser,
+            credential
+        ).catch((error) => {
+            throw error;
+        })
+
+        if (result.user.accessToken === AUTH.currentUser.accessToken) {
+            updatePassword(AUTH.currentUser, newPassword)
+            .catch((error) => {
+                throw error;
+            })
+        }
+    };
 
     // LOGIN
     const login = async (email, password) => (signInWithEmailAndPassword(AUTH, email, password))
