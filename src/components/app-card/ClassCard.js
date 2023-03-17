@@ -14,7 +14,8 @@ ClassCard.propTypes = {
 };
 
 export default function ClassCard({ accountRole, eachClass, onOpen }) {
-
+    
+    const teacher = eachClass.teacher.fullName
     const {
         id,
         classNo,
@@ -22,8 +23,10 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
         fromTime,
         toTime,
         room,
-    } = eachClass;
-
+      } = eachClass;
+      
+    //   console.log(teacher);
+    // console.log(eachClass.teacher.fullName)
     if (accountRole === 'student') {
         return (
             <Grid container sx={{ my: 2 }}>
@@ -31,7 +34,8 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                     <Card
                         variant="outlined"
                         sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}
-                        onClick={() => onOpen(eachClass)}>
+                        // onClick={() => onOpen(eachClass)}
+                        >
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <CardContent sx={{ pr: 0 }}>
                                 <Typography variant="body1" component="div">
@@ -40,6 +44,9 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                                 <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendance !== 'None'}>
                                     {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
                                 </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Teacher: {teacher}
+                                </Typography>
                                 {eachClass.attendance !== 'None' && (
                                     <Typography variant="body2" sx={{ color: (eachClass.attendance === 'Present' ? '#36B37E' : eachClass.attendance === 'Absent' ? '#FF5630' : '#FFAB00') }}>
                                         {eachClass.attendance.toUpperCase()}
@@ -47,9 +54,9 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                                 )}
                             </CardContent>
                         </Box>
-                        <CardActions sx={{ pl: 0 }}>
+                        {/* <CardActions sx={{ pl: 0 }}>
                             <ArrowForwardIosRoundedIcon fontSize='large' sx={{ color: "#D7D7D7" }} />
-                        </CardActions>
+                        </CardActions> */}
                     </Card>
                 </Box>
             </Grid>

@@ -10,18 +10,28 @@ import useResponsive from '../../../hooks/useResponsive';
 // components
 import CalendarClassCard from '../../../components/app-card/CalendarClassCard';
 
+// StudentCalendar.propTypes = {
+//     currentStudent: PropTypes.object,
+// };
 StudentCalendar.propTypes = {
-    currentStudent: PropTypes.object,
+    currentStudent: PropTypes.array,
 };
 
+// export default function StudentCalendar({ currentStudent }) {
 export default function StudentCalendar({ currentStudent }) {
-
     const isDesktop = useResponsive('up', 'lg');
+    // console.log('current',currentStudent)
+    // const today = new Date(2023, 2, 15);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0)
+    // console.log(today)
+    // console.log(real)
 
-    const today = new Date(2023, 2, 13)
     const [value, setValue] = useState(today);
-
-    const { studentPrivateClass, studentGroupClass, studentPrivateCourse, studentGroupCourse } = currentStudent;
+    // console.log(real)
+    
+    const studentPrivateClass = currentStudent;
+    // const { studentPrivateClass, studentGroupClass, studentPrivateCourse, studentGroupCourse } = currentStudent;
 
     const onKeyDown = (e) => {
         e.preventDefault();
@@ -31,7 +41,7 @@ export default function StudentCalendar({ currentStudent }) {
         <>
             {isDesktop ? (
                 <DesktopDatePicker
-                    value={value}
+                    value={value}   
                     onChange={(newValue) => {
                         setValue(newValue);
                     }}
@@ -64,11 +74,11 @@ export default function StudentCalendar({ currentStudent }) {
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />))
             )}
-            {studentGroupClass.length > 0 && (
+            {/* {studentGroupClass.length > 0 && (
                 studentGroupClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='student'  eachClass={eachClass} />))
-            )}
+            )} */}
         </>
     )
 }
