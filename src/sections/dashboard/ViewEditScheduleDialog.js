@@ -52,18 +52,15 @@ ViewEditScheduleDialog.propTypes = {
     selectedRequest: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
-    role: PropTypes.string
+    role: PropTypes.string,
+    students: PropTypes.array
 }
 
-export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, selectedRequest, open, onClose, role }) {
+export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, selectedRequest, open, onClose, role, students }) {
     // console.log(selectedSchedules)
     const { enqueueSnackbar } = useSnackbar();
     const moment = extendMoment(Moment);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        setSchedules(selectedSchedules);
-    }, [selectedSchedules])
 
     const {
         courseType
@@ -81,9 +78,42 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
     const [deletedClass, setDeletedClass] = useState({});
     const [openDeleteClassDialog, setOpenDeleteClassDialog] = useState(false);
 
-    const handleAddClass = (addedClass) => {
-        console.log(selectedCourse)
-        console.log(addedClass);
+    useEffect(() => {
+        setSchedules(selectedSchedules);
+    }, [selectedSchedules])
+
+    const handleAddClass = async (addedClass) => {
+        try {
+            const formattedData = {
+                courseId: selectedCourse.id,
+                room: "",
+                method: addedClass.method,
+                date: fDate(addedClass.date, 'dd-MMM-yyyy'),
+                fromTime: addedClass.fromTime,
+                toTime: addedClass.toTime,
+                studentPrivateClasses: students.map((student) => ({
+                    studentId: student.studentId,
+                    attendance: "None"
+                })),
+                teacherPrivateClass: {
+                    teacherId: addedClass.teacher.id,
+                    workType: addedClass.teacher.workType,
+                    status: "Incomplete"
+                }
+            }
+            console.log(formattedData)
+
+            await axios.post(`${HOG_API}/api/Schedule/Class/Post`, formattedData)
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error;
+                })
+
+            // navigate(0);
+        } catch (error) {
+            enqueueSnackbar(error.message, { variant: "error" })
+        }
+
     };
 
     const handleOpenEditDialog = (row) => {
@@ -372,14 +402,16 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
 
                 <Grid item xs={12} md={7}>
                     <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: role === 'Education Admin' ? 1 : 2 }}>
                             <Typography variant="h6">
                                 Classes & Schedules
                             </Typography>
 
-                            <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
-                                <AddIcon sx={{ mr: 0.5 }} /> Add Class
-                            </Button>
+                            {role === 'Education Admin' && (
+                                <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
+                                    <AddIcon sx={{ mr: 0.5 }} /> Add Class
+                                </Button>
+                            )}
 
                         </Stack>
                         {schedules.length > 0 && (
