@@ -57,40 +57,35 @@ export default function StudentPrivateCourseDetailPage() {
         return <LoadingScreen />
     }
 
-    const currentcourse = studentCourse.find(item => item.registeredCourses.id === parseInt(id,10));
+    const currentcourse = studentCourse.find(item => item.registeredCourse.id === parseInt(id,10));
     // console.log('currentcourse',currentcourse)
     const course = {
-        id: currentcourse.registeredCourses.id.toString(),
-        course: currentcourse.registeredCourses.course, 
-        subject: currentcourse.registeredCourses.subject,
-        level: currentcourse.registeredCourses.level,
-        type: currentcourse.registeredCourses.method,
-        section:currentcourse.registeredCourses.section,
+        id: currentcourse.registeredCourse.id.toString(),
+        course: currentcourse.registeredCourse.course, 
+        subject: currentcourse.registeredCourse.subject,
+        level: currentcourse.registeredCourse.level,
+        type: currentcourse.request.courseType,
+        section:currentcourse.registeredCourse.section,
     }
 
     const currentclasses = currentcourse.registeredClasses;   
-
+    
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
-        const mappedAttendance = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
-            // console.log(eachClass.studentPrivateClasses)
-          return {
-            attendance : eachClass.studentPrivateClasses.attendance
-          };
-        });
-      
+        const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record=>record.studentId === user.id)
+  
         return {
           id: eachClass.id,
           course,
           classNo: (index+1),
-          students: {id: '2', fullName: 'Hong'},
+        //   students: {id: '2', fullName: 'Hong'},
           date: eachClass.date,
           fromTime: eachClass.fromTime,
           toTime: eachClass.toTime,
           room: eachClass.room,
           section: course.section,
           teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-          attendance: 'Present'
+          attendance: mappedAttendanceStudent.attendance
         };
       });
       
