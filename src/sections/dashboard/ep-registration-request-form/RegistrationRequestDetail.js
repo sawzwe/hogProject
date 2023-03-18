@@ -848,20 +848,15 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                                 });
                         }
                     })
-                    .then(() => {
-                        data.paymentAttachmentFiles.map((file) => {
-                            const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
-                            if (file instanceof File) {
-                                return uploadBytes(fileRef, file)
-                                    .catch((error) => {
-                                        throw error;
-                                    });
-                            }
-                            return null;
-                        })
-                    })
-                    .catch((error) => console.error(error)
-                    )
+                    .catch((error) => console.error(error))
+
+                await Promise.all(data.paymentAttachmentFiles.map(async file => {
+                    const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
+                    return uploadBytes(fileRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                }))
 
                 // console.log('data attach name', namePaymentFiles)
                 // console.log('data attach', data.paymentAttachmentFiles)
@@ -882,18 +877,17 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
 
             } else {
                 await axios.put(`${HOG_API}/api/PrivateRegistrationRequest/Put`, updatedRequest)
-                    .then(() => {
-                        data.paymentAttachmentFiles.map((file) => {
-                            const storagePaymentFilesRef = ref(storage, `payments/${request.id}/${file.name}`);
-                            return uploadBytes(storagePaymentFilesRef, file)
-                                .catch((error) => {
-                                    throw error;
-                                });
-                        })
-                    })
                     .catch((error) => {
                         throw error;
                     })
+
+                await Promise.all(data.paymentAttachmentFiles.map(async file => {
+                    const fileRef = ref(storage, `payments/${request.id}/${file.name}`)
+                    return uploadBytes(fileRef, file)
+                        .catch((error) => {
+                            throw error;
+                        });
+                }))
 
                 const namePaymentFiles = data.paymentAttachmentFiles.map((file) => ({ file: file.name }))
                 await axios.post(`${HOG_API}/api/Payment/Post`, {
@@ -1316,7 +1310,7 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                                 sm: 'repeat(1, 1fr)',
                             }}
                         >
-                            <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
+                            <TextField fullWidth defaultValue={epRemark2} label="Comment for Office Admin" disabled />
                         </Box>
                     </Card>
                 </Grid>
@@ -1350,6 +1344,7 @@ export function RejectForm({ request, students, registeredCourses }) {
         id,
         eaStatus,
         paymentStatus,
+        epRemark1,
         epRemark2,
         eaRemark
     } = request;
@@ -1405,6 +1400,32 @@ export function RejectForm({ request, students, registeredCourses }) {
                                 }}
                             >
                                 <TextField fullWidth defaultValue={eaRemark} label="Comment for pending payment" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
+
+                {!!epRemark1 && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                Additional Comment
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
                             </Box>
                         </Card>
                     </Grid>

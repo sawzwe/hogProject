@@ -12,12 +12,6 @@ import Scrollbar from '../../../components/scrollbar';
 
 // ----------------------------------------------------------------------
 
-export const FILTER_GENDER_OPTIONS = [
-  { label: 'Men', value: 'Men' },
-  { label: 'Women', value: 'Women' },
-  { label: 'Kids', value: 'Kids' },
-];
-
 
 
 // ----------------------------------------------------------------------

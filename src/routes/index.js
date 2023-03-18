@@ -61,6 +61,7 @@ import {
   PageTeacherCheckGroupAttendance,
   PageTeacherCheckPrivateAttendance,
   ViewEditStudentCoursePage,
+  ViewEditTeacherCoursePage,
   PageEditTeacher,
   PageViewTeacher,
   PageViewStaff,
@@ -177,14 +178,14 @@ export default function Router() {
             {
               path: 'teacher-management/teacher-course', element: (
                 <RoleBasedGuard roles={['Education Admin']} hasContent>
-                  <PageSearchCourseStudent />
+                  <PageSearchCourseTeacher />
                 </RoleBasedGuard>
               )
             },
             {
               path: 'teacher-management/teacher-course/:id', element: (
                 <RoleBasedGuard roles={['Education Admin']} hasContent>
-                  <ViewEditStudentCoursePage />
+                  <ViewEditTeacherCoursePage />
                 </RoleBasedGuard>
               )
             },

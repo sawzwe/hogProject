@@ -75,7 +75,7 @@ export default function EditStudentPage() {
         fetchData();
     }, [])
 
-    if (student === undefined || !avatarURL) {
+    if (!dataFetchedRef.current) {
         return <LoadingScreen />;
     }
 

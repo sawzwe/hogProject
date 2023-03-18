@@ -95,7 +95,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
 
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
@@ -106,9 +106,14 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
             teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher)
         };
 
-        onAdd(newClass);
-        reset();
-        setValue('classDate', data.classDate);
+        await onAdd(newClass)
+        .then((res) => {
+            if (res === "success") {
+                reset();
+            } 
+        })
+        // reset();
+        // setValue('classDate', data.classDate);
         // onClose();
         // setTimeout(() => {
         //     reset(defaultValues);
@@ -124,6 +129,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         students.forEach((eachStudent, index) => {
             studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
         })
+        console.log(students);
 
         try {
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)
@@ -178,7 +184,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
     }
 
     return (
-        <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
+        <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
             <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
                 <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
                 <DialogContent>

@@ -159,8 +159,6 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     { value: 'Incomplete', label: 'Incomplete', count: getLengthByReceipt('Incomplete'), color: 'error' },
   ];
 
-  console.log(dataFiltered)
-
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -230,6 +228,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
               px: 2,
               bgcolor: 'background.neutral',
             }}
+            scrollButtons={false}
           >
             <Tab
               key={TABS[0].value}

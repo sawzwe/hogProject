@@ -18,25 +18,25 @@ import ToolbarStudentSearchCourse from './ToolbarStudentSearchCourse';
 
 // ----------------------------------------------------------------------
 
-function createData(id, fullname, nickname,ongoing) {
-  return { id, fullname, nickname, ongoing };
-}
+// function createData(id, fullname, nickname,ongoing) {
+//   return { id, fullname, nickname, ongoing };
+// }
 
-const TABLE_DATA = [
-  createData(12, 'Saw Zwe Wai Yan', 'Saw',2),
-  createData(15, 'Siwach Toprasert', 'Pan',1),
-  createData(879, 'Piyaphon Wu', 'Hong',2),
-  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff',1),
-  createData(2, 'Thanatuch Lertritsirikul', 'Tar',3),
-  createData(272, 'Zain Ijaz Janpatiew', 'Zain',1),
-  createData(662, 'Saw Zwe Wai Yan', 'Saw',2),
-  createData(85, 'Siwach Toprasert', 'Pan',1),
-  createData(52, 'Piyaphon Wu', 'Hong',1),
-  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff',2),
-  createData(422, 'Thanatuch Lertritsirikul', 'Tar',1),
-  createData(984, 'Zain Ijaz Janpatiew', 'Zain',5),
+// const TABLE_DATA = [
+//   createData(12, 'Saw Zwe Wai Yan', 'Saw',2),
+//   createData(15, 'Siwach Toprasert', 'Pan',1),
+//   createData(879, 'Piyaphon Wu', 'Hong',2),
+//   createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff',1),
+//   createData(2, 'Thanatuch Lertritsirikul', 'Tar',3),
+//   createData(272, 'Zain Ijaz Janpatiew', 'Zain',1),
+//   createData(662, 'Saw Zwe Wai Yan', 'Saw',2),
+//   createData(85, 'Siwach Toprasert', 'Pan',1),
+//   createData(52, 'Piyaphon Wu', 'Hong',1),
+//   createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff',2),
+//   createData(422, 'Thanatuch Lertritsirikul', 'Tar',1),
+//   createData(984, 'Zain Ijaz Janpatiew', 'Zain',5),
 
-];
+// ];
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Student ID', align: 'left' },
@@ -51,7 +51,7 @@ StudentCourseList.propTypes = {
   studentCourseData: PropTypes.array,
 }
 
-export default function StudentCourseList({studentCourseData}) {
+export default function StudentCourseList({ studentCourseData }) {
   const navigate = useNavigate();
   const {
     dense,
@@ -85,34 +85,9 @@ export default function StudentCourseList({studentCourseData}) {
   // Filter
   const [openFilter, setOpenFilter] = useState(false);
 
-  const isFiltered = filterValue !== '' ;
+  const isFiltered = filterValue !== '';
   const isNotFound =
-        (!dataFiltered.length && !!filterValue);
-
-
-  const defaultValues = {
-    gender: [],
-  };
-
-  const methods = useForm({
-    defaultValues,
-  });
-
-  const {
-    reset,
-    watch,
-    formState: { dirtyFields },
-  } = methods;
-
-  const isDefault =
-    (!dirtyFields.gender) ||
-    false;
-
-  const values = watch();
-
-  const handleResetFilter = () => {
-    reset();
-  };
+    (!dataFiltered.length && !!filterValue);
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -124,20 +99,19 @@ export default function StudentCourseList({studentCourseData}) {
 
   const handleFilterValue = (event) => {
     setFilterValue(event.target.value);
-};
+  };
 
 
   return (
     <div>
-      <ToolbarStudentSearchCourse 
+      <ToolbarStudentSearchCourse
         isFiltered={isFiltered}
         filterValue={filterValue}
-        onFilterValue={handleFilterValue} 
-        isDefault={isDefault}
+        onFilterValue={handleFilterValue}
         open={openFilter}
         onOpen={handleOpenFilter}
         onClose={handleCloseFilter}
-        onResetFilter={handleResetFilter} />
+      />
 
       <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
 
@@ -151,17 +125,17 @@ export default function StudentCourseList({studentCourseData}) {
             <TableBody>
               {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow
-                hover
-                key={row.id}
-                sx={{cursor: "pointer"}}
-                onClick={() => navigate(`/account/student-management/student-course/${row.id}`)}
+                  hover
+                  key={row.id}
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/account/student-management/student-course/${row.id}`)}
                 >
                   <TableCell align="left" > {row.studentId} </TableCell>
                   <TableCell align="left">{row.fullName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell align="center">{row.courseCount}</TableCell>
                   <TableCell>
-                        <Iconify icon="ic:chevron-right" />
+                    <Iconify icon="ic:chevron-right" />
                   </TableCell>
 
                 </TableRow>
@@ -178,9 +152,9 @@ export default function StudentCourseList({studentCourseData}) {
         rowsPerPage={rowsPerPage}
         onPageChange={onChangePage}
         onRowsPerPageChange={onChangeRowsPerPage}
-        //
-        // dense={dense}
-        // onChangeDense={onChangeDense}
+      //
+      // dense={dense}
+      // onChangeDense={onChangeDense}
       />
     </div>
   );
@@ -188,7 +162,7 @@ export default function StudentCourseList({studentCourseData}) {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator,filterValue }) {
+function applyFilter({ inputData, comparator, filterValue }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -203,13 +177,11 @@ function applyFilter({ inputData, comparator,filterValue }) {
 
   if (filterValue) {
     // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  user.id === parseInt(filterValue,10));
-    inputData = inputData.filter((user) => 
-    user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
-    user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||  
-    user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
-
-
-}
+    inputData = inputData.filter((user) =>
+      user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+      user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+      user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+  }
 
   return inputData;
 }
