@@ -51,7 +51,7 @@ export default function ViewEditTeacherCoursePage() {
                 const data = res.data.data
                 const completePaymentCourses = data.filter((course) => course.request.paymentStatus === 'Complete');
                 const pendingCourses = data.filter((course) => course.request.paymentStatus === 'Pending');
-                setPendingCourses(completePaymentCourses);
+                setPendingCourses(pendingCourses);
                 setCourses(completePaymentCourses);
             })
             .catch((error) => navigate('*', { replace: false }))
@@ -97,6 +97,10 @@ export default function ViewEditTeacherCoursePage() {
             </>
         )
     }
+
+    console.log(teacher)
+    console.log(courses)
+    console.log(pendingCourses)
 
     return (
         <>

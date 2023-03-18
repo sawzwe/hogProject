@@ -1,4 +1,7 @@
 import { Helmet } from 'react-helmet-async';
+import { useParams } from 'react-router';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
 // components
@@ -12,6 +15,20 @@ import { PATH_ACCOUNT } from '../../routes/paths';
 
 export default function NewAccountPage() {
     const { themeStretch } = useSettingsContext();
+    const { role, id } = useParams();
+    const [currentStaff, setCurrentStaff] = useState();
+    const dataFetchedRef = useRef(false);
+
+    const fetchData = () => {
+        axios.get('')
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchData();
+    }, [])
 
     const DUMMY_STAFF = {
         id: '1',

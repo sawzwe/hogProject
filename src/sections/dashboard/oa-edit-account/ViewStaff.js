@@ -107,7 +107,7 @@ export default function ViewStaff({ currentStaff }) {
                 accountRole={currentStaff.role}
                 open={openResetPasswordDialog}
                 onClose={() => setOpenResetPasswordDialog(false)}
-                defaultPassword="Staff's Line ID"
+                defaultPassword="hog + staff's phone number"
             />
 
             <DeleteAccountDialog

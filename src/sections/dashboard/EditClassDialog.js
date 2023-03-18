@@ -69,6 +69,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         'Onsite', 'Online'
     ];
 
+    // console.log(schedule);
+
     const [isLoadingTime, setIsLoadingTime] = useState(false);
     const [isLoadingTeacher, setIsLoadingTeacher] = useState(false);
     const [availableTime, setAvailableTime] = useState();
@@ -112,18 +114,29 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
         })
 
-        console.log(students);
+        // console.log(students);
 
         try {
-            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMMM-yyyy')}&hour=${hourPerClass}`)
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)
-                .then(((res) => {
-                    setAvailableTime(res.data.data)
-                    setIsLoadingTime(false);
-                }))
-                .catch((error) => {
-                    throw error;
-                })
+            // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMMM-yyyy')}&hour=${hourPerClass}`)
+            if (courseCustom) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTime(false);
@@ -139,15 +152,27 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
-                .then(((res) => {
-                    setAvailableTeacher(res.data.data)
-                    setIsLoadingTeacher(false);
-                }))
-                .catch((error) => {
-                    throw error;
-                })
+            // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
+
+            if (courseCustom) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTeacher(false);
@@ -197,9 +222,9 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         if (Object.keys(schedule).length) {
             setValue('classDate', date);
             handleChangeDate(date);
-            // setValue('classTime', fromTime.concat('-', toTime))
-            // handleChangeTime(fromTime.concat('-', toTime))
-            // setValue('classTeacher', teacher.id);
+            setValue('classTime', fromTime.concat('-', toTime))
+            handleChangeTime(fromTime.concat('-', toTime))
+            setValue('classTeacher', teacher.id);
             setValue('classMethod', method);
         }
     }, [schedule])
@@ -383,17 +408,13 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                 </DialogContent>
 
                 <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 3 }} spacing={1.5}>
-                    {!courseCustom ? (
-                        <Stack direction="row" sx={{ ml: 1.5 }}>
-                            <Grid item>
-                                <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
-                                    Delete
-                                </Button>
-                            </Grid>
-                        </Stack>
-                    ) : (
-                        <Stack direction="row" sx={{ ml: 1.5 }} />
-                    )}
+                    <Stack direction="row" sx={{ ml: 1.5 }}>
+                        <Grid item>
+                            <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </Grid>
+                    </Stack>
                     <Stack direction="row" spacing={1}>
                         <Grid item>
                             <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>

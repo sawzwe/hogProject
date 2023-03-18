@@ -27,11 +27,9 @@ export default function SearchTeacherCoursePage() {
     const [teacherCourseData, setTeacherCourseData] = useState();
 
     const fetchData = async () => {
-        return axios.get(`${HOG_API}/api/Student/CourseCount/Get`, config)
+        return axios.get(`${HOG_API}/api/Teacher/CourseCount/Get`, config)
             .then(response => {
-                // console.log(response.data.data)
                 setTeacherCourseData(response.data.data);
-                // console.log("API table" ,response.data.data);
             })
             .catch(error => {
                 console.log(error);

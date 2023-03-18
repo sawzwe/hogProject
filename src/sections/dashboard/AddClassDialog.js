@@ -106,12 +106,11 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
             teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher)
         };
 
-        await onAdd(newClass)
-        .then((res) => {
-            if (res === "success") {
-                reset();
-            } 
-        })
+        const result = await onAdd(newClass)
+
+        if (result === "success") {
+            reset();
+        }
         // reset();
         // setValue('classDate', data.classDate);
         // onClose();
