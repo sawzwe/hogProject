@@ -51,15 +51,15 @@ export default function StudentCalendarPage() {
     }
 
     const mappedStudentClasses = [];
-
+    console.log(studentCourse)
     studentCourse.forEach((currentCourse) => {
         const course = {
-            id: currentCourse.registeredCourses.id.toString(),
-            course: currentCourse.registeredCourses.course,
-            subject: currentCourse.registeredCourses.subject,
-            level: currentCourse.registeredCourses.level,
-            type: currentCourse.registeredCourses.method,
-            section: currentCourse.registeredCourses.section,
+            id: currentCourse.registeredCourse.id.toString(),
+            course: currentCourse.registeredCourse.course,
+            subject: currentCourse.registeredCourse.subject,
+            level: currentCourse.registeredCourse.level,
+            type: currentCourse.request.courseType,
+            section: currentCourse.registeredCourse.section,
         }
 
         const currentClasses = currentCourse.registeredClasses;
