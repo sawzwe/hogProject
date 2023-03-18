@@ -1,9 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect,useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Card, Container, Stack } from '@mui/material';
-// components
-import axios from 'axios';
 // auth
 import { useAuthContext } from '../auth/useAuthContext';
 // components
@@ -59,7 +58,7 @@ export default function SearchCourseStudentPage() {
     return (
         <>
             <Helmet>
-                <title>Student Course List Table</title>
+                <title>Student Course List</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
                 <CustomBreadcrumbs
@@ -73,7 +72,7 @@ export default function SearchCourseStudentPage() {
                 />
                 <Stack spacing={3}>
                     <Card>
-                        <StudentCourseList studentCourseData= {studentCourseData}/>
+                        <StudentCourseList studentCourseData={studentCourseData}/>
                     </Card>
                 </Stack>
             </Container>

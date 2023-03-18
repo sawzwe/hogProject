@@ -59,12 +59,11 @@ EditClassDialog.propTypes = {
     hourPerClass: PropTypes.number,
     fromDate: PropTypes.string,
     toDate: PropTypes.string,
-    students: PropTypes.array
+    students: PropTypes.array,
+    courseCustom: PropTypes.bool
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students }) {
-    console.log('students', students)
-    console.log('schedule', schedule)
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students, courseCustom = false }) {
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -110,11 +109,13 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
         })
 
+        console.log(students);
+
         try {
-            // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMMM-yyyy')}&hour=${hourPerClass}`)
+            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMMM-yyyy')}&hour=${hourPerClass}`)
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)
                 .then(((res) => {
                     setAvailableTime(res.data.data)
@@ -138,6 +139,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
+            console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
             axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
                 .then(((res) => {
                     setAvailableTeacher(res.data.data)
@@ -168,10 +170,11 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
             hourPerClass,
-            teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher), 
+            teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher),
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
-            method: data.classMethod
+            method: data.classMethod,
+            id: schedule?.id || ''
         };
         onEdit(newClass);
         // handleClose();
@@ -189,15 +192,14 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         }, 200);
     }
 
-    
+
     useEffect(() => {
         if (Object.keys(schedule).length) {
             setValue('classDate', date);
             handleChangeDate(date);
-            setValue('classTime', fromTime.concat('-', toTime));
-            handleChangeTime(fromTime.concat('-', toTime))
-
-            setValue('classTeacher', teacher.id);
+            // setValue('classTime', fromTime.concat('-', toTime))
+            // handleChangeTime(fromTime.concat('-', toTime))
+            // setValue('classTeacher', teacher.id);
             setValue('classMethod', method);
         }
     }, [schedule])
@@ -271,7 +273,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                     {availableTime.map((eachTime, index) => (
                                         <MenuItem
                                             key={index}
-                                            value={`${eachTime.fromTime}-${eachTime.toTime}`}
+                                            value={`${eachTime?.fromTime}-${eachTime?.toTime}`}
                                             sx={{
                                                 mx: 1,
                                                 my: 0.5,
@@ -381,13 +383,17 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                 </DialogContent>
 
                 <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 3 }} spacing={1.5}>
-                    <Stack direction="row" sx={{ ml: 1.5 }}>
-                        <Grid item>
-                            <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
-                                Delete
-                            </Button>
-                        </Grid>
-                    </Stack>
+                    {!courseCustom ? (
+                        <Stack direction="row" sx={{ ml: 1.5 }}>
+                            <Grid item>
+                                <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
+                                    Delete
+                                </Button>
+                            </Grid>
+                        </Stack>
+                    ) : (
+                        <Stack direction="row" sx={{ ml: 1.5 }} />
+                    )}
                     <Stack direction="row" spacing={1}>
                         <Grid item>
                             <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>

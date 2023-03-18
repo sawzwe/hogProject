@@ -235,9 +235,9 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
         .catch((error) => {
           throw error;
         })
-      navigate(0)
       setIsTakingRequest(false);
       setOpenConfirm(false);
+      navigate(`/course-registration/ea-request-status/${selectedRow.id}`)
     } catch (error) {
       enqueueSnackbar(error.message, { variant: 'error' });
       setIsTakingRequest(false);
@@ -263,6 +263,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
               px: 2,
               bgcolor: 'background.neutral',
             }}
+            scrollButtons={false}
           >
             <Tab
               key={TABS[0].value}
@@ -306,7 +307,6 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
 
           <RegistrationTableToolbar
             filterName={filterName}
-            // isFiltered={isFiltered}
             onFilterName={handleFilterName}
             onResetFilter={handleResetFilter}
           />

@@ -9,17 +9,6 @@ import { useState, React } from 'react'
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 
-
-// ----------------------------------------------------------------------
-
-export const FILTER_GENDER_OPTIONS = [
-  { label: 'Men', value: 'Men' },
-  { label: 'Women', value: 'Women' },
-  { label: 'Kids', value: 'Kids' },
-];
-
-
-
 // ----------------------------------------------------------------------
 // const onSelected = (selected, item) =>
 //   selected.includes(item) ? selected.filter((value) => value !== item) : [...selected, item];
@@ -45,10 +34,10 @@ export default function ToolbarTeacherSearchCourse({ filterValue, onFilterValue,
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
         <TextField value={filterValue}
-        onChange={onFilterValue} id="search-student" 
-        placeholder="Search ID or Teacher Fullname or Nickname..." 
-        variant="outlined" 
-        sx={{ width: "100%" }}
+        onChange={onFilterValue} 
+        id="search-teacher"
+        placeholder="Search by teacher's id, name or nickname..." 
+        variant="outlined" sx={{ width: '100%'}}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

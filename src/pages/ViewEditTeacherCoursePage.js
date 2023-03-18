@@ -16,12 +16,12 @@ import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import NotFound from '../components/NotFound';
 // sections
-import ViewEditStudentCourse from '../sections/dashboard/ViewEditStudentCourse';
-import { studentList } from '../sections/dashboard/ep-registration-request-form/_mockupData';
+import ViewEditTeacherCourse from '../sections/dashboard/ViewEditTeacherCourse';
+// import { studentList } from '../sections/dashboard/ep-registration-request-form/_mockupData';
 
 // ----------------------------------------------------------------------
 
-export default function ViewEditStudentCoursePage() {
+export default function ViewEditTeacherCoursePage() {
     const { themeStretch } = useSettingsContext();
     const { user } = useAuthContext();
     const navigate = useNavigate();
@@ -31,28 +31,28 @@ export default function ViewEditStudentCoursePage() {
 
     const dataFetchedRef = useRef(false);
 
-    const [student, setStudent] = useState();
+    const [teacher, setTeacher] = useState();
     const [courses, setCourses] = useState();
     const [pendingCourses, setPendingCourses] = useState();
 
-    const fetchStudent = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`, config)
+    const fetchTeacher = async () => {
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${id}`, config)
             .then((res) => {
                 const data = res.data.data
-                setStudent(data)
+                setTeacher(data)
             })
-            .catch((error) => setStudent('Not Found'))
+            .catch((error) => setTeacher('Not Found'))
     }
 
 
     const fetchCourses = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${id}`, config)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${id}`, config)
             .then((res) => {
                 const data = res.data.data
                 const completePaymentCourses = data.filter((course) => course.request.paymentStatus === 'Complete');
                 const pendingCourses = data.filter((course) => course.request.paymentStatus === 'Pending');
-                setPendingCourses(pendingCourses)
-                setCourses(completePaymentCourses)
+                setPendingCourses(completePaymentCourses);
+                setCourses(completePaymentCourses);
             })
             .catch((error) => navigate('*', { replace: false }))
     }
@@ -61,15 +61,15 @@ export default function ViewEditStudentCoursePage() {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
-        fetchStudent();
+        fetchTeacher();
         fetchCourses();
     }, [])
 
-    if (student === undefined || courses === undefined) {
+    if (teacher === undefined || courses === undefined) {
         return <LoadingScreen />
     }
 
-    if (student === 'Not Found') {
+    if (teacher === 'Not Found') {
         return (
             <>
                 <Helmet>
@@ -81,15 +81,15 @@ export default function ViewEditStudentCoursePage() {
                         heading="Teacher Course"
                         links={[
                             {
-                                name: 'All Students',
-                                href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
+                                name: 'All Teachers',
+                                href: PATH_ACCOUNT.teacherManagement.searchCourseTeacher,
                             },
                             { name: "Not found" },
                         ]}
                     />
                     <NotFound
-                        title='Sorry, student not found!'
-                        message='Sorry, we couldn’t find the student you’re looking for.'
+                        title='Sorry, teacher not found!'
+                        message='Sorry, we couldn’t find the teacher you’re looking for.'
                         action='Go Back'
                     />
                 </Container>
@@ -98,7 +98,6 @@ export default function ViewEditStudentCoursePage() {
         )
     }
 
-    
     return (
         <>
             <Helmet>
@@ -108,18 +107,18 @@ export default function ViewEditStudentCoursePage() {
             <Container maxWidth={themeStretch ? false : 'lg'}>
 
                 <CustomBreadcrumbs
-                    heading="Student Course"
+                    heading="Teacher Course"
                     links={[
                         {
-                            name: 'All Students',
-                            href: PATH_ACCOUNT.studentManagement.searchCourseStudent,
+                            name: 'All Teachers',
+                            href: PATH_ACCOUNT.teacherManagement.searchCourseTeacher,
                         },
-                        { name: `${student.fullName}` },
+                        { name: `${teacher.fullName}` },
                     ]}
                 />
                 <Stack spacing={3}>
 
-                    <ViewEditStudentCourse currentStudent={student} currentCourses={courses} pendingCourses={pendingCourses} />
+                    <ViewEditTeacherCourse currentTeacher={teacher} currentCourses={courses} pendingCourses={pendingCourses} />
 
                 </Stack>
             </Container>

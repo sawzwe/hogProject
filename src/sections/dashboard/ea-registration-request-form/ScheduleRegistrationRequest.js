@@ -135,6 +135,7 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
                 ))
             }
 
+            // console.log(formattedSchedule)
             return axios.post(`${HOG_API}/api/Schedule/Post`, formattedSchedule)
                 .catch((error) => {
                     throw error
@@ -516,18 +517,21 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             }
         })
 
+
         if (!hasConflict) {
             const updatedSchedules = [...schedules, newClass]
-            setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+            setSchedules(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
             setOpenAddClassDialog(false);
-        } else {
-            enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
+            return "success"
         }
+        return enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
     }
 
     const handleEditClass = async (newClass) => {
         let hasConflict = false;
-        await schedules.forEach((eachClass) => {
+
+        const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
+        await filteredSchedules.forEach((eachClass) => {
 
             // Calculate overlapping time
             const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
@@ -545,9 +549,8 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         })
 
         if (!hasConflict) {
-            const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== selectedSchedule)
             const updatedSchedules = [...filteredSchedules, newClass]
-            setSchedules(updatedSchedules.sort((class1, class2) => class1.date - class2.date));
+            setSchedules(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
             setSelectedSchedule({});
             setOpenEditClass(false);
         } else {

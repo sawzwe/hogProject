@@ -86,7 +86,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
     const { registerStudent, updateStudent, user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
 
     const NewStudentSchema = Yup.object().shape({
         studentTitle: Yup.string().nullable().required('Title is required'),
@@ -197,10 +197,11 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                         throw error;
                     })
                 setIsSubmitting(false);
-                enqueueSnackbar('Updated student information successfully!');
                 setOpenConfirmDialog(false);
+                // navigate(0);
+                enqueueSnackbar('Updated student information successfully!');
                 navigate(`/account/student-management/student/${currentStudent.id}`);
-                reset(defaultValues);
+                // reset(defaultValues);
             } else {
                 await registerStudent(data, config)
                     .catch((error) => {
@@ -407,7 +408,13 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <RHFTextField isNumber name="studentPhoneNo" label="Phone Number" required />
+                                <RHFTextField
+                                    isNumber
+                                    name="studentPhoneNo"
+                                    label="Phone Number"
+                                    inputProps={{ maxLength: 10 }}
+                                    required
+                                />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <RHFTextField name="studentLineId" label="Line ID" required />
@@ -515,7 +522,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="province" label="Province" required />
                             </Box>
                             <Box gridArea={"zipCode"}>
-                                <RHFTextField isNumber name="zipCode" label="Zip Code/Post Code" required />
+                                <RHFTextField isNumber name="zipCode" label="Zip Code/Post Code" inputProps={{ maxLength: 5 }} required />
                             </Box>
                         </Box>
                     </Card>
@@ -540,7 +547,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="parentRelationships" label="Relationships" required />
                             </Grid>
                             <Grid item xs={12} md={4}>
-                                <RHFTextField isNumber name="parentPhoneNo" label="Phone Number" required />
+                                <RHFTextField isNumber name="parentPhoneNo" label="Phone Number" inputProps={{ maxLength: 10 }} required />
                             </Grid>
                             <Grid item xs={12} md={4}>
                                 <RHFTextField name="parentEmail" label="Email Address" required />
@@ -644,7 +651,9 @@ ConfirmDialog.propTypes = {
 export function ConfirmDialog({ open, onClose, onSubmit, isEdit, isSubmitting }) {
 
     return (
-        <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
+        <Dialog fullWidth maxWidth="sm" open={open} onClose={
+            !isSubmitting ? onClose : null
+        }>
             <DialogTitle>
                 {isEdit ? 'Edit Student?' : 'Create Student?'}
             </DialogTitle>
@@ -652,7 +661,7 @@ export function ConfirmDialog({ open, onClose, onSubmit, isEdit, isSubmitting })
                 {isEdit ? 'Once editted, student information will be saved.' : 'Once submitted, student account will be created to the system.'}
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="inherit" onClick={onClose}>Cancel</Button>
+                <Button variant="outlined" color="inherit" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
                 <LoadingButton variant="contained" onClick={onSubmit} loading={isSubmitting}>Submit</LoadingButton>
             </DialogActions>
         </Dialog>
