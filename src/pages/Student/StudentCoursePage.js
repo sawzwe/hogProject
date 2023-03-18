@@ -67,11 +67,11 @@ export default function StudentCoursePage() {
     const mappedStudentCourse = studentCourse.map((course, index) => {
         // console.log(course)
         return {
-            id: course.registeredCourses.id.toString(),
-            course: course.registeredCourses.course, 
-            subject: course.registeredCourses.subject,
-            level: course.registeredCourses.level,
-            type: course.registeredCourses.method,
+            id: course.registeredCourse.id.toString(),
+            course: course.registeredCourse.course, 
+            subject: course.registeredCourse.subject,
+            level: course.registeredCourse.level,
+            type: course.request.courseType,
         };
     });
 
@@ -83,7 +83,7 @@ export default function StudentCoursePage() {
 
     // console.log('fetched',currentStudents)
     // console.log('dummy',currentStudent)
-    console.log(currentStudents)
+    // console.log(currentStudents)
     return (
         <>
             <Helmet>
