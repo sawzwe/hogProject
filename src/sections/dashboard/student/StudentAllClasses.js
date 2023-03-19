@@ -35,9 +35,9 @@ export default function StudentAllClasses({ classes }) {
 
     return (
         <>
-            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="student" eachClass={eachClass} onOpen={handleOpenDialog} />)}
-            {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
             {completeClass.length > 0 && completeClass.map((eachClass, index) => <ClassCard key={index} accountRole="student" eachClass={eachClass} onOpen={handleOpenDialog} />)}
+            {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
+            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="student" eachClass={eachClass} onOpen={handleOpenDialog} />)}
             {Object.keys(selectedClass).length > 0 && (<ClassDialog open={open} onClose={handleCloseDialog} selectedClass={selectedClass} />)}
         </>
     )

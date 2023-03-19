@@ -81,7 +81,7 @@ export default function StudentCalendarPage() {
                 room: eachClass.room,
                 section: course.section,
                 teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-                attendance: mappedAttendanceStudent.attendance,
+                attendance: mappedAttendanceStudent?.attendance,
                 paymentStatus: course.paymentStatus
             };
         });
