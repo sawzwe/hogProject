@@ -19,8 +19,8 @@ export default function TeacherCoursePage() {
     const { themeStretch } = useSettingsContext();
     const navigate = useNavigate();
 
-    const {user} = useAuthContext();
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const { user } = useAuthContext();
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
     // console.log(user.id)
 
     // console.log(userId)
@@ -31,7 +31,7 @@ export default function TeacherCoursePage() {
 
     const fetchStudent = async () => {
         // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`,config)
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`,config)  
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`, config)
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data
@@ -42,8 +42,8 @@ export default function TeacherCoursePage() {
     }
 
     const fetchCourse = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`,config)
-        // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
+            // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data
@@ -61,33 +61,61 @@ export default function TeacherCoursePage() {
     }, [])
 
     // if (teacherCourse  === undefined || teacher ===undefined ) {
-    if (teacherCourse  === undefined  ) {
+    if (teacherCourse === undefined) {
         return <LoadingScreen />
     }
-    
+
     // console.log(teacherCourse)
+
+    // // Map the teacher courses
+    // const mappedStudentCourse = teacherCourse.map((course, index) => {
+    //     // console.log(course)
+    //     return {
+    //         id: course.course.id.toString(),
+    //         course: course.course.course,
+    //         subject: course.course.subject,
+    //         level: course.course.level,
+    //         type: course.request.courseType,
+    //         paymentStatus: course.request.paymentStatus,
+
+    //     };
+    // });
+
+    // const currentTeachers = {
+    //     teacherPrivateCourse: mappedStudentCourse,
+    // };
+
+
+
+    // // console.log('fetched',currentStudents)
+    // // console.log('dummy',currentStudent)
+    // console.log('my', currentTeachers)
+    // // console.log('mock',currentTeacher)
+
+    // Assuming teacherId is already defined
+    const teacherCourses = teacherCourse.filter((course) => {
+        // Check if any of the classes in the course have the teacher's ID
+        return course.classes.some((classObj) => classObj.teacherPrivateClass.teacherId === user.id);
+    });
+
     // Map the teacher courses
-    const mappedStudentCourse = teacherCourse.map((course, index) => {
-        // console.log(course)
+    const mappedTeacherCourses = teacherCourses.map((course, index) => {
         return {
-            id: course.courses.id.toString(),
-            course: course.courses.course, 
-            subject: course.courses.subject,
-            level: course.courses.level,
-            type: course.courses.method,
+            id: course.course.id.toString(),
+            course: course.course.course,
+            subject: course.course.subject,
+            level: course.course.level,
+            type: course.request.courseType,
+            paymentStatus: course.request.paymentStatus,
         };
     });
 
     const currentTeachers = {
-        fName: 'teacher.fName',
-        lName: 'teacher.lName',
-        teacherPrivateCourse: mappedStudentCourse,
+        teacherPrivateCourse: mappedTeacherCourses,
     };
 
-    // console.log('fetched',currentStudents)
-    // console.log('dummy',currentStudent)
-    // console.log('my',currentTeachers)
-    // console.log('mock',currentTeacher)
+    console.log(currentTeachers);
+
 
     return (
         <>

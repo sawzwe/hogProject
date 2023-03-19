@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // @mui
+import axios from 'axios';
 import { Divider, Typography, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Box, Card, CardContent } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -9,6 +10,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useSnackbar } from '../../../components/snackbar';
 // utils
 import { fDate } from '../../../utils/formatTime';
+import { useAuthContext } from '../../../auth/useAuthContext';
+
 
 TeacherCheckAttendance.propTypes = {
     currentClass: PropTypes.object,
@@ -18,6 +21,9 @@ TeacherCheckAttendance.propTypes = {
 export default function TeacherCheckAttendance({ currentClass, isEdit }) {
     const navigate = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
+    const { classId } = useParams();
+    const { user } = useAuthContext();
+    const teacherId = user.id;
 
     const {
         students,
@@ -40,14 +46,67 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
 
     const isValidateAttendance = () => (attendances.length === students.length && !attendances.some(attendance => attendance.value === ''));
 
+    // const handleSubmitAttendance = () => {
+    //     if (isValidateAttendance()) {
+    //         console.log(attendances)
+    //         // navigate(0, { replace: true });
+    //         // navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
+    //         enqueueSnackbar('Successfully submitted', { variant: 'success' });
+    //     } else {
+    //         enqueueSnackbar('Please check all attendance!', { variant: 'error' });
+    //     }
+    // };
     const handleSubmitAttendance = () => {
         if (isValidateAttendance()) {
-            navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
+            const newAttendanceData = attendances.map(({ student, value }) => ({
+                data: {
+                    id: parseInt(classId,10),
+                    studentId: student.id,
+                    attendance: value,
+                },
+            }));
+
+            // Update the attendance data using Axios PUT request
+            axios
+                .all(
+                    newAttendanceData.map(({ data }) => {
+                        console.log(data);
+                        return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
+                        .then(res => console.log(res))
+                    })
+                )
+
+                .then(() => {
+                    console.log('Attendance data updated successfully');
+
+                    // Update the attendance status using Axios PUT request
+                    const attendanceStatusData = {
+                        id: parseInt(classId,10),
+                        teacherId,
+                        workType: 'Normal',
+                        status: 'Complete',
+                    };
+
+                    axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Teacher/Class/Status/Put`, attendanceStatusData)
+                        .then(() => {
+                            console.log('Attendance status updated successfully');
+                        })
+                        .catch((error) => {
+                            console.error('Error updating attendance status', error);
+                        });
+                })
+                .catch((error) => {
+                    console.error('Error updating attendance data', error);
+                });
+
+            // navigate(0, { replace: true });
+            // navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
             enqueueSnackbar('Successfully submitted', { variant: 'success' });
         } else {
             enqueueSnackbar('Please check all attendance!', { variant: 'error' });
         }
     };
+
 
     return (
         <>
@@ -64,21 +123,21 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                 )}
             </Stack>
             <Stack direction="row" sx={{ mt: 4 }}>
-            {isEdit && (
-                <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    color="primary"
-                    onClick={() => setOpenConfirmDialog(true)}>
-                    {studentAttendance.length ? 'Save Changes' : 'Submit'}
-                </Button>
-            )}
+                {isEdit && (
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        size="large"
+                        color="primary"
+                        onClick={() => setOpenConfirmDialog(true)}>
+                        {studentAttendance.length ? 'Save Changes' : 'Submit'}
+                    </Button>
+                )}
                 <ConfirmDialog
                     open={openConfirmDialog}
                     onClose={() => setOpenConfirmDialog(false)}
                     onSubmit={handleSubmitAttendance}
-                    isEdit={studentAttendance.length}
+                    isEdit={!!studentAttendance.length}
                 />
             </Stack>
         </>
@@ -179,7 +238,7 @@ export function AttendanceButtons({ student, studentAttendance, readOnly, onChec
                 <Stack
                     direction="column">
                     <Typography variant="body2" sx={{ fontWeight: "bold" }}>{student.nickname}</Typography>
-                    <Typography variant="body2">{student.firstName} {student.lastName.charAt(0)}.</Typography>
+                    <Typography variant="body2">{student.fullName}.</Typography>
                 </Stack>
                 <Stack
                     direction="row"
@@ -230,6 +289,7 @@ ConfirmDialog.propTypes = {
 };
 
 export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
+    // console.log('Edit',isEdit)
     return (
         <Dialog open={open} fullWidth maxWidth="xs">
             <DialogTitle sx={{ mx: 'auto', pb: 0 }}>
@@ -237,7 +297,7 @@ export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body1" align="center" sx={{ fontWeight: 'bold', fontSize: 'h5.fontSize', mb: 1 }}>
-                    {isEdit? 'Update the attendance?' : 'Submit the attendance?'}
+                    {isEdit ? 'Update the attendance?' : 'Submit the attendance?'}
                 </Typography>
                 <Typography align="center">
                     {isEdit ? 'Once saved, the attendance will be updated to the system' : 'Once submitted, the attendance will be updated to the system'}
