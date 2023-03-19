@@ -44,8 +44,6 @@ export default function NewAccountPage() {
         return <LoadingScreen />
     }
 
-    console.log(teacher);
-
     const TEACHER_DATA = {
         id: teacher.id.toString(),
         role: 'Teacher',
