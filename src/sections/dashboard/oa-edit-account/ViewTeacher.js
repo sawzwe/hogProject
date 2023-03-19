@@ -155,7 +155,7 @@ export default function ViewTeacher({ currentTeacher }) {
             <ResetPasswordDialog
                 open={openResetPasswordDialog}
                 onClose={() => setOpenResetPasswordDialog(false)}
-                defaultPassword="Teacher's Line ID"
+                defaultPassword="hog + teacher's phone number"
             />
 
             <DeleteAccountDialog

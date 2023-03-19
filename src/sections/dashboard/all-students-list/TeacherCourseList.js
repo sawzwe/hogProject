@@ -131,7 +131,7 @@ export default function TeacherCourseList({ teacherCourseData }) {
                   sx={{ cursor: "pointer" }}
                   onClick={() => navigate(`/account/teacher-management/teacher-course/${row.id}`)}
                 >
-                  <TableCell align="left" > {row.studentId} </TableCell>
+                  <TableCell align="left" align="left" sx={{ pl: 5.5 }}> {row.id} </TableCell>
                   <TableCell align="left">{row.fullName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell align="center">{row.courseCount}</TableCell>
@@ -178,7 +178,7 @@ function applyFilter({ inputData, comparator, filterValue }) {
     inputData = inputData.filter((user) =>
       user.fullName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
       user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
-      user.studentId.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+      user.id === parseInt(filterValue, 10));
   }
 
   return inputData;

@@ -56,7 +56,7 @@ const TABLE_DATA = [
 StaffList.propTypes = {
   allStaffs: PropTypes.array,
 }
-export default function StaffList({allStaffs}) {
+export default function StaffList({ allStaffs }) {
   const {
     dense,
     page,
@@ -139,6 +139,8 @@ export default function StaffList({allStaffs}) {
     setOpenConfirm(false);
   };
 
+  console.log(dataFiltered)
+
 
   return (
     <div>
@@ -150,7 +152,8 @@ export default function StaffList({allStaffs}) {
         open={openFilter}
         onOpen={handleOpenFilter}
         onClose={handleCloseFilter}
-        onResetFilter={handleResetFilter} />
+        onResetFilter={handleResetFilter}
+      />
 
       <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
 
@@ -212,7 +215,7 @@ function applyFilter({ inputData, comparator, filterValue }) {
   if (filterValue) {
     // inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
     // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
-    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 );
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
 
   }
 
