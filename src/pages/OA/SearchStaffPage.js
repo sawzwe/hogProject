@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect,useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // @mui
 import { Card, Container, Stack } from '@mui/material';
 // components
@@ -24,42 +24,73 @@ export default function SearchStaffPage() {
     const [eaStaff, setEaStaff] = useState();
     const [allStaffs, setAllStaffs] = useState();
 
-    const fetchDataEP = async () => {
-        return axios.get(`${HOG_API}/api/EP/Get`)
-            .then(response => {
-                return response.data.data;
+    // const fetchDataEP = async () => {
+    //     await axios.get(`${HOG_API}/api/EP/Get`)
+    //         .then(response => {
+    //             console.log('ep', response)
+    //             setAllStaffs([...allStaffs, ...response.data.data])
+    //             setEpStaff(response.data.data)
+    //         })
+    //         .catch(error => {
+    //             console.log(error);
+    //         });
+    // }
+
+    const fetchData = async () => {
+        await axios.get(`${HOG_API}/api/EP/Get`)
+            .then(async (resEP) => {
+                const allEPs = resEP.data.data
+                const formattedEPs = allEPs.map((ep) => ({
+                    id: ep.id,
+                    fName: ep.fName,
+                    lName: ep.lName,
+                    email: ep.email,
+                    firebaseId: ep.firebaseId,
+                    fullName: ep.fullName,
+                    nickname: ep.nickname,
+                    line: ep.line,
+                    phone: ep.phone,
+                    role: "EP"
+                }))
+                await axios.get(`${HOG_API}/api/EA/Get`)
+                    .then(resEA => {
+                        const allEAs = resEA.data.data
+                        const formattedEAs = allEAs.map((ea) => ({
+                            id: ea.id,
+                            fName: ea.fName,
+                            lName: ea.lName,
+                            email: ea.email,
+                            firebaseId: ea.firebaseId,
+                            fullName: ea.fullName,
+                            nickname: ea.nickname,
+                            line: ea.line,
+                            phone: ea.phone,
+                            role: "EA"
+                        }))
+                        setAllStaffs([...formattedEPs, ...formattedEAs])
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             })
             .catch(error => {
                 console.log(error);
             });
+
     }
-    
-    const fetchDataEA = async () => {
-        return axios.get(`${HOG_API}/api/EA/Get`)
-            .then(response => {
-                return response.data.data;
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-    
+
     useEffect(() => {
-        Promise.all([fetchDataEP(), fetchDataEA()])
-            .then(([epStaff, eaStaff]) => {
-                setAllStaffs([...epStaff, ...eaStaff]);
-                setEpStaff(epStaff);
-                setEaStaff(eaStaff);
-                // console.log(allStaffs);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchData()
     }, []);
 
-    if (epStaff === undefined || eaStaff === undefined) {
+    if (allStaffs === undefined) {
         return <LoadingScreen />;
     }
+
+    // console.log(allStaffs)
 
     return (
         <>
@@ -67,7 +98,7 @@ export default function SearchStaffPage() {
                 <title>All Staff</title>
             </Helmet>
             <Container maxWidth={themeStretch ? false : 'lg'}>
-            <CustomBreadcrumbs
+                <CustomBreadcrumbs
                     heading="All Staff"
                     links={[
                         { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff },

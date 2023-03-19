@@ -206,7 +206,7 @@ export default function Router() {
               )
             },
             {
-              path: 'staff-management/staff/:id/edit', element: (
+              path: 'staff-management/staff/:role/:id/edit', element: (
                 <RoleBasedGuard roles={['Office Admin']} hasContent>
                   <PageEditStaff />
                 </RoleBasedGuard>

@@ -24,31 +24,10 @@ function createData(id, fullname, nickname) {
 
 const TABLE_HEAD = [
   // { id: 'id', label: 'Teacher ID', align: 'left' },
-  { id: 'fullname', label: 'Fullname  ', align: 'left' },
-  { id: 'nickname', label: 'Nickname  ', align: 'left' },
-  { id: 'details', label: ' ', align: 'left' },
-];
-
-const TABLE_DATA = [
-  createData(12, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(15, 'Siwach Toprasert', 'Pan'),
-  createData(879, 'Piyaphon Wu', 'Hong'),
-  createData(122, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(2, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(272, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(662, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(85, 'Siwach Toprasert', 'Pan'),
-  createData(52, 'Piyaphon Wu', 'Hong'),
-  createData(162, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(422, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(984, 'Zain Ijaz Janpatiew', 'Zain'),
-  createData(155, 'Saw Zwe Wai Yan', 'Saw'),
-  createData(468, 'Siwach Toprasert', 'Pan'),
-  createData(777, 'Piyaphon Wu', 'Hong'),
-  createData(666, 'Jeffrey Zhi Chi Chong', 'Jeff'),
-  createData(333, 'Thanatuch Lertritsirikul', 'Tar'),
-  createData(222, 'Zain Ijaz Janpatiew', 'Zain'),
-
+  { id: 'fullname', label: 'Fullname', align: 'left' },
+  { id: 'nickname', label: 'Nickname', align: 'left' },
+  { id: 'role', label: 'Role', align: 'left' },
+  { id: 'details', label: '', align: 'left' },
 ];
 
 // ----------------------------------------------------------------------
@@ -139,7 +118,7 @@ export default function StaffList({ allStaffs }) {
     setOpenConfirm(false);
   };
 
-  console.log(dataFiltered)
+  // console.log(dataFiltered)
 
 
   return (
@@ -165,17 +144,19 @@ export default function StaffList({ allStaffs }) {
             />
 
             <TableBody>
-              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+              {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
                 <TableRow
                   hover
-                  key={row.index}
-                  onClick={() => navigate(`/account/staff-management/staff/${parseInt(row.id, 10)}`)}
+                  key={index}
+                  sx={{ cursor: 'pointer'}}
+                  onClick={() => navigate(`/account/staff-management/staff/${row.role === 'EA' ? 'ea' : 'ep'}/${parseInt(row.id, 10)}`)}
                 >
                   {/* <TableCell align="left" > {row.id} </TableCell> */}
                   <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
-                  <TableCell>
-                    <Iconify icon="ic:chevron-right" />
+                  <TableCell align="left">{row.role}</TableCell>
+                  <TableCell align="right">
+                    <Iconify icon="ic:chevron-right" sx={{mr: 5}} />
                   </TableCell>
 
                 </TableRow>
@@ -215,7 +196,10 @@ function applyFilter({ inputData, comparator, filterValue }) {
   if (filterValue) {
     // inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
     // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
-    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
+    user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
+    user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+    user.role.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
 
   }
 

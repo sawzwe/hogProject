@@ -9,6 +9,7 @@ import {
     DialogActions,
     Button
 } from '@mui/material';
+import { useSnackbar } from './snackbar';
 import { HOG_API } from '../config';
 
 ResetPasswordDialog.propTypes = {
@@ -19,19 +20,24 @@ ResetPasswordDialog.propTypes = {
 
 export default function ResetPasswordDialog({ open, onClose, email }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleResetPassword = async () => {
         setIsSubmitting(true);
         try {
+            // console.log(email);
             await axios.post(`${HOG_API}/api/Auth/ResetPassword`, email)
-                .then((res) => console.log(res))
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
             setIsSubmitting(false);
+            enqueueSnackbar('Successfully sent reset password request', { variant: 'success' });
+
         } catch (error) {
             console.error(error);
             setIsSubmitting(false);
+            enqueueSnackbar(error.message, { variant: 'error' });
         }
     }
 

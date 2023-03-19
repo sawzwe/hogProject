@@ -26,17 +26,14 @@ export default function SaveChangesDialog({ data, open, onClose, accountRole }) 
         setIsSubmitting(true);
         try {
             if (accountRole === 'Teacher') {
-
                 const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
                 const preferredDays = [data.monday, data.tuesday, data.wednesday, data.thursday, data.friday, data.saturday, data.sunday]
-
                 const workTimes = []
                 preferredDays.forEach((day, index) => {
                     if (day.isSelected) {
                         workTimes.push({ day: weekdays[index], fromTime: day.fromTime, toTime: day.toTime })
                     }
                 })
-
                 const formattedData = {
                     id: data.id,
                     fName: data.fName,
@@ -47,17 +44,55 @@ export default function SaveChangesDialog({ data, open, onClose, accountRole }) 
                     line: data.line,
                     workTimes
                 }
-
                 await axios.put(`${HOG_API}/api/Teacher/Put`, formattedData)
-                    .then((res) => console.log(res))
+                    // .then((res) => console.log(res))
                     .catch((error) => {
                         throw error
                     })
 
-                // console.log('teacher')
-                // console.log("Save changes will be added!", formattedData);
                 enqueueSnackbar("Save changes successfully", { variant: 'success' });
                 navigate(`/account/teacher-management/teacher/${data.id}`);
+            }
+
+            if (accountRole === 'Education Admin') {
+                const formattedData = {
+                    id: data.id,
+                    fName: data.fName,
+                    lName: data.lName,
+                    nickname: data.nickname,
+                    phone: data.phone,
+                    email: data.email,
+                    line: data.line,
+                    role: 'ea'
+                }
+                await axios.put(`${HOG_API}/api/EA/Put`, formattedData)
+                    // .then((res) => console.log(res))
+                    .catch((error) => {
+                        throw error
+                    })
+
+                enqueueSnackbar("Save changes successfully", { variant: 'success' });
+                navigate(`/account/staff-management/staff/ea/${data.id}`)
+            }
+
+            if (accountRole === 'Education Planner') {
+                const formattedData = {
+                    id: data.id,
+                    fName: data.fName,
+                    lName: data.lName,
+                    nickname: data.nickname,
+                    phone: data.phone,
+                    email: data.email,
+                    line: data.line,
+                    role: 'ep'
+                }
+                await axios.put(`${HOG_API}/api/EP/Put`, formattedData)
+                    // .then((res) => console.log(res))
+                    .catch((error) => {
+                        throw error
+                    })
+                enqueueSnackbar("Save changes successfully", { variant: 'success' });
+                navigate(`/account/staff-management/staff/ep/${data.id}`)
             }
             setIsSubmitting(false);
         } catch (error) {

@@ -7,16 +7,17 @@ import { useForm } from 'react-hook-form';
 import { Card, Grid, Stack, Typography, Button } from '@mui/material';
 // components
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
+import ResetPasswordDialog from '../../../components/ResetPasswordDialog';
 //
-import ResetPasswordDialog from './ResetPasswordDialog';
 import DeleteAccountDialog from './DeleteAccountDialog';
 
 // ----------------------------------------------------------------------
 ViewStaff.propTypes = {
-    currentStaff: PropTypes.object
+    currentStaff: PropTypes.object,
+    currentRole: PropTypes.string
 }
 
-export default function ViewStaff({ currentStaff }) {
+export default function ViewStaff({ currentStaff, currentRole }) {
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
@@ -37,7 +38,7 @@ export default function ViewStaff({ currentStaff }) {
     });
 
     const handleClickEdit = () => {
-        navigate(`/account/staff-management/staff/${currentStaff.id}/edit`);
+        navigate(`/account/staff-management/staff/${currentRole === 'ea' ? 'ea' : 'ep'}/${currentStaff.id}/edit`);
     };
 
     return (
@@ -49,7 +50,7 @@ export default function ViewStaff({ currentStaff }) {
                         display: 'block',
                     }}
                 >
-                    {`Staff detail (${currentStaff.role})`}
+                    {`Staff detail (${currentRole === 'ea' ? 'Education Admin' : 'Education Planner'})`}
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>
@@ -102,17 +103,15 @@ export default function ViewStaff({ currentStaff }) {
                 </Grid>
             </Card>
 
-            <ResetPasswordDialog
-                accountId={currentStaff.id}
-                accountRole={currentStaff.role}
+            <ResetPasswordDialog 
                 open={openResetPasswordDialog}
                 onClose={() => setOpenResetPasswordDialog(false)}
-                defaultPassword="hog + staff's phone number"
+                email={currentStaff.email}
             />
 
             <DeleteAccountDialog
-                accountId={currentStaff.id}
-                accountRole={currentStaff.role}
+                accountId={currentStaff.id.toString()}
+                accountRole={currentRole === 'ea' ? 'Education Admin' : 'Education Planner'}
                 accountName={currentStaff.fName}
                 open={openDeleteAccountDialog}
                 onClose={() => setOpenDeleteAccountDialog(false)}

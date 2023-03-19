@@ -16,15 +16,15 @@ import SaveChangesDialog from './SaveChangesDialog';
 // ----------------------------------------------------------------------
 
 EditStaff.propTypes = {
-    currentStaff: PropTypes.object
+    currentStaff: PropTypes.object,
+    currentRole: PropTypes.string
 }
 
-export default function EditStaff({ currentStaff }) {
+export default function EditStaff({ currentStaff, currentRole }) {
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
     const NewStaffSchema = Yup.object().shape({
-        role: Yup.string().required('Role is required'),
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
@@ -34,7 +34,6 @@ export default function EditStaff({ currentStaff }) {
     });
 
     const defaultValues = {
-        role: currentStaff?.role || '',
         fName: currentStaff?.fName || '',
         lName: currentStaff?.lName || '',
         nickname: currentStaff?.nickname || '',
@@ -59,6 +58,8 @@ export default function EditStaff({ currentStaff }) {
 
     const onSubmit = async (data) => {
         try {
+            data.id = currentStaff.id;
+
             await setSavedData(data);
             await setOpenSaveChangesDialog(true);
         } catch (error) {
@@ -76,7 +77,7 @@ export default function EditStaff({ currentStaff }) {
     };
 
     const handleCancelEdit = () => {
-        navigate(`/account/staff-management/staff/${currentStaff.id}`);
+        navigate(`/account/staff-management/staff/${currentRole}/${currentStaff.id}`);
     }
 
     return (
@@ -88,7 +89,7 @@ export default function EditStaff({ currentStaff }) {
                         display: 'block',
                     }}
                 >
-                    {`Edit Account (${currentStaff.role})`}
+                    {`Edit Account (${currentRole === 'ea' ? 'Education Admin' : 'Education Planner'})`}
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>
@@ -136,6 +137,7 @@ export default function EditStaff({ currentStaff }) {
                 open={openSaveChangesDialog}
                 onClose={() => setOpenSaveChangesDialog(false)}
                 data={savedData}
+                accountRole={currentRole === 'ea' ? 'Education Admin' : 'Education Planner'}
             />
 
 
