@@ -129,11 +129,11 @@ export default function TeacherCheckPrivateAttendance({ classes }) {
     const handleDiscard = () => {
         navigate(-1);
     };
-    // const today = new Date();
-    // today.setHours(0, 0, 0, 0)
-    // const assumeCurrentDate = fDate(today, 'dd MMMM yyyy');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0)
+    const assumeCurrentDate = fDate(today, 'dd MMMM yyyy');
 
-    const assumeCurrentDate = fDate(new Date("2023-04-10"), 'dd MMMM yyyy');
+    // const assumeCurrentDate = fDate(new Date("2023-04-10"), 'dd MMMM yyyy');
 
     // console.log(assumeCurrentDate)
     const classDate = fDate(new Date(currentClass.date), 'dd MMMM yyyy');

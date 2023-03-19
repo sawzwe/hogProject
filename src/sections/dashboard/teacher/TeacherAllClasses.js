@@ -17,9 +17,10 @@ export default function TeacherAllClasses({ classes }) {
 
     return (
         <>
-            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="teacher" eachClass={eachClass} />)}
-            {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
             {completeClass.length > 0 && completeClass.map((eachClass, index) => <ClassCard key={index} accountRole="teacher" eachClass={eachClass} />)}
+            {upcommingClass.length > 0 && completeClass.length > 0 && <Divider />}
+            {upcommingClass.length > 0 && upcommingClass.map((eachClass, index) => <ClassCard key={index} accountRole="teacher" eachClass={eachClass} />)}
+
         </>
     )
 }
