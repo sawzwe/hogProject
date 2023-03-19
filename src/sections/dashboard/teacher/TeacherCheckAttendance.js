@@ -60,7 +60,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
         if (isValidateAttendance()) {
             const newAttendanceData = attendances.map(({ student, value }) => ({
                 data: {
-                    id: parseInt(classId,10),
+                    id: parseInt(student.apiId, 10),
                     studentId: student.id,
                     attendance: value,
                 },
