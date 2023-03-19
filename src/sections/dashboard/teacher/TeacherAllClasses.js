@@ -9,7 +9,7 @@ TeacherAllClasses.propTypes = {
 };
 
 export default function TeacherAllClasses({ classes }) {
-    console.log(classes)
+    // console.log(classes)
 
     // Separate Completed class and Incomplete class here
     const completeClass = classes.filter(eachClass => eachClass.attendanceStatus !== 'None');

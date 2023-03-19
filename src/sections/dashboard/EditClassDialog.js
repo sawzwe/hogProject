@@ -45,7 +45,7 @@ import { fDate } from '../../utils/formatTime'
 // components
 import { useSnackbar } from '../../components/snackbar';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
-import FormProvider, { RHFSelect } from '../../components/hook-form';
+import FormProvider, { RHFSelect, RHFTextField } from '../../components/hook-form';
 //
 import { HOG_API } from '../../config';
 // ----------------------------------------------------------------------
@@ -69,8 +69,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         'Onsite', 'Online'
     ];
 
-    // console.log(schedule);
-
     const [isLoadingTime, setIsLoadingTime] = useState(false);
     const [isLoadingTeacher, setIsLoadingTeacher] = useState(false);
     const [availableTime, setAvailableTime] = useState();
@@ -82,13 +80,16 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         toTime,
         teacher,
         method,
+        room
     } = schedule;
+    
 
     const defaultValues = {
         classDate: date,
         classTime: fromTime.concat('-', toTime),
         classTeacher: teacher.id,
-        classMethod: _.capitalize(method)
+        classMethod: _.capitalize(method),
+        classRoom: room
     };
 
     const methods = useForm({
@@ -117,8 +118,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         // console.log(students);
 
         try {
-            // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMMM-yyyy')}&hour=${hourPerClass}`)
             if (courseCustom) {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTime(res.data.data)
@@ -152,9 +153,9 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
 
             if (courseCustom) {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTeacher(res.data.data)
@@ -199,6 +200,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
             method: data.classMethod,
+            room: data.classRoom,
             id: schedule?.id || ''
         };
         onEdit(newClass);
@@ -235,7 +237,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                 <DialogTitle sx={{ pb: 0 }}>Edit Schedule</DialogTitle>
                 <DialogContent>
                     <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={!courseCustom ? 3 : 2.5}>
                             <Controller
                                 name="classDate"
                                 control={control}
@@ -256,7 +258,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={!courseCustom ? 3 : 2.5}>
                             {availableTime === undefined && !isLoadingTime && (
                                 <TextField
                                     fullWidth
@@ -370,14 +372,14 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                            {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.workType})`}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={!courseCustom ? 3 : 2}>
                             <RHFSelect
                                 fullWidth
                                 name="classMethod"
@@ -403,6 +405,16 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                 ))}
                             </RHFSelect>
                         </Grid>
+
+                        {courseCustom && (
+                            <Grid item xs={12} md={2}>
+                                <RHFTextField
+                                    fullWidth
+                                    name="classRoom"
+                                    label="Room"
+                                />
+                            </Grid>
+                        )}
 
                     </Grid>
                 </DialogContent>

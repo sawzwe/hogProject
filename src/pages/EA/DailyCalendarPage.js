@@ -7,6 +7,9 @@ import axios from 'axios';
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 // @mui
+import { DatePicker } from '@mui/x-date-pickers';
+import { LoadingButton } from '@mui/lab';
+import EditIcon from '@mui/icons-material/Edit';
 import { useTheme } from '@mui/material/styles';
 import {
     Tab,
@@ -28,7 +31,11 @@ import {
     Box,
     Stack,
     InputAdornment,
-    TextField
+    TextField,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 // utils
 import { fTimestamp, fDate } from '../../utils/formatTime';
@@ -51,6 +58,7 @@ import {
 } from '../../components/table';
 // sections
 import { HOG_API } from '../../config';
+import { EditClassDialog } from '../../sections/dashboard/EditClassDialog';
 
 // ----------------------------------------------------------------------
 
@@ -67,13 +75,23 @@ export default function DailyCalendarPage() {
                     const data = res.data.data;
                     data.map((eachSchedule) => (eachSchedule.classes.map((eachClass) => {
                         return setClasses(classes => [...classes, {
+                            id: eachClass.id,
                             date: eachClass.date,
+                            fromTime: eachClass.fromTime,
+                            toTime: eachClass.toTime,
                             time: `${eachClass.fromTime}-${eachClass.toTime}`,
-                            teacher: eachClass.teacherPrivateClass?.nickname || '',
+                            teacherNickname: eachClass.teacherPrivateClass?.nickname || '',
                             course: `${eachSchedule.course.course} ${eachSchedule.course?.subject} ${eachSchedule.course.level}`,
                             section: eachSchedule.course.section,
                             room: eachClass.room,
-                            method: eachClass.method,
+                            method: _.capitalize(eachClass.method),
+                            students: eachClass.studentPrivateClasses,
+                            teacher: {
+                                id: eachClass.teacherPrivateClass?.teacherId || null,
+                                status: eachClass.teacherPrivateClass?.status,
+                                currentId: eachClass.teacherPrivateClass?.id
+                            },
+                            hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
                         }])
                     })))
                 })
@@ -93,8 +111,6 @@ export default function DailyCalendarPage() {
         return <LoadingScreen />
     }
 
-    console.log(classes)
-
     return (
         <>
             <Helmet>
@@ -111,7 +127,6 @@ export default function DailyCalendarPage() {
                     ]}
                 />
 
-                <Typography >Course Transfer Details</Typography>
                 <ClassList classes={classes} />
             </Container>
         </>
@@ -139,13 +154,12 @@ ClassList.propTypes = {
 }
 
 const TABLE_HEAD_REQUESTS = [
-    { id: 'classDate', label: 'Class Date', align: 'left' },
     { id: 'classTime', label: 'Class Time', align: 'left' },
-    { id: 'teacher ', label: 'Teacher', align: 'left'},
-    { id: 'course', label: 'Course', align: 'left'},
-    { id: 'section', label: 'Section', align: 'left'},
-    { id: 'method', label: 'Method', align: 'left'},
-    { id: 'room', label: 'Room', align: 'left'},
+    { id: 'teacher ', label: 'Teacher', align: 'left' },
+    { id: 'course', label: 'Course', align: 'left' },
+    { id: 'section', label: 'Section', align: 'left' },
+    { id: 'method', label: 'Method', align: 'left' },
+    { id: 'room', label: 'Room', align: 'left' },
     { id: 'action' },
 ];
 
@@ -186,87 +200,117 @@ export function ClassList({ classes }) {
 
     const [filterName, setFilterName] = useState('');
 
-    const [openConfirm, setOpenConfirm] = useState(false);
+    const [filterDate, setFilterDate] = useState(new Date());
 
-    const [filterRole, setFilterRole] = useState('PendingEA');
+    const [selectedClass, setSelectedClass] = useState({});
+    const [openEditClassDialog, setOpenEditClassDialog] = useState(false);
+
+    const [deletedClass, setDeletedClass] = useState({});
+    const [openDeleteClassDialog, setOpenDeleteClassDialog] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const dataFiltered = applyFilter({
         inputData: tableData,
         comparator: getComparator(order, orderBy),
         filterName,
-        filterRole,
+        filterDate,
     });
 
     const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     const denseHeight = dense ? 56 : 76;
 
-    const isFiltered =
-        filterRole !== 'pendingEA' || filterName !== '';
+    const isFiltered = filterName !== '';
 
     const isNotFound =
-        (!dataFiltered.length && !!filterName) ||
-        (!dataFiltered.length && !!filterRole);
-
-    const getLengthByStatus = (role) => tableData.filter((item) => item.role === role).length;
-
-
-    const handleOpenConfirm = () => {
-        setOpenConfirm(true);
-    };
-
-    const handleCloseConfirm = () => {
-        setOpenConfirm(false);
-    };
-
-
-    const handleFilterRole = (event, newValue) => {
-        setPage(0);
-        setFilterRole(newValue);
-    };
+        (!dataFiltered.length && !!filterName);
 
     const handleFilterName = (event) => {
         setPage(0);
         setFilterName(event.target.value);
     };
 
-    const handleDeleteRow = (id) => {
-        const deleteRow = tableData.filter((row) => row.id !== id);
-        setSelected([]);
-        setTableData(deleteRow);
-
-        if (page > 0) {
-            if (dataInPage.length < 2) {
-                setPage(page - 1);
-            }
-        }
-    };
-
-    const handleDeleteRows = (selected) => {
-        const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-        setSelected([]);
-        setTableData(deleteRows);
-
-        if (page > 0) {
-            if (selected.length === dataInPage.length) {
-                setPage(page - 1);
-            } else if (selected.length === dataFiltered.length) {
-                setPage(0);
-            } else if (selected.length > dataInPage.length) {
-                const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-                setPage(newPage);
-            }
-        }
-    };
-
-    const handleResetFilter = () => {
-        setFilterName('');
-        setFilterRole('pendingEA');
-    };
+    const handleFilterDate = (value) => {
+        setPage(0);
+        setFilterDate(value)
+    }
 
     if (!dataFetchedRef.current) return (
         <LoadingScreen />
     )
+
+    const handleSelectClass = (selectedClass) => {
+        setSelectedClass(selectedClass);
+        setOpenEditClassDialog(true);
+    }
+
+    const handleCloseEditClassDialog = () => {
+        setSelectedClass({});
+        setOpenEditClassDialog(false);
+    }
+
+    const handleEditClass = async (newClass) => {
+        setIsSubmitting(true);
+        try {
+            const formattedData = {
+                id: newClass.id,
+                room: newClass.room,
+                method: newClass.method,
+                date: fDate(newClass.date, 'dd-MMM-yyyy'),
+                fromTime: newClass.fromTime,
+                toTime: newClass.toTime,
+                studentPrivateClasses: selectedClass.students.map((student) => ({
+                    id: student.id,
+                    studentId: student.studentId,
+                    attendance: student.attendance
+                })),
+                teacherPrivateClass: {
+                    id: selectedClass.teacher.currentId,
+                    teacherId: newClass.teacher.id,
+                    workType: newClass.teacher.workType,
+                    status: selectedClass.teacher.status
+                }
+            }
+
+            await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
+                .catch((error) => {
+                    throw error
+                })
+            setIsSubmitting(false);
+            navigate(0)
+        } catch (error) {
+            console.error(error);
+            setIsSubmitting(false);
+        }
+    }
+
+    const handleOpenDeleteClassDialog = (deletedClass) => {
+        setDeletedClass(deletedClass);
+        setOpenDeleteClassDialog(true);
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setDeletedClass({});
+        setOpenDeleteClassDialog(false);
+    }
+
+    const handleDeleteClass = async () => {
+        setIsSubmitting(true)
+        try {
+            await axios.delete(`${HOG_API}/api/Schedule/Class/Delete/${deletedClass.id}`)
+                .then((res) => console.log(res))
+                .catch((error) => {
+                    throw error;
+                })
+            setIsSubmitting(false)
+            navigate(0);
+        } catch (error) {
+            console.error(error);
+            setIsSubmitting(false)
+        }
+    }
+
 
     return (
         <>
@@ -274,8 +318,9 @@ export function ClassList({ classes }) {
                 <Card>
                     <RegistrationTableToolbar
                         filterName={filterName}
+                        filterDate={filterDate}
                         onFilterName={handleFilterName}
-                        onResetFilter={handleResetFilter}
+                        onFilterDate={handleFilterDate}
                     />
 
                     <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
@@ -291,16 +336,16 @@ export function ClassList({ classes }) {
                                             hover
                                             key={index}
                                             sx={{ cursor: "pointer" }}
+                                            onClick={() => handleSelectClass(row)}
                                         >
-                                            <TableCell align="left"> {row.date} </TableCell>
                                             <TableCell align="left">{row.time}</TableCell>
-                                            <TableCell align="left">{row.teacher}</TableCell>
+                                            <TableCell align="left">{row.teacherNickname}</TableCell>
                                             <TableCell align="left">{row.course}</TableCell>
                                             <TableCell align="left">{row.section}</TableCell>
-                                            <TableCell align="left">{_.capitalize(row.method)}</TableCell>
-                                            <TableCell align="left">{row.room}</TableCell>
+                                            <TableCell align="left">{row.method}</TableCell>
+                                            <TableCell align="left">{row.room === '' ? '-' : row.room}</TableCell>
                                             <TableCell>
-                                                <Iconify icon="ic:chevron-right" />
+                                                <EditIcon fontSize="small" color="action" />
                                             </TableCell>
 
                                         </TableRow>
@@ -322,6 +367,36 @@ export function ClassList({ classes }) {
                         onRowsPerPageChange={onChangeRowsPerPage}
                     />
                 </Card>
+
+                {Object.keys(selectedClass).length > 0 && (
+                    <EditClassDialog
+                        open={openEditClassDialog}
+                        close={handleCloseEditClassDialog}
+                        schedule={selectedClass}
+                        students={selectedClass.students}
+                        hourPerClass={selectedClass.hourPerClass}
+                        onEdit={handleEditClass}
+                        onDelete={handleOpenDeleteClassDialog}
+                        courseCustom
+                    />
+                )}
+
+                {Object.keys(deletedClass).length > 0 && (
+                    <Dialog open={openDeleteClassDialog} onClose={handleCloseDeleteDialog}>
+                        <DialogTitle>
+                            Delete Class?
+                        </DialogTitle>
+                        <DialogContent>
+                            {`Once deleted, ${deletedClass.course} on ${fDate(deletedClass.date, 'dd-MMM-yyyy')} (${deletedClass.fromTime} - ${deletedClass.toTime}) will be removed from the system.`}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" color="inherit" onClick={handleCloseDeleteDialog}>Cancel</Button>
+                            <LoadingButton loading={isSubmitting} variant="contained" color="error" onClick={handleDeleteClass}>
+                                Delete
+                            </LoadingButton>
+                        </DialogActions>
+                    </Dialog>
+                )}
             </Container>
         </>
     );
@@ -333,8 +408,7 @@ function applyFilter({
     inputData,
     comparator,
     filterName,
-    filterStatus,
-    filterRole,
+    filterDate,
 }) {
     const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -346,21 +420,19 @@ function applyFilter({
 
     inputData = stabilizedThis.map((el) => el[0]);
 
-    // if (filterName) {
-    //   inputData = inputData.filter((request) => request.id.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 || request.courseType.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
-    // }
-    // if (filterName) {
-    //     inputData = inputData.filter((request) =>
-    //         request.id === parseInt(filterName, 10) ||
-    //         request.requestDate.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-    //         request.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
-    // }
+    if (filterDate) {
+        inputData = inputData.filter((eachClass) => eachClass.date.toLowerCase().indexOf(fDate(filterDate, 'dd-MMMM-yyyy').toLowerCase()) !== -1)
+    }
 
-    // if (filterRole !== '') {
-    //     inputData = inputData.filter((request) => request.role === filterRole);
-    // }
-
-
+    if (filterName) {
+        inputData = inputData.filter((eachClass) => eachClass.time.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+            eachClass.teacherNickname.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+            eachClass.course.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+            eachClass.section.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+            eachClass.method.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
+            eachClass.room.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+        );
+    }
 
     return inputData;
 }
@@ -371,15 +443,23 @@ RegistrationTableToolbar.propTypes = {
     isFiltered: PropTypes.bool,
     filterName: PropTypes.string,
     onFilterName: PropTypes.func,
+    onFilterDate: PropTypes.func,
     onResetFilter: PropTypes.func,
 };
 
 export function RegistrationTableToolbar({
     isFiltered,
     filterName,
+    filterDate,
     onFilterName,
+    onFilterDate,
     onResetFilter,
 }) {
+
+    const onKeyDown = (e) => {
+        e.preventDefault();
+    };
+
     return (
         <Stack
             spacing={2}
@@ -390,6 +470,18 @@ export function RegistrationTableToolbar({
             }}
             sx={{ px: 2.5, py: 3 }}
         >
+
+            <DatePicker
+                label="Date"
+                minDate={new Date()}
+                value={filterDate}
+                onChange={onFilterDate}
+                renderInput={(params) => (
+                    <TextField onKeyDown={onKeyDown} {...params} />
+                )}
+                disableMaskedInput
+                inputFormat="dd-MMM-yyyy"
+            />
 
             <TextField
                 fullWidth

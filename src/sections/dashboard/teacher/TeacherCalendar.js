@@ -60,11 +60,16 @@ export default function TeacherCalendar({ currentTeacher }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {teacherPrivateClass.length > 0 && (
+            {teacherPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === value.getTime())
+                .map((eachClass, index) => (
+                    <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />
+                ))
+            }
+            {/* {teacherPrivateClass.length > 0 && (
                 teacherPrivateClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='teacher' eachClass={eachClass} />))
-            )}
+            )} */}
             {/* {teacherGroupClass.length > 0 && (
                 teacherGroupClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&

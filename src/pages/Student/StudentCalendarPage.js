@@ -24,6 +24,7 @@ export default function StudentCalendarPage() {
 
     const { user } = useAuthContext();
     const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
+    // console.log(user.id)
 
     // Course ID
     const [studentCourse, setStudentCourse] = useState();
@@ -51,7 +52,7 @@ export default function StudentCalendarPage() {
     }
 
     const mappedStudentClasses = [];
-    console.log(studentCourse)
+    
     studentCourse.forEach((currentCourse) => {
         const course = {
             id: currentCourse.registeredCourse.id.toString(),
@@ -60,22 +61,28 @@ export default function StudentCalendarPage() {
             level: currentCourse.registeredCourse.level,
             type: currentCourse.request.courseType,
             section: currentCourse.registeredCourse.section,
+            paymentStatus: currentCourse.request.paymentStatus
         }
 
         const currentClasses = currentCourse.registeredClasses;
         const mappedClasses = currentClasses.map((eachClass, index) => {
+            const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record=>record.studentId === user.id)
+            console.log(eachClass.studentPrivateClasses)
+            // console.log(mappedAttendanceStudent)
+
             return {
                 id: eachClass.id,
                 course,
                 classNo: index,
-                students: [{ id: '1', fullName: 'Piyaphon Wu' }],
+                // students: [{ id: '1', fullName: 'Piyaphon Wu' }],
                 date: eachClass.date,
                 fromTime: eachClass.fromTime,
                 toTime: eachClass.toTime,
                 room: eachClass.room,
                 section: course.section,
                 teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-                attendance: 'Present'
+                attendance: mappedAttendanceStudent.attendance,
+                paymentStatus: course.paymentStatus
             };
         });
 

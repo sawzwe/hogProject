@@ -101,7 +101,6 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                     status: "Incomplete"
                 }
             }
-            console.log(formattedData)
 
             await axios.post(`${HOG_API}/api/Schedule/Class/Post`, formattedData)
                 .then((res) => console.log(res))

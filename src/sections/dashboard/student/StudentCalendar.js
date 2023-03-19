@@ -19,6 +19,7 @@ StudentCalendar.propTypes = {
 
 // export default function StudentCalendar({ currentStudent }) {
 export default function StudentCalendar({ currentStudent }) {
+
     const isDesktop = useResponsive('up', 'lg');
     // console.log('current',currentStudent)
     // const today = new Date(2023, 2, 15);
@@ -29,7 +30,7 @@ export default function StudentCalendar({ currentStudent }) {
 
     const [value, setValue] = useState(today);
     // console.log(real)
-    
+
     const studentPrivateClass = currentStudent;
     // const { studentPrivateClass, studentGroupClass, studentPrivateCourse, studentGroupCourse } = currentStudent;
 
@@ -41,7 +42,7 @@ export default function StudentCalendar({ currentStudent }) {
         <>
             {isDesktop ? (
                 <DesktopDatePicker
-                    value={value}   
+                    value={value}
                     onChange={(newValue) => {
                         setValue(newValue);
                     }}
@@ -69,11 +70,17 @@ export default function StudentCalendar({ currentStudent }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {studentPrivateClass.length > 0 && (
+            {studentPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === value.getTime())
+                .map((eachClass, index) => (
+                    <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />
+                ))
+            }
+
+            {/* {studentPrivateClass.length > 0 && (
                 studentPrivateClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
                     <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />))
-            )}
+            )} */}
             {/* {studentGroupClass.length > 0 && (
                 studentGroupClass.map((eachClass, index) =>
                 (new Date(eachClass.date).getTime() === value.getTime() &&
