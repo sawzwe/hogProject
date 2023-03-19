@@ -57,6 +57,7 @@ export default function StudentPrivateCourseDetailPage() {
         return <LoadingScreen />
     }
 
+    
     const currentcourse = studentCourse.find(item => item.registeredCourse.id === parseInt(id,10));
     // console.log('currentcourse',currentcourse)
     const course = {
@@ -66,14 +67,15 @@ export default function StudentPrivateCourseDetailPage() {
         level: currentcourse.registeredCourse.level,
         type: currentcourse.request.courseType,
         section:currentcourse.registeredCourse.section,
+        paymentStatus: currentcourse.request.paymentStatus
     }
-
+    // console.log(currentcourse)
     const currentclasses = currentcourse.registeredClasses;   
     
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
         const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record=>record.studentId === user.id)
-  
+        // console.log(eachClass.request.paymentStatus)
         return {
           id: eachClass.id,
           course,
@@ -85,7 +87,8 @@ export default function StudentPrivateCourseDetailPage() {
           room: eachClass.room,
           section: course.section,
           teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-          attendance: mappedAttendanceStudent.attendance
+          attendance: mappedAttendanceStudent?.attendance || '' ,
+          paymentStatus: course.paymentStatus
         };
       });
       

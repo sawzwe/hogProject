@@ -14,6 +14,7 @@ ClassCard.propTypes = {
 };
 
 export default function ClassCard({ accountRole, eachClass, onOpen }) {
+    // console.log('card',eachClass)
     
     const teacher = eachClass.teacher.fullName
     const {

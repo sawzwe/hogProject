@@ -48,17 +48,18 @@ export default function TeacherCalendarPage() {
     if (teacherCourse === undefined) {
         return <LoadingScreen />
     }
-    console.log(teacherCourse)
+    // console.log(teacherCourse)
     const mappedStudentClasses = [];
-    
+
     teacherCourse.forEach((currentCourse) => {
         const course = {
-            id: currentCourse.courses.id.toString(),
-            course: currentCourse.courses.course,
-            subject: currentCourse.courses.subject,
-            level: currentCourse.courses.level,
-            type: currentCourse.courses.method,
-            section: currentCourse.courses.section,
+            id: currentCourse.course.id.toString(),
+            course: currentCourse.course.course,
+            subject: currentCourse.course.subject,
+            level: currentCourse.course.level,
+            type: currentCourse.request.courseType,
+            section: currentCourse.course.section,
+            paymentStatus: currentCourse.request.paymentStatus
         }
 
         const currentClasses = currentCourse.classes;
@@ -66,7 +67,7 @@ export default function TeacherCalendarPage() {
             return {
                 id: eachClass.id,
                 course,
-                classNo: index,
+                classNo: (index + 1),
                 students: [{ id: '1', fullName: 'Piyaphon Wu' }],
                 date: eachClass.date,
                 fromTime: eachClass.fromTime,
@@ -74,13 +75,20 @@ export default function TeacherCalendarPage() {
                 room: eachClass.room,
                 section: course.section,
                 teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-                attendance: 'Present'
+                paymentStatus: course.paymentStatus
+                // attendance: 'Present'
             };
         });
 
         mappedStudentClasses.push(...mappedClasses);
     });
     // console.log(mappedStudentClasses)
+    // Filter the classes based on the teacher ID
+    const filteredClasses = mappedStudentClasses.filter((eachClass) => eachClass.teacher.id === user.id);
+
+    // Log the filtered classes to the console
+    // console.log(filteredClasses);
+
     // console.log('teacher',currentTeacher)
     return (
         <>
@@ -92,7 +100,7 @@ export default function TeacherCalendarPage() {
                 <Typography variant="h4" gutterBottom>
                     Teacher Calendar
                 </Typography>
-                <TeacherCalendar currentTeacher={mappedStudentClasses} />
+                <TeacherCalendar currentTeacher={filteredClasses} />
             </Container>
         </>
     );
