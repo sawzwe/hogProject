@@ -70,7 +70,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
             axios
                 .all(
                     newAttendanceData.map(({ data }) => {
-                        console.log(data);
+                        // console.log(data);
                         return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
                         .then(res => console.log(res))
                     })
@@ -99,7 +99,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                     console.error('Error updating attendance data', error);
                 });
 
-            // navigate(0, { replace: true });
+            navigate(-1, { replace: true });
             // navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
             enqueueSnackbar('Successfully submitted', { variant: 'success' });
         } else {
