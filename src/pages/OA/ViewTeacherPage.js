@@ -28,10 +28,8 @@ export default function NewAccountPage() {
     const fetchData = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${id}`)
             .then((res) => {
-                console.log('res', res);
                 const data = res.data.data
                 setTeacher(data)
-                console.log('data', data)
             })
             .catch((error) => navigate('*', { replace: false }))
     }
@@ -46,6 +44,8 @@ export default function NewAccountPage() {
         return <LoadingScreen />
     }
 
+    console.log(teacher);
+
     const TEACHER_DATA = {
         id: teacher.id.toString(),
         role: 'Teacher',
@@ -58,33 +58,33 @@ export default function NewAccountPage() {
         email: teacher.email,
         workTimes: (() => {
             const workTimes = {
-              monday: {
-                fromTime:  '',
-                toTime:      ''
-              },
-                tuesday:  {
-                  fromTime:   '',
-                  toTime:      ''
+                monday: {
+                    fromTime: '',
+                    toTime: ''
                 },
-                wednesday:  {
-                  fromTime:   '',
-                  toTime:      ''
+                tuesday: {
+                    fromTime: '',
+                    toTime: ''
                 },
-                thursday:  {
-                  fromTime:   '',
-                  toTime:  ''
+                wednesday: {
+                    fromTime: '',
+                    toTime: ''
                 },
-                friday:  {
-                  fromTime:   '',
-                  toTime:     ''
+                thursday: {
+                    fromTime: '',
+                    toTime: ''
                 },
-                saturday:  {
-                  fromTime:   '',
-                  toTime:     ''
+                friday: {
+                    fromTime: '',
+                    toTime: ''
                 },
-                sunday:  {
-                  fromTime:  '',
-                  toTime:     ''
+                saturday: {
+                    fromTime: '',
+                    toTime: ''
+                },
+                sunday: {
+                    fromTime: '',
+                    toTime: ''
                 },
             };
 

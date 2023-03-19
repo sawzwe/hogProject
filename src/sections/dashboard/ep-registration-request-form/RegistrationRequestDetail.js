@@ -38,7 +38,9 @@ import {
     FormGroup,
     DialogActions,
     DialogTitle,
-    DialogContent
+    DialogContent,
+    Radio,
+    RadioGroup
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -1167,6 +1169,8 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
 
     const dataFetchedRef = useRef(false);
 
+    const [paymentType, setPaymentType] = useState("");
+
     // Firebase
     const firebaseApp = initializeApp(FIREBASE_API);
     const storage = getStorage(firebaseApp);
@@ -1194,6 +1198,13 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                 .catch((error) => {
                     throw error;
                 })
+
+            await axios.get(`${HOG_API}/api/Payment/GetPrivatePayment/${request.id}`)
+                .then((res) => {
+                    setPaymentType(res.data.data[0].paymentType)
+                })
+                .catch((error) => console.error(error))
+
         } catch (error) {
             console.error(error);
         }
@@ -1227,10 +1238,6 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
         setOpenCourseDialog(false);
     }
 
-    if (filesURL.length === 0) {
-        return <LoadingScreen />
-    }
-
     return (
         <>
             <Grid container spacing={3}>
@@ -1258,6 +1265,15 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                                 }}>
                                 Payment Attachments
                             </Typography>
+                            <RadioGroup
+                                value={paymentType}
+                                sx={{ my: 2, mx: 1 }}
+                            >
+                                <Stack direction="row" spacing={1}>
+                                    <FormControlLabel value="Complete Payment" disabled control={<Radio />} label="Complete Payment" />
+                                    <FormControlLabel value="Installments Payment" disabled control={<Radio />} label="Installment Payment" />
+                                </Stack>
+                            </RadioGroup>
                             <Stack direction="row">
                                 {filesURL.map((file) => {
                                     return (

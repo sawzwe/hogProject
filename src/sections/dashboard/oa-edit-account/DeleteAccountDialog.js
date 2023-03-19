@@ -23,23 +23,32 @@ export default function DeleteAccountDialog({ accountId, accountRole, accountNam
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const element = document.querySelector('#delete-request-error-handling .status');
-    
+
     const handleDelete = async () => {
-      setIsSubmitting(true);
-    
-      try {
-        await axios.delete(`${HOG_API}/api/Teacher/Delete/${accountId}`);
-        enqueueSnackbar("Deleted the account successfully", { variant: 'success' });
-        navigate(-1)
-      } catch (error) {
-        console.error('There was an error!', error);
-        element.parentElement.innerHTML = `Error: ${error.message}`;
-      }
-    
-      setIsSubmitting(false);
+        setIsSubmitting(true);
+
+        try {
+            console.log(accountId, accountRole, accountName)
+            if (accountRole === 'Teacher') {
+                await axios.delete(`${HOG_API}/api/Teacher/Delete/${accountId}`)
+                    .catch((error) => {
+                        throw error;
+                    })
+                enqueueSnackbar("Deleted the account successfully", { variant: 'success' });
+                navigate('/account/teacher-management/teacher')
+            }
+            // await axios.delete(`${HOG_API}/api/Teacher/Delete/${accountId}`);
+            // enqueueSnackbar("Deleted the account successfully", { variant: 'success' });
+            // navigate(-1)
+        } catch (error) {
+            console.error('There was an error!', error);
+            element.parentElement.innerHTML = `Error: ${error.message}`;
+        }
+
+        setIsSubmitting(false);
     };
-    
-      
+
+
 
     return (
         <Dialog maxWidth="md" open={open} onClose={onClose}>

@@ -158,9 +158,9 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
         setOpenCourseDialog(false);
     }
 
-    if (filesURL.length === 0) {
-        return <LoadingScreen />
-    }
+    // if (filesURL.length === 0) {
+    //     return <LoadingScreen />
+    // }
 
     const handleAccept = async () => {
         setIsSubmitting(true);
@@ -260,7 +260,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                             >
                                 <Stack direction="row" spacing={1}>
                                     <FormControlLabel value="Complete Payment" disabled control={<Radio />} label="Complete Payment" />
-                                    <FormControlLabel value="Installment Payment" disabled control={<Radio />} label="Installment Payment" />
+                                    <FormControlLabel value="Installments Payment" disabled control={<Radio />} label="Installment Payment" />
                                 </Stack>
                             </RadioGroup>
                             <Stack direction="row">

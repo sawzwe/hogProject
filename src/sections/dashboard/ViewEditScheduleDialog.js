@@ -86,21 +86,24 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         try {
             const formattedData = {
                 courseId: selectedCourse.id,
-                room: "",
-                method: addedClass.method,
-                date: fDate(addedClass.date, 'dd-MMM-yyyy'),
-                fromTime: addedClass.fromTime,
-                toTime: addedClass.toTime,
-                studentPrivateClasses: students.map((student) => ({
-                    studentId: student.studentId,
-                    attendance: "None"
-                })),
-                teacherPrivateClass: {
-                    teacherId: addedClass.teacher.id,
-                    workType: addedClass.teacher.workType,
-                    status: "Incomplete"
+                privateClass: {
+                    room: "",
+                    method: addedClass.method,
+                    date: fDate(addedClass.date, 'dd-MMM-yyyy'),
+                    fromTime: addedClass.fromTime,
+                    toTime: addedClass.toTime,
+                    studentPrivateClasses: students.map((student) => ({
+                        studentId: student.studentId,
+                        attendance: "None"
+                    })),
+                    teacherPrivateClass: {
+                        teacherId: addedClass.teacher.id,
+                        workType: addedClass.teacher.workType,
+                        status: "Incomplete"
+                    }
                 }
             }
+            console.log(formattedData);
 
             await axios.post(`${HOG_API}/api/Schedule/Class/Post`, formattedData)
                 .then((res) => console.log(res))
@@ -110,6 +113,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
 
             // navigate(0);
         } catch (error) {
+            console.error(error);
             enqueueSnackbar(error.message, { variant: "error" })
         }
 

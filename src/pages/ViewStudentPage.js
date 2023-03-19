@@ -11,6 +11,7 @@ import { useAuthContext } from '../auth/useAuthContext';
 // routes
 import { PATH_ACCOUNT } from '../routes/paths';
 // components
+import ResetPasswordDialog from '../components/ResetPasswordDialog';
 import LoadingScreen from '../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../components/settings';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
@@ -26,7 +27,7 @@ export default function ViewStudentPage() {
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
 
     const dataFetchedRef = useRef(false);
 
@@ -36,6 +37,8 @@ export default function ViewStudentPage() {
     const [student, setStudent] = useState();
     const [avatarURL, setAvatarURL] = useState();
     const [filesURL, setFilesURL] = useState([]);
+
+    const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
 
     const fetchData = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${id}`, config)
@@ -76,10 +79,6 @@ export default function ViewStudentPage() {
         return <LoadingScreen />;
     };
 
-    const handleResetPassword = () => {
-        console.log('Reset Password');
-    };
-
     return (
         <>
             <Helmet>
@@ -100,9 +99,8 @@ export default function ViewStudentPage() {
                     action={
                         <>
                             <Stack direction="row" spacing={2}>
-                                <Button size='large' color="inherit" variant='outlined' onClick={handleResetPassword}>Reset Password</Button>
+                                <Button size='large' color="inherit" variant='outlined' onClick={() => setOpenResetPasswordDialog(true)}>Reset Password</Button>
                                 <Button component={Link} to={`/account/student-management/student/${id}/edit`} size='large' variant='contained'>Edit Student</Button>
-
                             </Stack>
                         </>
                     }
@@ -110,6 +108,13 @@ export default function ViewStudentPage() {
 
                 <ViewStudent student={student} avatarURL={avatarURL} filesURL={filesURL} />
             </Container>
+
+            <ResetPasswordDialog
+                open={openResetPasswordDialog}
+                onClose={() => setOpenResetPasswordDialog(false)}
+                email={student.email}
+            />
+
         </>
     );
 }

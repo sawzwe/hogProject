@@ -100,9 +100,9 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
         const currentCourse = allCourses.find((eachCourse) => eachCourse.course.id === course.id).course
         const currentRequest = allCourses.find((eachCourse) => eachCourse.course.id === course.id).request
         const currentSchedules = allCourses.find((eachCourse) => eachCourse.course.id === course.id).classes
-        console.log('cc', currentCourse)
-        console.log('cr', currentRequest)
-        console.log('cs', currentSchedules)
+        // console.log('cc', currentCourse)
+        // console.log('cr', currentRequest)
+        // console.log('cs', currentSchedules)
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
