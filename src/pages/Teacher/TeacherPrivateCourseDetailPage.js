@@ -10,6 +10,7 @@ import LoadingScreen from '../../components/loading-screen/LoadingScreen';
 import { useSettingsContext } from '../../components/settings';
 // sections
 import TeacherAllClasses from '../../sections/dashboard/teacher/TeacherAllClasses'
+import TeacherCheckPrivateAttendance from './TeacherCheckPrivateAttendancePage';
 import { currentTeacher } from './mockup';
 import { useAuthContext } from '../../auth/useAuthContext';
 
@@ -35,7 +36,7 @@ export default function TeacherPrivateCourseDetailPage() {
     const [teacherCourse, setTeacherCourse] = useState();
 
     const fetchClass = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${1}`, config)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data
@@ -59,51 +60,62 @@ export default function TeacherPrivateCourseDetailPage() {
     }
 
 
-    const currentcourse = teacherCourse.find(item => item.registeredCourses.id === parseInt(courseId, 10));
+    const currentcourse = teacherCourse.find(item => item.course.id === parseInt(courseId, 10));
     const course = {
-        id: currentcourse.registeredCourses.id.toString(),
-        course: currentcourse.registeredCourses.course,
-        subject: currentcourse.registeredCourses.subject,
-        level: currentcourse.registeredCourses.level,
-        type: currentcourse.registeredCourses.method,
-        section: currentcourse.registeredCourses.section,
+        id: currentcourse.course.id.toString(),
+        course: currentcourse.course.course,
+        subject: currentcourse.course.subject,
+        level: currentcourse.course.level,
+        type: currentcourse.request.courseType,
+        section: currentcourse.course.section,
     }
 
 
 
-    const currentclasses = currentcourse.registeredClasses;
+    const currentclasses = currentcourse.classes;
     // console.log(currentclasses)
+
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
         const mappedAttendanceStudent = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
-            // console.log( eachClass.teacherPrivateClass.status)
-            return {
-                attendance: studentPrivateClass.attendance,
-                attendanceStatus : eachClass.teacherPrivateClass.status,    
-            };
+          return {
+            student: { 
+              id: studentPrivateClass.studentId,  
+              fullName: studentPrivateClass.fullName, 
+              nickname: studentPrivateClass.nickname
+            }, 
+            value: studentPrivateClass.attendance
+          };
         });
-        // console.log('hi',mappedAttendanceStudent[0].attendance)
-
+      
         return {
-            id: eachClass.id,
-            course,
-            classNo: (index + 1),
-            // students: { id: '2', fullName: 'Michael Bull' },
-            date: eachClass.date,
-            fromTime: eachClass.fromTime,
-            attendanceStatus : mappedAttendanceStudent[0].attendanceStatus,    
-            // attendanceStatus : 'Complete',
-            toTime: eachClass.toTime,
-            room: eachClass.room,
-            section: course.section,
-            teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-            // studentAttendance: [
-            //     { student: { id: '2', firstName: 'Michael', lastName: 'Bull', fullName: 'Michael Bull', nickname: 'Michael' }, value: 'Present' }
-            // ]
+          id: eachClass.id,
+          course,
+          classNo: (index + 1),
+          date: eachClass.date,
+          fromTime: eachClass.fromTime,
+          attendanceStatus: eachClass.teacherPrivateClass.status, // include attendance status for this class
+          toTime: eachClass.toTime,
+          room: eachClass.room,
+          section: course.section,
+          teacher: { 
+            id: eachClass.teacherPrivateClass.teacherId, 
+            fullName: eachClass.teacherPrivateClass.fullName 
+          },
+          studentAttendance: mappedAttendanceStudent.map((attendance) => { // map attendance records for each student in this class
+            return {
+              student: attendance.student,
+              value: attendance.value
+            };
+          })
         };
-    });
+      });
+      
     // console.log(currentTeacher)
     // console.log(mappedStudentClass)
+    const filteredClasses = mappedStudentClass.filter((eachClass) => eachClass.teacher.id === user.id);
+    // console.log(filteredClasses)
+
 
     return (
         <>
@@ -124,7 +136,7 @@ export default function TeacherPrivateCourseDetailPage() {
                 <Typography variant="body2" sx={{ ml: 3.5 }}>
                     {course.section}
                 </Typography>
-                <TeacherAllClasses classes={mappedStudentClass} />
+                <TeacherAllClasses classes={filteredClasses} />
             </Container>
         </>
     );
