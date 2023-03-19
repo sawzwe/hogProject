@@ -390,7 +390,7 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
 
                 <Grid item xs={12} md={7}>
                     <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                             <Typography variant="h6">
                                 Classes & Schedules
                             </Typography>
@@ -427,7 +427,9 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
                                                 <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
                                                 <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
                                                 <StyledTableCell align="center">{_.capitalize(eachClass.method)}</StyledTableCell>
-                                                <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.nickname} {!!eachClass.teacherPrivateClass?.workType ? `(${eachClass.teacherPrivateClass.workType})` : ''}</StyledTableCell>
+                                                <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass?.nickname.toUpperCase() || ""}
+                                                    {!!eachClass.teacherPrivateClass?.workType ? eachClass.teacherPrivateClass.workType !== 'Normal' && `(${eachClass.teacherPrivateClass.workType})` : ""}
+                                                </StyledTableCell>
                                                 <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                             </StyledTableRow>
                                         )

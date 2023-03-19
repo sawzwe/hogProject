@@ -256,7 +256,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                             </Typography>
                             <RadioGroup
                                 value={paymentType}
-                                sx={{my: 2, mx: 1}}
+                                sx={{ my: 2, mx: 1 }}
                             >
                                 <Stack direction="row" spacing={1}>
                                     <FormControlLabel value="Complete Payment" disabled control={<Radio />} label="Complete Payment" />
@@ -319,6 +319,32 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                         </Box>
                     </Card>
                 </Grid>
+
+                {!!request.oaRemark && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                OA Remark
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={request.oaRemark} label="Comment by Office Admin" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
 
                 {request.status !== 'Complete' && request.status !== 'Reject' && request.paymentStatus !== 'Incomplete' &&
                     <Grid item xs={12} md={12}>

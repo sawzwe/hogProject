@@ -45,7 +45,7 @@ import { fDate } from '../../utils/formatTime'
 // components
 import { useSnackbar } from '../../components/snackbar';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
-import FormProvider, { RHFSelect } from '../../components/hook-form';
+import FormProvider, { RHFSelect, RHFTextField } from '../../components/hook-form';
 //
 import { HOG_API } from '../../config';
 // ----------------------------------------------------------------
@@ -72,8 +72,13 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         'Onsite', 'Online'
     ];
 
+    const HOUR_OPTIONS = [
+        '1', '2', '3'
+    ];
+
     const defaultValues = {
         classDate: '',
+        classHour: '',
         classTime: '',
         classTeacher: '',
         classMethod: _.capitalize(method)
@@ -99,7 +104,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
-            hourPerClass,
+            hourPerClass: data.classHour,
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
             method: data.classMethod,
@@ -111,27 +116,32 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         if (result === "success") {
             reset();
         }
-        // reset();
-        // setValue('classDate', data.classDate);
-        // onClose();
-        // setTimeout(() => {
-        //     reset(defaultValues);
-        //     resetValue();
-        // }, 200)
     }
 
     const handleChangeDate = async (newDate) => {
         resetValue();
         setValue('classDate', newDate);
+        let studentList = "";
+        students.forEach((eachStudent, index) => {
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+        })
+    }
+
+    const handleChangeHourPerClass = (newHour) => {
+        setAvailableTeacher();
+        setAvailableTime();
+        setValue('classHour', newHour)
+        setValue('classTime', '')
+        setValue('classTeacher', '')
+
         setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
             studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
         })
-        console.log(students);
 
         try {
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)
+            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}`)
                 .then(((res) => {
                     setAvailableTime(res.data.data)
                     setIsLoadingTime(false);
@@ -169,10 +179,11 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
     }
 
     const resetValue = () => {
-        setValue('classDate', '')
-        setValue('classTime', '')
-        setValue('classTeacher', '')
-        setValue('classMethod', _.capitalize(method))
+        setValue('classDate', '');
+        setValue('classHour', '')
+        setValue('classTime', '');
+        setValue('classTeacher', '');
+        setValue('classMethod', _.capitalize(method));
         setAvailableTime();
         setAvailableTeacher();
     }
@@ -188,7 +199,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                 <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
                 <DialogContent>
                     <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={2.5}>
                             <Controller
                                 name="classDate"
                                 control={control}
@@ -209,7 +220,37 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={1.5}>
+                            <RHFSelect
+                                fullWidth
+                                name="classHour"
+                                label="Hours"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                onChange={(event) => handleChangeHourPerClass(event.target.value)}
+                                disabled={!values.classDate}
+                                required={!!values.classDate}
+                            >
+                                {HOUR_OPTIONS.map((eachHour, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachHour}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachHour}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={6} md={2.5}>
                             {availableTime === undefined && !isLoadingTime && (
                                 <TextField
                                     fullWidth
@@ -269,7 +310,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={3}>
                             {availableTeacher === undefined && !isLoadingTeacher && (
                                 <TextField
                                     fullWidth
@@ -323,14 +364,14 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                            {`${eachTeacher.nickname.toUpperCase()} - ${eachTeacher.fName.toUpperCase()} (${eachTeacher.workType})`}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={2.5}>
                             <RHFSelect
                                 fullWidth
                                 name="classMethod"
@@ -363,7 +404,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                     <Button variant="outlined" color="inherit" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="contained" color="primary">
+                    <Button type="submit" variant="contained" color="primary" disabled={values.classTime === '' || values.classTeacher === ''}>
                         Add
                     </Button>
                 </DialogActions>

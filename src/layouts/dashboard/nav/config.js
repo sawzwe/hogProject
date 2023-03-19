@@ -5,6 +5,7 @@ import LockResetIcon from '@mui/icons-material/LockReset';
 import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 // routes
 import { PATH_AUTH, PATH_ACCOUNT, PATH_REGISTRATION, PATH_COURSE_TRANSFER, PATH_SCHEDULE_CHANGING } from '../../../routes/paths';
 // components
@@ -33,7 +34,8 @@ const ICONS = {
   file: icon('ic_file'),
   group: <GroupIcon />,
   changePassword: <LockResetIcon />,
-  logout: <LogoutIcon />
+  logout: <LogoutIcon />,
+  teacher: <AssignmentIndIcon />
 };
 
 // ----------------------------------------------------------------------
@@ -70,15 +72,15 @@ const EPNavConfig = [
           { title: 'Request Status', path: PATH_REGISTRATION.epRequestStatus },
         ]
       },
-      {
-        title: 'course transferring',
-        path: PATH_COURSE_TRANSFER.root,
-        icon: ICONS.file,
-        children: [
-          { title: 'Create Request', path: PATH_COURSE_TRANSFER.createRequest},
-          { title: 'Request Status', path: PATH_COURSE_TRANSFER.epCourseTransferRequest },
-        ]
-      },
+      // {
+      //   title: 'course transferring',
+      //   path: PATH_COURSE_TRANSFER.root,
+      //   icon: ICONS.file,
+      //   children: [
+      //     { title: 'Create Request', path: PATH_COURSE_TRANSFER.createRequest},
+      //     { title: 'Request Status', path: PATH_COURSE_TRANSFER.epCourseTransferRequest },
+      //   ]
+      // },
     ],
   },
 
@@ -120,7 +122,7 @@ const EANavConfig = [
       {
         title: 'teacher',
         path: PATH_ACCOUNT.teacherManagement.root,
-        icon: ICONS.user,
+        icon: ICONS.teacher,
         children: [
           { title: 'personal detail', path: PATH_ACCOUNT.teacherManagement.searchTeacher },
           { title: 'course detail', path: PATH_ACCOUNT.teacherManagement.searchCourseTeacher },
@@ -134,15 +136,15 @@ const EANavConfig = [
     subheader: 'request management',
     items: [
       { title: 'registration request', path: PATH_REGISTRATION.eaRequestStatus, icon: ICONS.mail },
-      {
-        title: 'schedule request',
-        path: PATH_SCHEDULE_CHANGING.root,
-        icon: ICONS.file,
-        children: [
-          { title: 'student', path: PATH_SCHEDULE_CHANGING.studentRequest },
-          { title: 'staff', path: PATH_SCHEDULE_CHANGING.staffRequest },
-        ],
-      },
+      // {
+      //   title: 'schedule request',
+      //   path: PATH_SCHEDULE_CHANGING.root,
+      //   icon: ICONS.file,
+      //   children: [
+      //     { title: 'student', path: PATH_SCHEDULE_CHANGING.studentRequest },
+      //     { title: 'staff', path: PATH_SCHEDULE_CHANGING.staffRequest },
+      //   ],
+      // },
     ]
   },
 

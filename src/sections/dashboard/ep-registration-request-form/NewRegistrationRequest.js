@@ -617,7 +617,7 @@ export function NewSemiPrivateRequestForm({ studentList, educationPlannerId }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <RHFTextField name="additionalComment" label="Add comment here" />
+                                <RHFTextField name="additionalComment" label="Comment to Education Admin" />
                             </Box>
                         </Card>
                     </Grid>

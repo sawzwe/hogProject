@@ -88,8 +88,7 @@ export default function DailyCalendarPage() {
                             students: eachClass.studentPrivateClasses,
                             teacher: {
                                 id: eachClass.teacherPrivateClass?.teacherId || null,
-                                status: eachClass.teacherPrivateClass?.status,
-                                currentId: eachClass.teacherPrivateClass?.id
+                                status: eachClass.teacherPrivateClass?.status
                             },
                             hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
                         }])
@@ -253,6 +252,8 @@ export function ClassList({ classes }) {
     const handleEditClass = async (newClass) => {
         setIsSubmitting(true);
         try {
+            console.log('newClass', newClass);
+            console.log('SelectedClass',selectedClass);
             const formattedData = {
                 id: newClass.id,
                 room: newClass.room,
@@ -266,19 +267,21 @@ export function ClassList({ classes }) {
                     attendance: student.attendance
                 })),
                 teacherPrivateClass: {
-                    id: selectedClass.teacher.currentId,
+                    id: selectedClass.id,
                     teacherId: newClass.teacher.id,
                     workType: newClass.teacher.workType,
                     status: selectedClass.teacher.status
                 }
             }
 
+            // console.log(formattedData);
             await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
+                .then((res) => console.log(res))
                 .catch((error) => {
                     throw error
                 })
             setIsSubmitting(false);
-            navigate(0)
+            // navigate(0)
         } catch (error) {
             console.error(error);
             setIsSubmitting(false);
@@ -377,6 +380,7 @@ export function ClassList({ classes }) {
                         hourPerClass={selectedClass.hourPerClass}
                         onEdit={handleEditClass}
                         onDelete={handleOpenDeleteClassDialog}
+                        isSubmitting={isSubmitting}
                         courseCustom
                     />
                 )}
@@ -465,7 +469,7 @@ export function RegistrationTableToolbar({
             spacing={2}
             alignItems="center"
             direction={{
-                xs: 'column',
+                xs: 'row',
                 md: 'row',
             }}
             sx={{ px: 2.5, py: 3 }}

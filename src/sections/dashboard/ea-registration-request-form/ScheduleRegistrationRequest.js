@@ -499,6 +499,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     }
 
     const handleAddClass = async (newClass) => {
+
         let hasConflict = false;
         await schedules.forEach((eachClass) => {
 
@@ -792,7 +793,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                                                     <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
                                                     <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.nickname} ${eachClass.teacher.workType === 'Normal' ? '' : `(${eachClass.teacher.workType})`} `}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.nickname.toUpperCase()} ${eachClass.teacher.workType === 'Normal' ? '' : `(${eachClass.teacher.workType})`} `}</StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                                     <StyledTableCell align="center" > {
                                                         <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
@@ -822,7 +823,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     schedule={selectedSchedule}
                     onEdit={handleEditClass}
                     onDelete={handleDeleteClass}
-                    hourPerClass={selectedCourse.hourPerClass}
+                    // hourPerClass={selectedSchedule.hourPerClass}
                     fromDate={selectedCourse.fromDate}
                     toDate={selectedCourse.toDate}
                     students={students}

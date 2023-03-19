@@ -1415,7 +1415,7 @@ export function RejectForm({ request, students, registeredCourses }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <TextField fullWidth defaultValue={eaRemark} label="Comment for pending payment" disabled />
+                                <TextField fullWidth defaultValue={eaRemark} label="Comment by Education Admin" disabled />
                             </Box>
                         </Card>
                     </Grid>
@@ -1441,7 +1441,7 @@ export function RejectForm({ request, students, registeredCourses }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <TextField fullWidth defaultValue={epRemark1} label="Comment for pending payment" disabled />
+                                <TextField fullWidth defaultValue={epRemark1} label="Comment by Education Planner" disabled />
                             </Box>
                         </Card>
                     </Grid>
@@ -1467,7 +1467,7 @@ export function RejectForm({ request, students, registeredCourses }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <TextField fullWidth defaultValue={epRemark2} label="Comment for pending payment" disabled />
+                                <TextField fullWidth defaultValue={epRemark2} label="Comment By Education Planner" disabled />
                             </Box>
                         </Card>
                     </Grid>

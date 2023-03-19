@@ -105,11 +105,11 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
             }
             console.log(formattedData);
 
-            await axios.post(`${HOG_API}/api/Schedule/Class/Post`, formattedData)
-                .then((res) => console.log(res))
-                .catch((error) => {
-                    throw error;
-                })
+            // await axios.post(`${HOG_API}/api/Schedule/Class/Post`, formattedData)
+            //     // .then((res) => console.log(res))
+            //     .catch((error) => {
+            //         throw error;
+            //     })
 
             // navigate(0);
         } catch (error) {
@@ -122,9 +122,10 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
     const handleOpenEditDialog = (row) => {
         const formattedRow = {
             date: new Date(row.date),
+            hourPerClass: Math.abs(parseInt(row.fromTime.slice(0, 2), 10) - parseInt(row.toTime.slice(0, 2), 10)).toString(),
             fromTime: row.fromTime,
             toTime: row.toTime,
-            teacher: { id: row.teacherPrivateClass.teacherId },
+            teacher: { id: row.teacherPrivateClass?.teacherId || "" },
             method: _.capitalize(row.method),
             id: row.id
         }
@@ -140,6 +141,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
     }
 
     const handleEditClass = async (newClass) => {
+        setIsSubmitting(true)
         let hasConflict = false;
         const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule.id !== newClass.id)
         // console.log(filteredSchedules)
@@ -188,18 +190,20 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                 // console.log(schedules)
                 // console.log(formattedData)
                 await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
-                    .then((res) => console.log(res))
+                    // .then((res) => console.log(res))
                     .catch((error) => {
                         throw error
                     })
-
+                setIsSubmitting(false);
                 navigate(0)
             } catch (error) {
                 console.error(error)
+                setIsSubmitting(false);
                 enqueueSnackbar(error.message, { variant: 'error' })
             }
         } else {
             enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
+            setIsSubmitting(false);
         }
     }
 
@@ -215,7 +219,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         setIsSubmitting(true)
         try {
             await axios.delete(`${HOG_API}/api/Schedule/Class/Delete/${deletedClass.id}`)
-                .then((res) => console.log(res))
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
@@ -451,7 +455,9 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                                                     <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
                                                     <StyledTableCell sx={{ width: '8%' }} align="center">{hourPerClass.toString()}</StyledTableCell>
                                                     <StyledTableCell align="center">{_.capitalize(eachClass.method)}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass.nickname} {!!eachClass.teacherPrivateClass?.workType ? `(${eachClass.teacherPrivateClass.workType})` : ''}</StyledTableCell>
+                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{eachClass.teacherPrivateClass?.nickname.toUpperCase() || ""}
+                                                        {!!eachClass.teacherPrivateClass?.workType ? eachClass.teacherPrivateClass.workType !== 'Normal' && `(${eachClass.teacherPrivateClass.workType})` : ""}
+                                                    </StyledTableCell>
                                                     <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
                                                     {role === 'Education Admin' && (
                                                         <StyledTableCell align="center">
@@ -493,6 +499,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                     hourPerClass={selectedCourse.hourPerClass}
                     onEdit={handleEditClass}
                     onDelete={handleOpenDeleteClassDialog}
+                    isSubmitting={isSubmitting}
                     courseCustom
                 />
             )}

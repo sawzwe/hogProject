@@ -56,17 +56,22 @@ EditClassDialog.propTypes = {
     schedule: PropTypes.object,
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
-    hourPerClass: PropTypes.number,
+    // hourPerClass: PropTypes.number,
     fromDate: PropTypes.string,
     toDate: PropTypes.string,
     students: PropTypes.array,
-    courseCustom: PropTypes.bool
+    courseCustom: PropTypes.bool,
+    isSubmitting: PropTypes.bool,
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourPerClass, fromDate, toDate, students, courseCustom = false }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromDate, toDate, students, courseCustom = false, isSubmitting }) {
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
+    ];
+
+    const HOUR_OPTIONS = [
+        '1', '2', '3'
     ];
 
     const [isLoadingTime, setIsLoadingTime] = useState(false);
@@ -76,18 +81,19 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
 
     const {
         date,
+        hourPerClass,
         fromTime,
         toTime,
         teacher,
         method,
         room
     } = schedule;
-    
 
     const defaultValues = {
         classDate: date,
+        classHour: hourPerClass,
         classTime: fromTime.concat('-', toTime),
-        classTeacher: teacher.id,
+        classTeacher: teacher?.id || "",
         classMethod: _.capitalize(method),
         classRoom: room
     };
@@ -109,13 +115,10 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
     const handleChangeDate = async (newDate) => {
         resetValue();
         setValue('classDate', newDate);
-        setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
         })
-
-        // console.log(students);
 
         try {
             if (courseCustom) {
@@ -130,6 +133,46 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                     })
             } else {
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
+        } catch (error) {
+            console.error(error);
+            setIsLoadingTime(false);
+        }
+    }
+
+    const handleChangeHourPerClass = (newHour) => {
+        setAvailableTeacher();
+        setAvailableTime();
+        setValue('classHour', newHour)
+        setValue('classTime', '')
+        setValue('classTeacher', '')
+
+        setIsLoadingTime(true);
+        let studentList = "";
+        students.forEach((eachStudent, index) => {
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+        })
+
+        try {
+            if (courseCustom) {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
                     .then(((res) => {
                         setAvailableTime(res.data.data)
                         setIsLoadingTime(false);
@@ -181,10 +224,11 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
     }
 
     const resetValue = () => {
-        setValue('classDate', '')
-        setValue('classTime', '')
-        setValue('classTeacher', '')
-        setValue('classMethod', _.capitalize(method))
+        setValue('classDate', '');
+        setValue('classHour', '')
+        setValue('classTime', '');
+        setValue('classTeacher', '');
+        setValue('classMethod', _.capitalize(method));
         setAvailableTime();
         setAvailableTeacher();
     }
@@ -195,13 +239,13 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
-            hourPerClass,
+            hourPerClass: data.classHour,
             teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher),
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
             method: data.classMethod,
             room: data.classRoom,
-            id: schedule?.id || ''
+            id: schedule?.id
         };
         onEdit(newClass);
         // handleClose();
@@ -224,9 +268,10 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
         if (Object.keys(schedule).length) {
             setValue('classDate', date);
             handleChangeDate(date);
+            setValue('classHour', hourPerClass);
             setValue('classTime', fromTime.concat('-', toTime))
             handleChangeTime(fromTime.concat('-', toTime))
-            setValue('classTeacher', teacher.id);
+            setValue('classTeacher', teacher?.id || "");
             setValue('classMethod', method);
         }
     }, [schedule])
@@ -237,7 +282,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                 <DialogTitle sx={{ pb: 0 }}>Edit Schedule</DialogTitle>
                 <DialogContent>
                     <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-                        <Grid item xs={12} md={!courseCustom ? 3 : 2.5}>
+                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
                             <Controller
                                 name="classDate"
                                 control={control}
@@ -258,7 +303,37 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={!courseCustom ? 3 : 2.5}>
+                        <Grid item xs={6} md={1.5}>
+                            <RHFSelect
+                                fullWidth
+                                name="classHour"
+                                label="Hours"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                onChange={(event) => handleChangeHourPerClass(event.target.value)}
+                                disabled={!values.classDate}
+                                required
+                            >
+                                {HOUR_OPTIONS.map((eachHour, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachHour}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachHour}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
                             {availableTime === undefined && !isLoadingTime && (
                                 <TextField
                                     fullWidth
@@ -317,6 +392,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                 </RHFSelect>
                             )}
                         </Grid>
+                        
 
                         <Grid item xs={12} md={3}>
                             {availableTeacher === undefined && !isLoadingTeacher && (
@@ -372,14 +448,14 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.workType})`}
+                                            {`${eachTeacher.nickname.toUpperCase()} - ${eachTeacher.fName.toUpperCase()} (${eachTeacher.workType})`}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={!courseCustom ? 3 : 2}>
+                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
                             <RHFSelect
                                 fullWidth
                                 name="classMethod"
@@ -407,7 +483,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                         </Grid>
 
                         {courseCustom && (
-                            <Grid item xs={12} md={2}>
+                            <Grid item xs={12} md={1.5}>
                                 <RHFTextField
                                     fullWidth
                                     name="classRoom"
@@ -434,9 +510,9 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, hourP
                             </Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" size="medium" type="submit">
+                            <LoadingButton loading={isSubmitting} variant="contained" size="medium" type="submit">
                                 Save Change
-                            </Button>
+                            </LoadingButton>
                         </Grid>
                     </Stack>
                 </Grid>
