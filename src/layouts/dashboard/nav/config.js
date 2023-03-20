@@ -245,13 +245,13 @@ const TeacherNavConfig = [
   },
 
   // Others
-  {
-    subheader: 'request management',
-    items: [
-      { title: 'Leaving Request', path: 'teacher-leaving-request', icon: ICONS.user },
-      { title: 'Request History', path: 'teacher-inbox', icon: ICONS.mail },
-    ],
-  },
+  // {
+  //   subheader: 'request management',
+  //   items: [
+  //     { title: 'Leaving Request', path: 'teacher-leaving-request', icon: ICONS.user },
+  //     { title: 'Request History', path: 'teacher-inbox', icon: ICONS.mail },
+  //   ],
+  // },
 
   // Settings
   {
