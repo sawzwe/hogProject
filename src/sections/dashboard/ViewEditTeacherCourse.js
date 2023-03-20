@@ -102,14 +102,18 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
         const currentCourse = allCourses.find((eachCourse) => eachCourse.course.id === course.id).course
         const currentRequest = allCourses.find((eachCourse) => eachCourse.course.id === course.id).request
         const currentSchedules = allCourses.find((eachCourse) => eachCourse.course.id === course.id).classes
-        // console.log('cc', currentCourse)
-        // console.log('cr', currentRequest)
-        // console.log('cs', currentSchedules)
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
 
         setOpenViewEditSchedule(true);
+    }
+
+    const handleCloseViewEditDialog = () => {
+        setSelectedCourse({})
+        setSelectedRequest({})
+        setSelectedSchedules({})
+        setOpenViewEditSchedule(false)
     }
 
     const handleClickDelete = async (course) => {
@@ -158,7 +162,7 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
         )
     }
 
-    console.log("HI")
+    // console.log("HI")
 
     return (
         <>
@@ -217,7 +221,7 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
                 Object.keys(selectedRequest).length !== 0 && selectedSchedules.length > 0 && (
                     <ViewEditScheduleDialog
                         open={openViewEditSchedule}
-                        onClose={() => setOpenViewEditSchedule(false)}
+                        onClose={handleCloseViewEditDialog}
                         selectedCourse={selectedCourse}
                         selectedSchedules={selectedSchedules}
                         selectedRequest={selectedRequest}

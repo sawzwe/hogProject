@@ -98,9 +98,9 @@ export default function ViewEditTeacherCoursePage() {
         )
     }
 
-    console.log(teacher)
-    console.log(courses)
-    console.log(pendingCourses)
+    // console.log(teacher)
+    // console.log(courses)
+    // console.log(pendingCourses)
 
     return (
         <>

@@ -87,7 +87,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                         status: 'Complete',
                     };
 
-                    axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Teacher/Class/Status/Put`, attendanceStatusData)
+                    axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, attendanceStatusData)
                         .then(() => {
                             console.log('Attendance status updated successfully');
                         })

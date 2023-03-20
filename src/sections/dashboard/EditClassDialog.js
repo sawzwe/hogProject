@@ -62,9 +62,11 @@ EditClassDialog.propTypes = {
     students: PropTypes.array,
     courseCustom: PropTypes.bool,
     isSubmitting: PropTypes.bool,
+    deletedClassList: PropTypes.array,
+    edittedClassList: PropTypes.array,
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromDate, toDate, students, courseCustom = false, isSubmitting }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromDate, toDate, students, courseCustom = false, deletedClassList, edittedClassList, isSubmitting }) {
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -78,6 +80,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
     const [isLoadingTeacher, setIsLoadingTeacher] = useState(false);
     const [availableTime, setAvailableTime] = useState();
     const [availableTeacher, setAvailableTeacher] = useState();
+
+    const editDeleteClassWithId = [...deletedClassList, ...edittedClassList];
 
     const {
         date,
@@ -115,36 +119,36 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
     const handleChangeDate = async (newDate) => {
         resetValue();
         setValue('classDate', newDate);
-        let studentList = "";
-        students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
-        })
+        // let studentList = "";
+        // students.forEach((eachStudent, index) => {
+        //     studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
+        // })
 
-        try {
-            if (courseCustom) {
-                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
-                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
-                    .then(((res) => {
-                        setAvailableTime(res.data.data)
-                        setIsLoadingTime(false);
-                    }))
-                    .catch((error) => {
-                        throw error;
-                    })
-            } else {
-                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=0`)
-                    .then(((res) => {
-                        setAvailableTime(res.data.data)
-                        setIsLoadingTime(false);
-                    }))
-                    .catch((error) => {
-                        throw error;
-                    })
-            }
-        } catch (error) {
-            console.error(error);
-            setIsLoadingTime(false);
-        }
+        // try {
+        //     if (courseCustom && schedule.id !== "") {
+        //         console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
+        //         axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
+        //             .then(((res) => {
+        //                 setAvailableTime(res.data.data)
+        //                 setIsLoadingTime(false);
+        //             }))
+        //             .catch((error) => {
+        //                 throw error;
+        //             })
+        //     } else {
+        //         axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=0`)
+        //             .then(((res) => {
+        //                 setAvailableTime(res.data.data)
+        //                 setIsLoadingTime(false);
+        //             }))
+        //             .catch((error) => {
+        //                 throw error;
+        //             })
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        //     setIsLoadingTime(false);
+        // }
     }
 
     const handleChangeHourPerClass = (newHour) => {
@@ -157,12 +161,22 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
         setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
         })
 
         try {
-            if (courseCustom) {
-                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}&classId=${schedule.id}`)
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
+                })
+            }
+
+            if (courseCustom && schedule.id !== "") {
+                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTime(res.data.data)
@@ -171,7 +185,18 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                     .catch((error) => {
                         throw error;
                     })
+            } else if (courseCustom && sameDateClassId !== 0) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
             } else {
+                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
                     .then(((res) => {
                         setAvailableTime(res.data.data)
@@ -194,11 +219,21 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
 
         setIsLoadingTeacher(true);
         try {
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
+                })
+            }
+
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
 
-            if (courseCustom) {
-                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
+            if (courseCustom && schedule.id !== "") {
+                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTeacher(res.data.data)
@@ -207,7 +242,17 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                     .catch((error) => {
                         throw error;
                     })
+            } else if (courseCustom && sameDateClassId !== 0) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
             } else {
+                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
                     .then(((res) => {
                         setAvailableTeacher(res.data.data)
@@ -245,14 +290,24 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
             toTime: data.classTime.slice(6, 11),
             method: data.classMethod,
             room: data.classRoom,
-            id: schedule?.id
+            id: schedule?.id || ""
         };
         onEdit(newClass);
         // handleClose();
     }
 
-    const handleDelete = () => {
-        onDelete(schedule);
+    const handleDelete = (data) => {
+        const deletedClass = {
+            date: data.classDate,
+            hourPerClass: data.classHour,
+            teacher: availableTeacher.find((eachTeacher) => eachTeacher.id === data.classTeacher),
+            fromTime: data.classTime.slice(0, 5),
+            toTime: data.classTime.slice(6, 11),
+            method: data.classMethod,
+            room: data?.classRoom || "",
+            id: schedule?.id || ""
+        };
+        onDelete(deletedClass, students);
         handleClose();
     }
 
@@ -266,10 +321,11 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
 
     useEffect(() => {
         if (Object.keys(schedule).length) {
-            setValue('classDate', date);
+            // setValue('classDate', date);
             handleChangeDate(date);
-            setValue('classHour', hourPerClass);
-            setValue('classTime', fromTime.concat('-', toTime))
+            // setValue('classHour', hourPerClass);
+            handleChangeHourPerClass(hourPerClass);
+            // setValue('classTime', fromTime.concat('-', toTime))
             handleChangeTime(fromTime.concat('-', toTime))
             setValue('classTeacher', teacher?.id || "");
             setValue('classMethod', method);
@@ -392,7 +448,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                                 </RHFSelect>
                             )}
                         </Grid>
-                        
+
 
                         <Grid item xs={12} md={3}>
                             {availableTeacher === undefined && !isLoadingTeacher && (
@@ -498,7 +554,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                 <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 3 }} spacing={1.5}>
                     <Stack direction="row" sx={{ ml: 1.5 }}>
                         <Grid item>
-                            <Button variant="contained" size="medium" color="error" onClick={handleDelete} disabled={isSubmitting}>
+                            <Button variant="contained" size="medium" color="error" onClick={handleSubmit(handleDelete)} disabled={isSubmitting}>
                                 Delete
                             </Button>
                         </Grid>

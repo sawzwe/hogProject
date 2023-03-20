@@ -79,9 +79,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
-    // console.log(pendingCourses)
     const allCourses = [...currentCourses, ...pendingCourses]
-    // console.log(allCourses)
 
     const {
         role
@@ -92,6 +90,8 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const [selectedSchedules, setSelectedSchedules] = useState([]);
 
     const [openViewEditSchedule, setOpenViewEditSchedule] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [deleteCourseId, setDeleteCourseId] = useState()
     const [deleteCourseName, setDeleteCourseName] = useState()
@@ -108,6 +108,13 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
         setOpenViewEditSchedule(true);
     }
 
+    const handleCloseViewEditDialog = () => {
+        setSelectedCourse({})
+        setSelectedRequest({})
+        setSelectedSchedules({})
+        setOpenViewEditSchedule(false)
+    }
+
     const handleClickDelete = async (course) => {
         setDeleteCourseId(course.id)
         setDeleteCourseName(`${(course.course)} ${(course.subject)} ${(course.level)} (${course.section})`)
@@ -120,14 +127,17 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     }
 
     const handleDeleteCourse = async () => {
+        setIsSubmitting(false)
         try {
             await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
                 .catch((error) => {
                     throw error
                 })
+            setIsSubmitting(false)
             navigate(0)
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' })
+            setIsSubmitting(false)
         }
     }
 
@@ -226,6 +236,21 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
                         selectedRequest={selectedRequest}
                         role={role}
                     />
+                )
+            }
+
+            {
+                deleteCourseName !== undefined && (
+                    <Dialog fullWidth maxWidth="sm" open={openDeleteDialog} onClose={handleCloseDelete}>
+                        <DialogTitle>Delete Course?</DialogTitle>
+                        <DialogContent>
+                            {`Once deleted, ${deleteCourseName} will be removed from the system.`}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" color="inherit" onClick={handleCloseDelete}>Cancel</Button>
+                            <LoadingButton variant="contained" color="error" loading={isSubmitting} onClick={handleDeleteCourse}>Delete</LoadingButton>
+                        </DialogActions>
+                    </Dialog>
                 )
             }
         </>

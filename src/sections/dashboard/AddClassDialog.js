@@ -58,15 +58,20 @@ AddClassDialog.propTypes = {
     fromDate: PropTypes.string,
     toDate: PropTypes.string,
     method: PropTypes.string,
-    students: PropTypes.array
+    students: PropTypes.array,
+    deletedClassList: PropTypes.array,
+    edittedClassList: PropTypes.array,
+    courseCustom: PropTypes.bool
 }
 
-export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method, students }) {
+export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method, students, deletedClassList, edittedClassList, courseCustom = false }) {
 
     const [isLoadingTime, setIsLoadingTime] = useState(false);
     const [isLoadingTeacher, setIsLoadingTeacher] = useState(false);
     const [availableTime, setAvailableTime] = useState();
     const [availableTeacher, setAvailableTeacher] = useState();
+
+    const editDeleteClassWithId = [...deletedClassList, ...edittedClassList];
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -121,10 +126,6 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
     const handleChangeDate = async (newDate) => {
         resetValue();
         setValue('classDate', newDate);
-        let studentList = "";
-        students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
-        })
     }
 
     const handleChangeHourPerClass = (newHour) => {
@@ -137,18 +138,42 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
         })
 
         try {
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}`)
-                .then(((res) => {
-                    setAvailableTime(res.data.data)
-                    setIsLoadingTime(false);
-                }))
-                .catch((error) => {
-                    throw error;
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
                 })
+            }
+
+            if (courseCustom && sameDateClassId !== 0) {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        console.log('availableTime', res.data.data)
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTime(false);
@@ -164,14 +189,36 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
-                .then(((res) => {
-                    setAvailableTeacher(res.data.data)
-                    setIsLoadingTeacher(false);
-                }))
-                .catch((error) => {
-                    throw error;
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
                 })
+            }
+
+            if (courseCustom && sameDateClassId !== 0) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTeacher(false);
