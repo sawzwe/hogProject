@@ -71,7 +71,11 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
     const [availableTime, setAvailableTime] = useState();
     const [availableTeacher, setAvailableTeacher] = useState();
 
-    const editDeleteClassWithId = [...deletedClassList, ...edittedClassList];
+    const [editDeleteClassWithId, setEditDeleteClassWithId] = useState([]);
+
+    if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
+        setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
+    }
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -119,7 +123,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         const result = await onAdd(newClass)
 
         if (result === "success") {
-            reset();
+            resetValue();
         }
     }
 
@@ -156,7 +160,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                 // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
                     .then(((res) => {
-                        console.log('availableTime', res.data.data)
+                        // console.log('availableTime', res.data.data)
                         setAvailableTime(res.data.data)
                         setIsLoadingTime(false);
                     }))

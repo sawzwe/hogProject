@@ -259,13 +259,13 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
             >
                 <DialogTitle>
                     <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                        <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                        {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                         <Typography variant="h5">{"Submit the request?"}</Typography>
                     </Stack>
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Your response will be updated to the system and sent to the student and the teacher.
+                        Once submitted, the request with schedules will be sent to Education Planner.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -463,6 +463,21 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    const mapStudentsForAddEditDialog = () => {
+        return students.map((eachStudent) => ({
+            studentId: eachStudent.id
+        }
+        ))
+    }
+
+    const filterCourses = completeCourses.filter((eachCourse) => eachCourse.course !== selectedCourse.course ||
+        eachCourse.subject !== selectedCourse.subject ||
+        eachCourse.level !== selectedCourse.level ||
+        eachCourse.fromDate !== selectedCourse.fromDate ||
+        eachCourse.toDate !== selectedCourse.toDate)
+
+    // console.log('filterCourses', filterCourses);
+
     // Generate Schedules -------------------------------------------------------------------
     const [schedules, setSchedules] = useState([])
 
@@ -498,10 +513,10 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
         setOpenEditClass(false);
     }
 
-    const handleAddClass = async (newClass) => {
+    const handleAddClass = (newClass) => {
 
         let hasConflict = false;
-        await schedules.forEach((eachClass) => {
+        schedules.forEach((eachClass) => {
 
             // Calculate overlapping time
             const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
@@ -518,14 +533,36 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             }
         })
 
+        if (filterCourses.length > 0) {
+            const allSchedules = [];
+            const filterCoursesSchedules = filterCourses.map((eachCourse) => eachCourse.schedules.map((schedule) => allSchedules.push(schedule)))
+            // console.log('eachSchedulefromanothercourse', allSchedules)
+
+            allSchedules.forEach((eachClass) => {
+                const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+                const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+    
+                const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
+                const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
+    
+                const range1 = moment.range(timeAStart, timeAEnd);
+                const range2 = moment.range(timeBStart, timeBEnd);
+    
+                if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
+                    hasConflict = true;
+                }
+            })
+        }
+
 
         if (!hasConflict) {
             const updatedSchedules = [...schedules, newClass]
             setSchedules(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
             setOpenAddClassDialog(false);
-            return "success"
+            return "success";
         }
-        return enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
+        enqueueSnackbar('Selected time overlaps with a class in the request', { variant: 'error' });
+        return "error";
     }
 
     const handleEditClass = async (newClass) => {
@@ -549,6 +586,27 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             }
         })
 
+        if (filterCourses.length > 0) {
+            const allSchedules = [];
+            const filterCoursesSchedules = filterCourses.map((eachCourse) => eachCourse.schedules.map((schedule) => allSchedules.push(schedule)))
+            // console.log('eachSchedulefromanothercourse', allSchedules)
+
+            allSchedules.forEach((eachClass) => {
+                const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
+                const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
+    
+                const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
+                const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
+    
+                const range1 = moment.range(timeAStart, timeAEnd);
+                const range2 = moment.range(timeBStart, timeBEnd);
+    
+                if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
+                    hasConflict = true;
+                }
+            })
+        }
+
         if (!hasConflict) {
             const updatedSchedules = [...filteredSchedules, newClass]
             setSchedules(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
@@ -560,7 +618,11 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     }
 
     const handleDeleteClass = (deletedClass) => {
-        const filteredSchedules = schedules.filter((eachSchedule) => eachSchedule !== deletedClass)
+        console.log(deletedClass)
+        const filteredSchedules = schedules.filter((eachSchedule) =>
+            new Date(eachSchedule.date).getTime() !== new Date(deletedClass.date).getTime() ||
+            eachSchedule.fromTime !== deletedClass.fromTime ||
+            eachSchedule.toTime !== deletedClass.toTime)
         setSchedules(filteredSchedules.sort((class1, class2) => class1.date - class2.date));
     }
 
@@ -826,7 +888,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                     // hourPerClass={selectedSchedule.hourPerClass}
                     fromDate={selectedCourse.fromDate}
                     toDate={selectedCourse.toDate}
-                    students={students}
+                    students={mapStudentsForAddEditDialog()}
                 />
             }
 
@@ -838,7 +900,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
                 fromDate={selectedCourse.fromDate}
                 toDate={selectedCourse.toDate}
                 method={selectedCourse.method}
-                students={students}
+                students={mapStudentsForAddEditDialog()}
             />
 
             <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>

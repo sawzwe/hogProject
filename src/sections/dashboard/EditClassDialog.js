@@ -81,7 +81,11 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
     const [availableTime, setAvailableTime] = useState();
     const [availableTeacher, setAvailableTeacher] = useState();
 
-    const editDeleteClassWithId = [...deletedClassList, ...edittedClassList];
+    const [editDeleteClassWithId, setEditDeleteClassWithId] = useState([]);
+
+    if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
+        setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
+    }
 
     const {
         date,
@@ -176,7 +180,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
             }
 
             if (courseCustom && schedule.id !== "") {
-                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTime(res.data.data)
@@ -195,7 +199,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                         throw error;
                     })
             } else {
-                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
 
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
                     .then(((res) => {
@@ -233,7 +237,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
 
             if (courseCustom && schedule.id !== "") {
-                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${schedule.id}`)
                     .then(((res) => {
                         setAvailableTeacher(res.data.data)
@@ -252,7 +256,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                         throw error;
                     })
             } else {
-                console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
                 axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
                     .then(((res) => {
                         setAvailableTeacher(res.data.data)
