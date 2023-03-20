@@ -25,14 +25,13 @@ export default function ResetPasswordDialog({ open, onClose, email }) {
     const handleResetPassword = async () => {
         setIsSubmitting(true);
         try {
-            // console.log(email);
-            await axios.post(`${HOG_API}/api/Auth/ResetPassword`, email)
-                // .then((res) => console.log(res))
+            await axios.post(`${HOG_API}/api/Auth/ResetPassword?email=${encodeURIComponent(email)}`)
                 .catch((error) => {
                     throw error;
                 })
             setIsSubmitting(false);
             enqueueSnackbar('Successfully sent reset password request', { variant: 'success' });
+            onClose();
 
         } catch (error) {
             console.error(error);
