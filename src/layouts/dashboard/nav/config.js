@@ -213,13 +213,13 @@ const StudentNavConfig = [
   },
 
   // Others
-  {
-    subheader: 'others',
-    items: [
-      { title: 'Profile', path: 'student-profile', icon: ICONS.user },
-      { title: 'Request Inbox', path: 'student-inbox', icon: ICONS.mail },
-    ],
-  },
+  // {
+  //   subheader: 'others',
+  //   items: [
+  //     { title: 'Profile', path: 'student-profile', icon: ICONS.user },
+  //     { title: 'Request Inbox', path: 'student-inbox', icon: ICONS.mail },
+  //   ],
+  // },
 
   // Settings
   {

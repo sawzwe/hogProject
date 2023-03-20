@@ -498,19 +498,19 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                 <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 3 }} spacing={1.5}>
                     <Stack direction="row" sx={{ ml: 1.5 }}>
                         <Grid item>
-                            <Button variant="contained" size="medium" color="error" onClick={handleDelete}>
+                            <Button variant="contained" size="medium" color="error" onClick={handleDelete} disabled={isSubmitting}>
                                 Delete
                             </Button>
                         </Grid>
                     </Stack>
                     <Stack direction="row" spacing={1}>
                         <Grid item>
-                            <Button variant="outlined" size="medium" color="inherit" onClick={handleClose}>
+                            <Button variant="outlined" size="medium" color="inherit" onClick={handleClose} disabled={isSubmitting}>
                                 Close
                             </Button>
                         </Grid>
                         <Grid item>
-                            <LoadingButton loading={isSubmitting} variant="contained" size="medium" type="submit">
+                            <LoadingButton loading={isSubmitting} variant="contained" size="medium" type="submit" disabled={values.classTime === '' || values.classTeacher === ''}>
                                 Save Change
                             </LoadingButton>
                         </Grid>

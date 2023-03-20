@@ -201,9 +201,13 @@ export function ClassList({ classes }) {
         setTableData(classes)
     }, []);
 
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
     const [filterName, setFilterName] = useState('');
 
-    const [filterDate, setFilterDate] = useState(new Date());
+    const [filterDate, setFilterDate] = useState(tomorrow);
 
     const [selectedClass, setSelectedClass] = useState({});
     const [openEditClassDialog, setOpenEditClassDialog] = useState(false);
@@ -256,8 +260,8 @@ export function ClassList({ classes }) {
     const handleEditClass = async (newClass) => {
         setIsSubmitting(true);
         try {
-            console.log('newClass', newClass);
-            console.log('SelectedClass', selectedClass);
+            // console.log('newClass', newClass);
+            // console.log('SelectedClass', selectedClass);
             const formattedData = {
                 id: newClass.id,
                 room: newClass.room,
@@ -285,7 +289,7 @@ export function ClassList({ classes }) {
                     throw error
                 })
             setIsSubmitting(false);
-            // navigate(0)
+            navigate(0)
         } catch (error) {
             console.error(error);
             setIsSubmitting(false);
