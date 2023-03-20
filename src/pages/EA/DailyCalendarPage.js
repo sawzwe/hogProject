@@ -73,26 +73,30 @@ export default function DailyCalendarPage() {
             await axios.get(`${HOG_API}/api/Schedule/Get`)
                 .then((res) => {
                     const data = res.data.data;
-                    data.map((eachSchedule) => (eachSchedule.classes.map((eachClass) => {
-                        return setClasses(classes => [...classes, {
-                            id: eachClass.id,
-                            date: eachClass.date,
-                            fromTime: eachClass.fromTime,
-                            toTime: eachClass.toTime,
-                            time: `${eachClass.fromTime}-${eachClass.toTime}`,
-                            teacherNickname: eachClass.teacherPrivateClass?.nickname || '',
-                            course: `${eachSchedule.course.course} ${eachSchedule.course?.subject} ${eachSchedule.course.level}`,
-                            section: eachSchedule.course.section,
-                            room: eachClass.room,
-                            method: _.capitalize(eachClass.method),
-                            students: eachClass.studentPrivateClasses,
-                            teacher: {
-                                id: eachClass.teacherPrivateClass?.teacherId || null,
-                                status: eachClass.teacherPrivateClass?.status
-                            },
-                            hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
-                        }])
-                    })))
+                    if (data.length === 0) {
+                        setClasses([])
+                    } else {
+                        data.map((eachSchedule) => (eachSchedule.classes.map((eachClass) => {
+                            return setClasses(classes => [...classes, {
+                                id: eachClass.id,
+                                date: eachClass.date,
+                                fromTime: eachClass.fromTime,
+                                toTime: eachClass.toTime,
+                                time: `${eachClass.fromTime}-${eachClass.toTime}`,
+                                teacherNickname: eachClass.teacherPrivateClass?.nickname || '',
+                                course: `${eachSchedule.course.course} ${eachSchedule.course?.subject} ${eachSchedule.course.level}`,
+                                section: eachSchedule.course.section,
+                                room: eachClass.room,
+                                method: _.capitalize(eachClass.method),
+                                students: eachClass.studentPrivateClasses,
+                                teacher: {
+                                    id: eachClass.teacherPrivateClass?.teacherId || null,
+                                    status: eachClass.teacherPrivateClass?.status
+                                },
+                                hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
+                            }])
+                        })))
+                    }
                 })
         } catch (error) {
             console.error(error);
@@ -253,7 +257,7 @@ export function ClassList({ classes }) {
         setIsSubmitting(true);
         try {
             console.log('newClass', newClass);
-            console.log('SelectedClass',selectedClass);
+            console.log('SelectedClass', selectedClass);
             const formattedData = {
                 id: newClass.id,
                 room: newClass.room,
