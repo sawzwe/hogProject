@@ -92,12 +92,16 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
-        if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
-            axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
-                .then((res) => setSchedules(res.data.data))
-                .catch((error) => console.error(error))
-        }
+        axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+            .then((res) => setSchedules(res.data.data))
+            .catch((error) => console.error(error))
+        // if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
+        //     axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+        //         .then((res) => setSchedules(res.data.data))
+        //         .catch((error) => console.error(error))
+        // }
     }, [])
+
 
     // Complete Registration (has schedules)
     if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
@@ -153,7 +157,7 @@ export function StudentSection({ courseType, students }) {
                     <Typography variant="h6">{`Student(s) ${students.length} / ${studentLimit.toString()}`}</Typography>
                 </Grid>
             </Grid>
-            
+
             <Grid container direction="row" spacing={1} sx={{ mt: 1 }}>
                 {students.map((student, index) => (
                     <Grid item xs={12} md={4} key={student.id}>
@@ -537,13 +541,13 @@ export function OtherRejectForm({ request, students, registeredCourses, schedule
     const handleOpenCourseDialog = async (courseIndex) => {
         const _course = registeredCourses[courseIndex];
         await setSelectedCourse(_course);
-        // if (hasSchedule) {
-        //     const _schedule = schedules.find(
-        //         eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
-        //             && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
-        //     );
-        //     await setCurrentSchedule(_schedule);
-        // }
+        if (hasSchedule) {
+            const _schedule = schedules.find(
+                eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                    && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+            );
+            await setCurrentSchedule(_schedule);
+        }
         setOpenCourseDialog(true);
     }
 
@@ -592,7 +596,7 @@ export function OtherRejectForm({ request, students, registeredCourses, schedule
                 </Grid>
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}

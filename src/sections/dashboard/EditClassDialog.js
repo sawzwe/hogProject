@@ -64,9 +64,10 @@ EditClassDialog.propTypes = {
     isSubmitting: PropTypes.bool,
     deletedClassList: PropTypes.array,
     edittedClassList: PropTypes.array,
+    dailyCalendar: PropTypes.bool
 }
 
-export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromDate, toDate, students, courseCustom = false, deletedClassList, edittedClassList, isSubmitting }) {
+export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromDate, toDate, students, courseCustom = false, deletedClassList, edittedClassList, isSubmitting, dailyCalendar }) {
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -82,10 +83,6 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
     const [availableTeacher, setAvailableTeacher] = useState();
 
     const [editDeleteClassWithId, setEditDeleteClassWithId] = useState([]);
-
-    if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
-        setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
-    }
 
     const {
         date,
@@ -178,6 +175,8 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                     }
                 })
             }
+
+            const currentDate = fDate(values.classDate, 'dd-MMM-yyyy')
 
             if (courseCustom && schedule.id !== "") {
                 // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${schedule.id}`)
@@ -274,7 +273,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
 
     const resetValue = () => {
         setValue('classDate', '');
-        setValue('classHour', '')
+        setValue('classHour', '');
         setValue('classTime', '');
         setValue('classTeacher', '');
         setValue('classMethod', _.capitalize(method));
@@ -284,7 +283,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
 
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    const handleSaveChange = (data) => {
+    const handleSaveChange = async (data) => {
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
@@ -324,7 +323,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
 
 
     useEffect(() => {
-        if (Object.keys(schedule).length) {
+        if (Object.keys(schedule).length > 0) {
             // setValue('classDate', date);
             handleChangeDate(date);
             // setValue('classHour', hourPerClass);
@@ -334,6 +333,10 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
             setValue('classTeacher', teacher?.id || "");
             setValue('classMethod', method);
         }
+
+        if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
+            setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
+        }
     }, [schedule])
 
     return (
@@ -342,7 +345,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                 <DialogTitle sx={{ pb: 0 }}>Edit Schedule</DialogTitle>
                 <DialogContent>
                     <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
+                        <Grid item xs={12} md={!dailyCalendar ? 2.5 : 2}>
                             <Controller
                                 name="classDate"
                                 control={control}
@@ -393,7 +396,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                             </RHFSelect>
                         </Grid>
 
-                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
+                        <Grid item xs={12} md={!dailyCalendar ? 2.5 : 2}>
                             {availableTime === undefined && !isLoadingTime && (
                                 <TextField
                                     fullWidth
@@ -515,7 +518,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={!courseCustom ? 2.5 : 2}>
+                        <Grid item xs={12} md={!dailyCalendar ? 2.5 : 2}>
                             <RHFSelect
                                 fullWidth
                                 name="classMethod"
@@ -542,7 +545,7 @@ export function EditClassDialog({ open, close, schedule, onEdit, onDelete, fromD
                             </RHFSelect>
                         </Grid>
 
-                        {courseCustom && (
+                        {dailyCalendar && (
                             <Grid item xs={12} md={1.5}>
                                 <RHFTextField
                                     fullWidth

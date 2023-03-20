@@ -157,8 +157,8 @@ ClassList.propTypes = {
 }
 
 const TABLE_HEAD_REQUESTS = [
-    { id: 'classTime', label: 'Class Time', align: 'left' },
     { id: 'teacher ', label: 'Teacher', align: 'left' },
+    { id: 'classTime', label: 'Class Time', align: 'left' },
     { id: 'course', label: 'Course', align: 'left' },
     { id: 'section', label: 'Section', align: 'left' },
     { id: 'method', label: 'Method', align: 'left' },
@@ -269,11 +269,6 @@ export function ClassList({ classes }) {
                 date: fDate(newClass.date, 'dd-MMM-yyyy'),
                 fromTime: newClass.fromTime,
                 toTime: newClass.toTime,
-                studentPrivateClasses: selectedClass.students.map((student) => ({
-                    id: student.id,
-                    studentId: student.studentId,
-                    attendance: student.attendance
-                })),
                 teacherPrivateClass: {
                     id: selectedClass.id,
                     teacherId: newClass.teacher.id,
@@ -283,8 +278,8 @@ export function ClassList({ classes }) {
             }
 
             // console.log(formattedData);
-            await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
-                .then((res) => console.log(res))
+            await axios.put(`${HOG_API}/api/Schedule/Class/Put`, formattedData)
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error
                 })
@@ -310,7 +305,7 @@ export function ClassList({ classes }) {
         setIsSubmitting(true)
         try {
             await axios.delete(`${HOG_API}/api/Schedule/Class/Delete/${deletedClass.id}`)
-                .then((res) => console.log(res))
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
@@ -349,8 +344,8 @@ export function ClassList({ classes }) {
                                             sx={{ cursor: "pointer" }}
                                             onClick={() => handleSelectClass(row)}
                                         >
+                                            <TableCell align="left">{row.teacherNickname.toUpperCase()}</TableCell>
                                             <TableCell align="left">{row.time}</TableCell>
-                                            <TableCell align="left">{row.teacherNickname}</TableCell>
                                             <TableCell align="left">{row.course}</TableCell>
                                             <TableCell align="left">{row.section}</TableCell>
                                             <TableCell align="left">{row.method}</TableCell>
@@ -390,6 +385,7 @@ export function ClassList({ classes }) {
                         onDelete={handleOpenDeleteClassDialog}
                         isSubmitting={isSubmitting}
                         courseCustom
+                        dailyCalendar
                     />
                 )}
 

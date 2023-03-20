@@ -73,9 +73,11 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
 
     const [editDeleteClassWithId, setEditDeleteClassWithId] = useState([]);
 
-    if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
-        setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
-    }
+    useEffect(() => {
+        if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
+            setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
+        }
+    }, [])
 
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
@@ -455,7 +457,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                     <Button variant="outlined" color="inherit" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="contained" color="primary" disabled={values.classTime === '' || values.classTeacher === ''}>
+                    <Button type="submit" variant="contained" color="primary" disabled={values.classTime === '' || values.classTeacher === '' || values.classMethod === ''}>
                         Add
                     </Button>
                 </DialogActions>

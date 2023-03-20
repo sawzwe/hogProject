@@ -242,6 +242,8 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
             const updatedSchedules = [...filteredSchedules, formattedData]
             setLocalSchedule(updatedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
             setOpenEditClassDialog(false);
+            setSelectedClass({});
+            // return "success";
 
             // setLocalSchedule([...localSchedule, formattedData])
 
@@ -260,6 +262,8 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         } else {
             enqueueSnackbar('Selected time overlaps with existing schedules', { variant: 'error' });
         }
+        // return "error";
+
     }
 
     // console.log('local', localSchedule)

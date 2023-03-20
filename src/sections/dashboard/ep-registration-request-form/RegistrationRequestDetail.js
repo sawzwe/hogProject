@@ -99,11 +99,14 @@ export default function RegistrationRequestDetail({ currentRequest, educationPla
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
-        if (request.eaStatus === 'Complete') {
-            axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
-                .then((res) => setSchedules(res.data.data))
-                .catch((error) => console.error(error))
-        }
+        axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+            .then((res) => setSchedules(res.data.data))
+            .catch((error) => console.error(error))
+        // if (request.eaStatus === 'Complete') {
+        //     axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
+        //         .then((res) => setSchedules(res.data.data))
+        //         .catch((error) => console.error(error))
+        // }
     }, [])
 
     if (status === 'Pending EA') {
@@ -913,9 +916,10 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
         } else {
             setIsSubmitting(true);
             try {
-                const classIds = schedules.map((eachSchedule) => eachSchedule.course.id)
-                await classIds.forEach((id) => {
-                    axios.delete(`${HOG_API}/api/Schedule/Delete/${id}`)
+                const courseIds = schedules.map((eachSchedule) => eachSchedule.course.id)
+                await courseIds.forEach((id) => {
+                    axios.delete(`${HOG_API}/api/Schedule/SoftDelete/${id}`)
+                        .then((res) => console.log(res))
                         .catch((error) => {
                             throw error;
                         })
@@ -933,7 +937,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                         oaRemark: request.oaRemark,
                         takenByEPId: educationPlannerId,
                         takenByEAId: request.takenByEAId,
-                        takenByOAId: 0
+                        takenByOAId: request.takenByOAId,
                     }
                 })
                     .catch((error) => {
@@ -1351,10 +1355,12 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
 RejectForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
-    registeredCourses: PropTypes.array
+    registeredCourses: PropTypes.array,
+    schedules: PropTypes.array,
+    hasSchedule: PropTypes.bool,
 }
 
-export function RejectForm({ request, students, registeredCourses }) {
+export function RejectForm({ request, students, registeredCourses, schedules, hasSchedule }) {
 
     const {
         id,
@@ -1366,10 +1372,19 @@ export function RejectForm({ request, students, registeredCourses }) {
     } = request;
 
     const [selectedCourse, setSelectedCourse] = useState({});
+    const [currentSchedule, setCurrentSchedule] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
 
     const handleOpenCourseDialog = async (courseIndex) => {
-        await setSelectedCourse(registeredCourses[courseIndex]);
+        const _course = registeredCourses[courseIndex];
+        await setSelectedCourse(_course);
+        if (hasSchedule) {
+            const _schedule = schedules.find(
+                eachSchedule => eachSchedule.course.course === _course.course && eachSchedule.course.subject === _course.subject
+                    && eachSchedule.course.level === _course.level && eachSchedule.course.fromDate === _course.fromDate && eachSchedule.course.toDate === _course.toDate
+            );
+            await setCurrentSchedule(_schedule);
+        }
         setOpenCourseDialog(true);
     }
 
@@ -1391,7 +1406,7 @@ export function RejectForm({ request, students, registeredCourses }) {
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
-                        status="Reject"
+                        hasSchedule={hasSchedule}
                     />
                 </Grid>
 
@@ -1474,11 +1489,14 @@ export function RejectForm({ request, students, registeredCourses }) {
                 )}
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
                     registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule={hasSchedule}
                 />
             )}
         </>
