@@ -105,26 +105,30 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
 
-    registrationRequests.map((request) => {
-      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
-        .then((res) => {
-          const newData = {
-            id: request.request.id,
-            requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-            courseType: request.request.courseType,
-            section: request.request.section,
-            registeredCourses: request.information.length,
-            requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
-            role: request.request.status,
-            receipt: request.request.paymentStatus,
-          }
-          setTableData(tableData => [...tableData, newData])
-        })
-    })
+    if (registrationRequests.length > 0) {
+      registrationRequests.map((request) => {
+        return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+          .then((res) => {
+            console.log('res', res);
+            console.log("Hi")
+            const newData = {
+              id: request.request.id,
+              requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+              courseType: request.request.courseType,
+              section: request.request.section,
+              registeredCourses: request.information.length,
+              requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+              role: request.request.status,
+              receipt: request.request.paymentStatus,
+            }
+            setTableData(tableData => [...tableData, newData])
+          }).catch((error) => console.error(error))
+      })
+    } else {
+      setTableData([]);
+    }
+
   }, []);
-  // useEffect(() => {
-  //   setTableData(TABLE_DATA_REQUESTS);
-  // }, []);
 
   const [filterName, setFilterName] = useState('');
 
@@ -213,7 +217,9 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     setFilterRole('');
   };
 
-  if (!dataFetchedRef.current) return (
+  console.log(dataFetchedRef.current)
+
+  if (dataFetchedRef.current === false) return (
     <LoadingScreen />
   )
 

@@ -101,8 +101,7 @@ export default function SearchStaffPage() {
                 <CustomBreadcrumbs
                     heading="All Staff"
                     links={[
-                        { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff },
-                        { name: 'Edit Account' }
+                        { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff }
                     ]}
                 />
                 <Stack spacing={3}>

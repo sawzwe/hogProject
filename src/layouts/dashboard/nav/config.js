@@ -185,7 +185,7 @@ const OANavConfig = [
     subheader: 'request management',
     items: [
       { title: 'Registration Request', path: PATH_REGISTRATION.oaRequestStatus, icon: ICONS.mail },
-      { title: 'Leaving Request', path: 'schedule-changing/leaving-request', icon: ICONS.leave },
+      // { title: 'Leaving Request', path: 'schedule-changing/leaving-request', icon: ICONS.leave },
     ],
   },
 
