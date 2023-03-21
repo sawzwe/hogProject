@@ -34,7 +34,7 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                 <Box display="inline-block" sx={{ width: '100%' }}>
                     <Card
                         variant="outlined"
-                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer" }}
+                        sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1 }}
                         // onClick={() => onOpen(eachClass)}
                         >
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -42,7 +42,7 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                                 <Typography variant="body1" component="div">
                                     Class {classNo.toString()}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendance !== 'None'}>
+                                <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendance === 'Complete'}>
                                     {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">

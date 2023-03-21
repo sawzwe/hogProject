@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { createContext, useEffect, useReducer, useCallback } from 'react';
 import { initializeApp } from 'firebase/app';
+import _ from 'lodash';
 import {
     getAuth,
     signOut,
@@ -162,9 +163,9 @@ export function AuthProvider({ children }) {
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         const formattedData = {
             title: data.studentTitle,
-            fName: data.studentFirstName,
-            lName: data.studentLastName,
-            nickname: data.studentNickname,
+            fName: _.capitalize(data.studentFirstName),
+            lName: _.capitalize(data.studentLastName),
+            nickname: _.capitalize(data.studentNickname),
             profilePicture: data.studentImageURL.name,
             additionalFiles: nameAdditionalFiles || [],
             dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
@@ -180,9 +181,9 @@ export function AuthProvider({ children }) {
             hogInfo: data.studentSource,
             healthInfo: data.studentHealthInfo,
             parent: {
-                fName: data.parentFirstName,
-                lName: data.parentLastName,
-                relationship: data.parentRelationships,
+                fName: _.capitalize(data.parentFirstName),
+                lName: _.capitalize(data.parentLastName),
+                relationship: _.capitalize(data.parentRelationships),
                 phone: data.parentPhoneNo,
                 email: data.parentEmail,
                 line: data.parentLineId,
@@ -243,9 +244,9 @@ export function AuthProvider({ children }) {
             id: currentStudent.id,
             firebaseId: currentStudent.firebaseId,
             title: data.studentTitle,
-            fName: data.studentFirstName,
-            lName: data.studentLastName,
-            nickname: data.studentNickname,
+            fName: _.capitalize(data.studentFirstName),
+            lName: _.capitalize(data.studentLastName),
+            nickname: _.capitalize(data.studentNickname),
             profilePicture: data.studentImageURL.name,
             additionalFiles: nameAdditionalFiles || [],
             dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
@@ -261,9 +262,9 @@ export function AuthProvider({ children }) {
             hogInfo: data.studentSource,
             healthInfo: data.studentHealthInfo,
             parent: {
-                fName: data.parentFirstName,
-                lName: data.parentLastName,
-                relationship: data.parentRelationships,
+                fName: _.capitalize(data.parentFirstName),
+                lName: _.capitalize(data.parentLastName),
+                relationship: _.capitalize(data.parentRelationships),
                 phone: data.parentPhoneNo.toString(),
                 email: data.parentEmail,
                 line: data.parentLineId,
@@ -285,7 +286,7 @@ export function AuthProvider({ children }) {
         if (data.studentFirstName !== currentStudent.firstName || data.studentLastName !== currentStudent.lastName) {
             const studentRef = doc(DB, "users", currentStudent.firebaseId);
             await updateDoc(studentRef, {
-                "displayName": `${data.studentFirstName} ${data.studentLastName}`
+                "displayName": `${_.capitalize(data.studentFirstName)} ${_.capitalize(data.studentLastName)}`
             })
                 .catch((error) => {
                     throw error;

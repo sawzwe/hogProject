@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import _ from 'lodash';
 // @mui
 import axios from 'axios';
+import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
 import { Divider, Typography, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Box, Card, CardContent } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -228,6 +230,7 @@ export function AttendanceButtons({ student, studentAttendance, readOnly, onChec
         }
     };
 
+    const formattedStudentName = student.fullName.split(' ')
 
     return (
         <>
@@ -237,8 +240,8 @@ export function AttendanceButtons({ student, studentAttendance, readOnly, onChec
                 alignItems="center">
                 <Stack
                     direction="column">
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{student.nickname}</Typography>
-                    <Typography variant="body2">{student.fullName}.</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{_.capitalize(student.nickname)}</Typography>
+                    <Typography variant="body2">{`${_.capitalize(formattedStudentName[0])} ${formattedStudentName[1].charAt(0).toUpperCase()}.`}</Typography>
                 </Stack>
                 <Stack
                     direction="row"
@@ -293,7 +296,7 @@ export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
     return (
         <Dialog open={open} fullWidth maxWidth="xs">
             <DialogTitle sx={{ mx: 'auto', pb: 0 }}>
-                <CloudUploadIcon sx={{ fontSize: '100px' }} />
+                <AssignmentTurnedInRoundedIcon sx={{ fontSize: '100px' }} />
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body1" align="center" sx={{ fontWeight: 'bold', fontSize: 'h5.fontSize', mb: 1 }}>
