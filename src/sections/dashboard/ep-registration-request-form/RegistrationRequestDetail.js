@@ -1071,7 +1071,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <RHFTextField name="additionalComment" label="Comment for pending payment" />
+                                <RHFTextField name="additionalComment" label="Comment to Office Admin" />
                             </Box>
                         </Card>
                     </Grid>
@@ -1109,7 +1109,7 @@ export function PendingEPForm({ request, students, registeredCourses, schedules,
                 >
                     <DialogTitle>
                         <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                            <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                            {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                             <Typography variant="h5">Reject the request?</Typography>
                         </Stack>
                     </DialogTitle>

@@ -23,7 +23,7 @@ export default function EAForm() {
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
-        phone: Yup.string().required('Phone number is required'),
+        phone: Yup.string().min(10, 'Phone number must contain 10 numbers').max(10, 'phone number must contain 10 numbers').required('Phone number is required'),
         line: Yup.string().required('Line ID is required'),
         email: Yup.string().email('Email is invalid').required('Email is required'),
     });

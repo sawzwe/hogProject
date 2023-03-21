@@ -51,7 +51,12 @@ export default function AuthLoginForm() {
       if (error.message === 'Firebase: Error (auth/user-not-found).') {
         setError('afterSubmit', {
           ...error,
-          message: 'Email or password is incorrect'
+          message: 'Invalid email or password'
+        });
+      } else if (error.message === 'Firebase: Error (auth/wrong-password).') {
+        setError('afterSubmit', {
+          ...error,
+          message: 'Invalid email or password'
         });
       } else {
         setError('afterSubmit', {

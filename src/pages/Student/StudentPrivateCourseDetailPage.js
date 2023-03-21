@@ -21,8 +21,8 @@ export default function StudentPrivateCourseDetailPage() {
     const navigate = useNavigate();
     const dataFetchedRef = useRef(false);
 
-    const {user} = useAuthContext();
-    const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
+    const { user } = useAuthContext();
+    const config = { headers: { Authorization: `Bearer ${user.accessToken}` } }
 
     // Course ID
     const { id } = useParams();
@@ -34,7 +34,7 @@ export default function StudentPrivateCourseDetailPage() {
     const [studentCourse, setStudentCourse] = useState();
 
     const fetchClass = async () => {
-        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
+        return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`, config)
             .then((res) => {
                 console.log('res', res);
                 const data = res.data.data
@@ -53,46 +53,47 @@ export default function StudentPrivateCourseDetailPage() {
 
 
 
-    if (studentCourse  === undefined ) {
+    if (studentCourse === undefined) {
         return <LoadingScreen />
     }
 
-    
-    const currentcourse = studentCourse.find(item => item.registeredCourse.id === parseInt(id,10));
+
+    const currentcourse = studentCourse.find(item => item.registeredCourse.id === parseInt(id, 10));
+    // console.log('currentcourse', currentcourse)
     // console.log('currentcourse',currentcourse)
     const course = {
         id: currentcourse.registeredCourse.id.toString(),
-        course: currentcourse.registeredCourse.course, 
+        course: currentcourse.registeredCourse.course,
         subject: currentcourse.registeredCourse.subject,
         level: currentcourse.registeredCourse.level,
         type: currentcourse.request.courseType,
-        section:currentcourse.registeredCourse.section,
+        section: currentcourse.registeredCourse.section,
         paymentStatus: currentcourse.request.paymentStatus
     }
     // console.log(currentcourse)
-    const currentclasses = currentcourse.registeredClasses;   
-    
+    const currentclasses = currentcourse.registeredClasses;
+
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
-        const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record=>record.studentId === user.id)
+        const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record => record.studentId === user.id)
         // console.log(eachClass.request.paymentStatus)
         return {
-          id: eachClass.id,
-          course,
-          classNo: (index+1),
-        //   students: {id: '2', fullName: 'Hong'},
-          date: eachClass.date,
-          fromTime: eachClass.fromTime,
-          toTime: eachClass.toTime,
-          room: eachClass.room,
-          section: course.section,
-          teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
-          attendance: mappedAttendanceStudent?.attendance || '' ,
-          paymentStatus: course.paymentStatus
+            id: eachClass.id,
+            course,
+            classNo: (index + 1),
+            //   students: {id: '2', fullName: 'Hong'},
+            date: eachClass.date,
+            fromTime: eachClass.fromTime,
+            toTime: eachClass.toTime,
+            room: eachClass.room,
+            section: course.section,
+            teacher: { id: eachClass.teacherPrivateClass.teacherId, fullName: eachClass.teacherPrivateClass.fullName },
+            attendance: mappedAttendanceStudent?.attendance || '',
+            paymentStatus: course.paymentStatus
         };
-      });
-      
-    
+    });
+
+
 
     // console.log('mapped',mappedStudentClass)
     // console.log('course',course.course)
@@ -195,7 +196,7 @@ export default function StudentPrivateCourseDetailPage() {
                 </Stack>
                 <StudentAllClasses classes={mappedStudentClass} />
             </Container>
-            
+
         </>
     );
 }

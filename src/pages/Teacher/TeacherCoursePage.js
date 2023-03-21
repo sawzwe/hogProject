@@ -106,7 +106,7 @@ export default function TeacherCoursePage() {
             subject: course.course.subject,
             level: course.course.level,
             type: course.request.courseType,
-            paymentStatus: course.request.paymentStatus,
+            paymentStatus: course.request.status,
         };
     });
 
@@ -114,7 +114,7 @@ export default function TeacherCoursePage() {
         teacherPrivateCourse: mappedTeacherCourses,
     };
 
-    console.log(currentTeachers);
+    // console.log(currentTeachers);
 
 
     return (

@@ -72,7 +72,7 @@ export default function StudentCoursePage() {
             subject: course.registeredCourse.subject,
             level: course.registeredCourse.level,
             type: course.request.courseType,
-            paymentStatus: course.request.paymentStatus
+            paymentStatus: course.request.status
         };
     });
 

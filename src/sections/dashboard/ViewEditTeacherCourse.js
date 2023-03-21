@@ -152,7 +152,7 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
                 </m.div>
 
                 <m.div variants={varBounce().in}>
-                    <Typography sx={{ color: 'text.secondary' }}>Student has not registered for any courses yet</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>Teacher has not been assigned for any courses yet</Typography>
                 </m.div>
 
                 <m.div variants={varBounce().in}>

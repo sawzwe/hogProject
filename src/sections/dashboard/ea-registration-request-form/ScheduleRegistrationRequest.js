@@ -284,7 +284,7 @@ export default function ScheduleRegistrationRequest({ currentRequest, educationA
             >
                 <DialogTitle>
                     <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                        <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                        {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                         <Typography variant="h5">Reject the request?</Typography>
                     </Stack>
                 </DialogTitle>

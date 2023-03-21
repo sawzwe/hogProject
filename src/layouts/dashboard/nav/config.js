@@ -6,6 +6,7 @@ import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded';
 // routes
 import { PATH_AUTH, PATH_ACCOUNT, PATH_REGISTRATION, PATH_COURSE_TRANSFER, PATH_SCHEDULE_CHANGING } from '../../../routes/paths';
 // components
@@ -35,7 +36,8 @@ const ICONS = {
   group: <GroupIcon />,
   changePassword: <LockResetIcon />,
   logout: <LogoutIcon />,
-  teacher: <AssignmentIndIcon />
+  teacher: <AssignmentIndIcon />,
+  book: <AutoStoriesRoundedIcon />
 };
 
 // ----------------------------------------------------------------------
@@ -207,8 +209,8 @@ const StudentNavConfig = [
   {
     subheader: 'general',
     items: [
-      { title: 'Calendar', path: 'student-calendar', icon: ICONS.user },
-      { title: 'Course', path: 'student-course', icon: ICONS.mail },
+      { title: 'Calendar', path: 'student-calendar', icon: ICONS.calendar },
+      { title: 'Course', path: 'student-course', icon: ICONS.book },
     ],
   },
 
@@ -239,8 +241,8 @@ const TeacherNavConfig = [
   {
     subheader: 'general',
     items: [
-      { title: 'Calendar', path: 'teacher-calendar', icon: ICONS.user },
-      { title: 'Course', path: 'teacher-course', icon: ICONS.mail },
+      { title: 'Calendar', path: 'teacher-calendar', icon: ICONS.calendar },
+      { title: 'Course', path: 'teacher-course', icon: ICONS.book },
     ],
   },
 

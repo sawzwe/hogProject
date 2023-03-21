@@ -418,7 +418,7 @@ export function AcceptDialog({ open, close, onAccept, isSubmitting }) {
         >
             <DialogTitle>
                 <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                     <Typography variant="h5">Accept the request?</Typography>
                 </Stack>
             </DialogTitle>
@@ -459,7 +459,7 @@ export function SendBackDialog({ open, close, onSendBack, isSubmitting }) {
         >
             <DialogTitle>
                 <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                     <Typography variant="h5">Reason of sending back to EP</Typography>
                 </Stack>
             </DialogTitle>
