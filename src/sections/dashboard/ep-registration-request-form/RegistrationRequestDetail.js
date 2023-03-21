@@ -1336,7 +1336,17 @@ export function PendingOAForm({ request, students, registeredCourses, schedules,
                 </Grid>
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && currentSchedule === undefined && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    hasSchedule={false}
+                />
+            )}
+
+            {Object.keys(selectedCourse).length > 0 && currentSchedule !== undefined && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}
@@ -1370,6 +1380,8 @@ export function RejectForm({ request, students, registeredCourses, schedules, ha
         epRemark2,
         eaRemark
     } = request;
+
+    console.log('sc',schedules);
 
     const [selectedCourse, setSelectedCourse] = useState({});
     const [currentSchedule, setCurrentSchedule] = useState({});
@@ -1489,7 +1501,18 @@ export function RejectForm({ request, students, registeredCourses, schedules, ha
                 )}
             </Grid>
 
-            {Object.keys(selectedCourse).length > 0 && Object.keys(currentSchedule).length > 0 && (
+            {Object.keys(selectedCourse).length > 0 && schedules.length === 0 && (
+                <ViewCourseDialog
+                    open={openCourseDialog}
+                    onClose={handleCloseEditCourseDialog}
+                    registeredCourse={selectedCourse}
+                    courseType={request.courseType}
+                    schedules={currentSchedule}
+                    hasSchedule={hasSchedule}
+                />
+            )}
+
+            {Object.keys(selectedCourse).length > 0 && currentSchedule !== undefined && Object.keys(currentSchedule).length > 0 && (
                 <ViewCourseDialog
                     open={openCourseDialog}
                     onClose={handleCloseEditCourseDialog}

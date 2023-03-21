@@ -133,6 +133,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
           section: request.request.section,
           registeredCourses: request.information.length,
           requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+          takenByEPId: request.request.takenByEPId,
           takenByEAId: request.request.takenByEAId,
           eaStatus: request.request.eaStatus,
           status: request.request.status,
@@ -248,7 +249,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
           epRemark2: "",
           eaRemark: "",
           oaRemark: "",
-          takenByEPId: selectedRow.requestedBy,
+          takenByEPId: selectedRow.takenByEPId,
           takenByEAId: educationAdminId,
           takenByOAId: 0
         }

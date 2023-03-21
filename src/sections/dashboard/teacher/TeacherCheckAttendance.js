@@ -58,7 +58,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
     //         enqueueSnackbar('Please check all attendance!', { variant: 'error' });
     //     }
     // };
-    const handleSubmitAttendance = () => {
+    const handleSubmitAttendance = async () => {
         if (isValidateAttendance()) {
             const newAttendanceData = attendances.map(({ student, value }) => ({
                 data: {
@@ -69,41 +69,41 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
             }));
 
             // Update the attendance data using Axios PUT request
-            axios
+            await axios
                 .all(
                     newAttendanceData.map(({ data }) => {
                         // console.log(data);
                         return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
-                        .then(res => console.log(res))
+                            .then(res => console.log(res))
                     })
                 )
 
-                .then(() => {
+                .then(async () => {
                     console.log('Attendance data updated successfully');
 
                     // Update the attendance status using Axios PUT request
                     const attendanceStatusData = {
-                        id: parseInt(classId,10),
+                        id: parseInt(classId, 10),
                         teacherId,
                         workType: 'Normal',
                         status: 'Complete',
                     };
 
-                    axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, attendanceStatusData)
+                    await axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, attendanceStatusData)
                         .then(() => {
                             console.log('Attendance status updated successfully');
                         })
                         .catch((error) => {
                             console.error('Error updating attendance status', error);
                         });
+
+                    navigate(-1, { replace: true });
+                    enqueueSnackbar('Successfully submitted', { variant: 'success' });
                 })
                 .catch((error) => {
                     console.error('Error updating attendance data', error);
                 });
-
-            navigate(-1, { replace: true });
             // navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
-            enqueueSnackbar('Successfully submitted', { variant: 'success' });
         } else {
             enqueueSnackbar('Please check all attendance!', { variant: 'error' });
         }
