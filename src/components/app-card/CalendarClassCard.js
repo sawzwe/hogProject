@@ -21,6 +21,8 @@ export default function CalendarClassCard({ accountRole, eachClass }) {
         section
     } = eachClass
 
+    console.log(teacher);
+
     const groupCourseLink = (accountRole === 'student') ? `/student-course/group-course/${course.id}` : `/teacher-course/group-course/${course.id}`
     const privateCourseLink = (accountRole === 'student') ? `/student-course/private-course/${course.id}` : `/teacher-course/private-course/${course.id}`
 

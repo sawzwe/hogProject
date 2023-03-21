@@ -541,13 +541,13 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             allSchedules.forEach((eachClass) => {
                 const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
                 const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
-    
+
                 const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
                 const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
-    
+
                 const range1 = moment.range(timeAStart, timeAEnd);
                 const range2 = moment.range(timeBStart, timeBEnd);
-    
+
                 if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
                     hasConflict = true;
                 }
@@ -594,13 +594,13 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
             allSchedules.forEach((eachClass) => {
                 const timeAStart = moment([eachClass.fromTime.slice(0, 2), eachClass.fromTime.slice(3, 5)], "HH:mm")
                 const timeAEnd = moment([eachClass.toTime.slice(0, 2), eachClass.toTime.slice(3, 5)], "HH:mm")
-    
+
                 const timeBStart = moment([newClass.fromTime.slice(0, 2), newClass.fromTime.slice(3, 5)], "HH:mm");
                 const timeBEnd = moment([newClass.toTime.slice(0, 2), newClass.toTime.slice(3, 5)], "HH:mm");
-    
+
                 const range1 = moment.range(timeAStart, timeAEnd);
                 const range2 = moment.range(timeBStart, timeBEnd);
-    
+
                 if (eachClass.date.getTime() === newClass.date.getTime() && range1.overlaps(range2)) {
                     hasConflict = true;
                 }
@@ -677,237 +677,238 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
 
     return (
         <Dialog fullWidth maxWidth="xl" open={open} onClose={close}>
-
-            <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
-                <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6"> Create Class </Typography>
-                    <IconButton variant="h6" onClick={close}> <CloseIcon /> </IconButton>
+            <Scrollbar>
+                <Grid container direction="row" sx={{ p: 3, pb: 1 }} spacing={2} >
+                    <Grid container item xs={12} md={12} justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6"> Create Class </Typography>
+                        <IconButton variant="h6" onClick={close}> <CloseIcon /> </IconButton>
+                    </Grid>
                 </Grid>
-            </Grid>
 
-            <Grid container direction="row" sx={{ px: 3 }} spacing={2}>
+                <Grid container direction="row" sx={{ px: 3 }} spacing={2}>
 
-                <Grid item xs={12} md={5}>
-                    <Grid item xs={12} md={12} sx={{ pb: 2 }}>
-                        <Typography variant="h6"> Course Information </Typography>
-                    </Grid>
-
-                    <Stack direction="row" sx={{ pb: 2 }}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={selectedCourse.course.concat(' ', selectedCourse.subject, ' ', selectedCourse.level)}
-                                    label="Course"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={courseType.toUpperCase()}
-                                    label="Course Type"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
+                    <Grid item xs={12} md={5}>
+                        <Grid item xs={12} md={12} sx={{ pb: 2 }}>
+                            <Typography variant="h6"> Course Information </Typography>
                         </Grid>
-                    </Stack>
 
-                    <Stack direction="row" sx={{ pb: 2 }}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={selectedCourse.method}
-                                    label="Learning Method"
-                                    disabled
-                                    inputProps={{
-                                        style: { textTransform: "capitalize", fontSize: "0.9rem" }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={selectedCourse.totalHour}
-                                    label="Total Hours"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={selectedCourse.hourPerClass}
-                                    label="Hours/Class"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-
-                    <Stack direction="row" sx={{ pb: 2 }} spacing={2}>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={fDate(selectedCourse.fromDate, 'dd-MMM-yyyy')}
-                                    label="Start Date"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    value={fDate(selectedCourse.toDate, 'dd-MMM-yyyy')}
-                                    label="End Date"
-                                    disabled
-                                    InputProps={{
-                                        style: customTextFieldStyle
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Stack>
-
-                    <Grid item xs={12} md={12} sx={{ mb: 1 }}>
-                        <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
-                            Preferred Days
-                        </Typography>
-                    </Grid>
-
-                    <Stack direction="row" sx={{ pb: 3 }}>
-                        <Grid container direction="row" spacing={2}>
-                            {selectedCourse.preferredDays.map((eachDay, index) => (
-                                <Grid item xs={6} md={3} key={index}>
+                        <Stack direction="row" sx={{ pb: 2 }}>
+                            <Grid container direction="row" spacing={2}>
+                                <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth
-                                        label={eachDay.day}
-                                        value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+                                        variant="outlined"
+                                        value={selectedCourse.course.concat(' ', selectedCourse.subject, ' ', selectedCourse.level)}
+                                        label="Course"
+                                        disabled
                                         InputProps={{
-                                            style: { fontSize: '0.8rem' }
+                                            style: customTextFieldStyle
                                         }}
-                                        disabled />
+                                    />
                                 </Grid>
-                            ))}
-                        </Grid>
-                    </Stack>
-                </Grid>
-
-                <Grid item xs={12} md={7}>
-                    <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                            <Typography variant="h6">
-                                Classes & Schedules
-                            </Typography>
-
-                            <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
-                                <AddIcon sx={{ mr: 0.5 }} /> Add Class
-                            </Button>
-
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={courseType.toUpperCase()}
+                                        label="Course Type"
+                                        disabled
+                                        InputProps={{
+                                            style: customTextFieldStyle
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
                         </Stack>
-                        {!!schedules.length && (
-                            <TableContainer component={Paper} >
-                                <Table sx={{ width: '100%' }}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <StyledTableCell align="center">No.</StyledTableCell>
-                                            <StyledTableCell align="center">Day</StyledTableCell>
-                                            <StyledTableCell align="center">Date</StyledTableCell>
-                                            <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
-                                            <StyledTableCell align="center">Method</StyledTableCell>
-                                            <StyledTableCell align="center">Teacher</StyledTableCell>
-                                            <StyledTableCell align="center">Hours</StyledTableCell>
-                                            <StyledTableCell align="center" />
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {schedules.map((eachClass, index) => {
-                                            displayAccumulatedHours += parseInt(eachClass.hourPerClass, 10);
-                                            return (
-                                                <StyledTableRow key={index}>
-                                                    <StyledTableCell component="th" scope="row" align="center">
-                                                        {(index + 1).toString()}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="center"> {eachClass.day.slice(0, 3)} </StyledTableCell>
-                                                    <StyledTableCell align="center">{fDate(eachClass.date)}</StyledTableCell>
-                                                    <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
-                                                    <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
-                                                    <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.nickname.toUpperCase()} ${eachClass.teacher.workType === 'Normal' ? '' : `(${eachClass.teacher.workType})`} `}</StyledTableCell>
-                                                    <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
-                                                    <StyledTableCell align="center" > {
-                                                        <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
-                                                            <EditIcon fontSize="small" />
-                                                        </IconButton>
-                                                    }
-                                                    </StyledTableCell>
-                                                </StyledTableRow>
-                                            )
-                                        })}
-                                        <StyledTableRow>
-                                            <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
-                                            <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
-                                            <StyledTableCell />
-                                        </StyledTableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        )}
-                    </Scrollbar>
+
+                        <Stack direction="row" sx={{ pb: 2 }}>
+                            <Grid container direction="row" spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={selectedCourse.method}
+                                        label="Learning Method"
+                                        disabled
+                                        inputProps={{
+                                            style: { textTransform: "capitalize", fontSize: "0.9rem" }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={selectedCourse.totalHour}
+                                        label="Total Hours"
+                                        disabled
+                                        InputProps={{
+                                            style: customTextFieldStyle
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={3}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={selectedCourse.hourPerClass}
+                                        label="Hours/Class"
+                                        disabled
+                                        InputProps={{
+                                            style: customTextFieldStyle
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Stack>
+
+                        <Stack direction="row" sx={{ pb: 2 }} spacing={2}>
+                            <Grid container direction="row" spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={fDate(selectedCourse.fromDate, 'dd-MMM-yyyy')}
+                                        label="Start Date"
+                                        disabled
+                                        InputProps={{
+                                            style: customTextFieldStyle
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        value={fDate(selectedCourse.toDate, 'dd-MMM-yyyy')}
+                                        label="End Date"
+                                        disabled
+                                        InputProps={{
+                                            style: customTextFieldStyle
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Stack>
+
+                        <Grid item xs={12} md={12} sx={{ mb: 1 }}>
+                            <Typography variant="inherit" sx={{ color: 'text.disabled' }}>
+                                Preferred Days
+                            </Typography>
+                        </Grid>
+
+                        <Stack direction="row" sx={{ pb: 3 }}>
+                            <Grid container direction="row" spacing={2}>
+                                {selectedCourse.preferredDays.map((eachDay, index) => (
+                                    <Grid item xs={6} md={3} key={index}>
+                                        <TextField
+                                            fullWidth
+                                            label={eachDay.day}
+                                            value={`${eachDay.fromTime} - ${eachDay.toTime}`}
+                                            InputProps={{
+                                                style: { fontSize: '0.8rem' }
+                                            }}
+                                            disabled />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Stack>
+                    </Grid>
+
+                    <Grid item xs={12} md={7}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1, mr: 1.5 }}>
+                                <Typography variant="h6">
+                                    Classes & Schedules
+                                </Typography>
+
+                                <Button variant="text" color="primary" onClick={() => setOpenAddClassDialog(true)}>
+                                    <AddIcon sx={{ mr: 0.5 }} /> Add Class
+                                </Button>
+
+                            </Stack>
+                            <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
+                            {!!schedules.length && (
+                                <TableContainer component={Paper} >
+                                    <Table sx={{ width: '100%' }}>
+                                        <TableHead>
+                                            <TableRow>
+                                                <StyledTableCell align="center">No.</StyledTableCell>
+                                                <StyledTableCell align="center">Day</StyledTableCell>
+                                                <StyledTableCell align="center">Date</StyledTableCell>
+                                                <StyledTableCell colSpan={2} align="center">Time</StyledTableCell>
+                                                <StyledTableCell align="center">Method</StyledTableCell>
+                                                <StyledTableCell align="center">Teacher</StyledTableCell>
+                                                <StyledTableCell align="center">Hours</StyledTableCell>
+                                                <StyledTableCell align="center" />
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {schedules.map((eachClass, index) => {
+                                                displayAccumulatedHours += parseInt(eachClass.hourPerClass, 10);
+                                                return (
+                                                    <StyledTableRow key={index}>
+                                                        <StyledTableCell component="th" scope="row" align="center">
+                                                            {(index + 1).toString()}
+                                                        </StyledTableCell>
+                                                        <StyledTableCell align="center"> {eachClass.day.slice(0, 3)} </StyledTableCell>
+                                                        <StyledTableCell align="center">{fDate(eachClass.date)}</StyledTableCell>
+                                                        <StyledTableCell align="center">{eachClass.fromTime} - {eachClass.toTime}</StyledTableCell>
+                                                        <StyledTableCell sx={{ width: '8%' }} align="center">{eachClass.hourPerClass}</StyledTableCell>
+                                                        <StyledTableCell align="center">{eachClass.method}</StyledTableCell>
+                                                        <StyledTableCell sx={{ width: '15%' }} align="center">{`${eachClass.teacher.nickname.toUpperCase()} ${eachClass.teacher.workType === 'Normal' ? '' : `(${eachClass.teacher.workType})`} `}</StyledTableCell>
+                                                        <StyledTableCell align="center">{displayAccumulatedHours.toString()}</StyledTableCell>
+                                                        <StyledTableCell align="center" > {
+                                                            <IconButton onClick={() => handleOpenEditDialog(eachClass)}>
+                                                                <EditIcon fontSize="small" />
+                                                            </IconButton>
+                                                        }
+                                                        </StyledTableCell>
+                                                    </StyledTableRow>
+                                                )
+                                            })}
+                                            <StyledTableRow>
+                                                <StyledTableCell colSpan={7} align="center">TOTAL</StyledTableCell>
+                                                <StyledTableCell align="center">{accumulatedHours()}</StyledTableCell>
+                                                <StyledTableCell />
+                                            </StyledTableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            )}
+                        </Scrollbar>
+                    </Grid>
+
+                    <Grid container item justifyContent="flex-end" sx={{mr: 1, mb: 2}}>
+                        <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
+                            {checkAlreadyCreated(completeCourses, selectedCourse) ? 'Save Changes' : 'Create'}
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
-            {Object.keys(selectedSchedule).length > 0 &&
-                <EditClassDialog
-                    open={openEditClass}
-                    close={handleCloseEditDialog}
-                    schedule={selectedSchedule}
-                    onEdit={handleEditClass}
-                    onDelete={handleDeleteClass}
-                    // hourPerClass={selectedSchedule.hourPerClass}
+                {Object.keys(selectedSchedule).length > 0 &&
+                    <EditClassDialog
+                        open={openEditClass}
+                        close={handleCloseEditDialog}
+                        schedule={selectedSchedule}
+                        onEdit={handleEditClass}
+                        onDelete={handleDeleteClass}
+                        // hourPerClass={selectedSchedule.hourPerClass}
+                        fromDate={selectedCourse.fromDate}
+                        toDate={selectedCourse.toDate}
+                        students={mapStudentsForAddEditDialog()}
+                    />
+                }
+
+                <AddClassDialog
+                    open={openAddClassDialog}
+                    onClose={handleCloseAddClassDialog}
+                    onAdd={handleAddClass}
+                    hourPerClass={selectedCourse.hourPerClass}
                     fromDate={selectedCourse.fromDate}
                     toDate={selectedCourse.toDate}
+                    method={selectedCourse.method}
                     students={mapStudentsForAddEditDialog()}
                 />
-            }
-
-            <AddClassDialog
-                open={openAddClassDialog}
-                onClose={handleCloseAddClassDialog}
-                onAdd={handleAddClass}
-                hourPerClass={selectedCourse.hourPerClass}
-                fromDate={selectedCourse.fromDate}
-                toDate={selectedCourse.toDate}
-                method={selectedCourse.method}
-                students={mapStudentsForAddEditDialog()}
-            />
-
-            <Grid container justifyContent="flex-end" sx={{ p: 3, pt: 0 }}>
-                <Button variant="contained" size="large" disabled={accumulatedHours() !== selectedCourse.totalHour} onClick={handleCreate}>
-                    {checkAlreadyCreated(completeCourses, selectedCourse) ? 'Save Changes' : 'Create'}
-                </Button>
-            </Grid>
+            </Scrollbar>
         </Dialog>
     )
 }

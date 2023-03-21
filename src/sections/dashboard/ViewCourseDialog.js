@@ -388,15 +388,14 @@ export function ScheduledCourseDialog({ open, onClose, registeredCourse, courseT
                     </Stack>
                 </Grid>
 
-                <Grid item xs={12} md={7}>
-                    <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
+                <Grid item xs={12} md={7} sx={{mb: 4}}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                             <Typography variant="h6">
                                 Classes & Schedules
                             </Typography>
                         </Stack>
 
-
+                        <Scrollbar sx={{ maxHeight: '28.1rem', pr: 1.5 }}>
                         <TableContainer component={Paper} >
                             <Table sx={{ width: '100%' }}>
                                 <TableHead>
