@@ -52,48 +52,27 @@ export default function SaveChangesDialog({ data, open, onClose, accountRole }) 
 
                 enqueueSnackbar("Save changes successfully", { variant: 'success' });
                 navigate(`/account/teacher-management/teacher/${data.id}`);
-            }
-
-            if (accountRole === 'Education Admin') {
+            } else {
                 const formattedData = {
                     id: data.id,
+                    firebaseId: data.firebaseId,
                     fName: data.fName,
                     lName: data.lName,
                     nickname: data.nickname,
                     phone: data.phone,
                     email: data.email,
                     line: data.line,
-                    role: 'ea'
+                    role: data.role
                 }
-                await axios.put(`${HOG_API}/api/EA/Put`, formattedData)
-                    // .then((res) => console.log(res))
+                await axios.put(`${HOG_API}/api/Staff/Put`, formattedData)
                     .catch((error) => {
                         throw error
                     })
 
                 enqueueSnackbar("Save changes successfully", { variant: 'success' });
-                navigate(`/account/staff-management/staff/ea/${data.id}`)
+                navigate(`/account/staff-management/staff/${data.id}`)
             }
 
-            if (accountRole === 'Education Planner') {
-                const formattedData = {
-                    id: data.id,
-                    fName: data.fName,
-                    lName: data.lName,
-                    nickname: data.nickname,
-                    phone: data.phone,
-                    email: data.email,
-                    line: data.line,
-                    role: 'ep'
-                }
-                await axios.put(`${HOG_API}/api/EP/Put`, formattedData)
-                    // .then((res) => console.log(res))
-                    .catch((error) => {
-                        throw error
-                    })
-                enqueueSnackbar("Save changes successfully", { variant: 'success' });
-                navigate(`/account/staff-management/staff/ep/${data.id}`)
-            }
             setIsSubmitting(false);
         } catch (error) {
             console.error(error);

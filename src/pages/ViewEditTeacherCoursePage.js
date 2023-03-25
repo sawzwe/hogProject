@@ -49,8 +49,9 @@ export default function ViewEditTeacherCoursePage() {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${id}`, config)
             .then((res) => {
                 const data = res.data.data
-                const completePaymentCourses = data.filter((course) => course.request.paymentStatus === 'Complete');
-                const pendingCourses = data.filter((course) => course.request.paymentStatus === 'Pending');
+                const enabledCourses = data.filter((course) => course.course.isActive === true);
+                const completePaymentCourses = enabledCourses.filter((course) => course.request.paymentStatus === 'Complete');
+                const pendingCourses = enabledCourses.filter((course) => course.request.paymentStatus === 'Pending');
                 setPendingCourses(pendingCourses);
                 setCourses(completePaymentCourses);
             })
@@ -93,7 +94,6 @@ export default function ViewEditTeacherCoursePage() {
                         action='Go Back'
                     />
                 </Container>
-
             </>
         )
     }

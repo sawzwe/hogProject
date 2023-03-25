@@ -33,7 +33,7 @@ export default function TeacherCoursePage() {
         // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`,config)
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Get/${user.id}`, config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setTeacher(data)
                 // console.log('data', data)
@@ -45,7 +45,7 @@ export default function TeacherCoursePage() {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
             // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setTeacherCourse(data)
                 // console.log('data', data)

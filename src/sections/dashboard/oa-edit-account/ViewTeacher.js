@@ -18,7 +18,7 @@ ViewTeacher.propTypes = {
 }
 
 export default function ViewTeacher({ currentTeacher }) {
-    console.log("teacher", currentTeacher)
+    // console.log("teacher", currentTeacher)
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);

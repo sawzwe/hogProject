@@ -124,7 +124,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
     dataFetchedRef.current = true;
 
     privateRegistrationRequest.map((request) => {
-      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+      return axios.get(`${HOG_API}/api/Staff/Get/${request.request.takenByEPId}`)
       .then((res) => {
         const newData = {
           id: request.request.id,
@@ -254,7 +254,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
           takenByOAId: 0
         }
       })
-        .then((res) => console.log(res))
+        // .then((res) => console.log(res))
         .catch((error) => {
           throw error;
         })

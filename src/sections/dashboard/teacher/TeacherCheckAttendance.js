@@ -74,12 +74,12 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                     newAttendanceData.map(({ data }) => {
                         // console.log(data);
                         return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
-                            .then(res => console.log(res))
+                            // .then(res => console.log(res))
                     })
                 )
 
                 .then(async () => {
-                    console.log('Attendance data updated successfully');
+                    // console.log('Attendance data updated successfully');
 
                     // Update the attendance status using Axios PUT request
                     const attendanceStatusData = {
@@ -90,9 +90,9 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                     };
 
                     await axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, attendanceStatusData)
-                        .then(() => {
-                            console.log('Attendance status updated successfully');
-                        })
+                        // .then(() => {
+                        //     console.log('Attendance status updated successfully');
+                        // })
                         .catch((error) => {
                             console.error('Error updating attendance status', error);
                         });
@@ -167,7 +167,7 @@ export function SelectedClassCard({ eachClass }) {
             <Box display="inline-block" sx={{ width: '100%' }}>
                 <Card
                     variant='outlined'
-                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer", textDecoration: 'none' }}>
+                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, textDecoration: 'none' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ pr: 0 }}>
                             <Typography variant="body1" component="div">

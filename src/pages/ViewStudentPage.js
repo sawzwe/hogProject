@@ -55,7 +55,7 @@ export default function ViewStudentPage() {
                         res.items.map((itemRef) => (
                             getMetadata(itemRef)
                                 .then((metadata) => {
-                                    console.log('itemRef', itemRef)
+                                    // console.log('itemRef', itemRef)
                                     getDownloadURL(itemRef)
                                         .then((url) => setFilesURL(filesURL => [...filesURL, { name: metadata.name, preview: url }]))
                                         .catch((error) => console.error(error));

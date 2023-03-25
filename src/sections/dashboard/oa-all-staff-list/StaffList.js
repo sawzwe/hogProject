@@ -23,7 +23,7 @@ function createData(id, fullname, nickname) {
 }
 
 const TABLE_HEAD = [
-  // { id: 'id', label: 'Teacher ID', align: 'left' },
+  { id: 'id', label: 'Staff ID', align: 'left' },
   { id: 'fullname', label: 'Fullname', align: 'left' },
   { id: 'nickname', label: 'Nickname', align: 'left' },
   { id: 'role', label: 'Role', align: 'left' },
@@ -148,15 +148,15 @@ export default function StaffList({ allStaffs }) {
                 <TableRow
                   hover
                   key={index}
-                  sx={{ cursor: 'pointer'}}
-                  onClick={() => navigate(`/account/staff-management/staff/${row.role === 'EA' ? 'ea' : 'ep'}/${parseInt(row.id, 10)}`)}
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/account/staff-management/staff/${row.id}`)}
                 >
-                  {/* <TableCell align="left" > {row.id} </TableCell> */}
+                  <TableCell align="left"> {row.id} </TableCell>
                   <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
                   <TableCell align="left">{row.role}</TableCell>
                   <TableCell align="right">
-                    <Iconify icon="ic:chevron-right" sx={{mr: 5}} />
+                    <Iconify icon="ic:chevron-right" sx={{ mr: 5 }} />
                   </TableCell>
 
                 </TableRow>
@@ -196,10 +196,10 @@ function applyFilter({ inputData, comparator, filterValue }) {
   if (filterValue) {
     // inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
     // inputData = inputData.filter((user) => user.fullname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || user.id === parseInt(filterValue, 10));
-    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
-    user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 || 
-    user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
-    user.role.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
+    inputData = inputData.filter((user) => user.fName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+      user.nickname.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+      user.lName.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1 ||
+      user.role.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1);
 
   }
 

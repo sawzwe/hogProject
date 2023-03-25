@@ -16,11 +16,10 @@ import SaveChangesDialog from './SaveChangesDialog';
 // ----------------------------------------------------------------------
 
 EditStaff.propTypes = {
-    currentStaff: PropTypes.object,
-    currentRole: PropTypes.string
+    currentStaff: PropTypes.object
 }
 
-export default function EditStaff({ currentStaff, currentRole }) {
+export default function EditStaff({ currentStaff }) {
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
@@ -34,6 +33,8 @@ export default function EditStaff({ currentStaff, currentRole }) {
     });
 
     const defaultValues = {
+        role: currentStaff?.role || '',
+        firebaseId: currentStaff?.firebaseId || '',
         fName: currentStaff?.fName || '',
         lName: currentStaff?.lName || '',
         nickname: currentStaff?.nickname || '',
@@ -77,7 +78,7 @@ export default function EditStaff({ currentStaff, currentRole }) {
     };
 
     const handleCancelEdit = () => {
-        navigate(`/account/staff-management/staff/${currentRole}/${currentStaff.id}`);
+        navigate(`/account/staff-management/staff/${currentStaff.id}`);
     }
 
     return (
@@ -89,7 +90,7 @@ export default function EditStaff({ currentStaff, currentRole }) {
                         display: 'block',
                     }}
                 >
-                    {`Edit Account (${currentRole === 'ea' ? 'Education Admin' : 'Education Planner'})`}
+                    {`Edit Account (${currentStaff.role})`}
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>
@@ -137,7 +138,6 @@ export default function EditStaff({ currentStaff, currentRole }) {
                 open={openSaveChangesDialog}
                 onClose={() => setOpenSaveChangesDialog(false)}
                 data={savedData}
-                accountRole={currentRole === 'ea' ? 'Education Admin' : 'Education Planner'}
             />
 
 

@@ -23,30 +23,9 @@ export default function NewAccountPage() {
     const dataFetchedRef = useRef(false);
 
     const fetchData = async () => {
-        try {
-            if (role === 'ep') {
-                await axios.get(`${HOG_API}/api/EP/Get/${id}`)
-                    .then((res) => {
-                        setCurrentStaff(res.data.data)
-                        setCurrentRole('ep')
-                    })
-                    .catch((error) => {
-                        throw error;
-                    })
-            }
-            if (role === 'ea') {
-                await axios.get(`${HOG_API}/api/EA/Get/${id}`)
-                    .then((res) => {
-                        setCurrentStaff(res.data.data)
-                        setCurrentRole('ea')
-                    })
-                    .catch((error) => {
-                        throw error;
-                    })
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        await axios.get(`${HOG_API}/api/Staff/Get/${id}`)
+            .then((res) => setCurrentStaff(res.data.data))
+            .catch((error) => console.error(error))
     }
 
     useEffect(() => {
@@ -71,12 +50,12 @@ export default function NewAccountPage() {
                     heading="Edit Staff Account"
                     links={[
                         { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff },
-                        { name: `${currentStaff.fullName}`, href: `/account/staff-management/staff/${currentRole === 'ea' ? 'ea' : 'ep' }/${currentStaff.id}` },
+                        { name: `${currentStaff.fullName}`, href: `/account/staff-management/staff/${currentStaff.id}` },
                         { name: 'Edit Account' }
                     ]}
                 />
 
-                <EditStaff currentStaff={currentStaff} currentRole={currentRole} />
+                <EditStaff currentStaff={currentStaff} />
             </Container>
         </>
     );

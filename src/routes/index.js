@@ -199,14 +199,14 @@ export default function Router() {
             //   )
             // },
             {
-              path: 'staff-management/staff/:role/:id', element: (
+              path: 'staff-management/staff/:id', element: (
                 <RoleBasedGuard roles={['Office Admin']} hasContent>
                   <PageViewStaff />
                 </RoleBasedGuard>
               )
             },
             {
-              path: 'staff-management/staff/:role/:id/edit', element: (
+              path: 'staff-management/staff/:id/edit', element: (
                 <RoleBasedGuard roles={['Office Admin']} hasContent>
                   <PageEditStaff />
                 </RoleBasedGuard>

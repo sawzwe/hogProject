@@ -90,12 +90,15 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
         setSchedules(selectedSchedules);
         // setLocalSchedule(selectedSchedules);
         setLocalSchedule(selectedSchedules.sort((class1, class2) => new Date(`${fDate(class1.date, 'MMMM dd, yyyy')} ${class1.fromTime}:00`) - new Date(`${fDate(class2.date, 'MMMM dd, yyyy')} ${class2.fromTime}:00`)));
+        setSelectedStudents(students);
     }, [selectedSchedules])
 
-    // console.log('local', localSchedule);
+    console.log('selectedRequest',selectedRequest)
+    console.log('local', localSchedule);
 
     const handleAddClass = async (addedClass) => {
         // console.log(addedClass);
+        console.log('selectedStudents',selectedStudents);
         try {
             let hasConflict = false;
 
@@ -106,7 +109,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
                 date: fDate(addedClass.date, 'dd-MMM-yyyy'),
                 fromTime: addedClass.fromTime,
                 toTime: addedClass.toTime,
-                studentPrivateClasses: students.map((student) => ({
+                studentPrivateClasses: selectedStudents.map((student) => ({
                     studentId: student.studentId,
                     attendance: "None"
                 })),
@@ -728,7 +731,7 @@ export function ViewEditScheduleDialog({ selectedCourse, selectedSchedules, sele
 
                 {role === 'Education Admin' && (
                     <Grid container item justifyContent="flex-end" xs={12} md={12} sx={{ mr: 1 }}>
-                        <LoadingButton variant="contained" color="primary" onClick={() => setOpenSaveChangesDialog(true)} disabled={accumulatedHours() !== selectedCourse.totalHour}>
+                        <LoadingButton variant="contained" color="primary" onClick={() => setOpenSaveChangesDialog(true)}>
                             Save Changes
                         </LoadingButton>
                     </Grid>

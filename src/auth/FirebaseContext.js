@@ -128,37 +128,6 @@ export function AuthProvider({ children }) {
     // LOGIN
     const login = async (email, password) => (signInWithEmailAndPassword(AUTH, email, password))
 
-    // REGISTER STUDENT
-    // const registerStudent = async (data) =>
-    //     createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
-    //         .then(async (res) => {
-    //             const userRef = doc(collection(DB, 'users'), res.user?.uid);
-    //             return setDoc(userRef, {
-    //                 uid: res.user?.uid,
-    //                 email: data.studentEmail,
-    //                 displayName: `${data.studentFirstName} ${data.studentLastName}`,
-    //                 role: "Student"
-    //             })
-    //                 .catch((error) => console.error(error))
-    //                 .then(() => {
-    //                     const file = data.studentImageURL
-    //                     const storageProfileRef = ref(storage, `users/students/${res.user?.uid}/Avatar/${file.name}`);
-    //                     uploadBytes(storageProfileRef, file)
-    //                         .then((snapshot) => { console.log("uploaded!") })
-    //                         .catch((error) => console.error(error));
-    //                 })
-    //                 .catch((error) => console.error(error))
-    //                 .then(() => {
-    //                     data.studentAdditionalFiles.map((file, index) => {
-    //                         const storageAdditionalFilesRef = ref(storage, `users/students/${res.user?.uid}/Files/${file.name}`);
-    //                         return uploadBytes(storageAdditionalFilesRef, file)
-    //                             .then((snapshot) => console.log("Additional File uploaded!"))
-    //                             .catch((error) => console.error(error));
-    //                     })
-    //                 })
-    //                 .then(() => signOut(AUTH_STUDENT))
-    //         })
-
     const registerStudent = async (data, config) => {
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         const formattedData = {
@@ -368,17 +337,9 @@ export function AuthProvider({ children }) {
             })
     }
 
-    // CREATE EP
-    const registerEP = async (data) => {
-        await axios.post(`${HOG_API}/api/EP/Post`, data)
-            .catch((error) => {
-                throw error;
-            })
-    }
-
-    // CREATE EA
-    const registerEA = async (data) => {
-        await axios.post(`${HOG_API}/api/EA/Post`, data)
+    // CREATE EP, EA, OA
+    const registerStaff = async (data) => {
+        await axios.post(`${HOG_API}/api/Staff/Post`, data)
             .catch((error) => {
                 throw error;
             })
@@ -402,8 +363,7 @@ export function AuthProvider({ children }) {
                 login,
                 registerStudent,
                 updateStudent,
-                registerEA,
-                registerEP,
+                registerStaff,
                 registerTeacher,
                 logout,
                 changePassword,

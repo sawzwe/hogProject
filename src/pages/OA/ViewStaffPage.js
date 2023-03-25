@@ -17,37 +17,15 @@ import { HOG_API } from '../../config';
 
 export default function NewAccountPage() {
     const { themeStretch } = useSettingsContext();
-    const { role, id } = useParams();
+    const { id } = useParams();
     const [currentStaff, setCurrentStaff] = useState();
     const [currentRole, setCurrentRole] = useState("");
     const dataFetchedRef = useRef(false);
 
     const fetchData = async () => {
-
-        try {
-            if (role === 'ep') {
-                await axios.get(`${HOG_API}/api/EP/Get/${id}`)
-                    .then((res) => {
-                        setCurrentStaff(res.data.data)
-                        setCurrentRole('ep')
-                    })
-                    .catch((error) => {
-                        throw error;
-                    })
-            }
-            if (role === 'ea') {
-                await axios.get(`${HOG_API}/api/EA/Get/${id}`)
-                    .then((res) => {
-                        setCurrentStaff(res.data.data)
-                        setCurrentRole('ea')
-                    })
-                    .catch((error) => {
-                        throw error;
-                    })
-            }
-        } catch (error) {
-            console.error(error);
-        }
+        await axios.get(`${HOG_API}/api/Staff/Get/${id}`)
+            .then((res) => setCurrentStaff(res.data.data))
+            .catch((error) => console.error(error))
     }
 
     useEffect(() => {
@@ -81,7 +59,7 @@ export default function NewAccountPage() {
                     ]}
                 />
 
-                <ViewStaff currentStaff={currentStaff} currentRole={currentRole} />
+                <ViewStaff currentStaff={currentStaff} />
             </Container>
         </>
     );

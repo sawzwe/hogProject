@@ -32,7 +32,7 @@ export default function StudentCoursePage() {
     const fetchStudent = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Get/${user.id}`,config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setStudent(data)
                 // console.log('data', data)
@@ -44,7 +44,7 @@ export default function StudentCoursePage() {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
         // return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`,config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setStudentCourse(data)
                 // console.log('data', data)
@@ -65,14 +65,14 @@ export default function StudentCoursePage() {
     
     // Map the student courses
     const mappedStudentCourse = studentCourse.map((course, index) => {
-        // console.log(course)
         return {
             id: course.registeredCourse.id.toString(),
             course: course.registeredCourse.course, 
             subject: course.registeredCourse.subject,
             level: course.registeredCourse.level,
             type: course.request.courseType,
-            paymentStatus: course.request.status
+            paymentStatus: course.request.status,
+            isActive: course.registeredCourse.isActive
         };
     });
 
@@ -84,7 +84,7 @@ export default function StudentCoursePage() {
 
     // console.log('fetched',currentStudents)
     // console.log('dummy',currentStudent)
-    // console.log(currentStudents)
+    console.log(currentStudents)
     return (
         <>
             <Helmet>

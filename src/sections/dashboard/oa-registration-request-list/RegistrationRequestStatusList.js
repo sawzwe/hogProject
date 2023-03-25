@@ -107,10 +107,9 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
 
     if (registrationRequests.length > 0) {
       registrationRequests.map((request) => {
-        return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+        return axios.get(`${HOG_API}/api/Staff/Get/${request.request.takenByEPId}`)
           .then((res) => {
-            console.log('res', res);
-            console.log("Hi")
+            // console.log('res', res);
             const newData = {
               id: request.request.id,
               requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
@@ -217,7 +216,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     setFilterRole('');
   };
 
-  console.log(dataFetchedRef.current)
+  // console.log(dataFetchedRef.current)
 
   if (dataFetchedRef.current === false) return (
     <LoadingScreen />
@@ -349,7 +348,7 @@ function applyFilter({
   }
 
   if (filterRole !== '') {
-    console.log(inputData);
+    // console.log(inputData);
     if (filterRole === 'Incomplete') {
       inputData = inputData.filter((request) => request.receipt === 'Incomplete');
     } else {

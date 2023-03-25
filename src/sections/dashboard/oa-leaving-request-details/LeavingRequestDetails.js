@@ -244,7 +244,7 @@ export default function LeavingRequestDetails({ newRequest = true, currentStaff,
             } else {
                 await createStaff(data);
             }
-            console.log('DATA', JSON.stringify(data, null, 2));
+            // console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
             console.error(error);
         }

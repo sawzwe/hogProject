@@ -31,7 +31,7 @@ export default function StudentMakeup({ currentClass }) {
     // Sent Dialog
     const [openDialog, setOpenDialog] = useState(false);
     const handleCloseDialog = () => {
-        console.log('Go to another page!');
+        // console.log('Go to another page!');
         setOpenDialog(false);
     };
 
@@ -57,7 +57,7 @@ export default function StudentMakeup({ currentClass }) {
 
     const onSubmit = async (data) => {
         try {
-            console.log(data);
+            // console.log(data);
             setOpenDialog(true);
         } catch (error) {
             console.error(error.message);

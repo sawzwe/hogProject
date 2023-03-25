@@ -16,7 +16,7 @@ import FormProvider, { RHFTextField } from '../../../components/hook-form';
 // ----------------------------------------------------------------------
 
 export default function EPForm() {
-    const { registerEP } = useAuthContext();
+    const { registerStaff } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
     const NewEASchema = Yup.object().shape({
@@ -73,7 +73,7 @@ export default function EPForm() {
     const handleCreateAccount = async () => {
         setCreateLoading(true)
         try {
-            await registerEP(createdData);
+            await registerStaff(createdData);
             reset(defaultValues);
             setOpenConfirmDialog(false);
             setCreateLoading(false);

@@ -25,6 +25,8 @@ export default function SearchStudentPage() {
     const dataFetchedRef = useRef(false);
     const [studentTableData, setStudentTableData] = useState();
 
+    // console.log(user, 'user')
+
     const config = { headers: { Authorization: `Bearer ${user.accessToken}`} }
 
     const fetchData = async () => {
@@ -33,7 +35,7 @@ export default function SearchStudentPage() {
                 setStudentTableData(response.data.data);
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
             });
     }
 

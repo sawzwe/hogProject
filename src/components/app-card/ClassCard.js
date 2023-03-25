@@ -83,7 +83,7 @@ export default function ClassCard({ accountRole, eachClass, onOpen }) {
                             <Typography variant="body2" color="text.secondary" gutterBottom={eachClass.attendanceStatus !== 'None'}>
                                 {fDate(date, 'dd MMMM yyyy')} | {fromTime} - {toTime} {room ? `| R.${room}` : ''}
                             </Typography>
-                            {eachClass.attendanceStatus !== 'Incomplete' && (
+                            {eachClass.attendanceStatus !== 'None' && (
                                 <Typography variant="body2" sx={{ color: (eachClass.attendanceStatus === 'Complete' ? '#36B37E' : eachClass.attendanceStatus === 'Incomplete' && '#FF5630') }}>
                                     {eachClass.attendanceStatus.toUpperCase()}
                                 </Typography>

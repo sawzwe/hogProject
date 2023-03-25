@@ -58,6 +58,11 @@ export default function AuthLoginForm() {
           ...error,
           message: 'Invalid email or password'
         });
+      } else if (error.message === 'Firebase: Error (auth/user-disabled).') {
+        setError('afterSubmit', {
+          ...error,
+          message: 'The account is disabled'
+        });
       } else {
         setError('afterSubmit', {
           ...error,

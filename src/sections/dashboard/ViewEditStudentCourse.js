@@ -88,6 +88,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const [selectedCourse, setSelectedCourse] = useState({});
     const [selectedRequest, setSelectedRequest] = useState({})
     const [selectedSchedules, setSelectedSchedules] = useState([]);
+    const [currentStudents, setCurrentStudents] = useState([]);
 
     const [openViewEditSchedule, setOpenViewEditSchedule] = useState(false);
 
@@ -104,6 +105,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
+        await setCurrentStudents(currentSchedules[0].students)
 
         setOpenViewEditSchedule(true);
     }
@@ -127,9 +129,9 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     }
 
     const handleDeleteCourse = async () => {
-        setIsSubmitting(false)
+        setIsSubmitting(true)
         try {
-            await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
+            await axios.put(`${HOG_API}/api/Schedule/SoftDelete/${deleteCourseId}`)
                 .catch((error) => {
                     throw error
                 })
@@ -235,6 +237,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
                         selectedSchedules={selectedSchedules}
                         selectedRequest={selectedRequest}
                         role={role}
+                        students={currentStudents}
                     />
                 )
             }

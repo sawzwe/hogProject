@@ -618,7 +618,7 @@ export function CreateScheduleDialog({ open, close, courseType, selectedCourse, 
     }
 
     const handleDeleteClass = (deletedClass) => {
-        console.log(deletedClass)
+        // console.log(deletedClass)
         const filteredSchedules = schedules.filter((eachSchedule) =>
             new Date(eachSchedule.date).getTime() !== new Date(deletedClass.date).getTime() ||
             eachSchedule.fromTime !== deletedClass.fromTime ||

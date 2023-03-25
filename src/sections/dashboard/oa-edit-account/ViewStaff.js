@@ -13,11 +13,10 @@ import DeleteAccountDialog from './DeleteAccountDialog';
 
 // ----------------------------------------------------------------------
 ViewStaff.propTypes = {
-    currentStaff: PropTypes.object,
-    currentRole: PropTypes.string
+    currentStaff: PropTypes.object
 }
 
-export default function ViewStaff({ currentStaff, currentRole }) {
+export default function ViewStaff({ currentStaff }) {
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
@@ -38,7 +37,7 @@ export default function ViewStaff({ currentStaff, currentRole }) {
     });
 
     const handleClickEdit = () => {
-        navigate(`/account/staff-management/staff/${currentRole === 'ea' ? 'ea' : 'ep'}/${currentStaff.id}/edit`);
+        navigate(`/account/staff-management/staff/${currentStaff.id}/edit`);
     };
 
     return (
@@ -50,7 +49,7 @@ export default function ViewStaff({ currentStaff, currentRole }) {
                         display: 'block',
                     }}
                 >
-                    {`Staff detail (${currentRole === 'ea' ? 'Education Admin' : 'Education Planner'})`}
+                    {`Staff detail (${currentStaff.role})`}
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>
@@ -111,7 +110,7 @@ export default function ViewStaff({ currentStaff, currentRole }) {
 
             <DeleteAccountDialog
                 accountId={currentStaff.id.toString()}
-                accountRole={currentRole === 'ea' ? 'Education Admin' : 'Education Planner'}
+                accountRole={currentStaff.role}
                 accountName={currentStaff.fName}
                 open={openDeleteAccountDialog}
                 onClose={() => setOpenDeleteAccountDialog(false)}

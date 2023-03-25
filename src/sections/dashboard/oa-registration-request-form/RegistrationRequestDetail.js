@@ -73,6 +73,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
     const dataFetchedRef = useRef(false);
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
+    const [createdByEA, setCreatedByEA] = useState({});
 
     const {
         request,
@@ -133,12 +134,22 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
         }
     }
 
+    const fetchEA = async (EAId) => {
+        axios.get(`${HOG_API}/api/Staff/Get/${EAId}`)
+            .then((res) => setCreatedByEA(res.data.data))
+            .catch((error) => console.error(error))
+    }
+
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
         fetchPayments();
         fetchSchedules();
+
+        if (currentRequest.request.takenByEAId !== 0) {
+            fetchEA(currentRequest.request.takenByEAId)
+        }
     }, [])
 
     const handleOpenCourseDialog = async (courseIndex) => {
@@ -241,6 +252,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                         courses={information}
                         onView={handleOpenCourseDialog}
                         hasSchedule={!!schedules.length}
+                        createdByEA={createdByEA}
                     />
                 </Grid>
 
@@ -529,9 +541,10 @@ CourseSection.propTypes = {
     courses: PropTypes.array,
     onView: PropTypes.func,
     hasSchedule: PropTypes.bool,
+    createdByEA: PropTypes.object,
 }
 
-export function CourseSection({ courses, onView, hasSchedule }) {
+export function CourseSection({ courses, onView, hasSchedule, createdByEA }) {
 
     // Schedule Dialog for group
     const [open, setOpen] = useState(false);
@@ -545,6 +558,13 @@ export function CourseSection({ courses, onView, hasSchedule }) {
                 <Grid item xs={6} md={6}>
                     <Typography variant="h6">{`New Course(s)`}</Typography>
                 </Grid>
+                {!!createdByEA && (
+                    <Grid item xs={6} md={6}>
+                        <Stack direction="row" justifyContent="end" sx={{ mr: 1 }}>
+                            <Typography variant="subtitle2">{`Scheduled by: ${createdByEA.fName} (${createdByEA.nickname})`}</Typography>
+                        </Stack>
+                    </Grid>
+                )}
             </Grid>
             {courses.map((course, index) => (
                 <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} hasSchedule={hasSchedule} />

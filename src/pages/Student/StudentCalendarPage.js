@@ -32,7 +32,7 @@ export default function StudentCalendarPage() {
     const fetchClass = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Student/Course/Get/${user.id}`, config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setStudentCourse(data)
                 // console.log('data', data)
@@ -52,8 +52,10 @@ export default function StudentCalendarPage() {
     }
 
     const mappedStudentClasses = [];
-    
+
     studentCourse.forEach((currentCourse) => {
+        if (!currentCourse.registeredCourse.isActive) return;
+        console.log(currentCourse)
         const course = {
             id: currentCourse.registeredCourse.id.toString(),
             course: currentCourse.registeredCourse.course,
@@ -66,8 +68,8 @@ export default function StudentCalendarPage() {
 
         const currentClasses = currentCourse.registeredClasses;
         const mappedClasses = currentClasses.map((eachClass, index) => {
-            const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record=>record.studentId === user.id)
-            console.log(eachClass.studentPrivateClasses)
+            const mappedAttendanceStudent = eachClass.studentPrivateClasses.find(record => record.studentId === user.id)
+            // console.log(eachClass.studentPrivateClasses)
             // console.log(mappedAttendanceStudent)
 
             return {
@@ -88,8 +90,6 @@ export default function StudentCalendarPage() {
 
         mappedStudentClasses.push(...mappedClasses);
     });
-
-    // console.log(mappedStudentClasses);
 
     return (
         <>

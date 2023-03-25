@@ -38,7 +38,7 @@ export default function TeacherPrivateCourseDetailPage() {
     const fetchClass = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setTeacherCourse(data)
                 // console.log('data', data)
@@ -70,13 +70,16 @@ export default function TeacherPrivateCourseDetailPage() {
         section: currentcourse.course.section,
     }
 
-
+    const today = new Date();
 
     const currentclasses = currentcourse.classes;
-    // console.log(currentclasses)
+
+    // const currentclasses = currentcourse.classes.filter((eachClass) => eachClass.teacherPrivateClass.teacherId === user.id);
+    // console.log('currentclasses',currentclasses)
 
     const mappedStudentClass = currentclasses.map((eachClass, index) => {
         // map the attendance records for each student private class
+        // console.log('index:', index)
         const mappedAttendanceStudent = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
           return {
             student: { 
@@ -94,7 +97,7 @@ export default function TeacherPrivateCourseDetailPage() {
           classNo: (index + 1),
           date: eachClass.date,
           fromTime: eachClass.fromTime,
-          attendanceStatus: eachClass.teacherPrivateClass.status, // include attendance status for this class
+          attendanceStatus: eachClass.teacherPrivateClass.status === 'Complete' ? 'Complete' : new Date(eachClass.date) < today ? 'Incomplete' : 'None', // include attendance status for this class
           toTime: eachClass.toTime,
           room: eachClass.room,
           section: course.section,
@@ -114,7 +117,7 @@ export default function TeacherPrivateCourseDetailPage() {
     // console.log(currentTeacher)
     // console.log(mappedStudentClass)
     const filteredClasses = mappedStudentClass.filter((eachClass) => eachClass.teacher.id === user.id);
-    // console.log(filteredClasses)
+    // console.log('filter', filteredClasses)
 
 
     return (

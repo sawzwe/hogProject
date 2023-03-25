@@ -72,6 +72,7 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
     const [selectedCourse, setSelectedCourse] = useState({});
     const [openCourseDialog, setOpenCourseDialog] = useState(false);
     const [schedules, setSchedules] = useState([]);
+    const [createdByEA, setCreatedByEA] = useState({});
 
     const {
         request,
@@ -89,17 +90,22 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
         setOpenCourseDialog(false);
     }
 
+    const fetchEA = async (EAId) => {
+        axios.get(`${HOG_API}/api/Staff/Get/${EAId}`)
+            .then((res) => setCreatedByEA(res.data.data))
+            .catch((error) => console.error(error))
+    }
+
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
         axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
             .then((res) => setSchedules(res.data.data))
             .catch((error) => console.error(error))
-        // if (request.eaStatus === 'Complete' && request.status !== 'Reject') {
-        //     axios.get(`${HOG_API}/api/Schedule/Get/${request.id}`)
-        //         .then((res) => setSchedules(res.data.data))
-        //         .catch((error) => console.error(error))
-        // }
+
+        if (currentRequest.request.takenByEAId !== 0) {
+            fetchEA(currentRequest.request.takenByEAId)
+        }
     }, [])
 
 
@@ -111,6 +117,7 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
             registeredCourses={information}
             schedules={schedules}
             hasSchedule={!!schedules.length}
+            createdByEA={createdByEA}
         />
     }
 
@@ -122,6 +129,7 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
             registeredCourses={information}
             schedules={schedules}
             hasSchedule={!!schedules.length}
+            createdByEA={createdByEA}
         />
     }
 
@@ -132,6 +140,7 @@ export default function CompleteRegistrationRequest({ currentRequest }) {
             students={students}
             registeredCourses={information}
             hasSchedule={!!schedules.length}
+            rejectedByEA={createdByEA}
         />
     }
 }
@@ -182,9 +191,11 @@ CourseSection.propTypes = {
     onView: PropTypes.func,
     schedules: PropTypes.array,
     hasSchedule: PropTypes.bool,
+    createdByEA: PropTypes.object,
+    rejectedByEA: PropTypes.object
 }
 
-export function CourseSection({ courses, onView, schedules, hasSchedule }) {
+export function CourseSection({ courses, onView, schedules, hasSchedule, createdByEA, rejectedByEA }) {
 
     return (
         <Card sx={{ p: 3 }}>
@@ -194,6 +205,20 @@ export function CourseSection({ courses, onView, schedules, hasSchedule }) {
                 <Grid item xs={6} md={6}>
                     <Typography variant="h6">{`New Course(s)`}</Typography>
                 </Grid>
+                {!!createdByEA && (
+                    <Grid item xs={6} md={6}>
+                        <Stack direction="row" justifyContent="end" sx={{ mr: 1 }}>
+                            <Typography variant="subtitle2">{`Scheduled by: ${createdByEA.fName} ${createdByEA.lName}`}</Typography>
+                        </Stack>
+                    </Grid>
+                )}
+                {!!rejectedByEA && (
+                    <Grid item xs={6} md={6}>
+                        <Stack direction="row" justifyContent="end" sx={{ mr: 1 }}>
+                            <Typography variant="subtitle2">{`Rejected by: ${rejectedByEA.fName} ${rejectedByEA.lName}`}</Typography>
+                        </Stack>
+                    </Grid>
+                )}
             </Grid>
             {courses.map((course, index) => (
                 <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} hasSchedule={hasSchedule} />
@@ -231,9 +256,10 @@ CompleteForm.propTypes = {
     registeredCourses: PropTypes.array,
     schedules: PropTypes.array,
     hasSchedule: PropTypes.bool,
+    createdByEA: PropTypes.object,
 }
 
-export function CompleteForm({ request, students, registeredCourses, schedules, hasSchedule }) {
+export function CompleteForm({ request, students, registeredCourses, schedules, hasSchedule, createdByEA }) {
 
     const {
         id,
@@ -275,6 +301,7 @@ export function CompleteForm({ request, students, registeredCourses, schedules, 
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
                         hasSchedule
+                        createdByEA={createdByEA}
                     />
                 </Grid>
 
@@ -442,10 +469,11 @@ export function RejectForm({ request, students, registeredCourses }) {
 EARejectForm.propTypes = {
     request: PropTypes.object,
     students: PropTypes.array,
-    registeredCourses: PropTypes.array
+    registeredCourses: PropTypes.array,
+    rejectedByEA: PropTypes.object
 }
 
-export function EARejectForm({ request, students, registeredCourses }) {
+export function EARejectForm({ request, students, registeredCourses, rejectedByEA }) {
 
     const {
         epRemark1,
@@ -476,6 +504,7 @@ export function EARejectForm({ request, students, registeredCourses }) {
                     <CourseSection
                         courses={registeredCourses}
                         onView={handleOpenCourseDialog}
+                        rejectedByEA={rejectedByEA}
                     />
                 </Grid>
                 <Grid item xs={12} md={12}>

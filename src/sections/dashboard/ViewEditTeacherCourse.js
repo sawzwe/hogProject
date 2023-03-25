@@ -130,7 +130,7 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
     const handleDeleteCourse = async () => {
         setIsSubmitting(true)
         try {
-            await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
+            await axios.put(`${HOG_API}/api/Schedule/SoftDelete/${deleteCourseId}`)
                 .catch((error) => {
                     throw error
                 })

@@ -35,7 +35,7 @@ export default function TeacherCheckPrivateAttendance({ classes }) {
     const fetchClass = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setTeacherCourse(data)
                 // console.log('data', data)
@@ -55,7 +55,9 @@ export default function TeacherCheckPrivateAttendance({ classes }) {
     }
     // console.log(teacherCourse)
     const mappedStudentClasses = [];
-    
+
+    const today = new Date();
+
     teacherCourse.forEach((currentCourse) => {
         const course = {
             id: currentCourse.course.id.toString(),
@@ -71,66 +73,64 @@ export default function TeacherCheckPrivateAttendance({ classes }) {
         const mappedClass = currentClasses.map((eachClass, index) => {
             // map the attendance records for each student private class
             const mappedAttendanceStudent = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
-              return {
-                student: { 
-                  id: studentPrivateClass.studentId,  
-                  fullName: studentPrivateClass.fullName, 
-                  nickname: studentPrivateClass.nickname
-                }, 
-                value: studentPrivateClass.attendance
-              };
+                return {
+                    student: {
+                        id: studentPrivateClass.studentId,
+                        fullName: studentPrivateClass.fullName,
+                        nickname: studentPrivateClass.nickname
+                    },
+                    value: studentPrivateClass.attendance
+                };
             });
-            
+
             const students = eachClass.studentPrivateClasses.map((studentPrivateClass) => {
                 return {
                     apiId: studentPrivateClass.id,
-                    id: studentPrivateClass.studentId,  
-                    fullName: studentPrivateClass.fullName, 
+                    id: studentPrivateClass.studentId,
+                    fullName: studentPrivateClass.fullName,
                     nickname: studentPrivateClass.nickname
                 };
-              });
-          
+            });
+
             return {
-              id: eachClass.id,
-              course,
-              classNo: (index + 1),
-              students,
-              date: eachClass.date,
-              fromTime: eachClass.fromTime,
-              attendanceStatus: eachClass.teacherPrivateClass.status, // include attendance status for this class
-              toTime: eachClass.toTime,
-              room: eachClass.room,
-              section: course.section,
-              teacher: { 
-                id: eachClass.teacherPrivateClass.teacherId, 
-                fullName: eachClass.teacherPrivateClass.fullName 
-              },
-              studentAttendance: mappedAttendanceStudent.map((attendance) => { // map attendance records for each student in this class
-                return {
-                  student: attendance.student,
-                  value: attendance.value
-                };
-              })
+                id: eachClass.id,
+                course,
+                classNo: (index + 1),
+                students,
+                date: eachClass.date,
+                fromTime: eachClass.fromTime,
+                attendanceStatus: eachClass.teacherPrivateClass.status === 'Complete' ? 'Complete' : new Date(eachClass.date) < today ? 'Incomplete' : 'None', // include attendance status for this class
+                toTime: eachClass.toTime,
+                room: eachClass.room,
+                section: course.section,
+                teacher: {
+                    id: eachClass.teacherPrivateClass.teacherId,
+                    fullName: eachClass.teacherPrivateClass.fullName
+                },
+                studentAttendance: mappedAttendanceStudent.map((attendance) => { // map attendance records for each student in this class
+                    return {
+                        student: attendance.student,
+                        value: attendance.value
+                    };
+                })
             };
-          });
+        });
 
         mappedStudentClasses.push(...mappedClass);
     });
     // console.log(mappedStudentClasses)
 
     const current = currentTeacher.teacherPrivateClass.find(eachClass => (eachClass.id === '0'));
-    const currentClass= mappedStudentClasses.find(eachClass => eachClass.id === parseInt(classId,10));
+    const currentClass = mappedStudentClasses.find(eachClass => eachClass.id === parseInt(classId, 10));
     // console.log("mock",current);
     // console.log("api",currentClass);
 
     // Discard Dialog
-    
-
     const handleDiscard = () => {
         navigate(-1);
     };
-    const today = new Date();
-    today.setHours(0, 0, 0, 0)
+
+    today.setHours(0, 0, 0, 0);
     const assumeCurrentDate = fDate(today, 'dd MMMM yyyy');
 
     // const assumeCurrentDate = fDate(new Date("2023-04-10"), 'dd MMMM yyyy');
@@ -146,6 +146,7 @@ export default function TeacherCheckPrivateAttendance({ classes }) {
         }
     }
     // console.log(assumeCurrentDate === classDate);
+    // console.log('currentClass',currentClass)
     return (
         <>
             <Helmet>
