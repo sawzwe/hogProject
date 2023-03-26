@@ -79,9 +79,7 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
-    // console.log(pendingCourses)
     const allCourses = [...currentCourses, ...pendingCourses]
-    // console.log(allCourses)
 
     const {
         role
@@ -90,8 +88,11 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     const [selectedCourse, setSelectedCourse] = useState({});
     const [selectedRequest, setSelectedRequest] = useState({})
     const [selectedSchedules, setSelectedSchedules] = useState([]);
+    const [currentStudents, setCurrentStudents] = useState([]);
 
     const [openViewEditSchedule, setOpenViewEditSchedule] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [deleteCourseId, setDeleteCourseId] = useState()
     const [deleteCourseName, setDeleteCourseName] = useState()
@@ -104,8 +105,16 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
+        await setCurrentStudents(currentSchedules[0].students)
 
         setOpenViewEditSchedule(true);
+    }
+
+    const handleCloseViewEditDialog = () => {
+        setSelectedCourse({})
+        setSelectedRequest({})
+        setSelectedSchedules({})
+        setOpenViewEditSchedule(false)
     }
 
     const handleClickDelete = async (course) => {
@@ -120,14 +129,17 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
     }
 
     const handleDeleteCourse = async () => {
+        setIsSubmitting(true)
         try {
-            await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
+            await axios.put(`${HOG_API}/api/Schedule/SoftDelete/${deleteCourseId}`)
                 .catch((error) => {
                     throw error
                 })
+            setIsSubmitting(false)
             navigate(0)
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' })
+            setIsSubmitting(false)
         }
     }
 
@@ -225,7 +237,23 @@ export default function ViewEditStudentCourse({ currentStudent, currentCourses, 
                         selectedSchedules={selectedSchedules}
                         selectedRequest={selectedRequest}
                         role={role}
+                        students={currentStudents}
                     />
+                )
+            }
+
+            {
+                deleteCourseName !== undefined && (
+                    <Dialog fullWidth maxWidth="sm" open={openDeleteDialog} onClose={handleCloseDelete}>
+                        <DialogTitle>Delete Course?</DialogTitle>
+                        <DialogContent>
+                            {`Once deleted, ${deleteCourseName} will be removed from the system.`}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" color="inherit" onClick={handleCloseDelete}>Cancel</Button>
+                            <LoadingButton variant="contained" color="error" loading={isSubmitting} onClick={handleDeleteCourse}>Delete</LoadingButton>
+                        </DialogActions>
+                    </Dialog>
                 )
             }
         </>

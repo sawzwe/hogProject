@@ -24,7 +24,7 @@ export default function ResetPasswordDialog({ accountId, accountRole, open, onCl
 
     const handleResetPassword = async () => {
         setIsResetingPassword(true);
-        console.log("Reset will be added soon (Don't forget to pass account id)")
+        // console.log("Reset will be added soon (Don't forget to pass account id)")
         enqueueSnackbar("Reset password successfully", { variant: 'success' });
         setIsResetingPassword(false);
     }

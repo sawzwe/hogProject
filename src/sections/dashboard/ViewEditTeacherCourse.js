@@ -91,6 +91,8 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
     const [selectedSchedules, setSelectedSchedules] = useState([]);
 
     const [openViewEditSchedule, setOpenViewEditSchedule] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [deleteCourseId, setDeleteCourseId] = useState()
     const [deleteCourseName, setDeleteCourseName] = useState()
@@ -100,14 +102,18 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
         const currentCourse = allCourses.find((eachCourse) => eachCourse.course.id === course.id).course
         const currentRequest = allCourses.find((eachCourse) => eachCourse.course.id === course.id).request
         const currentSchedules = allCourses.find((eachCourse) => eachCourse.course.id === course.id).classes
-        console.log('cc', currentCourse)
-        console.log('cr', currentRequest)
-        console.log('cs', currentSchedules)
         await setSelectedCourse(currentCourse)
         await setSelectedRequest(currentRequest)
         await setSelectedSchedules(currentSchedules)
 
         setOpenViewEditSchedule(true);
+    }
+
+    const handleCloseViewEditDialog = () => {
+        setSelectedCourse({})
+        setSelectedRequest({})
+        setSelectedSchedules({})
+        setOpenViewEditSchedule(false)
     }
 
     const handleClickDelete = async (course) => {
@@ -122,14 +128,17 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
     }
 
     const handleDeleteCourse = async () => {
+        setIsSubmitting(true)
         try {
-            await axios.delete(`${HOG_API}/api/Schedule/Delete/${deleteCourseId}`)
+            await axios.put(`${HOG_API}/api/Schedule/SoftDelete/${deleteCourseId}`)
                 .catch((error) => {
                     throw error
                 })
+            setIsSubmitting(false)
             navigate(0)
         } catch (error) {
             enqueueSnackbar(error.message, { variant: 'error' })
+            setIsSubmitting(false)
         }
     }
 
@@ -143,7 +152,7 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
                 </m.div>
 
                 <m.div variants={varBounce().in}>
-                    <Typography sx={{ color: 'text.secondary' }}>Student has not registered for any courses yet</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>Teacher has not been assigned for any courses yet</Typography>
                 </m.div>
 
                 <m.div variants={varBounce().in}>
@@ -152,6 +161,8 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
             </Container>
         )
     }
+
+    // console.log("HI")
 
     return (
         <>
@@ -210,13 +221,28 @@ export default function ViewEditTeacherCourse({ currentTeacher, currentCourses, 
                 Object.keys(selectedRequest).length !== 0 && selectedSchedules.length > 0 && (
                     <ViewEditScheduleDialog
                         open={openViewEditSchedule}
-                        onClose={() => setOpenViewEditSchedule(false)}
+                        onClose={handleCloseViewEditDialog}
                         selectedCourse={selectedCourse}
                         selectedSchedules={selectedSchedules}
                         selectedRequest={selectedRequest}
                         students={selectedSchedules[0].studentPrivateClasses}
                         role={role}
                     />
+                )
+            }
+
+            {
+                deleteCourseName !== undefined && (
+                    <Dialog fullWidth maxWidth="sm" open={openDeleteDialog} onClose={handleCloseDelete}>
+                        <DialogTitle>Delete Course?</DialogTitle>
+                        <DialogContent>
+                            {`Once deleted, ${deleteCourseName} will be removed from the system.`}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" color="inherit" onClick={handleCloseDelete}>Cancel</Button>
+                            <LoadingButton variant="contained" color="error" loading={isSubmitting} onClick={handleDeleteCourse}>Delete</LoadingButton>
+                        </DialogActions>
+                    </Dialog>
                 )
             }
         </>

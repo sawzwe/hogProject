@@ -7,8 +7,8 @@ import { useForm } from 'react-hook-form';
 import { Card, Grid, Stack, Typography, Button } from '@mui/material';
 // components
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
+import ResetPasswordDialog from '../../../components/ResetPasswordDialog';
 //
-import ResetPasswordDialog from './ResetPasswordDialog';
 import DeleteAccountDialog from './DeleteAccountDialog';
 
 // ----------------------------------------------------------------------
@@ -102,16 +102,14 @@ export default function ViewStaff({ currentStaff }) {
                 </Grid>
             </Card>
 
-            <ResetPasswordDialog
-                accountId={currentStaff.id}
-                accountRole={currentStaff.role}
+            <ResetPasswordDialog 
                 open={openResetPasswordDialog}
                 onClose={() => setOpenResetPasswordDialog(false)}
-                defaultPassword="hog + staff's phone number"
+                email={currentStaff.email}
             />
 
             <DeleteAccountDialog
-                accountId={currentStaff.id}
+                accountId={currentStaff.id.toString()}
                 accountRole={currentStaff.role}
                 accountName={currentStaff.fName}
                 open={openDeleteAccountDialog}

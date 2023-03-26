@@ -14,7 +14,7 @@ import FormProvider, { RHFTextField } from '../../../components/hook-form';
 
 // ----------------------------------------------------------------------
 
-export default function EAForm() {
+export default function OAForm() {
     const { registerStaff } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -31,7 +31,7 @@ export default function EAForm() {
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
     const defaultValues = {
-        role: 'Education Admin',
+        role: 'Office Admin',
         fName: '',
         lName: '',
         nickname: '',
@@ -92,7 +92,7 @@ export default function EAForm() {
                         display: 'block',
                     }}
                 >
-                    {`Create Account Form (EA)`}
+                    {`Create Account Form (OA)`}
                 </Typography>
 
                 <Grid direction="row" container spacing={2}>

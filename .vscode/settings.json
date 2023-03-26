@@ -2,4 +2,5 @@
   "javascript.validate.enable": false,
   "typescript.validate.enable": false,
   "appService.showBuildDuringDeployPrompt": false,
+  "appService.defaultWebAppToDeploy": "None",
 }

@@ -73,27 +73,30 @@ export default function DailyCalendarPage() {
             await axios.get(`${HOG_API}/api/Schedule/Get`)
                 .then((res) => {
                     const data = res.data.data;
-                    data.map((eachSchedule) => (eachSchedule.classes.map((eachClass) => {
-                        return setClasses(classes => [...classes, {
-                            id: eachClass.id,
-                            date: eachClass.date,
-                            fromTime: eachClass.fromTime,
-                            toTime: eachClass.toTime,
-                            time: `${eachClass.fromTime}-${eachClass.toTime}`,
-                            teacherNickname: eachClass.teacherPrivateClass?.nickname || '',
-                            course: `${eachSchedule.course.course} ${eachSchedule.course?.subject} ${eachSchedule.course.level}`,
-                            section: eachSchedule.course.section,
-                            room: eachClass.room,
-                            method: _.capitalize(eachClass.method),
-                            students: eachClass.studentPrivateClasses,
-                            teacher: {
-                                id: eachClass.teacherPrivateClass?.teacherId || null,
-                                status: eachClass.teacherPrivateClass?.status,
-                                currentId: eachClass.teacherPrivateClass?.id
-                            },
-                            hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
-                        }])
-                    })))
+                    if (data.length === 0) {
+                        setClasses([])
+                    } else {
+                        data.map((eachSchedule) => (eachSchedule.classes.map((eachClass) => {
+                            return setClasses(classes => [...classes, {
+                                id: eachClass.id,
+                                date: eachClass.date,
+                                fromTime: eachClass.fromTime,
+                                toTime: eachClass.toTime,
+                                time: `${eachClass.fromTime}-${eachClass.toTime}`,
+                                teacherNickname: eachClass.teacherPrivateClass?.nickname || '',
+                                course: `${eachSchedule.course.course} ${eachSchedule.course?.subject} ${eachSchedule.course.level}`,
+                                section: eachSchedule.course.section,
+                                room: eachClass.room,
+                                method: _.capitalize(eachClass.method),
+                                students: eachClass.studentPrivateClasses,
+                                teacher: {
+                                    id: eachClass.teacherPrivateClass?.teacherId || null,
+                                    status: eachClass.teacherPrivateClass?.status
+                                },
+                                hourPerClass: Math.abs(parseInt(eachClass.fromTime.slice(0, 2), 10) - parseInt(eachClass.toTime.slice(0, 2), 10))
+                            }])
+                        })))
+                    }
                 })
         } catch (error) {
             console.error(error);
@@ -154,8 +157,8 @@ ClassList.propTypes = {
 }
 
 const TABLE_HEAD_REQUESTS = [
-    { id: 'classTime', label: 'Class Time', align: 'left' },
     { id: 'teacher ', label: 'Teacher', align: 'left' },
+    { id: 'classTime', label: 'Class Time', align: 'left' },
     { id: 'course', label: 'Course', align: 'left' },
     { id: 'section', label: 'Section', align: 'left' },
     { id: 'method', label: 'Method', align: 'left' },
@@ -198,9 +201,13 @@ export function ClassList({ classes }) {
         setTableData(classes)
     }, []);
 
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
     const [filterName, setFilterName] = useState('');
 
-    const [filterDate, setFilterDate] = useState(new Date());
+    const [filterDate, setFilterDate] = useState(tomorrow);
 
     const [selectedClass, setSelectedClass] = useState({});
     const [openEditClassDialog, setOpenEditClassDialog] = useState(false);
@@ -253,6 +260,8 @@ export function ClassList({ classes }) {
     const handleEditClass = async (newClass) => {
         setIsSubmitting(true);
         try {
+            // console.log('newClass', newClass);
+            // console.log('SelectedClass', selectedClass);
             const formattedData = {
                 id: newClass.id,
                 room: newClass.room,
@@ -260,20 +269,17 @@ export function ClassList({ classes }) {
                 date: fDate(newClass.date, 'dd-MMM-yyyy'),
                 fromTime: newClass.fromTime,
                 toTime: newClass.toTime,
-                studentPrivateClasses: selectedClass.students.map((student) => ({
-                    id: student.id,
-                    studentId: student.studentId,
-                    attendance: student.attendance
-                })),
                 teacherPrivateClass: {
-                    id: selectedClass.teacher.currentId,
+                    id: selectedClass.id,
                     teacherId: newClass.teacher.id,
                     workType: newClass.teacher.workType,
                     status: selectedClass.teacher.status
                 }
             }
 
-            await axios.put(`${HOG_API}/api/Schedule/Put`, formattedData)
+            // console.log(formattedData);
+            await axios.put(`${HOG_API}/api/Schedule/Class/Put`, formattedData)
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error
                 })
@@ -299,7 +305,7 @@ export function ClassList({ classes }) {
         setIsSubmitting(true)
         try {
             await axios.delete(`${HOG_API}/api/Schedule/Class/Delete/${deletedClass.id}`)
-                .then((res) => console.log(res))
+                // .then((res) => console.log(res))
                 .catch((error) => {
                     throw error;
                 })
@@ -338,8 +344,8 @@ export function ClassList({ classes }) {
                                             sx={{ cursor: "pointer" }}
                                             onClick={() => handleSelectClass(row)}
                                         >
+                                            <TableCell align="left">{row.teacherNickname.toUpperCase()}</TableCell>
                                             <TableCell align="left">{row.time}</TableCell>
-                                            <TableCell align="left">{row.teacherNickname}</TableCell>
                                             <TableCell align="left">{row.course}</TableCell>
                                             <TableCell align="left">{row.section}</TableCell>
                                             <TableCell align="left">{row.method}</TableCell>
@@ -377,7 +383,9 @@ export function ClassList({ classes }) {
                         hourPerClass={selectedClass.hourPerClass}
                         onEdit={handleEditClass}
                         onDelete={handleOpenDeleteClassDialog}
+                        isSubmitting={isSubmitting}
                         courseCustom
+                        dailyCalendar
                     />
                 )}
 
@@ -465,7 +473,7 @@ export function RegistrationTableToolbar({
             spacing={2}
             alignItems="center"
             direction={{
-                xs: 'column',
+                xs: 'row',
                 md: 'row',
             }}
             sx={{ px: 2.5, py: 3 }}

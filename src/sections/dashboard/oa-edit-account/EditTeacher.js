@@ -128,6 +128,7 @@ export default function EditTeacher({ currentTeacher }) {
 
 
     const defaultValues = {
+        id: currentTeacher?.id,
         role: 'Teacher',
         fName: currentTeacher?.fName || '',
         lName: currentTeacher?.lName || '',
@@ -263,6 +264,7 @@ export default function EditTeacher({ currentTeacher }) {
                 open={openSaveChangesDialog}
                 onClose={() => setOpenSaveChangesDialog(false)}
                 data={savedData}
+                accountRole="Teacher"
             />
         </FormProvider >
     )

@@ -30,7 +30,7 @@ export default function SearchTeacherPage() {
                 // console.log("API table" ,response.data.data);
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
             });
     }
 

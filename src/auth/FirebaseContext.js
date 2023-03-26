@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { createContext, useEffect, useReducer, useCallback } from 'react';
 import { initializeApp } from 'firebase/app';
+import _ from 'lodash';
 import {
     getAuth,
     signOut,
@@ -127,44 +128,13 @@ export function AuthProvider({ children }) {
     // LOGIN
     const login = async (email, password) => (signInWithEmailAndPassword(AUTH, email, password))
 
-    // REGISTER STUDENT
-    // const registerStudent = async (data) =>
-    //     createUserWithEmailAndPassword(AUTH_STUDENT, data.studentEmail, '123456')
-    //         .then(async (res) => {
-    //             const userRef = doc(collection(DB, 'users'), res.user?.uid);
-    //             return setDoc(userRef, {
-    //                 uid: res.user?.uid,
-    //                 email: data.studentEmail,
-    //                 displayName: `${data.studentFirstName} ${data.studentLastName}`,
-    //                 role: "Student"
-    //             })
-    //                 .catch((error) => console.error(error))
-    //                 .then(() => {
-    //                     const file = data.studentImageURL
-    //                     const storageProfileRef = ref(storage, `users/students/${res.user?.uid}/Avatar/${file.name}`);
-    //                     uploadBytes(storageProfileRef, file)
-    //                         .then((snapshot) => { console.log("uploaded!") })
-    //                         .catch((error) => console.error(error));
-    //                 })
-    //                 .catch((error) => console.error(error))
-    //                 .then(() => {
-    //                     data.studentAdditionalFiles.map((file, index) => {
-    //                         const storageAdditionalFilesRef = ref(storage, `users/students/${res.user?.uid}/Files/${file.name}`);
-    //                         return uploadBytes(storageAdditionalFilesRef, file)
-    //                             .then((snapshot) => console.log("Additional File uploaded!"))
-    //                             .catch((error) => console.error(error));
-    //                     })
-    //                 })
-    //                 .then(() => signOut(AUTH_STUDENT))
-    //         })
-
     const registerStudent = async (data, config) => {
         const nameAdditionalFiles = data.studentAdditionalFiles.map((file) => ({ file: file.name }))
         const formattedData = {
             title: data.studentTitle,
-            fName: data.studentFirstName,
-            lName: data.studentLastName,
-            nickname: data.studentNickname,
+            fName: _.capitalize(data.studentFirstName),
+            lName: _.capitalize(data.studentLastName),
+            nickname: _.capitalize(data.studentNickname),
             profilePicture: data.studentImageURL.name,
             additionalFiles: nameAdditionalFiles || [],
             dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
@@ -180,9 +150,9 @@ export function AuthProvider({ children }) {
             hogInfo: data.studentSource,
             healthInfo: data.studentHealthInfo,
             parent: {
-                fName: data.parentFirstName,
-                lName: data.parentLastName,
-                relationship: data.parentRelationships,
+                fName: _.capitalize(data.parentFirstName),
+                lName: _.capitalize(data.parentLastName),
+                relationship: _.capitalize(data.parentRelationships),
                 phone: data.parentPhoneNo,
                 email: data.parentEmail,
                 line: data.parentLineId,
@@ -243,9 +213,9 @@ export function AuthProvider({ children }) {
             id: currentStudent.id,
             firebaseId: currentStudent.firebaseId,
             title: data.studentTitle,
-            fName: data.studentFirstName,
-            lName: data.studentLastName,
-            nickname: data.studentNickname,
+            fName: _.capitalize(data.studentFirstName),
+            lName: _.capitalize(data.studentLastName),
+            nickname: _.capitalize(data.studentNickname),
             profilePicture: data.studentImageURL.name,
             additionalFiles: nameAdditionalFiles || [],
             dob: fDate(data.studentDateOfBirth, 'dd-MMMM-yyyy'),
@@ -261,9 +231,9 @@ export function AuthProvider({ children }) {
             hogInfo: data.studentSource,
             healthInfo: data.studentHealthInfo,
             parent: {
-                fName: data.parentFirstName,
-                lName: data.parentLastName,
-                relationship: data.parentRelationships,
+                fName: _.capitalize(data.parentFirstName),
+                lName: _.capitalize(data.parentLastName),
+                relationship: _.capitalize(data.parentRelationships),
                 phone: data.parentPhoneNo.toString(),
                 email: data.parentEmail,
                 line: data.parentLineId,
@@ -285,7 +255,7 @@ export function AuthProvider({ children }) {
         if (data.studentFirstName !== currentStudent.firstName || data.studentLastName !== currentStudent.lastName) {
             const studentRef = doc(DB, "users", currentStudent.firebaseId);
             await updateDoc(studentRef, {
-                "displayName": `${data.studentFirstName} ${data.studentLastName}`
+                "displayName": `${_.capitalize(data.studentFirstName)} ${_.capitalize(data.studentLastName)}`
             })
                 .catch((error) => {
                     throw error;
@@ -367,17 +337,9 @@ export function AuthProvider({ children }) {
             })
     }
 
-    // CREATE EP
-    const registerEP = async (data) => {
-        await axios.post(`${HOG_API}/api/EP/Post`, data)
-            .catch((error) => {
-                throw error;
-            })
-    }
-
-    // CREATE EA
-    const registerEA = async (data) => {
-        await axios.post(`${HOG_API}/api/EA/Post`, data)
+    // CREATE EP, EA, OA
+    const registerStaff = async (data) => {
+        await axios.post(`${HOG_API}/api/Staff/Post`, data)
             .catch((error) => {
                 throw error;
             })
@@ -401,8 +363,7 @@ export function AuthProvider({ children }) {
                 login,
                 registerStudent,
                 updateStudent,
-                registerEA,
-                registerEP,
+                registerStaff,
                 registerTeacher,
                 logout,
                 changePassword,

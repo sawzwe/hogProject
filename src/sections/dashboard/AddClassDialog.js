@@ -45,7 +45,7 @@ import { fDate } from '../../utils/formatTime'
 // components
 import { useSnackbar } from '../../components/snackbar';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
-import FormProvider, { RHFSelect } from '../../components/hook-form';
+import FormProvider, { RHFSelect, RHFTextField } from '../../components/hook-form';
 //
 import { HOG_API } from '../../config';
 // ----------------------------------------------------------------
@@ -58,22 +58,38 @@ AddClassDialog.propTypes = {
     fromDate: PropTypes.string,
     toDate: PropTypes.string,
     method: PropTypes.string,
-    students: PropTypes.array
+    students: PropTypes.array,
+    deletedClassList: PropTypes.array,
+    edittedClassList: PropTypes.array,
+    courseCustom: PropTypes.bool
 }
 
-export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method, students }) {
+export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, toDate, method, students, deletedClassList, edittedClassList, courseCustom = false }) {
 
     const [isLoadingTime, setIsLoadingTime] = useState(false);
     const [isLoadingTeacher, setIsLoadingTeacher] = useState(false);
     const [availableTime, setAvailableTime] = useState();
     const [availableTeacher, setAvailableTeacher] = useState();
 
+    const [editDeleteClassWithId, setEditDeleteClassWithId] = useState([]);
+
+    useEffect(() => {
+        if (deletedClassList !== undefined && deletedClassList.length > 0 || edittedClassList !== undefined && edittedClassList.length > 0) {
+            setEditDeleteClassWithId([...deletedClassList, ...edittedClassList]);
+        }
+    }, [])
+
     const METHOD_OPTIONS = [
         'Onsite', 'Online'
     ];
 
+    const HOUR_OPTIONS = [
+        '1', '2', '3'
+    ];
+
     const defaultValues = {
         classDate: '',
+        classHour: '',
         classTime: '',
         classTeacher: '',
         classMethod: _.capitalize(method)
@@ -99,7 +115,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         const newClass = {
             day: weekday[new Date(data.classDate).getDay()].slice(0, 3),
             date: data.classDate,
-            hourPerClass,
+            hourPerClass: data.classHour,
             fromTime: data.classTime.slice(0, 5),
             toTime: data.classTime.slice(6, 11),
             method: data.classMethod,
@@ -109,36 +125,61 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         const result = await onAdd(newClass)
 
         if (result === "success") {
-            reset();
+            resetValue();
         }
-        // reset();
-        // setValue('classDate', data.classDate);
-        // onClose();
-        // setTimeout(() => {
-        //     reset(defaultValues);
-        //     resetValue();
-        // }, 200)
     }
 
     const handleChangeDate = async (newDate) => {
         resetValue();
         setValue('classDate', newDate);
+    }
+
+    const handleChangeHourPerClass = (newHour) => {
+        setAvailableTeacher();
+        setAvailableTime();
+        setValue('classHour', newHour)
+        setValue('classTime', '')
+        setValue('classTeacher', '')
+
         setIsLoadingTime(true);
         let studentList = "";
         students.forEach((eachStudent, index) => {
-            studentList = studentList.concat(`listOfStudentId=${eachStudent.id}`, '&')
+            studentList = studentList.concat(`listOfStudentId=${eachStudent.studentId}`, '&')
         })
-        console.log(students);
 
         try {
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(newDate, 'dd-MMM-yyyy')}&hour=${hourPerClass}`)
-                .then(((res) => {
-                    setAvailableTime(res.data.data)
-                    setIsLoadingTime(false);
-                }))
-                .catch((error) => {
-                    throw error;
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
                 })
+            }
+
+            if (courseCustom && sameDateClassId !== 0) {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        // console.log('availableTime', res.data.data)
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTime?${studentList}date=${fDate(values.classDate, 'dd-MMM-yyyy')}&hour=${newHour}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTime(res.data.data)
+                        setIsLoadingTime(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTime(false);
@@ -154,14 +195,36 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
         try {
             const fromTime = newTime.slice(0, 5).replace(":", "%3A");
             const toTime = newTime.slice(6, 11).replace(":", "%3A");
-            axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}`)
-                .then(((res) => {
-                    setAvailableTeacher(res.data.data)
-                    setIsLoadingTeacher(false);
-                }))
-                .catch((error) => {
-                    throw error;
+
+            let sameDateClassId = 0;
+            if (editDeleteClassWithId.length > 0) {
+                editDeleteClassWithId.forEach((eachClass, index) => {
+                    if (new Date(eachClass.date).getTime() === new Date(values.classDate).getTime()) {
+                        sameDateClassId = eachClass.id
+                    }
                 })
+            }
+
+            if (courseCustom && sameDateClassId !== 0) {
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=${sameDateClassId}`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            } else {
+                // console.log(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                axios(`${HOG_API}/api/CheckAvailable/GetAvailableTeacher?fromTime=${fromTime}&toTime=${toTime}&date=${fDate(values.classDate, 'dd-MMM-yyyy')}&classId=0`)
+                    .then(((res) => {
+                        setAvailableTeacher(res.data.data)
+                        setIsLoadingTeacher(false);
+                    }))
+                    .catch((error) => {
+                        throw error;
+                    })
+            }
         } catch (error) {
             console.error(error);
             setIsLoadingTeacher(false);
@@ -169,10 +232,11 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
     }
 
     const resetValue = () => {
-        setValue('classDate', '')
-        setValue('classTime', '')
-        setValue('classTeacher', '')
-        setValue('classMethod', _.capitalize(method))
+        setValue('classDate', '');
+        setValue('classHour', '')
+        setValue('classTime', '');
+        setValue('classTeacher', '');
+        setValue('classMethod', _.capitalize(method));
         setAvailableTime();
         setAvailableTeacher();
     }
@@ -188,7 +252,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                 <DialogTitle sx={{ pb: 0 }}>Add Class</DialogTitle>
                 <DialogContent>
                     <Grid container direction="row" sx={{ mt: 1, mb: 2 }} spacing={2}>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={2.5}>
                             <Controller
                                 name="classDate"
                                 control={control}
@@ -209,7 +273,37 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={1.5}>
+                            <RHFSelect
+                                fullWidth
+                                name="classHour"
+                                label="Hours"
+                                SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                                onChange={(event) => handleChangeHourPerClass(event.target.value)}
+                                disabled={!values.classDate}
+                                required={!!values.classDate}
+                            >
+                                {HOUR_OPTIONS.map((eachHour, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        value={eachHour}
+                                        sx={{
+                                            mx: 1,
+                                            my: 0.5,
+                                            borderRadius: 0.75,
+                                            typography: 'body2',
+                                            textTransform: 'capitalize',
+                                            '&:first-of-type': { mt: 0 },
+                                            '&:last-of-type': { mb: 0 },
+                                        }}
+                                    >
+                                        {eachHour}
+                                    </MenuItem>
+                                ))}
+                            </RHFSelect>
+                        </Grid>
+
+                        <Grid item xs={6} md={2.5}>
                             {availableTime === undefined && !isLoadingTime && (
                                 <TextField
                                     fullWidth
@@ -269,7 +363,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={3}>
                             {availableTeacher === undefined && !isLoadingTeacher && (
                                 <TextField
                                     fullWidth
@@ -323,14 +417,14 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                                                 '&:last-of-type': { mb: 0 },
                                             }}
                                         >
-                                            {`${eachTeacher.nickname.toUpperCase()} (${eachTeacher.fullName})`}
+                                            {`${eachTeacher.nickname.toUpperCase()} - ${eachTeacher.fName.toUpperCase()} (${eachTeacher.workType})`}
                                         </MenuItem>
                                     ))}
                                 </RHFSelect>
                             )}
                         </Grid>
 
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={6} md={2.5}>
                             <RHFSelect
                                 fullWidth
                                 name="classMethod"
@@ -363,7 +457,7 @@ export function AddClassDialog({ open, onClose, onAdd, hourPerClass, fromDate, t
                     <Button variant="outlined" color="inherit" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="contained" color="primary">
+                    <Button type="submit" variant="contained" color="primary" disabled={values.classTime === '' || values.classTeacher === '' || values.classMethod === ''}>
                         Add
                     </Button>
                 </DialogActions>

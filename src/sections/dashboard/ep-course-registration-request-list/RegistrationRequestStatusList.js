@@ -126,7 +126,7 @@ export default function RegistrationRequestStatusList({ registrationRequests }) 
     dataFetchedRef.current = true;
 
     registrationRequests.map((request) => {
-      return axios.get(`${HOG_API}/api/EP/Get/${request.request.takenByEPId}`)
+      return axios.get(`${HOG_API}/api/Staff/Get/${request.request.takenByEPId}`)
         .then((res) => {
           const newData = {
             id: request.request.id,

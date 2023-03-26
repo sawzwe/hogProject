@@ -114,7 +114,7 @@ export default function EditStaffRequest({ isEdit = false, currentStaff, Id }) {
             } else {
                 await createStaff(data);
             }
-            console.log('DATA', JSON.stringify(data, null, 2));
+            // console.log('DATA', JSON.stringify(data, null, 2));
         } catch (error) {
             console.error(error);
         }

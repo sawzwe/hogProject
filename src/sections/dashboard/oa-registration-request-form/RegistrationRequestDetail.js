@@ -73,6 +73,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
     const dataFetchedRef = useRef(false);
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
+    const [createdByEA, setCreatedByEA] = useState({});
 
     const {
         request,
@@ -133,12 +134,22 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
         }
     }
 
+    const fetchEA = async (EAId) => {
+        axios.get(`${HOG_API}/api/Staff/Get/${EAId}`)
+            .then((res) => setCreatedByEA(res.data.data))
+            .catch((error) => console.error(error))
+    }
+
     useEffect(() => {
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
         fetchPayments();
         fetchSchedules();
+
+        if (currentRequest.request.takenByEAId !== 0) {
+            fetchEA(currentRequest.request.takenByEAId)
+        }
     }, [])
 
     const handleOpenCourseDialog = async (courseIndex) => {
@@ -158,9 +169,9 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
         setOpenCourseDialog(false);
     }
 
-    if (filesURL.length === 0) {
-        return <LoadingScreen />
-    }
+    // if (filesURL.length === 0) {
+    //     return <LoadingScreen />
+    // }
 
     const handleAccept = async () => {
         setIsSubmitting(true);
@@ -241,6 +252,7 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                         courses={information}
                         onView={handleOpenCourseDialog}
                         hasSchedule={!!schedules.length}
+                        createdByEA={createdByEA}
                     />
                 </Grid>
 
@@ -256,11 +268,11 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                             </Typography>
                             <RadioGroup
                                 value={paymentType}
-                                sx={{my: 2, mx: 1}}
+                                sx={{ my: 2, mx: 1 }}
                             >
                                 <Stack direction="row" spacing={1}>
                                     <FormControlLabel value="Complete Payment" disabled control={<Radio />} label="Complete Payment" />
-                                    <FormControlLabel value="Installment Payment" disabled control={<Radio />} label="Installment Payment" />
+                                    <FormControlLabel value="Installments Payment" disabled control={<Radio />} label="Installment Payment" />
                                 </Stack>
                             </RadioGroup>
                             <Stack direction="row">
@@ -319,6 +331,32 @@ export default function RegistrationRequestDetail({ currentRequest, currentPayme
                         </Box>
                     </Card>
                 </Grid>
+
+                {!!request.oaRemark && (
+                    <Grid item xs={12} md={12}>
+                        <Card sx={{ p: 3 }}>
+                            <Typography variant="h5"
+                                sx={{
+                                    mb: 2,
+                                    display: 'block',
+                                }}
+                            >
+                                OA Remark
+                            </Typography>
+                            <Box
+                                rowGap={3}
+                                columnGap={2}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: 'repeat(1, 1fr)',
+                                    sm: 'repeat(1, 1fr)',
+                                }}
+                            >
+                                <TextField fullWidth defaultValue={request.oaRemark} label="Comment by Office Admin" disabled />
+                            </Box>
+                        </Card>
+                    </Grid>
+                )}
 
                 {request.status !== 'Complete' && request.status !== 'Reject' && request.paymentStatus !== 'Incomplete' &&
                     <Grid item xs={12} md={12}>
@@ -392,7 +430,7 @@ export function AcceptDialog({ open, close, onAccept, isSubmitting }) {
         >
             <DialogTitle>
                 <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                     <Typography variant="h5">Accept the request?</Typography>
                 </Stack>
             </DialogTitle>
@@ -433,7 +471,7 @@ export function SendBackDialog({ open, close, onSendBack, isSubmitting }) {
         >
             <DialogTitle>
                 <Stack direction="row" alignItems="center" justifyContent="flex-start">
-                    <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    {/* <CheckCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} /> */}
                     <Typography variant="h5">Reason of sending back to EP</Typography>
                 </Stack>
             </DialogTitle>
@@ -503,9 +541,10 @@ CourseSection.propTypes = {
     courses: PropTypes.array,
     onView: PropTypes.func,
     hasSchedule: PropTypes.bool,
+    createdByEA: PropTypes.object,
 }
 
-export function CourseSection({ courses, onView, hasSchedule }) {
+export function CourseSection({ courses, onView, hasSchedule, createdByEA }) {
 
     // Schedule Dialog for group
     const [open, setOpen] = useState(false);
@@ -519,6 +558,13 @@ export function CourseSection({ courses, onView, hasSchedule }) {
                 <Grid item xs={6} md={6}>
                     <Typography variant="h6">{`New Course(s)`}</Typography>
                 </Grid>
+                {!!createdByEA && (
+                    <Grid item xs={6} md={6}>
+                        <Stack direction="row" justifyContent="end" sx={{ mr: 1 }}>
+                            <Typography variant="subtitle2">{`Scheduled by: ${createdByEA.fName} (${createdByEA.nickname})`}</Typography>
+                        </Stack>
+                    </Grid>
+                )}
             </Grid>
             {courses.map((course, index) => (
                 <ViewCourseCard key={index} courseIndex={index} courseInfo={course} onView={onView} hasSchedule={hasSchedule} />

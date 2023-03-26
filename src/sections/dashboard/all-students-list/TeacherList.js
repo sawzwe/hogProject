@@ -147,8 +147,8 @@ export default function TeacherList({teacherTableData}) {
                   <TableCell align="left" > {row.id} </TableCell>
                   <TableCell align="left">{row.fName} {row.lName}</TableCell>
                   <TableCell align="left">{row.nickname}</TableCell>
-                  <TableCell>
-                    <Iconify icon="ic:chevron-right" />
+                  <TableCell align="right">
+                    <Iconify icon="ic:chevron-right" sx={{mr: 5}} />
                   </TableCell>
 
                 </TableRow>

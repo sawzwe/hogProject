@@ -180,8 +180,8 @@ export default function StudentList({ studentTableData }) {
                       {row.nickname}
                   </TableCell>
 
-                  <TableCell>
-                      <Iconify icon="ic:chevron-right" />
+                  <TableCell align="right">
+                      <Iconify icon="ic:chevron-right" sx={{mr: 5}} />
                   </TableCell>
                 </TableRow>
 

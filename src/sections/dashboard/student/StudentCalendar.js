@@ -1,14 +1,19 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { m } from 'framer-motion';
 // @mui
-import { TextField, InputAdornment } from '@mui/material';
+import { TextField, InputAdornment, Container, Typography } from '@mui/material';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import EventIcon from '@mui/icons-material/Event';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
+import { MotionContainer, varBounce } from '../../../components/animate';
 import CalendarClassCard from '../../../components/app-card/CalendarClassCard';
+import NotFound from '../../../components/NotFound';
+// assets
+import { UploadIllustration } from '../../../assets/illustrations';
 
 // StudentCalendar.propTypes = {
 //     currentStudent: PropTypes.object,
@@ -19,6 +24,7 @@ StudentCalendar.propTypes = {
 
 // export default function StudentCalendar({ currentStudent }) {
 export default function StudentCalendar({ currentStudent }) {
+    const [todayClass, setTodayClass] = useState([]);
 
     const isDesktop = useResponsive('up', 'lg');
     // console.log('current',currentStudent)
@@ -45,6 +51,8 @@ export default function StudentCalendar({ currentStudent }) {
                     value={value}
                     onChange={(newValue) => {
                         setValue(newValue);
+                        const filteredClass = studentPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === newValue.getTime())
+                        setTodayClass(filteredClass)
                     }}
                     minDate={today}
                     renderInput={(params) => <TextField onKeyDown={onKeyDown} {...params} />}
@@ -56,6 +64,8 @@ export default function StudentCalendar({ currentStudent }) {
                     value={value}
                     onChange={(newValue) => {
                         setValue(newValue);
+                        const filteredClass = studentPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === newValue.getTime())
+                        setTodayClass(filteredClass)
                     }}
                     minDate={today}
                     renderInput={(params) => <TextField onKeyDown={onKeyDown} fullWidth {...params} />}
@@ -70,11 +80,31 @@ export default function StudentCalendar({ currentStudent }) {
                     inputFormat="dd MMMM yyyy"
                 />
             )}
-            {studentPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === value.getTime())
+
+            {todayClass.length > 0 ? todayClass.map((eachClass, index) => (
+                <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />
+            )) : (
+                <Container component={MotionContainer} sx={{ textAlign: 'center', mt: 4 }}>
+                    <m.div variants={varBounce().in}>
+                        <Typography variant="h3" paragraph>
+                            No class
+                        </Typography>
+                    </m.div>
+
+                    <m.div variants={varBounce().in}>
+                        <Typography sx={{ color: 'text.secondary' }}>You have no class today!</Typography>
+                    </m.div>
+
+                    <m.div variants={varBounce().in}>
+                        <UploadIllustration sx={{ height: 260, my: { xs: 5, sm: 10 } }} />
+                    </m.div>
+                </Container>
+            )}
+            {/* {studentPrivateClass.filter(eachClass => eachClass.paymentStatus === 'Complete' && new Date(eachClass.date).getTime() === value.getTime())
                 .map((eachClass, index) => (
                     <CalendarClassCard key={index} accountRole='student' eachClass={eachClass} />
                 ))
-            }
+            } */}
 
             {/* {studentPrivateClass.length > 0 && (
                 studentPrivateClass.map((eachClass, index) =>

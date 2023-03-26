@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types'
 // import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useNavigate } from 'react-router';
@@ -56,10 +56,10 @@ const TABLE_HEAD_REQUESTS = [
   { id: 'requestId', label: 'Request ID', align: 'left' },
   { id: 'requestDate', label: 'Request Date', align: 'left' },
   // { id: 'courseType', label: 'Course Type', align: 'left' },
-  { id: 'section ', label: 'Section', align: 'left', width: 200 },
-  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'left', width: 200 },
-  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
+  { id: 'section ', label: 'Section', align: 'left', width: 160 },
+  { id: 'registredCourses', label: 'Registered Courses(s)', align: 'center', width: 200 },
   { id: 'incomplete' },
+  { id: 'requestedBy', label: 'Requested by (EP)', align: 'left' },
   { id: 'moreInfo' },
 ];
 
@@ -103,6 +103,7 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   const { enqueueSnackbar } = useSnackbar();
   const { themeStretch } = useSettingsContext();
   const navigate = useNavigate();
+  const dataFetchedRef = useRef(false);
 
   const {
     dense,
@@ -119,23 +120,45 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
   const [tableData, setTableData] = useState([]);
   // const [tableData, setTableData] = useState(privateRegistrationRequest);
   useEffect(() => {
-    const formattedData = privateRegistrationRequest.map((request) => {
-      return {
-        id: request.request.id,
-        requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
-        courseType: request.request.courseType,
-        section: request.request.section,
-        registeredCourses: request.information.length,
-        requestedBy: request.request.takenByEPId,
-        takenByEAId: request.request.takenByEAId,
-        eaStatus: request.request.eaStatus,
-        status: request.request.status,
-        receipt: request.request.paymentStatus,
-        epRemark1: request.request.epRemark1,
-      }
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
+    privateRegistrationRequest.map((request) => {
+      return axios.get(`${HOG_API}/api/Staff/Get/${request.request.takenByEPId}`)
+      .then((res) => {
+        const newData = {
+          id: request.request.id,
+          requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+          courseType: request.request.courseType,
+          section: request.request.section,
+          registeredCourses: request.information.length,
+          requestedBy: `${res.data.data.fName} (${res.data.data.nickname})`,
+          takenByEPId: request.request.takenByEPId,
+          takenByEAId: request.request.takenByEAId,
+          eaStatus: request.request.eaStatus,
+          status: request.request.status,
+          receipt: request.request.paymentStatus,
+          epRemark1: request.request.epRemark1,
+        }
+        setTableData(tableData => [...tableData, newData])
+      })
+
+      // return {
+      //   id: request.request.id,
+      //   requestDate: fDate(request.request.dateCreated, 'dd-MMM-yyyy'),
+      //   courseType: request.request.courseType,
+      //   section: request.request.section,
+      //   registeredCourses: request.information.length,
+      //   requestedBy: request.request.takenByEPId,
+      //   takenByEAId: request.request.takenByEAId,
+      //   eaStatus: request.request.eaStatus,
+      //   status: request.request.status,
+      //   receipt: request.request.paymentStatus,
+      //   epRemark1: request.request.epRemark1,
+      // }
     })
 
-    setTableData(formattedData);
+    // setTableData(formattedData);
   }, []);
   // useEffect(() => {
   //   setTableData(TABLE_DATA_REQUESTS);
@@ -226,12 +249,12 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
           epRemark2: "",
           eaRemark: "",
           oaRemark: "",
-          takenByEPId: selectedRow.requestedBy,
+          takenByEPId: selectedRow.takenByEPId,
           takenByEAId: educationAdminId,
           takenByOAId: 0
         }
       })
-        .then((res) => console.log(res))
+        // .then((res) => console.log(res))
         .catch((error) => {
           throw error;
         })
@@ -337,8 +360,8 @@ export default function RegistrationRequestStatusList({ privateRegistrationReque
                         <TableCell align="left">{row.requestDate}</TableCell>
                         <TableCell align="left">{row.section}</TableCell>
                         <TableCell align="center">{row.registeredCourses}</TableCell>
-                        <TableCell align="center">{row.requestedBy}</TableCell>
                         <TableCell align="left" />
+                        <TableCell align="left">{row.requestedBy}</TableCell>
                         <TableCell>
                           <Iconify icon="ic:chevron-right" />
                         </TableCell>

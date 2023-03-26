@@ -24,7 +24,6 @@ export default function EditStaff({ currentStaff }) {
     const navigate = useNavigate();
 
     const NewStaffSchema = Yup.object().shape({
-        role: Yup.string().required('Role is required'),
         fName: Yup.string().required('Firstname is required'),
         lName: Yup.string().required('Lastname is required'),
         nickname: Yup.string().required('Nickname is required'),
@@ -35,6 +34,7 @@ export default function EditStaff({ currentStaff }) {
 
     const defaultValues = {
         role: currentStaff?.role || '',
+        firebaseId: currentStaff?.firebaseId || '',
         fName: currentStaff?.fName || '',
         lName: currentStaff?.lName || '',
         nickname: currentStaff?.nickname || '',
@@ -59,6 +59,8 @@ export default function EditStaff({ currentStaff }) {
 
     const onSubmit = async (data) => {
         try {
+            data.id = currentStaff.id;
+
             await setSavedData(data);
             await setOpenSaveChangesDialog(true);
         } catch (error) {
