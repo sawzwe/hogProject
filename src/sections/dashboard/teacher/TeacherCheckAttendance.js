@@ -24,6 +24,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
     const { classId } = useParams();
     const { user } = useAuthContext();
     const teacherId = user.id;
+    // console.log(teacherId);
 
     const {
         students,
@@ -71,7 +72,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                 .all(
                     newAttendanceData.map(({ data }) => {
                         // console.log(data);
-                        return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
+                        return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, data)
                         .then(res => console.log(res))
                     })
                 )
@@ -82,10 +83,11 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
                     // Update the attendance status using Axios PUT request
                     const attendanceStatusData = {
                         id: parseInt(classId,10),
-                        teacherId,
+                        teacherId: user.id,
                         workType: 'Normal',
                         status: 'Complete',
                     };
+                    console.log(attendanceStatusData)
 
                     axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Teacher/Class/Status/Put`, attendanceStatusData)
                         .then(() => {
