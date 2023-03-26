@@ -1,29 +1,42 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 // @mui
 import { Container } from '@mui/material';
 import { PATH_ACCOUNT } from '../../routes/paths';
 // components
+import LoadingScreen from '../../components/loading-screen/LoadingScreen';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../components/settings';
 // sections
 import EditStaff from '../../sections/dashboard/oa-edit-account/EditStaff';
+import { HOG_API } from '../../config';
 
 // ----------------------------------------------------------------------
 
 export default function NewAccountPage() {
     const { themeStretch } = useSettingsContext();
-    const { id } = useParams();
+    const { role, id } = useParams();
+    const [currentStaff, setCurrentStaff] = useState();
+    const [currentRole, setCurrentRole] = useState("");
+    const dataFetchedRef = useRef(false);
 
-    const DUMMY_STAFF = {
-        id: '1',
-        fName: 'Zain',
-        lName: 'Janpatiew',
-        nickname: 'Zain',
-        phone: '081645201',
-        line: 'Zn212',
-        email: 'zain@hotmail.com',
-        role: 'Education Admin'
+    const fetchData = async () => {
+        await axios.get(`${HOG_API}/api/Staff/Get/${id}`)
+            .then((res) => setCurrentStaff(res.data.data))
+            .catch((error) => console.error(error))
+    }
+
+    useEffect(() => {
+        if (dataFetchedRef.current) return;
+        dataFetchedRef.current = true;
+
+        fetchData();
+    }, [])
+
+    if (currentStaff === undefined) {
+        return <LoadingScreen />
     }
 
     return (
@@ -37,12 +50,12 @@ export default function NewAccountPage() {
                     heading="Edit Staff Account"
                     links={[
                         { name: 'All Staff', href: PATH_ACCOUNT.staffManagement.searchStaff },
-                        { name: `${DUMMY_STAFF.fName} ${DUMMY_STAFF.lName}`, href: `/account/staff-management/staff/${DUMMY_STAFF.id}` },
+                        { name: `${currentStaff.fullName}`, href: `/account/staff-management/staff/${currentStaff.id}` },
                         { name: 'Edit Account' }
                     ]}
                 />
 
-                <EditStaff currentStaff={DUMMY_STAFF} />
+                <EditStaff currentStaff={currentStaff} />
             </Container>
         </>
     );

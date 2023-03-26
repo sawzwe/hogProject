@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import _ from 'lodash';
 // @mui
 import axios from 'axios';
+import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
 import { Divider, Typography, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Box, Card, CardContent } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -56,7 +58,7 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
     //         enqueueSnackbar('Please check all attendance!', { variant: 'error' });
     //     }
     // };
-    const handleSubmitAttendance = () => {
+    const handleSubmitAttendance = async () => {
         if (isValidateAttendance()) {
             const newAttendanceData = attendances.map(({ student, value }) => ({
                 data: {
@@ -67,41 +69,41 @@ export default function TeacherCheckAttendance({ currentClass, isEdit }) {
             }));
 
             // Update the attendance data using Axios PUT request
-            axios
+            await axios
                 .all(
                     newAttendanceData.map(({ data }) => {
                         // console.log(data);
                         return axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Student/Attendance/Put`, data)
-                        .then(res => console.log(res))
+                            // .then(res => console.log(res))
                     })
                 )
 
-                .then(() => {
-                    console.log('Attendance data updated successfully');
+                .then(async () => {
+                    // console.log('Attendance data updated successfully');
 
                     // Update the attendance status using Axios PUT request
                     const attendanceStatusData = {
-                        id: parseInt(classId,10),
+                        id: parseInt(classId, 10),
                         teacherId,
                         workType: 'Normal',
                         status: 'Complete',
                     };
 
-                    axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Teacher/Class/Status/Put`, attendanceStatusData)
-                        .then(() => {
-                            console.log('Attendance status updated successfully');
-                        })
+                    await axios.put(`${process.env.REACT_APP_HOG_API}/api/Teacher/Class/Status/Put`, attendanceStatusData)
+                        // .then(() => {
+                        //     console.log('Attendance status updated successfully');
+                        // })
                         .catch((error) => {
                             console.error('Error updating attendance status', error);
                         });
+
+                    navigate(-1, { replace: true });
+                    enqueueSnackbar('Successfully submitted', { variant: 'success' });
                 })
                 .catch((error) => {
                     console.error('Error updating attendance data', error);
                 });
-
-            navigate(-1, { replace: true });
             // navigate(`/dashboard/teacher-course/${course.type === 'Group' ? 'group' : 'private'}-course/${course.id}`, { replace: true });
-            enqueueSnackbar('Successfully submitted', { variant: 'success' });
         } else {
             enqueueSnackbar('Please check all attendance!', { variant: 'error' });
         }
@@ -165,7 +167,7 @@ export function SelectedClassCard({ eachClass }) {
             <Box display="inline-block" sx={{ width: '100%' }}>
                 <Card
                     variant='outlined'
-                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, cursor: "pointer", textDecoration: 'none' }}>
+                    sx={{ display: 'flex', justifyContent: 'space-between', borderRadius: 1, boxShadow: 1, textDecoration: 'none' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ pr: 0 }}>
                             <Typography variant="body1" component="div">
@@ -228,6 +230,7 @@ export function AttendanceButtons({ student, studentAttendance, readOnly, onChec
         }
     };
 
+    const formattedStudentName = student.fullName.split(' ')
 
     return (
         <>
@@ -237,8 +240,8 @@ export function AttendanceButtons({ student, studentAttendance, readOnly, onChec
                 alignItems="center">
                 <Stack
                     direction="column">
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{student.nickname}</Typography>
-                    <Typography variant="body2">{student.fullName}.</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{_.capitalize(student.nickname)}</Typography>
+                    <Typography variant="body2">{`${_.capitalize(formattedStudentName[0])} ${formattedStudentName[1].charAt(0).toUpperCase()}.`}</Typography>
                 </Stack>
                 <Stack
                     direction="row"
@@ -293,7 +296,7 @@ export function ConfirmDialog({ open, onClose, onSubmit, isEdit }) {
     return (
         <Dialog open={open} fullWidth maxWidth="xs">
             <DialogTitle sx={{ mx: 'auto', pb: 0 }}>
-                <CloudUploadIcon sx={{ fontSize: '100px' }} />
+                <AssignmentTurnedInRoundedIcon sx={{ fontSize: '100px' }} />
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body1" align="center" sx={{ fontWeight: 'bold', fontSize: 'h5.fontSize', mb: 1 }}>

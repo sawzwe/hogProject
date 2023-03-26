@@ -316,7 +316,17 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                     display: 'block',
                                     textAlign: 'center',
                                     color: 'text.primary',
-                                }}> Student Image </Typography>
+                                }}
+                            >
+                                Student Image
+                                <Typography
+                                    component="span"
+                                    sx={{ color: '#db3131' }}
+                                >
+                                    *
+                                </Typography>
+                            </Typography>
+
                             <RHFUploadAvatar
                                 name="studentImageURL"
                                 maxSize={3145728}
@@ -420,7 +430,7 @@ export default function StudentNewEditForm({ isEdit = false, currentStudent, cur
                                 <RHFTextField name="studentLineId" label="Line ID" required />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <RHFTextField name="studentEmail" label="Email Address" required disabled={isEdit} />
+                                <RHFTextField name="studentEmail" label="Email Address" required />
                             </Grid>
                         </Grid>
                     </Card>

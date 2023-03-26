@@ -5,18 +5,20 @@ import { Grid, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import EAForm from './EAForm';
 import EPForm from './EPForm';
 import TeacherForm from './TeacherForm';
+import OAForm from './OAForm';
 
 // ----------------------------------------------------------------------
 
 const STAFF_ROLES_OPTIONS = [
+    { role: 'Teacher' },
     { role: 'Education Admin' },
     { role: 'Education Planner' },
-    { role: 'Teacher' },
+    { role: 'Office Admin' },
 ];
 
 export default function NewAccountForm() {
 
-    const [role, setRole] = useState('Education Admin');
+    const [role, setRole] = useState('Teacher');
 
     const handleChangeRole = (event) => {
         setRole(event.target.value);
@@ -71,6 +73,12 @@ export default function NewAccountForm() {
             {role === "Teacher" && (
                 <Grid item xs={12} md={12}>
                     <TeacherForm />
+                </Grid>
+            )}
+
+            {role === "Office Admin" && (
+                <Grid item xs={12} md={12}>
+                    <OAForm />
                 </Grid>
             )}
 

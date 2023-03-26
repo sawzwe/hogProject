@@ -9,8 +9,8 @@ import { Box, Card, Grid, Stack, Typography, Button, MenuItem } from '@mui/mater
 // components
 import FormProvider, { RHFTextField, RHFCheckbox, RHFSelect } from '../../../components/hook-form';
 //
-import ResetPasswordDialog from './ResetPasswordDialog';
 import DeleteAccountDialog from './DeleteAccountDialog';
+import ResetPasswordDialog from '../../../components/ResetPasswordDialog';
 
 // ----------------------------------------------------------------------
 ViewTeacher.propTypes = {
@@ -18,7 +18,7 @@ ViewTeacher.propTypes = {
 }
 
 export default function ViewTeacher({ currentTeacher }) {
-    console.log("teacher",currentTeacher.workTimes)
+    // console.log("teacher", currentTeacher)
     const navigate = useNavigate();
 
     const [openResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
@@ -155,7 +155,7 @@ export default function ViewTeacher({ currentTeacher }) {
             <ResetPasswordDialog
                 open={openResetPasswordDialog}
                 onClose={() => setOpenResetPasswordDialog(false)}
-                defaultPassword="hog + teacher's phone number"
+                email={currentTeacher.email}
             />
 
             <DeleteAccountDialog

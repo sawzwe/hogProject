@@ -211,7 +211,7 @@ export function TimeSlotDialog({ open, onClose, course, currentClass, selectedTi
 
     const handleCloseConfirmDialog = () => {
         navigate('/student-calendar')
-        console.log("Navigate to another page!");
+        // console.log("Navigate to another page!");
     };
 
     return (

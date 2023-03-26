@@ -308,6 +308,8 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
                 }
             })
 
+            // console.log('data', studentIds, request, information)
+
             await axios.post(`${HOG_API}/api/PrivateRegistrationRequest/Post`, {
                 studentIds,
                 request,
@@ -321,13 +323,13 @@ export function NewPrivateRequestForm({ studentList, educationPlannerId }) {
             navigate('/course-registration/ep-request-status')
 
         } catch (error) {
-            console.log(error)
+            console.error(error)
             enqueueSnackbar(error.message, { variant: 'error' })
         }
     }
 
     const onError = (error) => {
-        console.log(error)
+        console.error(error)
         const errors = Object.values(error)
         enqueueSnackbar(errors[0].message, { variant: 'error' })
     }
@@ -560,13 +562,13 @@ export function NewSemiPrivateRequestForm({ studentList, educationPlannerId }) {
             navigate('/course-registration/ep-request-status')
 
         } catch (error) {
-            console.log(error)
+            console.error(error)
             enqueueSnackbar(error.message, { variant: 'error' })
         }
     }
 
     const onError = (error) => {
-        console.log(error)
+        console.error(error)
         const errors = Object.values(error)
         enqueueSnackbar(errors[0].message, { variant: 'error' })
     }
@@ -617,7 +619,7 @@ export function NewSemiPrivateRequestForm({ studentList, educationPlannerId }) {
                                     sm: 'repeat(1, 1fr)',
                                 }}
                             >
-                                <RHFTextField name="additionalComment" label="Add comment here" />
+                                <RHFTextField name="additionalComment" label="Comment to Education Admin" />
                             </Box>
                         </Card>
                     </Grid>

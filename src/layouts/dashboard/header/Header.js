@@ -46,12 +46,12 @@ export default function Header({ onOpenNav }) {
         </IconButton>
       )}
 
-      {(user.role === 'Student' || user.role === 'Teacher') && (!isDesktop) && (
+      {/* {(user.role === 'Student' || user.role === 'Teacher') && (!isDesktop) && (
         <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-end" spacing={{ xs: 0.5, sm: 1.5 }}>
           <NotificationsPopover />
           <AccountPopover />
         </Stack>
-      )}
+      )} */}
     </>
   );
 

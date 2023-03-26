@@ -30,7 +30,7 @@ export default function TeacherCalendarPage() {
     const fetchClass = async () => {
         return axios.get(`${process.env.REACT_APP_HOG_API}/api/Teacher/Course/Get/${user.id}`, config)
             .then((res) => {
-                console.log('res', res);
+                // console.log('res', res);
                 const data = res.data.data
                 setTeacherCourse(data)
                 // console.log('data', data)
